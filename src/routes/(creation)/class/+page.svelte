@@ -9,7 +9,7 @@
 					<img src={classInfo.image} alt={`${classInfo.name} icon`} />
 					<span>{classInfo.name}</span>
 				</div>
-				<img class="card-arrow" src="/basic_icons/blue_next.png" alt="next arrow" />
+				<img class="card-arrow" src="{base}/basic_icons/blue_next.png" alt="next arrow" />
 			</button>
 		{/each}
 	</div>
@@ -48,6 +48,8 @@
 </div>
 
 <script lang="ts">
+	import { base } from '$app/paths';
+
 	let selectedClass: ClassInfo | null = null;
 
 	type Feature = {
@@ -69,18 +71,18 @@
 	};
 
 	const classes: ClassInfo[] = [
-		{ name: 'Barbarian', image: '/class_icons/barbarian.jpg', description: "Frenzied warriors fueled by primal rage.", primaryAbility: "Strength", features: [example_feature] },
-		{ name: 'Bard', image: '/class_icons/bard.jpg', description: "Musical magic users who inspire allies.", primaryAbility: "Charisma", features: [example_feature] },
-		{ name: 'Cleric', image: '/class_icons/cleric.jpg', description: "Holy warriors wielding divine magic.", primaryAbility: "Wisdom", features: [example_feature] },
-		{ name: 'Druid', image: '/class_icons/druid.jpg', description: "Nature-focused shapeshifters and spellcasters.", primaryAbility: "Wisdom", features: [example_feature] },
-		{ name: 'Fighter', image: '/class_icons/fighter.jpg', description: "Versatile combatants skilled with weapons.", primaryAbility: "Strength or Dexterity", features: [example_feature] },
-		{ name: 'Monk', image: '/class_icons/monk.jpg', description: "Martial artists channeling inner energy.", primaryAbility: "Dexterity", features: [example_feature] },
-		{ name: 'Paladin', image: '/class_icons/paladin.jpg', description: "Holy knights bound by sacred oaths.", primaryAbility: "Strength and Charisma", features: [example_feature] },
-		{ name: 'Ranger', image: '/class_icons/ranger.jpg', description: "Wilderness scouts and magical hunters.", primaryAbility: "Dexterity and Wisdom", features: [example_feature] },
-		{ name: 'Rogue', image: '/class_icons/rogue.jpg', description: "Sneaky tricksters and agile assassins.", primaryAbility: "Dexterity", features: [example_feature] },
-		{ name: 'Sorcerer', image: '/class_icons/sorcerer.jpg', description: "Innate spellcasters powered by bloodlines.", primaryAbility: "Charisma", features: [example_feature] },
-		{ name: 'Warlock', image: '/class_icons/warlock.jpg', description: "Deal-makers granted magic by patrons.", primaryAbility: "Charisma", features: [example_feature] },
-		{ name: 'Wizard', image: '/class_icons/wizard.jpg', description: "Scholarly spellcasters mastering arcane secrets.", primaryAbility: "Intelligence", features: [example_feature] }
+		{ name: 'Barbarian', image: base + '/class_icons/barbarian.jpg', description: "Frenzied warriors fueled by primal rage.", primaryAbility: "Strength", features: [example_feature] },
+		{ name: 'Bard', image: base + '/class_icons/bard.jpg', description: "Musical magic users who inspire allies.", primaryAbility: "Charisma", features: [example_feature] },
+		{ name: 'Cleric', image: base + '/class_icons/cleric.jpg', description: "Holy warriors wielding divine magic.", primaryAbility: "Wisdom", features: [example_feature] },
+		{ name: 'Druid', image: base + '/class_icons/druid.jpg', description: "Nature-focused shapeshifters and spellcasters.", primaryAbility: "Wisdom", features: [example_feature] },
+		{ name: 'Fighter', image: base + '/class_icons/fighter.jpg', description: "Versatile combatants skilled with weapons.", primaryAbility: "Strength or Dexterity", features: [example_feature] },
+		{ name: 'Monk', image: base + '/class_icons/monk.jpg', description: "Martial artists channeling inner energy.", primaryAbility: "Dexterity", features: [example_feature] },
+		{ name: 'Paladin', image: base + '/class_icons/paladin.jpg', description: "Holy knights bound by sacred oaths.", primaryAbility: "Strength and Charisma", features: [example_feature] },
+		{ name: 'Ranger', image: base + '/class_icons/ranger.jpg', description: "Wilderness scouts and magical hunters.", primaryAbility: "Dexterity and Wisdom", features: [example_feature] },
+		{ name: 'Rogue', image: base + '/class_icons/rogue.jpg', description: "Sneaky tricksters and agile assassins.", primaryAbility: "Dexterity", features: [example_feature] },
+		{ name: 'Sorcerer', image: base + '/class_icons/sorcerer.jpg', description: "Innate spellcasters powered by bloodlines.", primaryAbility: "Charisma", features: [example_feature] },
+		{ name: 'Warlock', image: base + '/class_icons/warlock.jpg', description: "Deal-makers granted magic by patrons.", primaryAbility: "Charisma", features: [example_feature] },
+		{ name: 'Wizard', image: base + '/class_icons/wizard.jpg', description: "Scholarly spellcasters mastering arcane secrets.", primaryAbility: "Intelligence", features: [example_feature] }
 	];
 </script>
 

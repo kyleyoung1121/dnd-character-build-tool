@@ -13,6 +13,9 @@ const config = {
 		}),
 		paths: {
 			base: dev ? '' : '/dnd-character-build-tool'
+		},
+		prerender: {
+			entries: ['*']
 		}
 	}
 };

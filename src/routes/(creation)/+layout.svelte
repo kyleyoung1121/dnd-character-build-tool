@@ -1,12 +1,14 @@
 <script>
+	import { base } from '$app/paths';
+
 	export let navItems = [
-		{ name: "Class", href: "/class" },
-		{ name: "Race", href: "/race" },
-		{ name: "Abilities", href: "/abilities" },
-		{ name: "Background", href: "/background" },
-		{ name: "Equipment", href: "/equipment" },
-		{ name: "Spells", href: "/spells" },
-		{ name: "Export", href: "/export" }
+		{ name: "Class", href: base + "/class" },
+		{ name: "Race", href: base + "/race" },
+		{ name: "Abilities", href: base + "/abilities" },
+		{ name: "Background", href: base + "/background" },
+		{ name: "Equipment", href: base + "/equipment" },
+		{ name: "Spells", href: base + "/spells" },
+		{ name: "Export", href: base + "/export" }
 	];
 </script>
 

@@ -1,8 +1,9 @@
 <script>
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 
 	function start() {
-		goto('/class');
+		goto(base + '/class');
 	}
 </script>
 

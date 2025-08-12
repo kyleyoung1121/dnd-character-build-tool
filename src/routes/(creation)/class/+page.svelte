@@ -1,11 +1,39 @@
 <script lang="ts">
 	import { base } from '$app/paths';
+
 	import { barbarian } from '$lib/data/classes/barbarian';
+    import { bard } from '$lib/data/classes/bard';
+    import { cleric } from '$lib/data/classes/cleric';
+    import { druid } from '$lib/data/classes/druid';
+    import { fighter } from '$lib/data/classes/fighter';
+    import { monk } from '$lib/data/classes/monk';
+    import { paladin } from '$lib/data/classes/paladin';
+    import { ranger } from '$lib/data/classes/ranger';
+    import { rogue } from '$lib/data/classes/rogue';
+    import { sorcerer } from '$lib/data/classes/sorcerer';
+    import { warlock } from '$lib/data/classes/warlock';
+    import { wizard } from '$lib/data/classes/wizard';
+
+
+
 
 	import type { ClassData } from '$lib/data/types/ClassData';
 	import type { FeaturePrompt } from '$lib/data/types/ClassFeatures';
 
-	const classes: ClassData[] = [barbarian];
+	const classes: ClassData[] = [
+        barbarian,
+        bard,
+        cleric,
+        druid,
+        fighter,
+        monk,
+        paladin,
+        ranger,
+        rogue,
+        sorcerer,
+        warlock,
+        wizard,
+    ];
 
 	let selectedClass: ClassData | null = null;
 	let selectedClassData: ClassData | null = null;
@@ -138,53 +166,77 @@
 		</div>
 	{/if}
 
-	{#if selectedClassData}
-		<!-- Selected class view -->
-		<div class="selected-class-section">
-			<h2>
-				{selectedClassData.name}
-				<button on:click={removeSelectedClass} aria-label="Remove selected class">✕</button>
-			</h2>
+	
+    {#if selectedClassData}
+        <!-- Selected class view -->
+        <div class="selected-class-section">
+            <h2>
+                {selectedClassData.name}
+                <button on:click={removeSelectedClass} aria-label="Remove selected class">✕</button>
+            </h2>
 
-			<!-- Render top-level features -->
-			{#each mergedFeatures as feature (feature.name)}
-				<div class="feature-card">
-					<h4>{feature.name}</h4>
-					<p>{@html feature.description}</p>
+            <!-- Render top-level features -->
+            {#each mergedFeatures as feature (feature.name)}
+                <div class="feature-card">
+                    <h4>{feature.name}</h4>
+                    <p>{@html feature.description}</p>
 
-					{#if feature.featureOptions}
-						{#each Array(feature.featureOptions.numPicks) as _, idx}
-							<select
-								value={featureSelections[feature.name]?.[idx] || ''}
-								on:change={(e: Event) => {
-									const target = e.target as HTMLSelectElement;
-									onSelectFeatureOption(feature, idx, target.value);
-								}}
-							>
-								<option value="" disabled selected>
-									{feature.featureOptions.placeholderText || 'Select an option'}
-								</option>
-								{#each getAvailableOptions(feature, idx) as option}
-									<option value={typeof option === 'string' ? option : option.name}>
-										{typeof option === 'string' ? option : option.name}
-									</option>
-								{/each}
-							</select>
-						{/each}
+                    {#if feature.featureOptions}
+                        {#each Array(feature.featureOptions.numPicks) as _, idx}
+                            <select
+                                value={featureSelections[feature.name]?.[idx] || ''}
+                                on:change={(e: Event) => {
+                                    const target = e.target as HTMLSelectElement;
+                                    onSelectFeatureOption(feature, idx, target.value);
+                                }}
+                            >
+                                <option value="" disabled selected>
+                                    {feature.featureOptions.placeholderText || 'Select an option'}
+                                </option>
+                                {#each getAvailableOptions(feature, idx) as option}
+                                    <option value={typeof option === 'string' ? option : option.name}>
+                                        {typeof option === 'string' ? option : option.name}
+                                    </option>
+                                {/each}
+                            </select>
+                        {/each}
 
-						<!-- Render one-level nested prompts -->
-						{#each getNestedPrompts(feature, featureSelections[feature.name] || []) as nestedFeature (nestedFeature.name)}
-							<div class="feature-card nested">
-								<h4>{nestedFeature.name}</h4>
-								<p>{nestedFeature.description}</p>
-								<!-- No further nesting here -->
-							</div>
-						{/each}
-					{/if}
-				</div>
-			{/each}
-		</div>
-	{/if}
+                        <!-- Render one-level nested prompts -->
+                        {#each getNestedPrompts(feature, featureSelections[feature.name] || []) as nestedFeature (nestedFeature.name)}
+                            <div class="feature-card nested">
+                                <h4>{nestedFeature.name}</h4>
+                                <p>{@html nestedFeature.description}</p>
+
+                                {#if nestedFeature.featureOptions}
+                                    {#each Array(nestedFeature.featureOptions.numPicks) as _, nestedIdx}
+                                        <select
+                                            value={featureSelections[nestedFeature.name]?.[nestedIdx] || ''}
+                                            on:change={(e: Event) => {
+                                                const target = e.target as HTMLSelectElement;
+                                                onSelectFeatureOption(nestedFeature, nestedIdx, target.value);
+                                            }}
+                                        >
+                                            <option value="" disabled selected>
+                                                {nestedFeature.featureOptions.placeholderText || 'Select an option'}
+                                            </option>
+                                            {#each nestedFeature.featureOptions.options as option}
+                                                <option value={typeof option === 'string' ? option : option.name}>
+                                                    {typeof option === 'string' ? option : option.name}
+                                                </option>
+                                            {/each}
+                                        </select>
+                                    {/each}
+                                {/if}
+                            </div>
+                        {/each}
+                    {/if}
+                </div>
+            {/each}
+        </div>
+    {/if}
+
+
+
 </div>
 
 <style>

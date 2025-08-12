@@ -1,27 +1,120 @@
+<script lang="ts">
+	import { base } from '$app/paths';
+	import { barbarian } from '$lib/data/classes/barbarian';
+
+	import type { ClassData } from '$lib/data/types/ClassData';
+	import type { FeaturePrompt } from '$lib/data/types/ClassFeatures';
+
+	const classes: ClassData[] = [barbarian];
+
+	let selectedClass: ClassData | null = null;
+	let selectedClassData: ClassData | null = null;
+
+	let featureSelections: Record<string, (string | null)[]> = {};
+
+	// Top-level features
+	$: mergedFeatures = selectedClassData
+		? [...(selectedClassData.classFeatures || [])]
+		: [];
+
+	function onSelectFeatureOption(feature: FeaturePrompt, index: number, selectedOption: string) {
+		if (!featureSelections[feature.name]) {
+			featureSelections[feature.name] = Array(feature.featureOptions?.numPicks || 1).fill(null);
+		}
+		const prev = featureSelections[feature.name][index];
+		featureSelections[feature.name][index] = selectedOption;
+
+		if (prev !== selectedOption) {
+			clearNestedFeatureSelections(feature, featureSelections);
+		}
+	}
+
+	function clearNestedFeatureSelections(feature: FeaturePrompt, selections: Record<string, (string | null)[]>) {
+		if (!feature.featureOptions) return;
+		for (const option of feature.featureOptions.options) {
+			if (typeof option !== 'string' && option.nestedPrompts) {
+				for (const nested of option.nestedPrompts) {
+					delete selections[nested.name];
+				}
+			}
+		}
+	}
+
+	function getAvailableOptions(feature: FeaturePrompt, index: number): (string | { name: string })[] {
+		const allOptions = feature.featureOptions?.options || [];
+		const chosen = featureSelections[feature.name] || [];
+
+		return allOptions.filter(opt => {
+			const optName = typeof opt === 'string' ? opt : opt.name;
+			return !chosen.some((choice, idx) => choice === optName && idx !== index);
+		});
+	}
+
+	// Get nested prompts only one level deep, from current selections of a feature
+	function getNestedPrompts(feature: FeaturePrompt, selectedOptions: (string | null)[]) {
+		if (!feature.featureOptions) return [];
+		const nested: FeaturePrompt[] = [];
+		for (const option of feature.featureOptions.options) {
+			const optionName = typeof option === 'string' ? option : option.name;
+			if (
+				selectedOptions.includes(optionName) &&
+				typeof option !== 'string' &&
+				option.nestedPrompts
+			) {
+				nested.push(...option.nestedPrompts);
+			}
+		}
+		return nested;
+	}
+
+	function removeSelectedClass() {
+		selectedClassData = null;
+		selectedClass = null;
+		featureSelections = {};
+	}
+
+	function confirmAddClass() {
+		if (selectedClass) {
+			selectedClassData = selectedClass;
+			selectedClass = null;
+			featureSelections = {};
+		}
+	}
+</script>
+
 <div class="main-content">
 	<h2>Class Selection</h2>
-	<p>In Dungeons & Dragons, your character's class defines their role in the party, abilities, and how they interact with the world. Each class offers unique strengths, weaknesses, and ways to play.</p>
+	<p>
+		In Dungeons & Dragons, your character's class defines their role in the party,
+		abilities, and how they interact with the world. Each class offers unique strengths,
+		weaknesses, and ways to play.
+	</p>
 
-	<div class="class-cards">
-		{#each classes as classInfo}
-			<button class="class-card" on:click={() => selectedClass = classInfo}>
-				<div class="card-left">
-					<img src={classInfo.image} alt={`${classInfo.name} icon`} />
-					<span>{classInfo.name}</span>
-				</div>
-				<img class="card-arrow" src="{base}/basic_icons/blue_next.png" alt="next arrow" />
-			</button>
-		{/each}
-	</div>
-
-
+	{#if !selectedClassData}
+		<div class="class-cards">
+			{#each classes as classInfo}
+				<button class="class-card" on:click={() => (selectedClass = classInfo)}>
+					<div class="card-left">
+						<img src={classInfo.image} alt={`${classInfo.name} icon`} />
+						<span>{classInfo.name}</span>
+					</div>
+					<img
+						class="card-arrow"
+						src="{base}/basic_icons/blue_next.png"
+						alt="next arrow"
+					/>
+				</button>
+			{/each}
+		</div>
+	{/if}
 
 	{#if selectedClass}
+		<!-- Popup Preview -->
 		<div class="popup">
 			<div class="popup-content">
 				<div class="popup-header">
 					<span>CONFIRM ADD CLASS</span>
-					<button class="close-button" on:click={() => selectedClass = null}>×</button>
+					<button class="close-button" on:click={() => (selectedClass = null)}>×</button>
 				</div>
 
 				<div class="popup-body">
@@ -29,69 +122,76 @@
 					<p class="description">{selectedClass.description}</p>
 					<p><strong>Primary Ability:</strong> {selectedClass.primaryAbility}</p>
 
-					{#each selectedClass.features as feature}
+					{#each selectedClass.classFeatures as feature}
 						<div class="feature-card">
-							<h4>{feature.title}</h4>
-							<p>{feature.description}</p>
+							<h4>{feature.name}</h4>
+							<p>{@html feature.description}</p>
 						</div>
 					{/each}
 				</div>
 
 				<div class="popup-footer">
-					<button class="cancel-button" on:click={() => selectedClass = null}>Cancel</button>
-					<button class="add-button">Add Class</button>
+					<button class="cancel-button" on:click={() => (selectedClass = null)}>Cancel</button>
+					<button class="add-button" on:click={confirmAddClass}>Add Class</button>
 				</div>
 			</div>
 		</div>
 	{/if}
 
+	{#if selectedClassData}
+		<!-- Selected class view -->
+		<div class="selected-class-section">
+			<h2>
+				{selectedClassData.name}
+				<button on:click={removeSelectedClass} aria-label="Remove selected class">✕</button>
+			</h2>
+
+			<!-- Render top-level features -->
+			{#each mergedFeatures as feature (feature.name)}
+				<div class="feature-card">
+					<h4>{feature.name}</h4>
+					<p>{@html feature.description}</p>
+
+					{#if feature.featureOptions}
+						{#each Array(feature.featureOptions.numPicks) as _, idx}
+							<select
+								value={featureSelections[feature.name]?.[idx] || ''}
+								on:change={(e: Event) => {
+									const target = e.target as HTMLSelectElement;
+									onSelectFeatureOption(feature, idx, target.value);
+								}}
+							>
+								<option value="" disabled selected>
+									{feature.featureOptions.placeholderText || 'Select an option'}
+								</option>
+								{#each getAvailableOptions(feature, idx) as option}
+									<option value={typeof option === 'string' ? option : option.name}>
+										{typeof option === 'string' ? option : option.name}
+									</option>
+								{/each}
+							</select>
+						{/each}
+
+						<!-- Render one-level nested prompts -->
+						{#each getNestedPrompts(feature, featureSelections[feature.name] || []) as nestedFeature (nestedFeature.name)}
+							<div class="feature-card nested">
+								<h4>{nestedFeature.name}</h4>
+								<p>{nestedFeature.description}</p>
+								<!-- No further nesting here -->
+							</div>
+						{/each}
+					{/if}
+				</div>
+			{/each}
+		</div>
+	{/if}
 </div>
 
-<script lang="ts">
-	import { base } from '$app/paths';
-
-	let selectedClass: ClassInfo | null = null;
-
-	type Feature = {
-		title: string;
-		description: string;
-	};
-
-	type ClassInfo = {
-		name: string;
-		image: string;
-		description: string;
-		primaryAbility: string;
-		features: Feature[];
-	};
-
-	const example_feature: Feature = {
-		title: "Example Feature",
-		description: "This is a placeholder description for a non-existent feature. Very cool!",
-	};
-
-	const classes: ClassInfo[] = [
-		{ name: 'Barbarian', image: base + '/class_icons/barbarian.jpg', description: "Frenzied warriors fueled by primal rage.", primaryAbility: "Strength", features: [example_feature] },
-		{ name: 'Bard', image: base + '/class_icons/bard.jpg', description: "Musical magic users who inspire allies.", primaryAbility: "Charisma", features: [example_feature] },
-		{ name: 'Cleric', image: base + '/class_icons/cleric.jpg', description: "Holy warriors wielding divine magic.", primaryAbility: "Wisdom", features: [example_feature] },
-		{ name: 'Druid', image: base + '/class_icons/druid.jpg', description: "Nature-focused shapeshifters and spellcasters.", primaryAbility: "Wisdom", features: [example_feature] },
-		{ name: 'Fighter', image: base + '/class_icons/fighter.jpg', description: "Versatile combatants skilled with weapons.", primaryAbility: "Strength or Dexterity", features: [example_feature] },
-		{ name: 'Monk', image: base + '/class_icons/monk.jpg', description: "Martial artists channeling inner energy.", primaryAbility: "Dexterity", features: [example_feature] },
-		{ name: 'Paladin', image: base + '/class_icons/paladin.jpg', description: "Holy knights bound by sacred oaths.", primaryAbility: "Strength and Charisma", features: [example_feature] },
-		{ name: 'Ranger', image: base + '/class_icons/ranger.jpg', description: "Wilderness scouts and magical hunters.", primaryAbility: "Dexterity and Wisdom", features: [example_feature] },
-		{ name: 'Rogue', image: base + '/class_icons/rogue.jpg', description: "Sneaky tricksters and agile assassins.", primaryAbility: "Dexterity", features: [example_feature] },
-		{ name: 'Sorcerer', image: base + '/class_icons/sorcerer.jpg', description: "Innate spellcasters powered by bloodlines.", primaryAbility: "Charisma", features: [example_feature] },
-		{ name: 'Warlock', image: base + '/class_icons/warlock.jpg', description: "Deal-makers granted magic by patrons.", primaryAbility: "Charisma", features: [example_feature] },
-		{ name: 'Wizard', image: base + '/class_icons/wizard.jpg', description: "Scholarly spellcasters mastering arcane secrets.", primaryAbility: "Intelligence", features: [example_feature] }
-	];
-</script>
-
-
 <style>
+	/* Your styles here, same as before */
 	.main-content {
 		padding: 1.5rem;
 	}
-
 	.class-cards {
 		display: flex;
 		flex-wrap: wrap;
@@ -99,12 +199,11 @@
 		gap: 1rem;
 		margin-top: 2rem;
 	}
-
 	.class-card {
 		width: 30%;
 		display: flex;
 		align-items: center;
-		justify-content: space-between; /* space between left and right sides */
+		justify-content: space-between;
 		gap: 1rem;
 		padding: 1rem 2rem;
 		font-size: 1.2rem;
@@ -113,41 +212,32 @@
 		border-radius: 0.5rem;
 		background-color: #f8f8f8;
 		transition: background-color 0.2s ease;
-		text-align: left; /* allow text to align to left */
+		text-align: left;
 	}
-
 	.card-left {
 		display: flex;
 		align-items: center;
 		gap: 1rem;
 	}
-
 	.class-card img {
 		width: 40px;
 		height: 40px;
 		object-fit: contain;
 	}
-
-	/* Optional: specific styling for the arrow if needed */
 	.card-arrow {
 		width: 24px;
 		height: 24px;
 		object-fit: contain;
 		margin-left: auto;
 	}
-
-
-
 	.class-card:hover,
 	.class-card:focus {
 		background-color: #e0e0e0;
 		outline: none;
 	}
-
 	.class-card:focus {
 		box-shadow: 0 0 0 3px rgba(100, 149, 237, 0.5);
 	}
-
 	.popup {
 		position: fixed;
 		top: 0;
@@ -160,7 +250,6 @@
 		align-items: center;
 		z-index: 1000;
 	}
-
 	.popup-content {
 		background: #fff;
 		width: 50vw;
@@ -171,7 +260,6 @@
 		overflow: hidden;
 		box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
 	}
-
 	.popup-header {
 		background: #222;
 		color: white;
@@ -184,7 +272,6 @@
 		top: 0;
 		z-index: 10;
 	}
-
 	.close-button {
 		background: none;
 		border: none;
@@ -192,31 +279,50 @@
 		font-size: 1.2rem;
 		cursor: pointer;
 	}
-
 	.popup-body {
 		padding: 16px;
 		overflow-y: auto;
 		flex: 1;
 	}
-
 	.description {
 		font-size: 0.95rem;
 		color: #555;
 		margin-bottom: 1rem;
 	}
-
+	.selected-class-section {
+		display: flex;
+		flex-direction: column;
+		align-items: center; /* center cards horizontally */
+		gap: 0.25rem;
+	}
 	.feature-card {
 		border: 1px solid #ccc;
 		border-radius: 6px;
 		padding: 10px 12px;
 		margin: 10px 0;
 		background: #f9f9f9;
-	}
 
+		width: 100%;
+		max-width: 50vw; /* limit card width to half viewport */
+		box-sizing: border-box;
+	}
 	.feature-card h4 {
 		margin: 0 0 4px 0;
+		font-weight: bold; /* bold feature title */
 	}
-
+	.feature-card select {
+		margin-top: 0.5rem;
+		width: 100%;
+		padding: 0.3rem 0.5rem;
+		font-size: 1rem;
+		border-radius: 4px;
+		border: 1px solid #aaa;
+	}
+	.feature-card.nested {
+		margin-left: 1rem;
+		border-color: #888;
+		background-color: #eee;
+	}
 	.popup-footer {
 		padding: 12px 16px;
 		display: flex;
@@ -225,5 +331,16 @@
 		border-top: 1px solid #ddd;
 		background: #f0f0f0;
 	}
-
+	.selected-class-section h2 {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	}
+	.selected-class-section h2 button {
+		font-size: 1.5rem;
+		cursor: pointer;
+		background: none;
+		border: none;
+		color: #c00;
+	}
 </style>

@@ -4,6 +4,7 @@ import type { FeaturePrompt } from '$lib/data/types/ClassFeatures';
 
 const proficienciesPrompt: FeaturePrompt = {
 	name: 'Skill Proficiencies',
+	id: 'fighter_skills_01',
 	description: `
 		Armor: All armor, shields <br>
 		Weapons: Simple weapons, martial weapons <br>
@@ -25,10 +26,18 @@ const proficienciesPrompt: FeaturePrompt = {
 		numPicks: 2,
 	},
 	source: "fighter.proficiencies",
+	effects: [
+		{
+			target: "skills",
+			action: "add",
+			value: "{userChoice}"
+		}
+	]
 };
 
 const fightingStylePrompt: FeaturePrompt = {
 	name: 'Fighting Style',
+	id: 'fighter_style_01',
 	description: 'Choose a fighting style that suits your combat approach.',
 	featureOptions: {
 		placeholderText: "-Choose a Fighting Style-",
@@ -43,108 +52,134 @@ const fightingStylePrompt: FeaturePrompt = {
 			},
 			{
 				name: 'Dueling',
-				optionDescription: 'When you are wielding a melee weapon in one hand and no other weapons, you gain a +2 bonus to damage rolls.'
+				optionDescription: 'When wielding a melee weapon in one hand and no other weapons, gain +2 to damage rolls.'
 			},
 			{
 				name: 'Great Weapon Fighting',
-				optionDescription: 'When you roll a 1 or 2 on a damage die for an attack you make with a melee weapon you are wielding with two hands, you can reroll the die.'
+				optionDescription: 'Reroll 1 or 2 on damage die for melee weapons wielded with two hands.'
 			},
 			{
 				name: 'Protection',
-				optionDescription: 'When a creature you can see attacks a target other than you that is within 5 feet of you, you can use your reaction to impose disadvantage on the attack roll.'
+				optionDescription: 'Use your reaction to impose disadvantage on an attack against an ally within 5 feet.'
 			},
 			{
 				name: 'Two-Weapon Fighting',
-				optionDescription: 'When you engage in two-weapon fighting, you can add your ability modifier to the damage of the second attack.'
+				optionDescription: 'Add your ability modifier to the damage of the second attack when engaging in two-weapon fighting.'
 			},
 		],
 		numPicks: 1,
 	},
-	source: "fighter"
+	source: "fighter",
+	effects: [
+		{
+			target: "features",
+			action: "add",
+			value: "{userChoice} Fighting Style"
+		}
+	]
 };
-
 
 const secondWindPrompt: FeaturePrompt = {
 	name: 'Second Wind',
+	id: 'fighter_second_wind_01',
 	description: `
-		You have a limited well of stamina that you can draw on to protect yourself from harm. 
-		On your turn, you can use a bonus action to regain hit points equal to 1d10 + your fighter level. 
-		Once you use this feature, you must finish a short or long rest before you can use it again.
+		You have a limited well of stamina to protect yourself. 
+		On your turn, you can use a bonus action to regain hit points equal to 1d10 + your fighter level.
+		Once used, must finish a short or long rest before using again.
 	`,
-	source: "fighter"
+	source: "fighter",
+	effects: [
+		{ target: "features", action: "add", value: "Second Wind" }
+	]
 };
 
 const actionSurgePrompt: FeaturePrompt = {
 	name: 'Action Surge',
+	id: 'fighter_action_surge_01',
 	description: `
-		Starting at 2nd level, you can push yourself beyond your normal limits for a moment. 
-		On your turn, you can take one additional action on top of your regular action and a possible bonus action. 
-		Once you use this feature, you must finish a short or long rest before you can use it again.
+		Starting at 2nd level, you can take one additional action on your turn. 
+		Once used, must finish a short or long rest before using again.
 	`,
-	source: "fighter"
+	source: "fighter",
+	effects: [
+		{ target: "features", action: "add", value: "Action Surge" }
+	]
 };
 
 const martialArchetypePrompt: FeaturePrompt = {
 	name: 'Martial Archetype',
+	id: 'fighter_archetype_01',
 	description: 'Choose a Martial Archetype at 3rd level.',
 	featureOptions: {
 		placeholderText: "-Choose an Archetype-",
 		options: [
 			{
 				name: "Champion",
-				optionDescription: `
-					Focused on raw physical power and improving critical hits.
-				`,
+				optionDescription: "Focused on raw physical power and improving critical hits.",
 				nestedPrompts: [
 					{
 						name: 'Improved Critical',
-						description: 'Your weapon attacks score a critical hit on a roll of 19 or 20.',
+						id: 'fighter_champion_critical_01',
+						description: 'Weapon attacks score a critical hit on 19 or 20.',
 						source: "fighter.champion",
+						effects: [
+							{ target: "features", action: "add", value: "Improved Critical" }
+						]
 					}
-				],
+				]
 			},
 			{
 				name: "Battle Master",
-				optionDescription: `
-					A master of martial techniques, using maneuvers to control the battlefield.
-				`,
+				optionDescription: "A master of martial techniques, using maneuvers to control the battlefield.",
 				nestedPrompts: [
 					{
 						name: 'Combat Superiority',
-						description: `
-							You gain a set of maneuvers and superiority dice to enhance your attacks.
-						`,
+						id: 'fighter_battle_master_01',
+						description: "Gain maneuvers and superiority dice to enhance attacks.",
 						source: "fighter.battle_master",
-					},
-				],
+						effects: [
+							{ target: "features", action: "add", value: "Combat Superiority" }
+						]
+					}
+				]
 			},
 			{
 				name: "Eldritch Knight",
-				optionDescription: `
-					You learn to cast spells and blend magic with combat.
-				`,
+				optionDescription: "Blend magic with combat.",
 				nestedPrompts: [
 					{
 						name: 'Weapon Bond',
-						description: `
-							You can bond with weapons to summon them to your hand.
-						`,
+						id: 'fighter_eldritch_weapon_bond_01',
+						description: "Bond with weapons to summon them to your hand.",
 						source: "fighter.eldritch_knight",
+						effects: [
+							{ target: "features", action: "add", value: "Weapon Bond" }
+						]
 					},
 					{
 						name: 'Spellcasting',
-						description: `
-							You learn a limited number of wizard spells.
-						`,
+						id: 'fighter_eldritch_spellcasting_01',
+						description: "Learn a limited number of wizard spells.",
 						source: "fighter.eldritch_knight",
-					},
-				],
+						effects: [
+							{ target: "features", action: "add", value: "Eldritch Knight Spellcasting" }
+						]
+					}
+				]
 			}
 		],
 		numPicks: 1,
 	},
 	source: "fighter",
+	effects: [
+		{
+			target: "subclass",
+			action: "set",
+			value: "{userChoice}"
+		}
+	]
 };
+
 
 const classFeaturesPrompt: FeaturePrompt[] = [
 	fightingStylePrompt,

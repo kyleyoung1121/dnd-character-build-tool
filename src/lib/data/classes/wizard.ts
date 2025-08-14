@@ -3,6 +3,7 @@ import type { ClassData } from '$lib/data/types/ClassData';
 import type { FeaturePrompt } from '$lib/data/types/ClassFeatures';
 
 const proficienciesPrompt: FeaturePrompt = {
+	id: 'wizard_proficiencies',
 	name: 'Skill Proficiencies',
 	description: `
 		Weapons: Daggers, darts, slings, quarterstaffs, light crossbows <br>
@@ -22,17 +23,27 @@ const proficienciesPrompt: FeaturePrompt = {
 		numPicks: 2,
 	},
 	source: 'wizard.proficiencies',
+	effects: [
+		{
+			target: 'skills',
+			action: 'add',
+			value: '{userChoice}'
+		}
+	]
 };
 
 const arcaneRecoveryPrompt: FeaturePrompt = {
+	id: 'wizard_arcane_recovery',
 	name: 'Arcane Recovery',
 	description: `
 		Once per day when you finish a short rest, you can recover expended spell slots with a combined level equal to or less than half your wizard level (rounded up).
 	`,
 	source: 'wizard',
+	effects: []
 };
 
 const spellcastingPrompt: FeaturePrompt = {
+	id: 'wizard_spellcasting',
 	name: 'Spellcasting',
 	description: `
 		You know three cantrips from the wizard spell list.
@@ -40,9 +51,11 @@ const spellcastingPrompt: FeaturePrompt = {
 		You prepare spells from your spellbook, using Intelligence as your spellcasting ability.
 	`,
 	source: 'wizard',
+	effects: []
 };
 
 const arcaneTraditionPrompt: FeaturePrompt = {
+	id: 'wizard_arcane_tradition',
 	name: 'Arcane Tradition',
 	description: 'Choose an Arcane Tradition at 2nd level.',
 	featureOptions: {
@@ -56,18 +69,22 @@ const arcaneTraditionPrompt: FeaturePrompt = {
 				`,
 				nestedPrompts: [
 					{
+						id: 'wizard_evocation_savant',
 						name: 'Evocation Savant',
 						description: `
 							The gold and time you must spend to copy an evocation spell into your spellbook is halved.
 						`,
 						source: 'wizard.evocation',
+						effects: []
 					},
 					{
+						id: 'wizard_sculpt_spells',
 						name: 'Sculpt Spells',
 						description: `
 							When you cast an evocation spell that affects other creatures you can see, you can protect some of them from the spell’s full force.
 						`,
 						source: 'wizard.evocation',
+						effects: []
 					},
 				],
 			},
@@ -78,18 +95,22 @@ const arcaneTraditionPrompt: FeaturePrompt = {
 				`,
 				nestedPrompts: [
 					{
+						id: 'wizard_illusion_savant',
 						name: 'Illusion Savant',
 						description: `
 							The gold and time you must spend to copy an illusion spell into your spellbook is halved.
 						`,
 						source: 'wizard.illusion',
+						effects: []
 					},
 					{
+						id: 'wizard_improved_minor_illusion',
 						name: 'Improved Minor Illusion',
 						description: `
 							When you cast Minor Illusion, you can create both a sound and an image with a single casting.
 						`,
 						source: 'wizard.illusion',
+						effects: []
 					},
 				],
 			},
@@ -97,6 +118,7 @@ const arcaneTraditionPrompt: FeaturePrompt = {
 		numPicks: 1,
 	},
 	source: 'wizard',
+	effects: []
 };
 
 const classFeaturesPrompt: FeaturePrompt[] = [

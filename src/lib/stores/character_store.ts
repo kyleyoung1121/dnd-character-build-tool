@@ -1,23 +1,5 @@
 import { writable } from 'svelte/store';
 
-export type ModHistoryEntry = {
-	bonus: number;
-	origin: string;
-}
-
-export type Stat = {
-	base_score: number | null;
-	bonuses: ModHistoryEntry[];
-}
-
-export type AbilityScores = {
-	STR: Stat;
-	DEX: Stat;
-	CON: Stat;
-	INT: Stat;
-	WIS: Stat;
-	CHA: Stat;
-};
 
 export type Attack = {
 	weapon: string;
@@ -33,7 +15,13 @@ export type Character = {
 	background: string;
 	alignment: string;
 
-	abilityScores: AbilityScores;
+	strength: number | null
+	dexterity: number | null
+	constitution: number | null
+	intelligence: number | null
+	wisdom: number | null
+	charisma: number | null
+
 	proficiencies: string[];
 	languages: string[];
 	skills: string[];
@@ -63,14 +51,14 @@ export const character_store = writable<Character>({
 	subclass: '',
 	background: '',
 	alignment: '',
-	abilityScores: {
-		STR: { base_score: null, bonuses: [] },
-		DEX: { base_score: null, bonuses: [] },
-		CON: { base_score: null, bonuses: [] },
-		INT: { base_score: null, bonuses: [] },
-		WIS: { base_score: null, bonuses: [] },
-		CHA: { base_score: null, bonuses: [] },
-	},
+	
+	strength: null,
+	dexterity: null,
+	constitution: null,
+	intelligence: null,
+	wisdom: null,
+	charisma: null,
+
 	proficiencies: [],
 	languages: [],
 	skills: [],

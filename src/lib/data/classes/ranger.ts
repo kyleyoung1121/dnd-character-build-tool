@@ -3,6 +3,7 @@ import type { ClassData } from '$lib/data/types/ClassData';
 import type { FeaturePrompt } from '$lib/data/types/ClassFeatures';
 
 const proficienciesPrompt: FeaturePrompt = {
+	id: 'ranger_proficiencies_01',
 	name: 'Skill Proficiencies',
 	description: `
 		Armor: Light armor, medium armor, shields <br>
@@ -25,46 +26,58 @@ const proficienciesPrompt: FeaturePrompt = {
 		numPicks: 3,
 	},
 	source: "ranger.proficiencies",
+	effects: [
+		{
+			target: "skills",
+			action: "add",
+			value: "{userChoice}"
+		}
+	]
 };
 
 const fightingStylePrompt: FeaturePrompt = {
+	id: 'ranger_fighting_style_01',
 	name: 'Fighting Style',
 	description: 'Choose a fighting style to suit your combat approach.',
 	featureOptions: {
 		placeholderText: "-Choose a Fighting Style-",
 		options: [
-			{
-				name: 'Archery',
-				optionDescription: 'You gain a +2 bonus to attack rolls you make with ranged weapons.',
-			},
-			{
-				name: 'Defense',
-				optionDescription: 'While you are wearing armor, you gain a +1 bonus to AC.',
-			},
-			{
-				name: 'Dueling',
-				optionDescription: 'When you are wielding a melee weapon in one hand and no other weapons, you gain a +2 bonus to damage rolls with that weapon.',
-			},
-			{
-				name: 'Two-Weapon Fighting',
-				optionDescription: 'When you engage in two-weapon fighting, you can add your ability modifier to the damage of the second attack.',
-			},
+			'Archery',
+			'Defense',
+			'Dueling',
+			'Two-Weapon Fighting'
 		],
-		numPicks: 1,
+		numPicks: 1
 	},
 	source: "ranger",
+	effects: [
+		{
+			target: "features",
+			action: "add",
+			value: "{userChoice} Fighting Style"
+		}
+	]
 };
 
 const spellcastingPrompt: FeaturePrompt = {
+	id: 'ranger_spellcasting_01',
 	name: 'Spellcasting',
 	description: `
 		You have learned to cast ranger spells using Wisdom as your spellcasting ability. 
 		At level 3, you know three 1st-level spells and have two 1st-level spell slots.
 	`,
-	source: "ranger"
+	source: "ranger",
+	effects: [
+		{
+			target: "features",
+			action: "add",
+			value: "Spellcasting"
+		}
+	]
 };
 
 const rangerArchetypePrompt: FeaturePrompt = {
+	id: 'ranger_archetype_01',
 	name: 'Ranger Archetype',
 	description: 'Choose a Ranger Archetype at 3rd level.',
 	featureOptions: {
@@ -72,54 +85,62 @@ const rangerArchetypePrompt: FeaturePrompt = {
 		options: [
 			{
 				name: 'Hunter',
-				optionDescription: `
-					You focus on the art of hunting and gain abilities that improve your combat effectiveness.
-				`,
+				optionDescription: `You focus on the art of hunting and gain abilities that improve your combat effectiveness.`,
 				nestedPrompts: [
 					{
-                        name: 'Hunter’s Prey',
-                        description: `Choose one of the following options:`,
-                        featureOptions: {
-                            placeholderText: "-Choose an Option-",
-                            options: [
-                                {
-                                    name: 'Colossus Slayer',
-                                    optionDescription: 'Extra 1d8 damage once per turn to creatures below their max HP.',
-                                },
-                                {
-                                    name: 'Giant Killer',
-                                    optionDescription: 'When a Large or larger creature attacks you, you can use your reaction to attack it immediately.',
-                                },
-                                {
-                                    name: 'Horde Breaker',
-                                    optionDescription: 'Once per turn, you can make an additional attack against a different creature within 5 feet of the original target.',
-                                },
-                            ],
-                            numPicks: 1,
-                        },
-                        source: 'ranger.hunter',
-                    }
+						id: 'ranger_hunter_prey_01',
+						name: 'Hunter’s Prey',
+						description: `Choose one of the following options:`,
+						featureOptions: {
+							placeholderText: "-Choose an Option-",
+							options: [
+								'Colossus Slayer',
+								'Giant Killer',
+								'Horde Breaker'
+							],
+							numPicks: 1
+						},
+						source: 'ranger.hunter',
+						effects: [
+							{
+								target: "features",
+								action: "add",
+								value: "{userChoice}"
+							}
+						]
+					}
 				]
 			},
 			{
 				name: 'Beast Master',
-				optionDescription: `
-					You gain a beast companion to fight alongside you.
-				`,
+				optionDescription: `You gain a beast companion to fight alongside you.`,
 				nestedPrompts: [
 					{
+						id: 'ranger_companion_01',
 						name: 'Ranger’s Companion',
-						description: `
-							You gain a beast companion that accompanies you on adventures and battles.
-						`,
+						description: `You gain a beast companion that accompanies you on adventures and battles.`,
 						source: 'ranger.beast_master',
+						effects: [
+							{
+								target: "features",
+								action: "add",
+								value: "Ranger’s Companion"
+							}
+						]
 					}
 				]
 			}
 		],
-		numPicks: 1,
+		numPicks: 1
 	},
 	source: "ranger",
+	effects: [
+		{
+			target: "subclass",
+			action: "set",
+			value: "{userChoice}"
+		}
+	]
 };
 
 const classFeaturesPrompt: FeaturePrompt[] = [

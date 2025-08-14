@@ -3,6 +3,7 @@ import type { ClassData } from '$lib/data/types/ClassData';
 import type { FeaturePrompt } from '$lib/data/types/ClassFeatures';
 
 const proficienciesPrompt: FeaturePrompt = {
+	id: 'sorcerer_proficiencies_01',
 	name: 'Skill Proficiencies',
 	description: `
 		Armor: None <br>
@@ -23,9 +24,17 @@ const proficienciesPrompt: FeaturePrompt = {
 		numPicks: 2,
 	},
 	source: 'sorcerer.proficiencies',
+	effects: [
+		{
+			target: "skills",
+			action: "add",
+			value: "{userChoice}"
+		}
+	]
 };
 
 const spellcastingPrompt: FeaturePrompt = {
+	id: 'sorcerer_spellcasting_01',
 	name: 'Spellcasting',
 	description: `
 		You know four cantrips of your choice from the sorcerer spell list. 
@@ -33,9 +42,17 @@ const spellcastingPrompt: FeaturePrompt = {
 		You can cast spells using Charisma as your spellcasting ability.
 	`,
 	source: 'sorcerer',
+	effects: [
+		{
+			target: "features",
+			action: "add",
+			value: "Spellcasting"
+		}
+	]
 };
 
 const sorceryPointsPrompt: FeaturePrompt = {
+	id: 'sorcerer_sorcery_points_01',
 	name: 'Sorcery Points',
 	description: `
 		Starting at 2nd level, you can use sorcery points to fuel your metamagic. 
@@ -43,9 +60,17 @@ const sorceryPointsPrompt: FeaturePrompt = {
 		You regain all expended sorcery points when you finish a long rest.
 	`,
 	source: 'sorcerer',
+	effects: [
+		{
+			target: "features",
+			action: "add",
+			value: "Sorcery Points"
+		}
+	]
 };
 
 const metamagicPrompt: FeaturePrompt = {
+	id: 'sorcerer_metamagic_01',
 	name: 'Metamagic',
 	description: 'Choose two Metamagic options to customize your spells.',
 	featureOptions: {
@@ -87,9 +112,17 @@ const metamagicPrompt: FeaturePrompt = {
 		numPicks: 2,
 	},
 	source: 'sorcerer',
+	effects: [
+		{
+			target: "features",
+			action: "add",
+			value: "{userChoice}"
+		}
+	]
 };
 
 const sorcerousOriginPrompt: FeaturePrompt = {
+	id: 'sorcerer_origin_01',
 	name: 'Sorcerous Origin',
 	description: 'Choose your Sorcerous Origin at 1st level.',
 	featureOptions: {
@@ -97,49 +130,69 @@ const sorcerousOriginPrompt: FeaturePrompt = {
 		options: [
 			{
 				name: 'Draconic Bloodline',
-				optionDescription: `
-					You have draconic ancestry that grants you additional resilience and elemental affinity.
-				`,
+				optionDescription: `You have draconic ancestry that grants you additional resilience and elemental affinity.`,
 				nestedPrompts: [
 					{
+						id: 'sorcerer_draconic_resilience_01',
 						name: 'Draconic Resilience',
-						description: `
-							Your hit point maximum increases by 1 per sorcerer level. 
-							Your AC equals 13 + your Dexterity modifier when not wearing armor.
-						`,
+						description: `Your hit point maximum increases by 1 per sorcerer level. 
+						Your AC equals 13 + your Dexterity modifier when not wearing armor.`,
 						source: 'sorcerer.draconic_bloodline',
+						effects: [
+							{
+								target: "features",
+								action: "add",
+								value: "Draconic Resilience"
+							}
+						]
 					},
 					{
+						id: 'sorcerer_elemental_affinity_01',
 						name: 'Elemental Affinity',
-						description: `
-							When you cast a spell that deals damage of the type associated with your draconic ancestry, 
-							you can add your Charisma modifier to one damage roll of that spell.
-						`,
+						description: `When you cast a spell that deals damage of the type associated with your draconic ancestry, 
+						you can add your Charisma modifier to one damage roll of that spell.`,
 						source: 'sorcerer.draconic_bloodline',
+						effects: [
+							{
+								target: "features",
+								action: "add",
+								value: "Elemental Affinity"
+							}
+						]
 					},
 				],
 			},
 			{
 				name: 'Wild Magic',
-				optionDescription: `
-					Your innate magic is unpredictable and chaotic, causing surges of random magical effects.
-				`,
+				optionDescription: `Your innate magic is unpredictable and chaotic, causing surges of random magical effects.`,
 				nestedPrompts: [
 					{
+						id: 'sorcerer_wild_magic_surge_01',
 						name: 'Wild Magic Surge',
-						description: `
-							Beginning at 1st level, your spellcasting can unleash surges of wild magic.
-							Your DM might ask you to roll on the Wild Magic Surge table after you cast a sorcerer spell.
-						`,
+						description: `Beginning at 1st level, your spellcasting can unleash surges of wild magic.
+						Your DM might ask you to roll on the Wild Magic Surge table after you cast a sorcerer spell.`,
 						source: 'sorcerer.wild_magic',
+						effects: [
+							{
+								target: "features",
+								action: "add",
+								value: "Wild Magic Surge"
+							}
+						]
 					},
 					{
+						id: 'sorcerer_tides_of_chaos_01',
 						name: 'Tides of Chaos',
-						description: `
-							You can gain advantage on one attack roll, ability check, or saving throw. 
-							Once you use this feature, you must finish a long rest before you can use it again.
-						`,
+						description: `You can gain advantage on one attack roll, ability check, or saving throw. 
+						Once you use this feature, you must finish a long rest before you can use it again.`,
 						source: 'sorcerer.wild_magic',
+						effects: [
+							{
+								target: "features",
+								action: "add",
+								value: "Tides of Chaos"
+							}
+						]
 					},
 				],
 			},
@@ -147,6 +200,13 @@ const sorcerousOriginPrompt: FeaturePrompt = {
 		numPicks: 1,
 	},
 	source: 'sorcerer',
+	effects: [
+		{
+			target: "subclass",
+			action: "set",
+			value: "{userChoice}"
+		}
+	]
 };
 
 const classFeaturesPrompt: FeaturePrompt[] = [

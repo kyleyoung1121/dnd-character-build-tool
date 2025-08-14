@@ -10,7 +10,5 @@ export interface ClassData {
 	armorProficiencies: string[];
 	weaponProficiencies: string[];
 	toolProficiencies?: string[];
-	skillChoices?: FeaturePrompt;
-	subclassChoices?: FeaturePrompt;
 	classFeatures: FeaturePrompt[];
 }

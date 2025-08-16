@@ -1,1 +1,0 @@
-import{w as l}from"./DCGsJdhs.js";const e=l({name:"",race:"",class:"",subclass:"",background:"",alignment:"",strength:null,dexterity:null,constitution:null,intelligence:null,wisdom:null,charisma:null,proficiencies:[],languages:[],skills:[],features:[],inventory:[],attacks:[],spells:[],hp:null,ac:null,speed:null,size:null});export{e as c};

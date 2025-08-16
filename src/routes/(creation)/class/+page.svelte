@@ -14,7 +14,7 @@
 	import { warlock } from '$lib/data/classes/warlock';
 	import { wizard } from '$lib/data/classes/wizard';
 	import type { ClassData } from '$lib/data/types/ClassData';
-	import type { FeaturePrompt } from '$lib/data/types/ClassFeatures';
+	import type { FeaturePrompt } from '$lib/data/types/Features';
 
 	import { applyChoice, revertChanges } from '$lib/stores/character_store_helpers';
 	import { get } from 'svelte/store';
@@ -50,6 +50,13 @@
 	$: mergedFeatures = selectedClassData
 		? [...(selectedClassData.classFeatures || [])]
 		: [];
+
+	// make sure this lives in <script> and stays after isFeatureIncomplete is defined
+	$: featureStatuses = mergedFeatures.map((feature) => ({
+	feature,
+	incomplete: isFeatureIncomplete(feature, featureSelections) // <-- pass the map
+	}));
+
 
 	/**
 	 * Build a globally-aware option list for a given feature + index:
@@ -107,7 +114,7 @@
 	}
 
 	function onSelectFeatureOption(feature: FeaturePrompt, index: number, selectedOption: string) {
-		// Ensure array exists & has the right length
+		// Ensure the selection array exists and has the right length
 		const num = feature.featureOptions?.numPicks || 1;
 		if (!featureSelections[feature.name]) {
 			featureSelections[feature.name] = Array(num).fill(null);
@@ -116,14 +123,17 @@
 		}
 
 		const prev = featureSelections[feature.name][index];
-		featureSelections[feature.name][index] = selectedOption;
 
-		// Force Svelte to react right away so other dropdowns update instantly
-		featureSelections = { ...featureSelections };
+		// Make a deep copy of the selections array for reactivity
+		const updatedSelections = [...featureSelections[feature.name]];
+		updatedSelections[index] = selectedOption;
+
+		// Update the main store object with a new array reference
+		featureSelections = { ...featureSelections, [feature.name]: updatedSelections };
 		bumpVersion();
 
 		if (prev !== selectedOption) {
-			// If the chosen option changes, clean up any nested picks under the previous branch
+			// Clear any nested selections under the previous branch
 			clearNestedFeatureSelections(feature, featureSelections);
 
 			const scopeId = `feature:${feature.name}:${index}`;
@@ -131,20 +141,18 @@
 				revertChanges(get(character_store), scopeId);
 			}
 
-			// Determine actual effects for this feature (skills, languages, subclass, etc.)
+			// Apply all effects for this feature
 			const effects = feature.effects || [];
 			const update: Record<string, any> = {};
 
 			for (const effect of effects) {
 				// Replace {userChoice} placeholder with the actual pick
-				const value =
-					effect.value === '{userChoice}' ? selectedOption : effect.value;
+				const value = effect.value === '{userChoice}' ? selectedOption : effect.value;
 
-				// Array targets vs scalar targets:
-				if (['skills', 'languages', 'proficiencies', 'features'].includes(effect.target)) {
+				// Use effect.action to determine how to apply
+				if (effect.action === 'add') {
 					update[effect.target] = Array.isArray(value) ? value : [value];
-				} else {
-					// e.g. subclass, class, alignment, etc.
+				} else if (effect.action === 'set') {
 					update[effect.target] = value;
 				}
 			}
@@ -152,6 +160,7 @@
 			applyChoice(scopeId, update);
 		}
 	}
+
 
 	function clearNestedFeatureSelections(feature: FeaturePrompt, selections: Record<string, (string | null)[]>) {
 		if (!feature.featureOptions) return;
@@ -265,6 +274,42 @@
 		const averagePerDie = Math.floor(dieMax / 2) + 1;
 		return dieMax + averagePerDie * 2;
 	}
+
+	function isFeatureIncomplete(
+		feature: FeaturePrompt,
+		selectionsMap: Record<string, (string | null)[]>
+		): boolean {
+		// No options => not marked incomplete/complete (leave default styling)
+		if (!feature.featureOptions) return false;
+
+		const numPicks = feature.featureOptions.numPicks ?? 1;
+		const selections = selectionsMap[feature.name];
+
+		// Not touched or undersized => incomplete
+		if (!selections || selections.length < numPicks) return true;
+
+		// Any empty slot => incomplete
+		if (selections.some((s) => !s)) return true;
+
+		// Only check nested prompts for options that are actually selected
+		const selectedNames = selections.filter(Boolean) as string[];
+
+		for (const opt of feature.featureOptions.options) {
+			if (typeof opt !== 'string') {
+			if (selectedNames.includes(opt.name) && opt.nestedPrompts) {
+				for (const nested of opt.nestedPrompts) {
+				if (isFeatureIncomplete(nested, selectionsMap)) return true;
+				}
+			}
+			}
+		}
+
+		// Fully complete
+		return false;
+		}
+
+
+
 
 	onMount(() => {
 		const state = get(character_store);
@@ -406,79 +451,81 @@
 
 			<!-- Render top-level features with collapsible cards -->
 			{#each mergedFeatures as feature (feature.name)}
-				<div class="feature-card">
-					<button
-						class="feature-header"
-						type="button"
-						on:click={() => toggleFeatureExpand(feature.name)}
-					>
-						<span class="feature-name">{feature.name}</span>
-						<span class="expand-indicator">
-							{expandedFeatures.has(feature.name) ? '–' : '+'}
-						</span>
-					</button>
+			<div class="feature-card {isFeatureIncomplete(feature, featureSelections) ? 'incomplete' : feature.featureOptions ? 'complete' : ''}">
+				<button
+				class="feature-header"
+				type="button"
+				on:click={() => toggleFeatureExpand(feature.name)}
+				>
+				<span class="feature-name">{feature.name}</span>
+				<span class="expand-indicator">
+					{expandedFeatures.has(feature.name) ? '–' : '+'}
+				</span>
+				</button>
 
-					{#if expandedFeatures.has(feature.name)}
-						<p>{@html feature.description}</p>
+				{#if expandedFeatures.has(feature.name)}
+				<p>{@html feature.description}</p>
 
-						{#if feature.featureOptions}
-							{#each Array(feature.featureOptions.numPicks) as _, idx}
-								{#key `${feature.name}:${idx}:${selectionVersion}`}
-									<select
-										value={featureSelections[feature.name]?.[idx] || ''}
-										on:change={(e: Event) => {
-											const target = e.target as HTMLSelectElement;
-											onSelectFeatureOption(feature, idx, target.value);
-										}}
-									>
-										<option value="" disabled>
-											{feature.featureOptions.placeholderText || 'Select an option'}
-										</option>
+				{#if feature.featureOptions}
+					{#each Array(feature.featureOptions.numPicks) as _, idx}
+					{#key `${feature.name}:${idx}:${selectionVersion}`}
+						<select
+						value={featureSelections[feature.name]?.[idx] || ''}
+						on:change={(e: Event) => {
+							const target = e.target as HTMLSelectElement;
+							onSelectFeatureOption(feature, idx, target.value);
+						}}
+						>
+						<option value="" disabled>
+							{feature.featureOptions.placeholderText || 'Select an option'}
+						</option>
 
-										{#each getGloballyAvailableOptions(feature, idx) as option (typeof option === 'string' ? option : option.name)}
-											<option value={typeof option === 'string' ? option : option.name}>
-												{typeof option === 'string' ? option : option.name}
-											</option>
-										{/each}
-									</select>
-								{/key}
-							{/each}
+						{#each getGloballyAvailableOptions(feature, idx) as option (typeof option === 'string' ? option : option.name)}
+							<option value={typeof option === 'string' ? option : option.name}>
+							{typeof option === 'string' ? option : option.name}
+							</option>
+						{/each}
+						</select>
+					{/key}
+					{/each}
 
-							<!-- Render nested prompts expanded -->
-							{#each getNestedPrompts(feature, featureSelections[feature.name] || []) as nestedFeature (nestedFeature.name)}
-								<div class="feature-card nested">
-									<h4>{nestedFeature.name}</h4>
-									<p>{@html nestedFeature.description}</p>
+					<!-- Render nested prompts expanded -->
+					{#each getNestedPrompts(feature, featureSelections[feature.name] || []) as nestedFeature (nestedFeature.name)}
+					<div class="feature-card nested {isFeatureIncomplete(nestedFeature, featureSelections) ? 'incomplete' : nestedFeature.featureOptions ? 'complete' : ''}">
+						<h4>{nestedFeature.name}</h4>
+						<p>{@html nestedFeature.description}</p>
 
-									{#if nestedFeature.featureOptions}
-										{#each Array(nestedFeature.featureOptions.numPicks) as _, nestedIdx}
-											{#key `${nestedFeature.name}:${nestedIdx}:${selectionVersion}`}
-												<select
-													value={featureSelections[nestedFeature.name]?.[nestedIdx] || ''}
-													on:change={(e: Event) => {
-														const target = e.target as HTMLSelectElement;
-														onSelectFeatureOption(nestedFeature, nestedIdx, target.value);
-													}}
-												>
-													<option value="" disabled>
-														{nestedFeature.featureOptions.placeholderText || 'Select an option'}
-													</option>
+						{#if nestedFeature.featureOptions}
+						{#each Array(nestedFeature.featureOptions.numPicks) as _, nestedIdx}
+							{#key `${nestedFeature.name}:${nestedIdx}:${selectionVersion}`}
+							<select
+								value={featureSelections[nestedFeature.name]?.[nestedIdx] || ''}
+								on:change={(e: Event) => {
+								const target = e.target as HTMLSelectElement;
+								onSelectFeatureOption(nestedFeature, nestedIdx, target.value);
+								}}
+							>
+								<option value="" disabled>
+								{nestedFeature.featureOptions.placeholderText || 'Select an option'}
+								</option>
 
-													{#each getGloballyAvailableOptions(nestedFeature, nestedIdx) as option (typeof option === 'string' ? option : option.name)}
-														<option value={typeof option === 'string' ? option : option.name}>
-															{typeof option === 'string' ? option : option.name}
-														</option>
-													{/each}
-												</select>
-											{/key}
-										{/each}
-									{/if}
-								</div>
-							{/each}
+								{#each getGloballyAvailableOptions(nestedFeature, nestedIdx) as option (typeof option === 'string' ? option : option.name)}
+								<option value={typeof option === 'string' ? option : option.name}>
+									{typeof option === 'string' ? option : option.name}
+								</option>
+								{/each}
+							</select>
+							{/key}
+						{/each}
 						{/if}
-					{/if}
-				</div>
+					</div>
+					{/each}
+				{/if}
+				{/if}
+			</div>
 			{/each}
+
+
 		</div>
 	{/if}
 </div>
@@ -663,7 +710,7 @@
 	}
 
 	.feature-card {
-		border: 1px solid #ccc;
+		border: 2px solid #ccc; /* default border slightly thicker for visibility */
 		border-radius: 6px;
 		padding: 10px 12px;
 		margin: 10px 0;
@@ -671,8 +718,10 @@
 		width: 100%;
 		max-width: 50vw;
 		box-sizing: border-box;
+		transition: border-color 0.2s ease; /* smooth transition when state changes */
 	}
 
+	/* Selects inside feature cards */
 	.feature-card select {
 		margin-top: 0.5rem;
 		width: 100%;
@@ -682,10 +731,20 @@
 		border: 1px solid #aaa;
 	}
 
+	/* Nested cards inherit base style but slightly different background & indent */
 	.feature-card.nested {
 		margin-left: 1rem;
-		border-color: #888;
 		background-color: #eee;
+		border-color: #888; /* fallback for nested cards without state class */
+	}
+
+	/* Dynamic border states */
+	.feature-card.incomplete {
+		border-color: red;
+	}
+
+	.feature-card.complete {
+		border-color: #4a90e2; /* nice blue accent */
 	}
 
 	.popup-footer {

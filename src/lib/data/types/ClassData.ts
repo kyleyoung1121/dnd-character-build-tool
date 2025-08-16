@@ -1,4 +1,4 @@
-import type { FeaturePrompt } from './ClassFeatures';
+import type { FeaturePrompt } from './Features';
 
 export interface ClassData {
 	name: string;

@@ -1,6 +1,6 @@
 import { base } from '$app/paths';
 import type { ClassData } from '$lib/data/types/ClassData';
-import type { FeaturePrompt } from '$lib/data/types/ClassFeatures';
+import type { FeaturePrompt } from '$lib/data/types/Features';
 
 const proficienciesPrompt: FeaturePrompt = {
 	name: 'Skill Proficiencies',

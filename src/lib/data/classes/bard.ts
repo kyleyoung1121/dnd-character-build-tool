@@ -214,6 +214,7 @@ const bardCollegePrompt: FeaturePrompt = {
 	]
 };
 
+
 const classFeaturesPrompt: FeaturePrompt[] = [
 	bardicInspirationPrompt,
 	spellcastingPrompt,

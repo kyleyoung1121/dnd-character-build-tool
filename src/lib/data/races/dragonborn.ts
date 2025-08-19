@@ -2,26 +2,45 @@ import { base } from '$app/paths';
 import type { RaceData } from '$lib/data/types/RaceData';
 import type { FeaturePrompt } from '$lib/data/types/Features';
 
-const draconicAncestryPrompt: FeaturePrompt = {
-	name: 'Draconic Ancestry',
-	id: 'dragonborn_draconic_ancestry',
+// Ability Score Choice Prompt
+const abilityScoreChoicePrompt: FeaturePrompt = {
+	name: "Ability Score Increase",
+	id: "dragonborn_ability_score_choice",
 	description: `
-		You have a draconic ancestry. Choose one type of dragon from the table. 
-		Your breath weapon and damage resistance are determined by the dragon type.
+		Your Strength score increases by 2, and your Charisma score increases by 1.
+	`,
+	source: "dragonborn",
+	effects: [
+		{
+			target: "strength",
+			action: "modify",
+			value: 2
+		},
+		{
+			target: "charisma",
+			action: "modify",
+			value: 1
+		}
+	]
+};
+
+// Core elemental relation prompt
+const draconicElementPrompt: FeaturePrompt = {
+	name: 'Elemental Affinity',
+	id: 'dragonborn_elemental_affinity',
+	description: `
+		Your draconic heritage manifests as a connection to a destructive element.
+		Choose the damage type that both your breath weapon and your natural resistance
+		are associated with.
 	`,
 	featureOptions: {
-		placeholderText: "-Choose a Dragon Type-",
+		placeholderText: "-Choose an Element-",
 		options: [
-			"Black (Acid)",
-			"Blue (Lightning)",
-			"Brass (Fire)",
-			"Bronze (Lightning)",
-			"Copper (Acid)",
-			"Gold (Fire)",
-			"Green (Poison)",
-			"Red (Fire)",
-			"Silver (Cold)",
-			"White (Cold)"
+			"Acid",
+			"Cold",
+			"Fire",
+			"Lightning",
+			"Poison"
 		],
 		numPicks: 1,
 	},
@@ -30,12 +49,65 @@ const draconicAncestryPrompt: FeaturePrompt = {
 		{
 			target: "features",
 			action: "add",
-			value: "{userChoice} Ancestry"
-		},
+			value: "Elemental Affinity: {userChoice}"
+		}
+	]
+};
+
+// Draconic color prompt
+const draconicColorPrompt: FeaturePrompt = {
+	name: 'Draconic Color',
+	id: 'dragonborn_draconic_color',
+	description: `
+		Choose the hue of your scales. Traditionally, a dragonborn’s color hinted at their elemental breath, but here it can simply reflect your style or personality. 
+	`,
+	featureOptions: {
+		placeholderText: "-Choose a Color-",
+		options: [
+			"Black",
+			"Blue",
+			"Brass",
+			"Bronze",
+			"Copper",
+			"Gold",
+			"Green",
+			"Red",
+			"Silver",
+			"White"
+		],
+		numPicks: 1,
+	},
+	source: "dragonborn",
+	effects: [
 		{
-			target: "resistances",
+			target: "features",
 			action: "add",
-			value: "{userChoice} Damage Resistance"
+			value: "Draconic Color: {userChoice}"
+		}
+	]
+};
+
+// Breath weapon prompt: let user specify shape
+const breathShapePrompt: FeaturePrompt = {
+	name: "Breath Shape",
+	id: "dragonborn_breath_shape",
+	description: `
+		Your breath weapon takes a particular form. Choose the shape of your exhalation.
+	`,
+	featureOptions: {
+		placeholderText: "-Choose a Shape-",
+		options: [
+			"15 ft. Cone",
+			"5 ft. by 30 ft. Line"
+		],
+		numPicks: 1,
+	},
+	source: "dragonborn",
+	effects: [
+		{
+			target: "features",
+			action: "add",
+			value: "Breath Weapon Shape: {userChoice}"
 		}
 	]
 };
@@ -46,7 +118,8 @@ const raceFeatures: FeaturePrompt[] = [
 		id: "dragonborn_breath_weapon",
 		description: `
 			You can use your action to exhale destructive energy. 
-			Your draconic ancestry determines the size, shape, and damage type of the exhalation.
+			The damage type is determined by your Elemental Affinity, and the area of effect
+			by your chosen Breath Shape.
 		`,
 		source: "dragonborn",
 		effects: [
@@ -61,7 +134,7 @@ const raceFeatures: FeaturePrompt[] = [
 		name: "Damage Resistance",
 		id: "dragonborn_damage_resistance",
 		description: `
-			You have resistance to the damage type associated with your draconic ancestry.
+			You have resistance to the damage type associated with your Elemental Affinity.
 		`,
 		source: "dragonborn",
 		effects: [
@@ -78,17 +151,17 @@ export const dragonborn: RaceData = {
 	name: 'Dragonborn',
 	image: base + '/race_icons/dragonborn.jpg',
 	description: `
-		Born of dragons, as their name proclaims, the dragonborn walk proudly through a world 
-		that greets them with fearful incomprehension. Shaped by draconic gods or the dragons 
-		themselves, dragonborn originally hatched from dragon eggs as a unique race, combining 
-		the best attributes of dragons and humanoids.
+		Dragonborn look like dragons who walk on two legs. They don’t have wings or tails, but they still are capable of unleashing the powerful breath of their ancestors.
 	`,
 	abilityScoreIncrease: "+2 Strength, +1 Charisma",
 	speed: "30 ft.",
 	size: "Medium",
 	knownLanguages: ["Common", "Draconic"],
 	raceFeatures: [
-		draconicAncestryPrompt,
+		abilityScoreChoicePrompt,
+		draconicElementPrompt,
+		draconicColorPrompt,
+		breathShapePrompt,
 		...raceFeatures
 	]
 };

@@ -52,12 +52,12 @@ export const character_store = writable<Character>({
 	background: '',
 	alignment: '',
 	
-	strength: null,
-	dexterity: null,
-	constitution: null,
-	intelligence: null,
-	wisdom: null,
-	charisma: null,
+	strength: 0,
+	dexterity: 0,
+	constitution: 0,
+	intelligence: 0,
+	wisdom: 0,
+	charisma: 0,
 
 	proficiencies: [],
 	languages: [],

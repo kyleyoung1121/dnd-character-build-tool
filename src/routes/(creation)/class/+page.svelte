@@ -113,7 +113,25 @@
 		}
 	}
 
-	function onSelectFeatureOption(feature: FeaturePrompt, index: number, selectedOption: string) {
+	/** Utility: does an effect require a user choice in its target or value? */
+	function effectNeedsChoice(e: any) {
+		return (
+			(typeof e.target === 'string' && e.target.includes('{userChoice}')) ||
+			(typeof e.value === 'string' && e.value.includes('{userChoice}'))
+		);
+	}
+
+
+
+	// --- onSelectFeatureOption ---
+	function onSelectFeatureOption(
+		feature: FeaturePrompt,
+		index: number,
+		selectedOption: string
+	) {
+		// We store the raw option label; targets will be snake-cased when needed.
+		const normalizedChoice = selectedOption;
+
 		// Ensure the selection array exists and has the right length
 		const num = feature.featureOptions?.numPicks || 1;
 		if (!featureSelections[feature.name]) {
@@ -126,40 +144,121 @@
 
 		// Make a deep copy of the selections array for reactivity
 		const updatedSelections = [...featureSelections[feature.name]];
-		updatedSelections[index] = selectedOption;
+		updatedSelections[index] = normalizedChoice;
 
 		// Update the main store object with a new array reference
 		featureSelections = { ...featureSelections, [feature.name]: updatedSelections };
 		bumpVersion();
 
-		if (prev !== selectedOption) {
-			// Clear any nested selections under the previous branch
-			clearNestedFeatureSelections(feature, featureSelections);
+		if (prev === normalizedChoice) return;
 
-			const scopeId = `feature:${feature.name}:${index}`;
-			if (prev) {
-				revertChanges(get(character_store), scopeId);
+		// Clear any nested selections under the previous branch
+		clearNestedFeatureSelections(feature, featureSelections);
+
+		const scopeId = `feature:${feature.name}:${index}`;
+
+		// Revert the previous top-level choice effects
+		if (prev) {
+			revertChanges(get(character_store), scopeId);
+
+			// Also revert any static nested effects that were tied to the previous choice
+			const prevNested = getNestedPrompts(feature, [prev]) || [];
+			for (const nested of prevNested) {
+				if (nested.featureOptions) continue; // only static nested
+				const prevNestedScopeId = `feature:${feature.name}:${index}:${nested.name}`;
+				revertChanges(get(character_store), prevNestedScopeId);
 			}
+		}
 
-			// Apply all effects for this feature
-			const effects = feature.effects || [];
-			const update: Record<string, any> = {};
+		// Prepare containers for ONLY the effects that depend on this choice
+		const update: Record<string, any> = {};
+		const modify: Record<string, number> = {};
 
-			for (const effect of effects) {
-				// Replace {userChoice} placeholder with the actual pick
-				const value = effect.value === '{userChoice}' ? selectedOption : effect.value;
+		const effects = feature.effects || [];
+		for (const effect of effects) {
+			if (!effectNeedsChoice(effect)) continue; // skip static effects here
 
-				// Use effect.action to determine how to apply
-				if (effect.action === 'add') {
-					update[effect.target] = Array.isArray(value) ? value : [value];
-				} else if (effect.action === 'set') {
-					update[effect.target] = value;
+			// Replace {userChoice} anywhere in target or value with the chosen value.
+			// If isTarget = true, also convert to snake_case.
+			const replaceUC = (s: any, isTarget = false) => {
+				if (typeof s !== "string") return s;
+				let replaced = s.replace(/\{userChoice\}/g, normalizedChoice);
+				if (isTarget) {
+					replaced = replaced.toLowerCase().replace(/\s+/g, "_");
+				}
+				return replaced;
+			};
+
+			const target = replaceUC(effect.target, true);
+			const value = replaceUC(effect.value);
+
+			switch (effect.action) {
+				case "add": {
+					const arr = Array.isArray(value) ? value : [value];
+					if (!update[target]) update[target] = [];
+					update[target].push(...arr);
+					break;
+				}
+				case "set": {
+					update[target] = value;
+					break;
+				}
+				case "modify": {
+					const amount = Number(value);
+					if (!isNaN(amount)) {
+						modify[target] = (modify[target] ?? 0) + amount;
+					}
+					break;
+				}
+			}
+		}
+
+		// Apply the choice-dependent effects for this top-level selection
+		applyChoice(scopeId, update, modify);
+
+		// ✅ Apply newly revealed static nested features (no user input) for THIS choice
+		const newlyRevealed = getNestedPrompts(feature, [normalizedChoice]) || [];
+		for (const nested of newlyRevealed) {
+			// Skip nested prompts that have their own options; those will be handled by user interaction later
+			if (nested.featureOptions) continue;
+
+			const nestedScopeId = `feature:${feature.name}:${index}:${nested.name}`;
+			revertChanges(get(character_store), nestedScopeId); // ensure idempotence
+
+			const nestedUpdate: Record<string, any> = {};
+			const nestedModify: Record<string, number> = {};
+
+			for (const effect of nested.effects || []) {
+				const target = effect.target;
+				const value = effect.value;
+
+				switch (effect.action) {
+					case "add": {
+						const arr = Array.isArray(value) ? value : [value];
+						if (!nestedUpdate[target]) nestedUpdate[target] = [];
+						nestedUpdate[target].push(...arr);
+						break;
+					}
+					case "set": {
+						nestedUpdate[target] = value;
+						break;
+					}
+					case "modify": {
+						const amount = Number(value);
+						if (!isNaN(amount)) {
+							nestedModify[target] = (nestedModify[target] ?? 0) + amount;
+						}
+						break;
+					}
 				}
 			}
 
-			applyChoice(scopeId, update);
+			applyChoice(nestedScopeId, nestedUpdate, nestedModify);
 		}
 	}
+
+
+
 
 
 	function clearNestedFeatureSelections(feature: FeaturePrompt, selections: Record<string, (string | null)[]>) {
@@ -255,16 +354,49 @@
 			});
 
 			for (const feature of selectedClassData.classFeatures || []) {
-				if (!feature.featureOptions) {
-					applyChoice(`feature:${feature.name}`, {
-						features: [feature.name]
-					});
+				// Skip features with options; those will be applied later
+				if (feature.featureOptions) continue;
+
+				const scopeId = `feature:${feature.name}`;
+				revertChanges(get(character_store), scopeId); // just in case
+
+				// Collect updates from static effects
+				const update: Record<string, any> = {};
+				const modify: Record<string, number> = {};
+
+				for (const effect of feature.effects || []) {
+					const target = effect.target;
+					const value = effect.value;
+
+					switch (effect.action) {
+						case "add": {
+							const arr = Array.isArray(value) ? value : [value];
+							if (!update[target]) update[target] = [];
+							update[target].push(...arr);
+							break;
+						}
+						case "set": {
+							update[target] = value;
+							break;
+						}
+						case "modify": {
+							const amount = Number(value);
+							if (!isNaN(amount)) {
+								modify[target] = (modify[target] ?? 0) + amount;
+							}
+							break;
+						}
+					}
 				}
+
+				// Apply the static base-level feature
+				applyChoice(scopeId, update, modify);
 			}
 
 			bumpVersion();
 		}
 	}
+
 
 	function calculateMaxHP(hitDie: string | undefined) {
 		if (!hitDie) return 'N/A';
@@ -309,67 +441,112 @@
 		}
 
 
-
-
+	// --- onMount for class feature restoration ---
 	onMount(() => {
 		const state = get(character_store);
 
-		if (state.class) {
-			// Restore selected class
-			const found = classes.find(c => c.name === state.class);
-			if (found) {
-				selectedClassData = found;
-				featureSelections = {};
+		if (!state.class) return;
 
-				// Prepare arrays for static features (if you want to keep their cards primed)
-				for (const feature of found.classFeatures || []) {
-					if (state.features?.includes(feature.name)) {
-						featureSelections[feature.name] = [];
-					}
-				}
+		// Find selected class
+		const found = classes.find(c => c.name === state.class);
+		if (!found) return;
 
-				// Restore dynamic selections from provenance
-				const provKeys = Object.keys(state._provenance || {});
-				for (const key of provKeys) {
-					if (!key.startsWith('feature:')) continue;
-					const [, featureName, indexStr] = key.split(':');
-					const index = parseInt(indexStr, 10) || 0;
-					const stored: any = state._provenance?.[key];
-					if (!stored) continue;
+		selectedClassData = found;
+		featureSelections = {};
 
-					// Ensure array exists & is sized for the feature
-					const numPicks =
-						found.classFeatures?.find(f => f.name === featureName)?.featureOptions?.numPicks || 1;
+		const toSnakeCase = (str: string) => str.toLowerCase().replace(/\s+/g, "_");
 
-					if (!featureSelections[featureName]) {
-						featureSelections[featureName] = Array(numPicks).fill(null);
-					} else {
-						ensureArrayLen(featureSelections[featureName], numPicks);
-					}
-
-					// Pick a representative value from the stored change
-					let restored: string | null = null;
-
-					if (Array.isArray(stored.skills) && stored.skills[0]) restored = stored.skills[0];
-					else if (Array.isArray(stored.languages) && stored.languages[0]) restored = stored.languages[0];
-					else if (Array.isArray(stored.proficiencies) && stored.proficiencies[0]) restored = stored.proficiencies[0];
-					else if (Array.isArray(stored.features) && stored.features[0]) restored = stored.features[0];
-					else if (typeof stored.subclass === 'string' && stored.subclass) restored = stored.subclass;
-					else if (Array.isArray(stored.subclass) && stored.subclass[0]) restored = stored.subclass[0];
-					else if (typeof stored.class === 'string' && stored.class) restored = stored.class;
-					else if (Array.isArray(stored.class) && stored.class[0]) restored = stored.class[0];
-
-					if (restored) {
-						featureSelections[featureName][index] = restored;
-					}
-				}
-
-				// Nudge reactivity after bulk restore
-				featureSelections = { ...featureSelections };
-				bumpVersion();
+		// Helper: convert stored snake_case value to display label
+		const tryRestoreFromValue = (val: string, optionMap: Map<string, string>) => {
+			const snakeVal = toSnakeCase(val);
+			for (const [key, label] of optionMap.entries()) {
+				if (snakeVal.includes(key)) return label;
 			}
-		}
+			return null;
+		};
+
+		// Recursive function to restore a feature and its nested prompts
+		const restoreFeatureSelection = (feature: FeaturePrompt) => {
+			const numPicks = feature.featureOptions?.numPicks || 1;
+
+			if (!featureSelections[feature.name]) {
+				featureSelections[feature.name] = Array(numPicks).fill(null);
+			} else {
+				ensureArrayLen(featureSelections[feature.name], numPicks);
+			}
+
+			const opts = feature.featureOptions?.options || [];
+			const optionMap = new Map(
+				opts.map(o => [toSnakeCase(typeof o === 'string' ? o : o.name), typeof o === 'string' ? o : o.name])
+			);
+
+			const prov = state._provenance || {};
+
+			for (let idx = 0; idx < numPicks; idx++) {
+				// Skip if already restored
+				if (featureSelections[feature.name][idx]) continue;
+
+				const key = `feature:${feature.name}:${idx}`;
+				const stored: any = prov[key];
+
+				let restored: string | null = null;
+
+				if (stored?._set) {
+					for (const effect of feature.effects || []) {
+						const target = effect.target;
+						const arr = stored._set[target];
+						if (Array.isArray(arr)) {
+							for (const val of arr) {
+								const maybe = tryRestoreFromValue(val, optionMap);
+								if (maybe) {
+									restored = maybe;
+									break;
+								}
+							}
+						} else if (typeof arr === "string") {
+							const maybe = tryRestoreFromValue(arr, optionMap);
+							if (maybe) restored = maybe;
+						}
+						if (restored) break;
+					}
+				}
+
+				if (!restored && stored?._mods) {
+					for (const modKey of Object.keys(stored._mods)) {
+						const maybe = tryRestoreFromValue(modKey, optionMap);
+						if (maybe) {
+							restored = maybe;
+							break;
+						}
+					}
+				}
+
+				if (restored) {
+					featureSelections[feature.name][idx] = restored;
+				}
+			}
+
+			// Recurse into nested prompts if any
+			if (feature.featureOptions?.options) {
+				feature.featureOptions.options.forEach(o => {
+					if (typeof o !== "string" && o.nestedPrompts) {
+						const selectedVal = featureSelections[feature.name].find(v => v === o.name);
+						if (selectedVal) {
+							o.nestedPrompts.forEach(nested => restoreFeatureSelection(nested));
+						}
+					}
+				});
+			}
+		};
+
+		// Restore all top-level features
+		found.classFeatures?.forEach(feature => restoreFeatureSelection(feature));
+
+		// Trigger Svelte reactivity
+		featureSelections = { ...featureSelections };
+		bumpVersion();
 	});
+
 </script>
 
 <div class="main-content">
@@ -451,84 +628,85 @@
 
 			<!-- Render top-level features with collapsible cards -->
 			{#each mergedFeatures as feature (feature.name)}
-			<div class="feature-card {isFeatureIncomplete(feature, featureSelections) ? 'incomplete' : feature.featureOptions ? 'complete' : ''}">
-				<button
-				class="feature-header"
-				type="button"
-				on:click={() => toggleFeatureExpand(feature.name)}
-				>
-				<span class="feature-name">{feature.name}</span>
-				<span class="expand-indicator">
-					{expandedFeatures.has(feature.name) ? '–' : '+'}
-				</span>
-				</button>
+				<div class="feature-card {isFeatureIncomplete(feature, featureSelections) ? 'incomplete' : feature.featureOptions ? 'complete' : ''}">
+					<button
+						class="feature-header"
+						type="button"
+						on:click={() => toggleFeatureExpand(feature.name)}
+					>
+						<span class="feature-name">{feature.name}</span>
+						<span class="expand-indicator">
+							{expandedFeatures.has(feature.name) ? '–' : '+'}
+						</span>
+					</button>
 
-				{#if expandedFeatures.has(feature.name)}
-				<p>{@html feature.description}</p>
+					{#if expandedFeatures.has(feature.name)}
+						<p>{@html feature.description}</p>
 
-				{#if feature.featureOptions}
-					{#each Array(feature.featureOptions.numPicks) as _, idx}
-					{#key `${feature.name}:${idx}:${selectionVersion}`}
-						<select
-						value={featureSelections[feature.name]?.[idx] || ''}
-						on:change={(e: Event) => {
-							const target = e.target as HTMLSelectElement;
-							onSelectFeatureOption(feature, idx, target.value);
-						}}
-						>
-						<option value="" disabled>
-							{feature.featureOptions.placeholderText || 'Select an option'}
-						</option>
+						{#if feature.featureOptions}
+							{#each Array(feature.featureOptions.numPicks) as _, idx}
+							{#key `${feature.name}:${idx}:${selectionVersion}`}
+								<select
+									value={featureSelections[feature.name]?.[idx] || ''}
+									on:change={(e: Event) => {
+										const target = e.target as HTMLSelectElement;
+										onSelectFeatureOption(feature, idx, target.value);
+									}}
+								>
+									<option value="" disabled>
+										{feature.featureOptions.placeholderText || 'Select an option'}
+									</option>
 
-						{#each getGloballyAvailableOptions(feature, idx) as option (typeof option === 'string' ? option : option.name)}
-							<option value={typeof option === 'string' ? option : option.name}>
-							{typeof option === 'string' ? option : option.name}
-							</option>
-						{/each}
-						</select>
-					{/key}
-					{/each}
-
-					<!-- Render nested prompts expanded -->
-					{#each getNestedPrompts(feature, featureSelections[feature.name] || []) as nestedFeature (nestedFeature.name)}
-					<div class="feature-card nested {isFeatureIncomplete(nestedFeature, featureSelections) ? 'incomplete' : nestedFeature.featureOptions ? 'complete' : ''}">
-						<h4>{nestedFeature.name}</h4>
-						<p>{@html nestedFeature.description}</p>
-
-						{#if nestedFeature.featureOptions}
-						{#each Array(nestedFeature.featureOptions.numPicks) as _, nestedIdx}
-							{#key `${nestedFeature.name}:${nestedIdx}:${selectionVersion}`}
-							<select
-								value={featureSelections[nestedFeature.name]?.[nestedIdx] || ''}
-								on:change={(e: Event) => {
-								const target = e.target as HTMLSelectElement;
-								onSelectFeatureOption(nestedFeature, nestedIdx, target.value);
-								}}
-							>
-								<option value="" disabled>
-								{nestedFeature.featureOptions.placeholderText || 'Select an option'}
-								</option>
-
-								{#each getGloballyAvailableOptions(nestedFeature, nestedIdx) as option (typeof option === 'string' ? option : option.name)}
-								<option value={typeof option === 'string' ? option : option.name}>
-									{typeof option === 'string' ? option : option.name}
-								</option>
-								{/each}
-							</select>
+									{#each getGloballyAvailableOptions(feature, idx) as option (typeof option === 'string' ? option : option.name)}
+										<option value={typeof option === 'string' ? option : option.name}>
+											{typeof option === 'string' ? option : option.name}
+										</option>
+									{/each}
+								</select>
 							{/key}
-						{/each}
+							{/each}
+
+							<!-- Render nested prompts only if the parent selection exists -->
+							{#each featureSelections[feature.name]?.filter(Boolean) as parentChoice}
+								{#each getNestedPrompts(feature, [parentChoice]) as nestedFeature (nestedFeature.name)}
+								<div class="feature-card nested {isFeatureIncomplete(nestedFeature, featureSelections) ? 'incomplete' : nestedFeature.featureOptions ? 'complete' : ''}">
+									<h4>{nestedFeature.name}</h4>
+									<p>{@html nestedFeature.description}</p>
+
+									{#if nestedFeature.featureOptions}
+										{#each Array(nestedFeature.featureOptions.numPicks) as _, nestedIdx}
+										{#key `${nestedFeature.name}:${nestedIdx}:${selectionVersion}`}
+											<select
+												value={featureSelections[nestedFeature.name]?.[nestedIdx] || ''}
+												on:change={(e: Event) => {
+													const target = e.target as HTMLSelectElement;
+													onSelectFeatureOption(nestedFeature, nestedIdx, target.value);
+												}}
+											>
+												<option value="" disabled>
+													{nestedFeature.featureOptions.placeholderText || 'Select an option'}
+												</option>
+
+												{#each getGloballyAvailableOptions(nestedFeature, nestedIdx) as option (typeof option === 'string' ? option : option.name)}
+													<option value={typeof option === 'string' ? option : option.name}>
+														{typeof option === 'string' ? option : option.name}
+													</option>
+												{/each}
+											</select>
+										{/key}
+										{/each}
+									{/if}
+								</div>
+								{/each}
+							{/each}
 						{/if}
-					</div>
-					{/each}
-				{/if}
-				{/if}
-			</div>
+					{/if}
+				</div>
 			{/each}
-
-
 		</div>
 	{/if}
 </div>
+
 
 
 <style>
@@ -733,7 +911,9 @@
 
 	/* Nested cards inherit base style but slightly different background & indent */
 	.feature-card.nested {
+		margin-top: 1rem;
 		margin-left: 1rem;
+		width: calc(100% - 2rem); /* shrink to match indent */
 		background-color: #eee;
 		border-color: #888; /* fallback for nested cards without state class */
 	}

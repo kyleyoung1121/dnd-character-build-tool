@@ -3,6 +3,20 @@
 	import { onMount } from 'svelte';
 
 	import { dragonborn } from '$lib/data/races/dragonborn';
+	import { halfElf } from '$lib/data/races/half_elf';
+	import { tiefling } from '$lib/data/races/tiefling';
+	import { highElf } from '$lib/data/races/elf/high_elf';
+	import { woodElf } from '$lib/data/races/elf/wood_elf';
+	import { darkElf } from '$lib/data/races/elf/dark_elf';
+	import { hillDwarf } from '$lib/data/races/dwarf/hill_dwarf';
+	import { mountainDwarf } from '$lib/data/races/dwarf/mountain_dwarf';
+	import { rockGnome } from '$lib/data/races/gnome/rock_gnome';
+	import { forestGnome } from '$lib/data/races/gnome/forest_gnome';
+	import { lightfootHalfling } from '$lib/data/races/halfling/lightfoot_halfling';
+	import { stoutHalfling } from '$lib/data/races/halfling/stout_halfling';
+	import { human } from '$lib/data/races/human/human';
+	import { variantHuman } from '$lib/data/races/human/variant_human';
+	import { halfOrc } from '$lib/data/races/half_orc';
 
 	import type { RaceData } from '$lib/data/types/RaceData';
 	import type { FeaturePrompt } from '$lib/data/types/Features';
@@ -11,12 +25,56 @@
 	import { get } from 'svelte/store';
 	import { character_store } from '$lib/stores/character_store';
 
-	const races: RaceData[] = [
+	// --- NEW: race group type ---
+	interface RaceGroup {
+		name: string;
+		image: string;
+		subraces: RaceData[];
+	}
+
+	const races: (RaceData | RaceGroup)[] = [
 		dragonborn,
+		{
+			name: 'Dwarf',
+			image: `${base}/race_icons/hill_dwarf.jpg`,
+			subraces: [hillDwarf, mountainDwarf]
+		},
+		{
+			name: 'Elf',
+			image: `${base}/race_icons/high_elf.jpg`,
+			subraces: [highElf, woodElf, darkElf]
+		},
+		{
+			name: 'Gnome',
+			image: `${base}/race_icons/rock_gnome.jpg`,
+			subraces: [rockGnome, forestGnome]
+		},
+		halfElf,
+		halfOrc,
+		{
+			name: 'Halfling',
+			image: `${base}/race_icons/lightfoot_halfling.jpg`,
+			subraces: [lightfootHalfling, stoutHalfling]
+		},
+		{
+			name: 'Human',
+			image: `${base}/race_icons/human.jpg`,
+			subraces: [human, variantHuman]
+		},
+		tiefling
 	];
+
 
 	let selectedRace: RaceData | null = null;
 	let selectedRaceData: RaceData | null = null;
+
+	// Collapsible parent races
+	let expandedRaces = new Set<string>();
+	function toggleRaceExpand(name: string) {
+		if (expandedRaces.has(name)) expandedRaces.delete(name);
+		else expandedRaces.add(name);
+		expandedRaces = new Set(expandedRaces); // force reactivity
+	}
 
 	// featureSelections maps feature.name -> array of picks (by index)
 	let featureSelections: Record<string, (string | null)[]> = {};
@@ -25,7 +83,6 @@
 
 	// Used to force Svelte to re-create <select> nodes so option lists refresh instantly
 	let selectionVersion = 0;
-
 	function bumpVersion() {
 		selectionVersion = (selectionVersion + 1) % 1_000_000;
 	}
@@ -37,16 +94,13 @@
 	}
 
 	// Current feature list for the selected race
-	$: mergedFeatures = selectedRaceData
-		? [...(selectedRaceData.raceFeatures || [])]
-		: [];
+	$: mergedFeatures = selectedRaceData ? [...(selectedRaceData.raceFeatures || [])] : [];
 
 	// make sure this lives in <script> and stays after isFeatureIncomplete is defined
 	$: featureStatuses = mergedFeatures.map((feature) => ({
-	feature,
-	incomplete: isFeatureIncomplete(feature, featureSelections) // <-- pass the map
+		feature,
+		incomplete: isFeatureIncomplete(feature, featureSelections)
 	}));
-
 
 	/**
 	 * Build a globally-aware option list for a given feature + index:
@@ -103,7 +157,59 @@
 		}
 	}
 
-	function onSelectFeatureOption(feature: FeaturePrompt, index: number, selectedOption: string) {
+	/** Utility: does an effect require a user choice in its target or value? */
+	function effectNeedsChoice(e: any) {
+		return (
+			(typeof e.target === 'string' && e.target.includes('{userChoice}')) ||
+			(typeof e.value === 'string' && e.value.includes('{userChoice}'))
+		);
+	}
+
+	/** Apply the static (choice-independent) effects for a feature exactly once. */
+	function applyStaticEffectsForFeatureOnce(feature: FeaturePrompt) {
+		const staticEffects = (feature.effects || []).filter((e) => !effectNeedsChoice(e));
+		if (!staticEffects.length) return;
+
+		const update: Record<string, any> = {};
+		const modify: Record<string, number> = {};
+
+		for (const effect of staticEffects) {
+			const target = effect.target;
+			const value = effect.value;
+
+			switch (effect.action) {
+				case 'add': {
+					const arr = Array.isArray(value) ? value : [value];
+					if (!update[target]) update[target] = [];
+					update[target].push(...arr);
+					break;
+				}
+				case 'set': {
+					update[target] = value;
+					break;
+				}
+				case 'modify': {
+					const amount = Number(value);
+					if (!isNaN(amount)) {
+						modify[target] = (modify[target] ?? 0) + amount;
+					}
+					break;
+				}
+			}
+		}
+
+		applyChoice(`feature:${feature.name}:static`, update, modify);
+	}
+
+	// --- onSelectFeatureOption (Race Tab) ---
+	function onSelectFeatureOption(
+		feature: FeaturePrompt,
+		index: number,
+		selectedOption: string
+	) {
+		// We store the raw option label; targets will be snake-cased when needed.
+		const normalizedChoice = selectedOption;
+
 		// Ensure the selection array exists and has the right length
 		const num = feature.featureOptions?.numPicks || 1;
 		if (!featureSelections[feature.name]) {
@@ -116,43 +222,123 @@
 
 		// Make a deep copy of the selections array for reactivity
 		const updatedSelections = [...featureSelections[feature.name]];
-		updatedSelections[index] = selectedOption;
+		updatedSelections[index] = normalizedChoice;
 
 		// Update the main store object with a new array reference
 		featureSelections = { ...featureSelections, [feature.name]: updatedSelections };
 		bumpVersion();
 
-		if (prev !== selectedOption) {
-			// Clear any nested selections under the previous branch
-			clearNestedFeatureSelections(feature, featureSelections);
+		if (prev === normalizedChoice) return;
 
-			const scopeId = `feature:${feature.name}:${index}`;
-			if (prev) {
-				revertChanges(get(character_store), scopeId);
+		// Clear any nested selections under the previous branch
+		clearNestedFeatureSelections(feature, featureSelections);
+
+		const scopeId = `feature:${feature.name}:${index}`;
+
+		// Revert previous top-level choice effects
+		if (prev) {
+			revertChanges(get(character_store), scopeId);
+
+			// Also revert any static nested effects tied to the previous choice
+			const prevNested = getNestedPrompts(feature, [prev]) || [];
+			for (const nested of prevNested) {
+				if (nested.featureOptions) continue; // only static nested
+				const prevNestedScopeId = `feature:${feature.name}:${index}:${nested.name}`;
+				revertChanges(get(character_store), prevNestedScopeId);
 			}
+		}
 
-			// Apply all effects for this feature
-			const effects = feature.effects || [];
-			const update: Record<string, any> = {};
+		// Prepare containers for ONLY the effects that depend on this choice
+		const update: Record<string, any> = {};
+		const modify: Record<string, number> = {};
 
-			for (const effect of effects) {
-				// Replace {userChoice} placeholder with the actual pick
-				const value = effect.value === '{userChoice}' ? selectedOption : effect.value;
+		const effects = feature.effects || [];
+		for (const effect of effects) {
+			if (!effectNeedsChoice(effect)) continue; // skip static effects here
 
-				// Use effect.action to determine how to apply
-				if (effect.action === 'add') {
-					update[effect.target] = Array.isArray(value) ? value : [value];
-				} else if (effect.action === 'set') {
-					update[effect.target] = value;
+			// Replace {userChoice} anywhere in target or value with the chosen value.
+			const replaceUC = (s: any, isTarget = false) => {
+				if (typeof s !== "string") return s;
+				let replaced = s.replace(/\{userChoice\}/g, normalizedChoice);
+				if (isTarget) {
+					replaced = replaced.toLowerCase().replace(/\s+/g, "_");
+				}
+				return replaced;
+			};
+
+			const target = replaceUC(effect.target, true);
+			const value = replaceUC(effect.value);
+
+			switch (effect.action) {
+				case "add": {
+					const arr = Array.isArray(value) ? value : [value];
+					if (!update[target]) update[target] = [];
+					update[target].push(...arr);
+					break;
+				}
+				case "set": {
+					update[target] = value;
+					break;
+				}
+				case "modify": {
+					const amount = Number(value);
+					if (!isNaN(amount)) {
+						modify[target] = (modify[target] ?? 0) + amount;
+					}
+					break;
+				}
+			}
+		}
+
+		// Apply the choice-dependent effects for this top-level selection
+		applyChoice(scopeId, update, modify);
+
+		// ✅ Apply newly revealed static nested features (no user input) for THIS choice
+		const newlyRevealed = getNestedPrompts(feature, [normalizedChoice]) || [];
+		for (const nested of newlyRevealed) {
+			// Skip nested prompts that have their own options; those will be handled by user interaction later
+			if (nested.featureOptions) continue;
+
+			const nestedScopeId = `feature:${feature.name}:${index}:${nested.name}`;
+			revertChanges(get(character_store), nestedScopeId); // ensure idempotence
+
+			const nestedUpdate: Record<string, any> = {};
+			const nestedModify: Record<string, number> = {};
+
+			for (const effect of nested.effects || []) {
+				const target = effect.target;
+				const value = effect.value;
+
+				switch (effect.action) {
+					case "add": {
+						const arr = Array.isArray(value) ? value : [value];
+						if (!nestedUpdate[target]) nestedUpdate[target] = [];
+						nestedUpdate[target].push(...arr);
+						break;
+					}
+					case "set": {
+						nestedUpdate[target] = value;
+						break;
+					}
+					case "modify": {
+						const amount = Number(value);
+						if (!isNaN(amount)) {
+							nestedModify[target] = (nestedModify[target] ?? 0) + amount;
+						}
+						break;
+					}
 				}
 			}
 
-			applyChoice(scopeId, update);
+			applyChoice(nestedScopeId, nestedUpdate, nestedModify);
 		}
 	}
 
 
-	function clearNestedFeatureSelections(feature: FeaturePrompt, selections: Record<string, (string | null)[]>) {
+	function clearNestedFeatureSelections(
+		feature: FeaturePrompt,
+		selections: Record<string, (string | null)[]>
+	) {
 		if (!feature.featureOptions) return;
 		let mutated = false;
 
@@ -215,11 +401,11 @@
 
 			const prefixes = [
 				`race:${selectedRaceData.name}`,
-				...allFeatureNames.map(f => `feature:${f}`)
+				...allFeatureNames.map((f) => `feature:${f}`)
 			];
 
 			for (const key of provKeys) {
-				if (prefixes.some(prefix => key.startsWith(prefix))) {
+				if (prefixes.some((prefix) => key.startsWith(prefix))) {
 					revertChanges(state, key);
 				}
 			}
@@ -231,7 +417,6 @@
 		expandedFeatures = new Set();
 		bumpVersion();
 	}
-
 
 	function confirmAddRace() {
 		if (selectedRace) {
@@ -245,21 +430,55 @@
 			});
 
 			for (const feature of selectedRaceData.raceFeatures || []) {
-				if (!feature.featureOptions) {
-					applyChoice(`feature:${feature.name}`, {
-						features: [feature.name]
-					});
+				// Skip features with options; those will be applied later
+				if (feature.featureOptions) continue;
+
+				const scopeId = `feature:${feature.name}`;
+				revertChanges(get(character_store), scopeId); // just in case
+
+				// Collect updates from static effects
+				const update: Record<string, any> = {};
+				const modify: Record<string, number> = {};
+
+				for (const effect of feature.effects || []) {
+					const target = effect.target;
+					const value = effect.value;
+
+					switch (effect.action) {
+						case "add": {
+							const arr = Array.isArray(value) ? value : [value];
+							if (!update[target]) update[target] = [];
+							update[target].push(...arr);
+							break;
+						}
+						case "set": {
+							update[target] = value;
+							break;
+						}
+						case "modify": {
+							const amount = Number(value);
+							if (!isNaN(amount)) {
+								modify[target] = (modify[target] ?? 0) + amount;
+							}
+							break;
+						}
+					}
 				}
+
+				// ✅ Only apply the feature if its effects exist
+				// (no auto-push into features[] unless the effect targets it)
+				applyChoice(scopeId, update, modify);
 			}
 
 			bumpVersion();
 		}
 	}
 
+
 	function isFeatureIncomplete(
 		feature: FeaturePrompt,
 		selectionsMap: Record<string, (string | null)[]>
-		): boolean {
+	): boolean {
 		// No options => not marked incomplete/complete (leave default styling)
 		if (!feature.featureOptions) return false;
 
@@ -277,58 +496,136 @@
 
 		for (const opt of feature.featureOptions.options) {
 			if (typeof opt !== 'string') {
-			if (selectedNames.includes(opt.name) && opt.nestedPrompts) {
-				for (const nested of opt.nestedPrompts) {
-				if (isFeatureIncomplete(nested, selectionsMap)) return true;
+				if (selectedNames.includes(opt.name) && opt.nestedPrompts) {
+					for (const nested of opt.nestedPrompts) {
+						if (isFeatureIncomplete(nested, selectionsMap)) return true;
+					}
 				}
-			}
 			}
 		}
 
 		// Fully complete
 		return false;
-		}
+	}
 
-
+	// --- onMount for feature restoration ---
 	onMount(() => {
 		const state = get(character_store);
 
 		if (state.race) {
-			// Restore selected race
-			const found = races.find(r => r.name === state.race);
-			if (found) {
+			// Find race or subrace
+			let found: RaceData | RaceGroup | undefined = races.find((r) => r.name === state.race);
+			if (!found) {
+				for (const race of races) {
+					if ("subraces" in race) {
+						const sub = race.subraces.find((sr) => sr.name === state.race);
+						if (sub) {
+							found = sub;
+							break;
+						}
+					}
+				}
+			}
+
+			if (found && !("subraces" in found)) {
 				selectedRaceData = found;
 				featureSelections = {};
 
 				// Prepare arrays for static features
-				for (const feature of found.raceFeatures || []) {
-					if (state.features?.includes(feature.name)) {
-						featureSelections[feature.name] = [];
+				if (state.features && found.raceFeatures) {
+					for (const feature of found.raceFeatures) {
+						if (state.features.includes(feature.name)) {
+							const numPicks = feature.featureOptions?.numPicks || 1;
+							featureSelections[feature.name] = Array(numPicks).fill(null);
+						}
 					}
 				}
 
+				const toSnakeCase = (str: string) => str.toLowerCase().replace(/\s+/g, "_");
+
 				// Restore dynamic selections from provenance
-				const provKeys = Object.keys(state._provenance || {});
-				for (const key of provKeys) {
-					if (!key.startsWith('feature:')) continue;
-					const [, featureName, indexStr] = key.split(':');
-					const index = parseInt(indexStr, 10) || 0;
-					const stored: any = state._provenance?.[key];
-					if (!stored) continue;
+				const prov = state._provenance || {};
+				for (const key of Object.keys(prov)) {
+					if (!key.startsWith("feature:")) continue;
+					const parts = key.split(":"); // feature:FeatureName:<index|static>
+					if (parts.length < 3) continue;
+					const featureName = parts[1];
+					const indexStr = parts[2];
+					if (indexStr === "static") continue;
 
-					// Ensure array exists & is sized for the feature
-					const numPicks =
-						found.raceFeatures?.find(f => f.name === featureName)?.featureOptions?.numPicks || 1;
+					const index = Number.isFinite(parseInt(indexStr, 10))
+						? parseInt(indexStr, 10)
+						: null;
+					if (index === null) continue;
 
-					if (!featureSelections[featureName]) {
-						featureSelections[featureName] = Array(numPicks).fill(null);
-					} else {
-						ensureArrayLen(featureSelections[featureName], numPicks);
+					const stored: any = prov[key];
+					const featureDef = found.raceFeatures?.find((f) => f.name === featureName);
+					if (!featureDef) continue;
+
+					const opts = featureDef.featureOptions?.options || [];
+
+					// Build map: snake_case => label
+					const optionMap = new Map(
+						opts.map((o) => {
+							const label = typeof o === "string" ? o : o.name;
+							return [toSnakeCase(label), label];
+						})
+					);
+
+					let restored: string | null = null;
+
+					// --- Helper: check if any stored value *contains* an option ---
+					const tryRestoreFromValue = (val: string) => {
+						const snakeVal = toSnakeCase(val);
+						for (const [key, label] of optionMap.entries()) {
+							if (snakeVal.includes(key)) {
+								return key; // return normalized key
+							}
+						}
+						return null;
+					};
+
+					// --- Check _set values ---
+					if (stored?._set) {
+						for (const effect of featureDef.effects || []) {
+							const target = effect.target;
+							const arr = stored._set[target];
+							if (Array.isArray(arr)) {
+								for (const val of arr) {
+									const maybe = tryRestoreFromValue(val);
+									if (maybe) {
+										restored = maybe;
+										break;
+									}
+								}
+							} else if (typeof arr === "string") {
+								const maybe = tryRestoreFromValue(arr);
+								if (maybe) restored = maybe;
+							}
+							if (restored) break;
+						}
 					}
 
-					// For races, only stored.features is relevant
-					if (Array.isArray(stored.features) && stored.features[0]) {
-						featureSelections[featureName][index] = stored.features[0];
+					// --- Check _mods (for ability score bumps etc.) ---
+					if (!restored && stored?._mods) {
+						for (const modKey of Object.keys(stored._mods)) {
+							const maybe = tryRestoreFromValue(modKey);
+							if (maybe) {
+								restored = maybe;
+								break;
+							}
+						}
+					}
+
+					// Save into featureSelections
+					if (restored) {
+						const numPicks = featureDef.featureOptions?.numPicks || 1;
+						if (!featureSelections[featureName]) {
+							featureSelections[featureName] = Array(numPicks).fill(null);
+						} else {
+							ensureArrayLen(featureSelections[featureName], numPicks);
+						}
+						featureSelections[featureName][index] = restored;
 					}
 				}
 
@@ -338,33 +635,88 @@
 			}
 		}
 	});
-	
+
+
+
+
 </script>
+
 
 
 <div class="main-content">
 	<p class="intro-text">
-		In Dungeons & Dragons, your character's race affects your abilities, traits, and what unique features you can access.
-		Each race has strengths and weaknesses, so choose wisely!
+		There are many different kinds of creatures you character can be, each with their own special traits and abilities.
 	</p>
 
 	{#if !selectedRaceData}
 		<div class="race-cards">
 			{#each races as raceInfo}
-				<button class="race-card" on:click={() => (selectedRace = raceInfo)}>
-					<div class="card-left">
-						<img src={raceInfo.image} alt={`${raceInfo.name} icon`} />
-						<span>{raceInfo.name}</span>
+				{#if 'subraces' in raceInfo}
+					<!-- Parent race container -->
+					<div class="parent-race-container">
+						<!-- Parent race button -->
+						<button
+							type="button"
+							class="race-card parent-race-button"
+							on:click={() => toggleRaceExpand(raceInfo.name)}
+							aria-expanded={expandedRaces.has(raceInfo.name)}
+						>
+							<div class="card-left">
+								<img src={raceInfo.image} alt={`${raceInfo.name} icon`} />
+								<span>{raceInfo.name}</span>
+							</div>
+							<img
+								class="card-arrow"
+								src="{base}/basic_icons/blue_next.png"
+								alt="toggle subraces"
+							/>
+						</button>
+
+						{#if expandedRaces.has(raceInfo.name)}
+							<div class="subrace-cards-container">
+								{#each raceInfo.subraces as subrace}
+									<button
+										class="race-card subrace-card"
+										on:click={() => (selectedRace = subrace)}
+									>
+										<div class="card-left">
+											<img src={subrace.image} alt={`${subrace.name} icon`} />
+											<span>{subrace.name}</span>
+										</div>
+										<img
+											class="card-arrow"
+											src="{base}/basic_icons/blue_next.png"
+											alt="next arrow"
+										/>
+									</button>
+								{/each}
+							</div>
+						{/if}
 					</div>
-					<img
-						class="card-arrow"
-						src="{base}/basic_icons/blue_next.png"
-						alt="next arrow"
-					/>
-				</button>
+				{:else}
+					<!-- Single race container -->
+					<div class="parent-race-container">
+						<button
+							class="race-card"
+							on:click={() => (selectedRace = raceInfo)}
+						>
+							<div class="card-left">
+								<img src={raceInfo.image} alt={`${raceInfo.name} icon`} />
+								<span>{raceInfo.name}</span>
+							</div>
+							<img
+								class="card-arrow"
+								src="{base}/basic_icons/blue_next.png"
+								alt="next arrow"
+							/>
+						</button>
+					</div>
+				{/if}
 			{/each}
 		</div>
 	{/if}
+
+
 
 	{#if selectedRace}
 		<!-- Popup Preview -->
@@ -449,7 +801,7 @@
 										</option>
 
 										{#each getGloballyAvailableOptions(feature, idx) as option (typeof option === 'string' ? option : option.name)}
-											<option value={typeof option === 'string' ? option : option.name}>
+											<option value={(typeof option === 'string' ? option : option.name).toLowerCase().replace(/\s+/g, "_")}>
 												{typeof option === 'string' ? option : option.name}
 											</option>
 										{/each}
@@ -478,7 +830,7 @@
 													</option>
 
 													{#each getGloballyAvailableOptions(nestedFeature, nestedIdx) as option (typeof option === 'string' ? option : option.name)}
-														<option value={typeof option === 'string' ? option : option.name}>
+														<option value={(typeof option === 'string' ? option : option.name).toLowerCase().replace(/\s+/g, "_")}>
 															{typeof option === 'string' ? option : option.name}
 														</option>
 													{/each}
@@ -511,21 +863,23 @@
 		color: #444;
 	}
 
+	/* Container for all race cards */
 	.race-cards {
 		display: flex;
-		flex-wrap: wrap;
-		justify-content: center;
+		flex-direction: column; /* vertical stack */
 		gap: 1rem;
 		margin-top: 2rem;
+		align-items: center; /* center the parent cards */
+		width: 100%;
 	}
 
+	/* Individual race card (single or parent) */
 	.race-card {
-		width: 30%;
+		width: 100%; /* fill parent width */
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: 1rem;
-		padding: 1rem 2rem;
+		padding: 1rem 1.5rem;
 		font-size: 1.2rem;
 		cursor: pointer;
 		border: 2px solid #ccc;
@@ -552,6 +906,12 @@
 		height: 24px;
 		object-fit: contain;
 		margin-left: auto;
+		transition: transform 0.2s ease;
+	}
+
+	/* Rotate arrow when expanded */
+	.race-card.expanded .card-arrow {
+		transform: rotate(90deg);
 	}
 
 	.race-card:hover,
@@ -564,6 +924,54 @@
 		box-shadow: 0 0 0 3px rgba(100, 149, 237, 0.5);
 	}
 
+	/* Parent + subrace grouping */
+	.parent-race-container {
+		display: flex;
+		flex-direction: column; /* stack parent + subraces */
+		width: 33%; /* 1/3 screen */
+		min-width: 220px; /* optional: ensure not too narrow on small screens */
+		box-sizing: border-box;
+	}
+
+	.parent-race-button {
+		width: 100%; /* fill container */
+	}
+
+	.subrace-cards-container {
+		display: flex;
+		flex-direction: column; /* stack subraces vertically */
+		gap: 0.5rem;
+		width: 100%; /* fill parent container */
+		padding-left: 5rem; /* indent for nesting */
+		box-sizing: border-box;
+		margin-top: 0.5rem; /* space between parent and first subrace */
+	}
+
+	/* Subrace card styling */
+	.subrace-card {
+		width: 100%; /* fill subrace container */
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0.8rem 1rem;
+		border-radius: 6px;
+		border: 2px solid #bbb;
+		background-color: #fafafa;
+		cursor: pointer;
+	}
+
+	.subrace-card img {
+		width: 32px;
+		height: 32px;
+		object-fit: contain;
+	}
+
+	.subrace-card:hover,
+	.subrace-card:focus {
+		background-color: #e8e8e8;
+	}
+
+	/* Popup and modal styles remain unchanged */
 	.popup {
 		position: fixed;
 		top: 0;
@@ -669,6 +1077,7 @@
 		background-color: #fdd;
 	}
 
+	/* Feature cards */
 	.feature-card {
 		border: 2px solid #ccc;
 		border-radius: 6px;
@@ -764,4 +1173,5 @@
 		font-weight: bold;
 		padding-left: 1rem;
 	}
+
 </style>

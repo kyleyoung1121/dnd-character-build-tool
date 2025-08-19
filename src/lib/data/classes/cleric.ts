@@ -77,7 +77,7 @@ const divineDomainPrompt: FeaturePrompt = {
 						description: "You gain proficiency with heavy armor.",
 						source: "cleric.life_domain",
 						effects: [
-							{ target: "armorProficiencies", action: "add", value: "Heavy Armor" }
+							{ target: "proficiencies", action: "add", value: "Heavy Armor" }
 						]
 					},
 					{

@@ -1,5 +1,5 @@
 import { base } from '$app/paths';
-import type { RaceData } from '$lib/data/types/RaceData';
+import type { SpeciesData } from '$lib/data/types/SpeciesData';
 import type { FeaturePrompt } from '$lib/data/types/Features';
 
 // Ability Score Choice Prompt
@@ -19,9 +19,9 @@ const abilityScoreChoicePrompt: FeaturePrompt = {
 	]
 };
 
-export const lightfootHalfling: RaceData = {
+export const lightfootHalfling: SpeciesData = {
 	name: "Lightfoot Halfling",
-	image: base + "/race_icons/lightfoot_halfling.jpg",
+	image: base + "/species_icons/lightfoot_halfling.jpg",
 	description: `
 		Lightfoot halflings are nimble and lucky, known for their stealth and friendly nature. 
 		They often move unseen and have a knack for staying out of trouble.
@@ -30,7 +30,7 @@ export const lightfootHalfling: RaceData = {
 	speed: "25 ft.",
 	size: "Small",
 	knownLanguages: ["Common", "Halfling"],
-	raceFeatures: [
+	speciesFeatures: [
 		abilityScoreChoicePrompt,
 		{
 			name: "Lucky",

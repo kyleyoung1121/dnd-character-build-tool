@@ -1,5 +1,5 @@
 import { base } from '$app/paths';
-import type { RaceData } from '$lib/data/types/RaceData';
+import type { SpeciesData } from '$lib/data/types/SpeciesData';
 import type { FeaturePrompt } from '$lib/data/types/Features';
 
 // Ability Score Choice Prompt
@@ -24,9 +24,9 @@ const abilityScoreChoicePrompt: FeaturePrompt = {
 	]
 };
 
-export const highElf: RaceData = {
+export const highElf: SpeciesData = {
 	name: "High Elf",
-	image: base + "/race_icons/high_elf.jpg",
+	image: base + "/species_icons/high_elf.jpg",
 	description: `
 		High elves are known for their intellect, refinement, and mastery of magic. 
 		They have keen senses, a love of learning, and an innate elegance.
@@ -35,7 +35,7 @@ export const highElf: RaceData = {
 	speed: "30 ft.",
 	size: "Medium",
 	knownLanguages: ["Common", "Elvish", "One extra language of your choice"],
-	raceFeatures: [
+	speciesFeatures: [
 		abilityScoreChoicePrompt,
 		{
 			name: "Darkvision",

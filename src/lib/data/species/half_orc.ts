@@ -1,5 +1,5 @@
 import { base } from '$app/paths';
-import type { RaceData } from '$lib/data/types/RaceData';
+import type { SpeciesData } from '$lib/data/types/SpeciesData';
 import type { FeaturePrompt } from '$lib/data/types/Features';
 
 // Ability Score Choice Prompt
@@ -24,9 +24,9 @@ const abilityScoreChoicePrompt: FeaturePrompt = {
 	]
 };
 
-export const halfOrc: RaceData = {
+export const halfOrc: SpeciesData = {
 	name: "Half-Orc",
-	image: base + "/race_icons/half_orc.jpg",
+	image: base + "/species_icons/half_orc.jpg",
 	description: `
 		Half-orcs are strong, resilient, and fierce warriors, often walking the line between 
 		human and orc societies. Their imposing presence is matched by their natural 
@@ -36,7 +36,7 @@ export const halfOrc: RaceData = {
 	speed: "30 ft.",
 	size: "Medium",
 	knownLanguages: ["Common", "Orc"],
-	raceFeatures: [
+	speciesFeatures: [
 		abilityScoreChoicePrompt,
 		{
 			name: "Darkvision",

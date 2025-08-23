@@ -116,6 +116,7 @@ export function getGloballyAvailableOptions(
 
 /**
  * Clear nested feature selections when parent changes
+ * Recursively clears all descendant selections
  */
 export function clearNestedFeatureSelections(
 	feature: FeaturePrompt,
@@ -126,13 +127,29 @@ export function clearNestedFeatureSelections(
 	const newSelections = { ...selections };
 	let mutated = false;
 
+	// Helper function to recursively clear nested selections
+	function clearRecursively(nestedFeature: FeaturePrompt) {
+		if (newSelections[nestedFeature.name]) {
+			delete newSelections[nestedFeature.name];
+			mutated = true;
+		}
+		
+		// Recursively clear any deeper nested selections
+		if (nestedFeature.featureOptions) {
+			for (const option of nestedFeature.featureOptions.options) {
+				if (typeof option !== 'string' && option.nestedPrompts) {
+					for (const deeperNested of option.nestedPrompts) {
+						clearRecursively(deeperNested);
+					}
+				}
+			}
+		}
+	}
+
 	for (const option of feature.featureOptions.options) {
 		if (typeof option !== 'string' && option.nestedPrompts) {
 			for (const nested of option.nestedPrompts) {
-				if (newSelections[nested.name]) {
-					delete newSelections[nested.name];
-					mutated = true;
-				}
+				clearRecursively(nested);
 			}
 		}
 	}

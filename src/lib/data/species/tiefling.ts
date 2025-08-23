@@ -1,5 +1,5 @@
 import { base } from '$app/paths';
-import type { RaceData } from '$lib/data/types/RaceData';
+import type { SpeciesData } from '$lib/data/types/SpeciesData';
 import type { FeaturePrompt } from '$lib/data/types/Features';
 
 // Ability Score Choice Prompt
@@ -24,9 +24,9 @@ const abilityScoreChoicePrompt: FeaturePrompt = {
 	]
 };
 
-export const tiefling: RaceData = {
+export const tiefling: SpeciesData = {
 	name: "Tiefling",
-	image: base + "/race_icons/tiefling.jpg",
+	image: base + "/species_icons/tiefling.jpg",
 	description: `
 		Tieflings are imbued with infernal heritage, giving them a charismatic yet mysterious presence. 
 		They often face suspicion, but their natural talents and magical gifts help them stand out.
@@ -35,7 +35,7 @@ export const tiefling: RaceData = {
 	speed: "30 ft.",
 	size: "Medium",
 	knownLanguages: ["Common", "Infernal"],
-	raceFeatures: [
+	speciesFeatures: [
 		abilityScoreChoicePrompt,
 		{
 			name: "Darkvision",

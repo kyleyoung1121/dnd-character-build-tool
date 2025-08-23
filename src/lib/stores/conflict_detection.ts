@@ -117,11 +117,11 @@ function getTabsFromSources(sources: string[]): string[] {
 			if (isUserChangeableClassFeature(source)) {
 				changeableTabs.add('class');
 			}
-		} else if (source.startsWith('race:') || isRaceFeature(source)) {
-			tabs.add('race');
-			// Most race features are automatic, but some races have choices
-			if (isUserChangeableRaceFeature(source)) {
-				changeableTabs.add('race');
+		} else if (source.startsWith('race:') || isSpeciesFeature(source)) {
+			tabs.add('species');
+			// Most species features are automatic, but some species have choices
+			if (isUserChangeableSpeciesFeature(source)) {
+				changeableTabs.add('species');
 			}
 		} else if (source.includes('background')) {
 			tabs.add('background');
@@ -151,10 +151,10 @@ function isUserChangeableClassFeature(scopeId: string): boolean {
 }
 
 /**
- * Check if a race feature represents a user choice
+ * Check if a species feature represents a user choice
  */
-function isUserChangeableRaceFeature(scopeId: string): boolean {
-	// Most race features are automatic, but some have choices
+function isUserChangeableSpeciesFeature(scopeId: string): boolean {
+	// Most species features are automatic, but some have choices
 	return /:\d+$/.test(scopeId) && (
 		scopeId.includes('Tool Proficiency') ||
 		scopeId.includes('Cantrip') ||
@@ -177,11 +177,11 @@ function isClassFeature(scopeId: string): boolean {
 }
 
 /**
- * Check if a feature scope belongs to a race
- * Race features include Keen Senses, Fey Ancestry, etc.
+ * Check if a feature scope belongs to a species
+ * Species features include Keen Senses, Fey Ancestry, etc.
  */
-function isRaceFeature(scopeId: string): boolean {
-	// Race features are typically named after racial traits
+function isSpeciesFeature(scopeId: string): boolean {
+	// Species features are typically named after species traits
 	return scopeId.includes('Keen Senses') ||
 		   scopeId.includes('Fey Ancestry') ||
 		   scopeId.includes('Trance') ||

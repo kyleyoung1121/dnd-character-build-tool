@@ -1,5 +1,5 @@
 import { base } from '$app/paths';
-import type { RaceData } from '$lib/data/types/RaceData';
+import type { SpeciesData } from '$lib/data/types/SpeciesData';
 import type { FeaturePrompt } from '$lib/data/types/Features';
 
 // Ability Score Choice Prompt
@@ -58,9 +58,9 @@ const skillVersatilityPrompt: FeaturePrompt = {
 	]
 };
 
-export const halfElf: RaceData = {
+export const halfElf: SpeciesData = {
 	name: "Half-Elf",
-	image: base + "/race_icons/half_elf.jpg",
+	image: base + "/species_icons/half_elf.jpg",
 	description: `
 		Half-elves combine what some say are the best qualities of their elf and human parents. 
 		They are charismatic, versatile, and find themselves at home in both societies, 
@@ -70,7 +70,7 @@ export const halfElf: RaceData = {
 	speed: "30 ft.",
 	size: "Medium",
 	knownLanguages: ["Common", "Elvish", "One extra language of your choice"],
-	raceFeatures: [
+	speciesFeatures: [
 		abilityScoreChoicePrompt,
 		{
 			name: "Darkvision",

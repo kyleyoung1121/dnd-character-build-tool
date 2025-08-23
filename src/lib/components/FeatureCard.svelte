@@ -151,10 +151,28 @@
 
 	.feature-card.nested {
 		margin-top: 1rem;
-		margin-left: 1rem;
+		margin-left: 1.5rem;
 		width: calc(100% - 2rem);
 		background-color: #eee;
 		border-color: #888;
+		border-width: 1px;
+		padding: 8px 10px;
+	}
+
+	/* Enhanced nesting: each level gets progressively more indented and lighter */
+	.feature-card.nested .feature-card.nested {
+		margin-left: 1rem;
+		background-color: #f5f5f5;
+		border-color: #999;
+		padding: 6px 8px;
+	}
+
+	.feature-card.nested .feature-card.nested .feature-card.nested {
+		margin-left: 0.75rem;
+		background-color: #fafafa;
+		border-color: #aaa;
+		padding: 4px 6px;
+		font-size: 0.95rem;
 	}
 
 	.feature-card.incomplete {

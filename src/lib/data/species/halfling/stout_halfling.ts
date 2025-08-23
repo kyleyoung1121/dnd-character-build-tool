@@ -1,5 +1,5 @@
 import { base } from '$app/paths';
-import type { RaceData } from '$lib/data/types/RaceData';
+import type { SpeciesData } from '$lib/data/types/SpeciesData';
 import type { FeaturePrompt } from '$lib/data/types/Features';
 
 // Ability Score Choice Prompt
@@ -24,9 +24,9 @@ const abilityScoreChoicePrompt: FeaturePrompt = {
 	]
 };
 
-export const stoutHalfling: RaceData = {
+export const stoutHalfling: SpeciesData = {
 	name: "Stout Halfling",
-	image: base + "/race_icons/stout_halfling.jpg",
+	image: base + "/species_icons/stout_halfling.jpg",
 	description: `
 		Stout halflings are hardy and resilient, often living in rugged environments. 
 		They are nimble and lucky, with a natural resistance to poison.
@@ -35,7 +35,7 @@ export const stoutHalfling: RaceData = {
 	speed: "25 ft.",
 	size: "Small",
 	knownLanguages: ["Common", "Halfling"],
-	raceFeatures: [
+	speciesFeatures: [
 		abilityScoreChoicePrompt,
 		{
 			name: "Lucky",

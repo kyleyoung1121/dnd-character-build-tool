@@ -1,5 +1,5 @@
 import { base } from '$app/paths';
-import type { RaceData } from '$lib/data/types/RaceData';
+import type { SpeciesData } from '$lib/data/types/SpeciesData';
 import type { FeaturePrompt } from '$lib/data/types/Features';
 
 // Ability Score Choice Prompt
@@ -24,9 +24,9 @@ const abilityScoreChoicePrompt: FeaturePrompt = {
 	]
 };
 
-export const woodElf: RaceData = {
+export const woodElf: SpeciesData = {
 	name: "Wood Elf",
-	image: base + "/race_icons/wood_elf.jpg",
+	image: base + "/species_icons/wood_elf.jpg",
 	description: `
 		Wood elves are reclusive and attuned to nature. They are swift, perceptive, and possess keen senses, thriving in forests and natural environments.
 	`,
@@ -34,7 +34,7 @@ export const woodElf: RaceData = {
 	speed: "35 ft.",
 	size: "Medium",
 	knownLanguages: ["Common", "Elvish"],
-	raceFeatures: [
+	speciesFeatures: [
 		abilityScoreChoicePrompt,
 		{
 			name: "Darkvision",

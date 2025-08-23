@@ -1,5 +1,5 @@
 import { base } from '$app/paths';
-import type { RaceData } from '$lib/data/types/RaceData';
+import type { SpeciesData } from '$lib/data/types/SpeciesData';
 import type { FeaturePrompt } from '$lib/data/types/Features';
 
 // Ability Score Choice Prompt
@@ -24,9 +24,9 @@ const abilityScoreChoicePrompt: FeaturePrompt = {
 	]
 };
 
-export const rockGnome: RaceData = {
+export const rockGnome: SpeciesData = {
 	name: "Rock Gnome",
-	image: base + "/race_icons/rock_gnome.jpg",
+	image: base + "/species_icons/rock_gnome.jpg",
 	description: `
 		Rock gnomes are known for their inventiveness and keen intellect. 
 		They are practical, cheerful, and curious, often tinkering with mechanical devices.
@@ -35,7 +35,7 @@ export const rockGnome: RaceData = {
 	speed: "25 ft.",
 	size: "Small",
 	knownLanguages: ["Common", "Gnomish"],
-	raceFeatures: [
+	speciesFeatures: [
 		abilityScoreChoicePrompt,
 		{
 			name: "Darkvision",

@@ -6,7 +6,7 @@
 
 	export let navItems = [
 		{ name: "Class", href: base + "/class", id: "class" },
-		{ name: "Race", href: base + "/race", id: "race" },
+		{ name: "Species", href: base + "/species", id: "species" },
 		{ name: "Abilities", href: base + "/abilities", id: "abilities" },
 		{ name: "Background", href: base + "/background", id: "background" },
 		{ name: "Equipment", href: base + "/equipment", id: "equipment" },

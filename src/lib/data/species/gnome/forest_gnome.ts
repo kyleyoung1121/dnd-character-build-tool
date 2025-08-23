@@ -1,5 +1,5 @@
 import { base } from '$app/paths';
-import type { RaceData } from '$lib/data/types/RaceData';
+import type { SpeciesData } from '$lib/data/types/SpeciesData';
 import type { FeaturePrompt } from '$lib/data/types/Features';
 
 // Ability Score Choice Prompt
@@ -24,9 +24,9 @@ const abilityScoreChoicePrompt: FeaturePrompt = {
 	]
 };
 
-export const forestGnome: RaceData = {
+export const forestGnome: SpeciesData = {
 	name: "Forest Gnome",
-	image: base + "/race_icons/forest_gnome.jpg",
+	image: base + "/species_icons/forest_gnome.jpg",
 	description: `
 		Forest gnomes are reclusive and whimsical, with a natural affinity for the forest. 
 		They are adept at illusion magic and skilled at hiding in their natural surroundings.
@@ -35,7 +35,7 @@ export const forestGnome: RaceData = {
 	speed: "25 ft.",
 	size: "Small",
 	knownLanguages: ["Common", "Gnomish"],
-	raceFeatures: [
+	speciesFeatures: [
 		abilityScoreChoicePrompt,
 		{
 			name: "Darkvision",

@@ -1,5 +1,5 @@
 import { base } from '$app/paths';
-import type { RaceData } from '$lib/data/types/RaceData';
+import type { SpeciesData } from '$lib/data/types/SpeciesData';
 import type { FeaturePrompt } from '$lib/data/types/Features';
 
 // Ability Score Choice Prompt
@@ -24,9 +24,9 @@ const abilityScoreChoicePrompt: FeaturePrompt = {
 	]
 };
 
-export const darkElf: RaceData = {
+export const darkElf: SpeciesData = {
 	name: "Dark Elf (Drow)",
-	image: base + "/race_icons/dark_elf.jpg",
+	image: base + "/species_icons/dark_elf.jpg",
 	description: `
 		Drows are a subterranean subrace of elves with darkvision and innate magical abilities. 
 		They are known for their dexterity, stealth, and charm, but often face distrust from other races.
@@ -35,7 +35,7 @@ export const darkElf: RaceData = {
 	speed: "30 ft.",
 	size: "Medium",
 	knownLanguages: ["Common", "Elvish"],
-	raceFeatures: [
+	speciesFeatures: [
 		abilityScoreChoicePrompt,
 		{
 			name: "Darkvision",

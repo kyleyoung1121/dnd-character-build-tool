@@ -1,5 +1,5 @@
 import { base } from '$app/paths';
-import type { RaceData } from '$lib/data/types/RaceData';
+import type { SpeciesData } from '$lib/data/types/SpeciesData';
 import type { FeaturePrompt } from '$lib/data/types/Features';
 
 // Ability Score Choice Prompt
@@ -52,9 +52,9 @@ const skillVersatilityPrompt: FeaturePrompt = {
 	]
 };
 
-export const variantHuman: RaceData = {
+export const variantHuman: SpeciesData = {
 	name: "Variant Human",
-	image: base + "/race_icons/variant_human.jpg",
+	image: base + "/species_icons/variant_human.jpg",
 	description: `
 		Variant humans are highly adaptable, gaining two ability score increases of your choice and proficiency in one skill.
 	`,
@@ -62,7 +62,7 @@ export const variantHuman: RaceData = {
 	speed: "30 ft.",
 	size: "Medium",
 	knownLanguages: ["Common", "One extra language of your choice"],
-	raceFeatures: [
+	speciesFeatures: [
 		abilityScoreChoicePrompt,
 		skillVersatilityPrompt
 	]

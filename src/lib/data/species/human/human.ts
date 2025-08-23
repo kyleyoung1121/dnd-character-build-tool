@@ -1,5 +1,5 @@
 import { base } from '$app/paths';
-import type { RaceData } from '$lib/data/types/RaceData';
+import type { SpeciesData } from '$lib/data/types/SpeciesData';
 import type { FeaturePrompt } from '$lib/data/types/Features';
 
 // Ability Score Choice Prompt
@@ -20,9 +20,9 @@ const abilityScoreChoicePrompt: FeaturePrompt = {
 	]
 };
 
-export const human: RaceData = {
+export const human: SpeciesData = {
 	name: "Human",
-	image: base + "/race_icons/human.jpg",
+	image: base + "/species_icons/human.jpg",
 	description: `
 		Humans are the most adaptable and ambitious people among the common races. 
 		They are diverse in talents, motivations, and appearance.
@@ -31,7 +31,7 @@ export const human: RaceData = {
 	speed: "30 ft.",
 	size: "Medium",
 	knownLanguages: ["Common", "One extra language of your choice"],
-	raceFeatures: [
+	speciesFeatures: [
 		abilityScoreChoicePrompt
 	]
 };

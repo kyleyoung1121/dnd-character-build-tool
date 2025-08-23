@@ -1,6 +1,6 @@
 import type { FeaturePrompt } from './Features';
 
-export interface RaceData {
+export interface SpeciesData {
 	name: string;
 	image: string;
 	description: string;
@@ -8,5 +8,5 @@ export interface RaceData {
 	speed: string; // e.g. "30 ft."
 	size: string; // Small / Medium
 	knownLanguages: string[];
-	raceFeatures: FeaturePrompt[]; // parallels classFeatures
+	speciesFeatures: FeaturePrompt[]; // parallels classFeatures
 }

@@ -1,5 +1,5 @@
 import { base } from '$app/paths';
-import type { RaceData } from '$lib/data/types/RaceData';
+import type { SpeciesData } from '$lib/data/types/SpeciesData';
 import type { FeaturePrompt } from '$lib/data/types/Features';
 
 // Ability Score Choice Prompt
@@ -112,7 +112,7 @@ const breathShapePrompt: FeaturePrompt = {
 	]
 };
 
-const raceFeatures: FeaturePrompt[] = [
+const speciesFeatures: FeaturePrompt[] = [
 	{
 		name: "Breath Weapon",
 		id: "dragonborn_breath_weapon",
@@ -147,9 +147,9 @@ const raceFeatures: FeaturePrompt[] = [
 	}
 ];
 
-export const dragonborn: RaceData = {
+export const dragonborn: SpeciesData = {
 	name: 'Dragonborn',
-	image: base + '/race_icons/dragonborn.jpg',
+	image: base + '/species_icons/dragonborn.jpg',
 	description: `
 		Dragonborn look like dragons who walk on two legs. They don’t have wings or tails, but they still are capable of unleashing the powerful breath of their ancestors.
 	`,
@@ -157,11 +157,11 @@ export const dragonborn: RaceData = {
 	speed: "30 ft.",
 	size: "Medium",
 	knownLanguages: ["Common", "Draconic"],
-	raceFeatures: [
+	speciesFeatures: [
 		abilityScoreChoicePrompt,
 		draconicElementPrompt,
 		draconicColorPrompt,
 		breathShapePrompt,
-		...raceFeatures
+		...speciesFeatures
 	]
 };

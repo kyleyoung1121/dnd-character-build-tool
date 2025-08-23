@@ -2,23 +2,23 @@
 	import { base } from '$app/paths';
 	import { onMount } from 'svelte';
 
-	import { dragonborn } from '$lib/data/races/dragonborn';
-	import { halfElf } from '$lib/data/races/half_elf';
-	import { tiefling } from '$lib/data/races/tiefling';
-	import { highElf } from '$lib/data/races/elf/high_elf';
-	import { woodElf } from '$lib/data/races/elf/wood_elf';
-	import { darkElf } from '$lib/data/races/elf/dark_elf';
-	import { hillDwarf } from '$lib/data/races/dwarf/hill_dwarf';
-	import { mountainDwarf } from '$lib/data/races/dwarf/mountain_dwarf';
-	import { rockGnome } from '$lib/data/races/gnome/rock_gnome';
-	import { forestGnome } from '$lib/data/races/gnome/forest_gnome';
-	import { lightfootHalfling } from '$lib/data/races/halfling/lightfoot_halfling';
-	import { stoutHalfling } from '$lib/data/races/halfling/stout_halfling';
-	import { human } from '$lib/data/races/human/human';
-	import { variantHuman } from '$lib/data/races/human/variant_human';
-	import { halfOrc } from '$lib/data/races/half_orc';
+	import { dragonborn } from '$lib/data/species/dragonborn';
+	import { halfElf } from '$lib/data/species/half_elf';
+	import { tiefling } from '$lib/data/species/tiefling';
+	import { highElf } from '$lib/data/species/elf/high_elf';
+	import { woodElf } from '$lib/data/species/elf/wood_elf';
+	import { darkElf } from '$lib/data/species/elf/dark_elf';
+	import { hillDwarf } from '$lib/data/species/dwarf/hill_dwarf';
+	import { mountainDwarf } from '$lib/data/species/dwarf/mountain_dwarf';
+	import { rockGnome } from '$lib/data/species/gnome/rock_gnome';
+	import { forestGnome } from '$lib/data/species/gnome/forest_gnome';
+	import { lightfootHalfling } from '$lib/data/species/halfling/lightfoot_halfling';
+	import { stoutHalfling } from '$lib/data/species/halfling/stout_halfling';
+	import { human } from '$lib/data/species/human/human';
+	import { variantHuman } from '$lib/data/species/human/variant_human';
+	import { halfOrc } from '$lib/data/species/half_orc';
 
-	import type { RaceData } from '$lib/data/types/RaceData';
+	import type { SpeciesData } from '$lib/data/types/SpeciesData';
 	import type { FeaturePrompt } from '$lib/data/types/Features';
 
 	import { applyChoice, revertChanges } from '$lib/stores/character_store_helpers';
@@ -31,55 +31,55 @@
 		effectNeedsChoice 
 	} from '$lib/components/feature-card-utils';
 
-	// --- NEW: race group type ---
-	interface RaceGroup {
+	// --- NEW: species group type ---
+	interface SpeciesGroup {
 		name: string;
 		image: string;
-		subraces: RaceData[];
+		subraces: SpeciesData[];
 	}
 
-	const races: (RaceData | RaceGroup)[] = [
+	const species: (SpeciesData | SpeciesGroup)[] = [
 		dragonborn,
 		{
 			name: 'Dwarf',
-			image: `${base}/race_icons/hill_dwarf.jpg`,
+			image: `${base}/species_icons/hill_dwarf.jpg`,
 			subraces: [hillDwarf, mountainDwarf]
 		},
 		{
 			name: 'Elf',
-			image: `${base}/race_icons/high_elf.jpg`,
+			image: `${base}/species_icons/high_elf.jpg`,
 			subraces: [highElf, woodElf, darkElf]
 		},
 		{
 			name: 'Gnome',
-			image: `${base}/race_icons/rock_gnome.jpg`,
+			image: `${base}/species_icons/rock_gnome.jpg`,
 			subraces: [rockGnome, forestGnome]
 		},
 		halfElf,
 		halfOrc,
 		{
 			name: 'Halfling',
-			image: `${base}/race_icons/lightfoot_halfling.jpg`,
+			image: `${base}/species_icons/lightfoot_halfling.jpg`,
 			subraces: [lightfootHalfling, stoutHalfling]
 		},
 		{
 			name: 'Human',
-			image: `${base}/race_icons/human.jpg`,
+			image: `${base}/species_icons/human.jpg`,
 			subraces: [human, variantHuman]
 		},
 		tiefling
 	];
 
 
-	let selectedRace: RaceData | null = null;
-	let selectedRaceData: RaceData | null = null;
+	let selectedSpecies: SpeciesData | null = null;
+	let selectedSpeciesData: SpeciesData | null = null;
 
 	// Collapsible parent races
-	let expandedRaces = new Set<string>();
-	function toggleRaceExpand(name: string) {
-		if (expandedRaces.has(name)) expandedRaces.delete(name);
-		else expandedRaces.add(name);
-		expandedRaces = new Set(expandedRaces); // force reactivity
+	let expandedSpecies = new Set<string>();
+	function toggleSpeciesExpand(name: string) {
+		if (expandedSpecies.has(name)) expandedSpecies.delete(name);
+		else expandedSpecies.add(name);
+		expandedSpecies = new Set(expandedSpecies); // force reactivity
 	}
 
 	// featureSelections maps feature.name -> array of picks (by index)
@@ -96,7 +96,7 @@
 
 
 	// Current feature list for the selected race
-	$: mergedFeatures = selectedRaceData ? [...(selectedRaceData.raceFeatures || [])] : [];
+	$: mergedFeatures = selectedSpeciesData ? [...(selectedSpeciesData.speciesFeatures || [])] : [];
 
 	// make sure this lives in <script> and stays after isFeatureIncomplete is defined
 	$: featureStatuses = mergedFeatures.map((feature) => ({
@@ -158,8 +158,8 @@
 
 
 
-	function removeSelectedRace() {
-		if (selectedRaceData) {
+	function removeSelectedSpecies() {
+		if (selectedSpeciesData) {
 			const state = get(character_store);
 			const provKeys = Object.keys(state._provenance || {});
 
@@ -179,10 +179,10 @@
 				return names;
 			}
 
-			const allFeatureNames = collectFeatureNames(selectedRaceData.raceFeatures || []);
+			const allFeatureNames = collectFeatureNames(selectedSpeciesData.speciesFeatures || []);
 
 			const prefixes = [
-				`race:${selectedRaceData.name}`,
+				`race:${selectedSpeciesData.name}`,
 				...allFeatureNames.map((f) => `feature:${f}`)
 			];
 
@@ -193,25 +193,25 @@
 			}
 		}
 
-		selectedRaceData = null;
-		selectedRace = null;
+		selectedSpeciesData = null;
+		selectedSpecies = null;
 		featureSelections = {};
 		expandedFeatures = new Set();
 		bumpVersion();
 	}
 
-	function confirmAddRace() {
-		if (selectedRace) {
-			selectedRaceData = selectedRace;
-			selectedRace = null;
+	function confirmAddSpecies() {
+		if (selectedSpecies) {
+			selectedSpeciesData = selectedSpecies;
+			selectedSpecies = null;
 			featureSelections = {};
 			expandedFeatures = new Set();
 
-			applyChoice(`race:${selectedRaceData.name}`, {
-				race: selectedRaceData.name
+			applyChoice(`race:${selectedSpeciesData.name}`, {
+				race: selectedSpeciesData.name
 			});
 
-			for (const feature of selectedRaceData.raceFeatures || []) {
+			for (const feature of selectedSpeciesData.speciesFeatures || []) {
 				// Skip features with options; those will be applied later
 				if (feature.featureOptions) continue;
 
@@ -265,11 +265,11 @@
 
 		if (state.race) {
 			// Find race or subrace
-			let found: RaceData | RaceGroup | undefined = races.find((r) => r.name === state.race);
+			let found: SpeciesData | SpeciesGroup | undefined = species.find((r) => r.name === state.race);
 			if (!found) {
-				for (const race of races) {
-					if ("subraces" in race) {
-						const sub = race.subraces.find((sr) => sr.name === state.race);
+				for (const speciesItem of species) {
+					if ("subraces" in speciesItem) {
+						const sub = speciesItem.subraces.find((sr) => sr.name === state.race);
 						if (sub) {
 							found = sub;
 							break;
@@ -279,12 +279,12 @@
 			}
 
 			if (found && !("subraces" in found)) {
-				selectedRaceData = found;
+				selectedSpeciesData = found;
 				featureSelections = {};
 
 				// Prepare arrays for static features
-				if (state.features && found.raceFeatures) {
-					for (const feature of found.raceFeatures) {
+				if (state.features && found.speciesFeatures) {
+					for (const feature of found.speciesFeatures) {
 						if (state.features.includes(feature.name)) {
 							const numPicks = feature.featureOptions?.numPicks || 1;
 							featureSelections[feature.name] = Array(numPicks).fill(null);
@@ -310,7 +310,7 @@
 					if (index === null) continue;
 
 					const stored: any = prov[key];
-					const featureDef = found.raceFeatures?.find((f) => f.name === featureName);
+					const featureDef = found.speciesFeatures?.find((f) => f.name === featureName);
 					if (!featureDef) continue;
 
 					const opts = featureDef.featureOptions?.options || [];
@@ -396,28 +396,28 @@
 
 <div class="main-content">
 	<!-- Show conflict warnings for this tab -->
-	<ConflictWarning tabName="race" />
+	<ConflictWarning tabName="species" />
 	
 	<p class="intro-text">
-		There are many different kinds of creatures you character can be, each with their own special traits and abilities.
+		There are many different species your character can be, each with their own special traits and abilities.
 	</p>
 
-	{#if !selectedRaceData}
+	{#if !selectedSpeciesData}
 		<div class="race-cards">
-			{#each races as raceInfo}
-				{#if 'subraces' in raceInfo}
+			{#each species as speciesInfo}
+				{#if 'subraces' in speciesInfo}
 					<!-- Parent race container -->
 					<div class="parent-race-container">
 						<!-- Parent race button -->
 						<button
 							type="button"
 							class="race-card parent-race-button"
-							on:click={() => toggleRaceExpand(raceInfo.name)}
-							aria-expanded={expandedRaces.has(raceInfo.name)}
+							on:click={() => toggleSpeciesExpand(speciesInfo.name)}
+							aria-expanded={expandedSpecies.has(speciesInfo.name)}
 						>
 							<div class="card-left">
-								<img src={raceInfo.image} alt={`${raceInfo.name} icon`} />
-								<span>{raceInfo.name}</span>
+								<img src={speciesInfo.image} alt={`${speciesInfo.name} icon`} />
+								<span>{speciesInfo.name}</span>
 							</div>
 							<img
 								class="card-arrow"
@@ -426,12 +426,12 @@
 							/>
 						</button>
 
-						{#if expandedRaces.has(raceInfo.name)}
+						{#if expandedSpecies.has(speciesInfo.name)}
 							<div class="subrace-cards-container">
-								{#each raceInfo.subraces as subrace}
+								{#each speciesInfo.subraces as subrace}
 									<button
 										class="race-card subrace-card"
-										on:click={() => (selectedRace = subrace)}
+										on:click={() => (selectedSpecies = subrace)}
 									>
 										<div class="card-left">
 											<img src={subrace.image} alt={`${subrace.name} icon`} />
@@ -452,11 +452,11 @@
 					<div class="parent-race-container">
 						<button
 							class="race-card"
-							on:click={() => (selectedRace = raceInfo)}
+							on:click={() => (selectedSpecies = speciesInfo)}
 						>
 							<div class="card-left">
-								<img src={raceInfo.image} alt={`${raceInfo.name} icon`} />
-								<span>{raceInfo.name}</span>
+								<img src={speciesInfo.image} alt={`${speciesInfo.name} icon`} />
+								<span>{speciesInfo.name}</span>
 							</div>
 							<img
 								class="card-arrow"
@@ -472,20 +472,20 @@
 
 
 
-	{#if selectedRace}
+	{#if selectedSpecies}
 		<!-- Popup Preview -->
 		<div class="popup">
 			<div class="popup-content">
 				<div class="popup-header">
-					<span>CONFIRM ADD RACE</span>
-					<button class="close-button" on:click={() => (selectedRace = null)}>×</button>
+					<span>CONFIRM ADD SPECIES</span>
+					<button class="close-button" on:click={() => (selectedSpecies = null)}>×</button>
 				</div>
 
 				<div class="popup-body">
-					<h2>{selectedRace.name}</h2>
-					<p class="description">{selectedRace.description}</p>
+					<h2>{selectedSpecies.name}</h2>
+					<p class="description">{selectedSpecies.description}</p>
 
-					{#each selectedRace.raceFeatures as feature}
+					{#each selectedSpecies.speciesFeatures as feature}
 						<div class="feature-card">
 							<h4>{feature.name}</h4>
 							<p>{@html feature.description}</p>
@@ -494,30 +494,30 @@
 				</div>
 
 				<div class="popup-footer">
-					<button class="cancel-button" on:click={() => (selectedRace = null)}>Cancel</button>
-					<button class="add-button" on:click={confirmAddRace}>Add Race</button>
+					<button class="cancel-button" on:click={() => (selectedSpecies = null)}>Cancel</button>
+					<button class="add-button" on:click={confirmAddSpecies}>Add Species</button>
 				</div>
 			</div>
 		</div>
 	{/if}
 
-	{#if selectedRaceData}
+	{#if selectedSpeciesData}
 		<!-- Selected race view -->
 		<div class="selected-race-card">
 			<div class="selected-race-info">
 				<img
-					src={selectedRaceData.image}
-					alt={`${selectedRaceData.name} icon`}
+					src={selectedSpeciesData.image}
+					alt={`${selectedSpeciesData.name} icon`}
 					class="selected-race-icon"
 				/>
 				<div class="selected-race-text">
-					<h2>{selectedRaceData.name}</h2>
-					<p class="description">{selectedRaceData.description}</p>
+					<h2>{selectedSpeciesData.name}</h2>
+					<p class="description">{selectedSpeciesData.description}</p>
 				</div>
 				<button
 					class="remove-race-button"
-					on:click={removeSelectedRace}
-					aria-label="Remove selected race"
+					on:click={removeSelectedSpecies}
+					aria-label="Remove selected species"
 				>
 					✕
 				</button>
@@ -597,10 +597,6 @@
 		transition: transform 0.2s ease;
 	}
 
-	/* Rotate arrow when expanded */
-	.race-card.expanded .card-arrow {
-		transform: rotate(90deg);
-	}
 
 	.race-card:hover,
 	.race-card:focus {

@@ -72,15 +72,72 @@ const primalPathPrompt: FeaturePrompt = {
 					{
 						name: "Totem Spirit",
 						id: "barbarian_totem_totem_spirit",
-						description: 'Choose a totem spirit and gain its feature. At 3rd level when you adopt this path, you gain the ability to cast the beast sense and speak with animals spells, but only as rituals, as described in the Spellcasting section.',
+						description: 'At 3rd level when you adopt this path, you choose a totem spirit and gain its feature. You must make or acquire a physical totem object - an amulet or similar adornment - that incorporates fur or feathers, claws, teeth, or bones of the totem animal.',
 						source: "barbarian.totem_warrior",
-						effects: [
-							{
-								target: "features",
-								action: "add",
-								value: "{userChoice}"
-							}
-						]
+						featureOptions: {
+							placeholderText: "Choose your totem spirit...",
+							options: [
+								{
+									name: "Bear",
+									optionDescription: "While raging, you have resistance to all damage except psychic damage. The spirit of the bear makes you tough enough to stand up to any punishment.",
+									nestedPrompts: [
+										{
+											name: "Bear Totem Warrior",
+											id: "barbarian_bear_totem_warrior",
+											description: "The bear spirit grants you incredible resilience. While raging, you have resistance to all damage except psychic damage.",
+											source: "barbarian.totem_warrior.bear",
+											effects: [
+												{
+													target: "features",
+													action: "add",
+													value: "Bear Totem Spirit"
+												}
+											]
+										}
+									]
+								},
+								{
+									name: "Eagle",
+									optionDescription: "While you're raging and aren't wearing heavy armor, other creatures have disadvantage on opportunity attack rolls against you, and you can use the Dash action as a bonus action on your turn. The spirit of the eagle makes you into a predator who can weave through the fray with ease.",
+									nestedPrompts: [
+										{
+											name: "Eagle Totem Warrior",
+											id: "barbarian_eagle_totem_warrior",
+											description: "The eagle spirit grants you incredible mobility. While raging and not wearing heavy armor, other creatures have disadvantage on opportunity attacks against you, and you can use the Dash action as a bonus action.",
+											source: "barbarian.totem_warrior.eagle",
+											effects: [
+												{
+													target: "features",
+													action: "add",
+													value: "Eagle Totem Spirit"
+												}
+											]
+										}
+									]
+								},
+								{
+									name: "Wolf",
+									optionDescription: "While you're raging, your friends have advantage on melee attack rolls against any creature within 5 feet of you that is hostile to you. The spirit of the wolf makes you a leader of hunters.",
+									nestedPrompts: [
+										{
+											name: "Wolf Totem Warrior",
+											id: "barbarian_wolf_totem_warrior",
+											description: "The wolf spirit grants you leadership in battle. While raging, your friends have advantage on melee attack rolls against any creature within 5 feet of you that is hostile to you.",
+											source: "barbarian.totem_warrior.wolf",
+											effects: [
+												{
+													target: "features",
+													action: "add",
+													value: "Wolf Totem Spirit"
+												}
+											]
+										}
+									]
+								}
+							],
+							numPicks: 1
+						},
+						effects: []
 					}
 				]
 			}

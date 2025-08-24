@@ -281,11 +281,6 @@
 		updateWindowWidth();
 		window.addEventListener('resize', updateWindowWidth);
 		
-		// Cleanup function
-		return () => {
-			window.removeEventListener('resize', updateWindowWidth);
-		};
-		
 		const state = get(character_store);
 
 		if (state.race) {
@@ -410,6 +405,11 @@
 				bumpVersion();
 			}
 		}
+		
+		// Return cleanup function at the end
+		return () => {
+			window.removeEventListener('resize', updateWindowWidth);
+		};
 	});
 
 

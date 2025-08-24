@@ -415,20 +415,39 @@
 	}
 
 	.class-cards {
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: center;
+		display: grid;
+		grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
 		gap: 1rem;
 		margin-top: 2rem;
+		padding: 0 1rem; /* add horizontal padding */
+		width: 100%;
+		align-items: start; /* align items to top of their grid area */
+		box-sizing: border-box;
+	}
+
+	/* Responsive grid behavior - matches species page breakpoints */
+	@media (max-width: 768px) {
+		.class-cards {
+			grid-template-columns: repeat(2, 1fr); /* 2 columns on tablets */
+			gap: 0.75rem; /* slightly smaller gap on tablets */
+		}
+	}
+
+	@media (max-width: 480px) {
+		.class-cards {
+			grid-template-columns: 1fr; /* single column on mobile */
+			gap: 0.5rem; /* smaller gap on mobile */
+			padding: 0 0.5rem; /* reduced padding on mobile */
+		}
 	}
 
 	.class-card {
-		width: 30%;
+		width: 100%; /* fill grid cell */
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		gap: 1rem;
-		padding: 1rem 2rem;
+		padding: 1rem 1.5rem; /* match species padding */
 		font-size: 1.2rem;
 		cursor: pointer;
 		border: 2px solid #ccc;
@@ -436,6 +455,7 @@
 		background-color: #f8f8f8;
 		transition: background-color 0.2s ease;
 		text-align: left;
+		box-sizing: border-box;
 	}
 
 	.card-left {

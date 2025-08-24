@@ -82,6 +82,22 @@
 		expandedSpecies = new Set(expandedSpecies); // force reactivity
 	}
 
+	// Responsive column distribution
+	let isMobile = false;
+	
+	// Reactive distributions for different screen sizes
+	$: column1Species = isMobile ? species : species.slice(0, 3);
+	$: column2Species = isMobile ? [] : species.slice(3, 6);
+	$: column3Species = isMobile ? [] : species.slice(6);
+	
+	// Track window width for responsiveness
+	let windowWidth = 768; // default to desktop
+	$: isMobile = windowWidth <= 768;
+	
+	function updateWindowWidth() {
+		windowWidth = window.innerWidth;
+	}
+
 	// featureSelections maps feature.name -> array of picks (by index)
 	let featureSelections: Record<string, (string | null)[]> = {};
 
@@ -261,6 +277,15 @@
 
 	// --- onMount for feature restoration ---
 	onMount(() => {
+		// Set up window resize listener for responsive behavior
+		updateWindowWidth();
+		window.addEventListener('resize', updateWindowWidth);
+		
+		// Cleanup function
+		return () => {
+			window.removeEventListener('resize', updateWindowWidth);
+		};
+		
 		const state = get(character_store);
 
 		if (state.race) {
@@ -404,10 +429,12 @@
 
 	{#if !selectedSpeciesData}
 		<div class="race-cards">
-			{#each species as speciesInfo}
-				{#if 'subraces' in speciesInfo}
-					<!-- Parent race container -->
-					<div class="parent-race-container">
+			<!-- Column 1 -->
+			<div class="race-column">
+				{#each column1Species as speciesInfo}
+					{#if 'subraces' in speciesInfo}
+						<!-- Parent race container -->
+						<div class="parent-race-container">
 						<!-- Parent race button -->
 						<button
 							type="button"
@@ -467,6 +494,141 @@
 					</div>
 				{/if}
 			{/each}
+			</div>
+
+			<!-- Column 2 -->
+			<div class="race-column">
+				{#each column2Species as speciesInfo}
+					{#if 'subraces' in speciesInfo}
+						<!-- Parent race container -->
+						<div class="parent-race-container">
+						<!-- Parent race button -->
+						<button
+							type="button"
+							class="race-card parent-race-button"
+							on:click={() => toggleSpeciesExpand(speciesInfo.name)}
+							aria-expanded={expandedSpecies.has(speciesInfo.name)}
+						>
+							<div class="card-left">
+								<img src={speciesInfo.image} alt={`${speciesInfo.name} icon`} />
+								<span>{speciesInfo.name}</span>
+							</div>
+							<img
+								class="card-arrow"
+								src="{base}/basic_icons/blue_next.png"
+								alt="toggle subraces"
+							/>
+						</button>
+
+						{#if expandedSpecies.has(speciesInfo.name)}
+							<div class="subrace-cards-container">
+								{#each speciesInfo.subraces as subrace}
+									<button
+										class="race-card subrace-card"
+										on:click={() => (selectedSpecies = subrace)}
+									>
+										<div class="card-left">
+											<img src={subrace.image} alt={`${subrace.name} icon`} />
+											<span>{subrace.name}</span>
+										</div>
+										<img
+											class="card-arrow"
+											src="{base}/basic_icons/blue_next.png"
+											alt="next arrow"
+										/>
+									</button>
+								{/each}
+							</div>
+						{/if}
+					</div>
+				{:else}
+					<!-- Single race container -->
+					<div class="parent-race-container">
+						<button
+							class="race-card"
+							on:click={() => (selectedSpecies = speciesInfo)}
+						>
+							<div class="card-left">
+								<img src={speciesInfo.image} alt={`${speciesInfo.name} icon`} />
+								<span>{speciesInfo.name}</span>
+							</div>
+							<img
+								class="card-arrow"
+								src="{base}/basic_icons/blue_next.png"
+								alt="next arrow"
+							/>
+						</button>
+					</div>
+				{/if}
+			{/each}
+			</div>
+
+			<!-- Column 3 -->
+			<div class="race-column">
+				{#each column3Species as speciesInfo}
+					{#if 'subraces' in speciesInfo}
+						<!-- Parent race container -->
+						<div class="parent-race-container">
+						<!-- Parent race button -->
+						<button
+							type="button"
+							class="race-card parent-race-button"
+							on:click={() => toggleSpeciesExpand(speciesInfo.name)}
+							aria-expanded={expandedSpecies.has(speciesInfo.name)}
+						>
+							<div class="card-left">
+								<img src={speciesInfo.image} alt={`${speciesInfo.name} icon`} />
+								<span>{speciesInfo.name}</span>
+							</div>
+							<img
+								class="card-arrow"
+								src="{base}/basic_icons/blue_next.png"
+								alt="toggle subraces"
+							/>
+						</button>
+
+						{#if expandedSpecies.has(speciesInfo.name)}
+							<div class="subrace-cards-container">
+								{#each speciesInfo.subraces as subrace}
+									<button
+										class="race-card subrace-card"
+										on:click={() => (selectedSpecies = subrace)}
+									>
+										<div class="card-left">
+											<img src={subrace.image} alt={`${subrace.name} icon`} />
+											<span>{subrace.name}</span>
+										</div>
+										<img
+											class="card-arrow"
+											src="{base}/basic_icons/blue_next.png"
+											alt="next arrow"
+										/>
+									</button>
+								{/each}
+							</div>
+						{/if}
+					</div>
+				{:else}
+					<!-- Single race container -->
+					<div class="parent-race-container">
+						<button
+							class="race-card"
+							on:click={() => (selectedSpecies = speciesInfo)}
+						>
+							<div class="card-left">
+								<img src={speciesInfo.image} alt={`${speciesInfo.name} icon`} />
+								<span>{speciesInfo.name}</span>
+							</div>
+							<img
+								class="card-arrow"
+								src="{base}/basic_icons/blue_next.png"
+								alt="next arrow"
+							/>
+						</button>
+					</div>
+				{/if}
+			{/each}
+			</div>
 		</div>
 	{/if}
 
@@ -554,11 +716,30 @@
 	/* Container for all race cards */
 	.race-cards {
 		display: flex;
-		flex-direction: column; /* vertical stack */
 		gap: 1rem;
 		margin-top: 2rem;
-		align-items: center; /* center the parent cards */
+		padding: 0 1rem; /* add horizontal padding */
 		width: 100%;
+		box-sizing: border-box;
+	}
+
+	/* Individual columns */
+	.race-column {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	/* Responsive columns behavior */
+	@media (max-width: 768px) {
+		.race-cards {
+			flex-direction: column;
+		}
+		
+		.race-column {
+			flex: none;
+		}
 	}
 
 	/* Individual race card (single or parent) */
@@ -612,9 +793,10 @@
 	.parent-race-container {
 		display: flex;
 		flex-direction: column; /* stack parent + subraces */
-		width: 33%; /* 1/3 screen */
+		width: 100%; /* fill column */
 		min-width: 220px; /* optional: ensure not too narrow on small screens */
 		box-sizing: border-box;
+		margin-bottom: 1rem; /* space between species */
 	}
 
 	.parent-race-button {

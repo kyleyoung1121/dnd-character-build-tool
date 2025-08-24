@@ -228,44 +228,46 @@
 			});
 
 			for (const feature of selectedSpeciesData.speciesFeatures || []) {
-				// Skip features with options; those will be applied later
-				if (feature.featureOptions) continue;
+				if (feature.featureOptions) {
+					// Features with options: apply only static effects now, user choices later
+					applyStaticEffectsForFeatureOnce(feature);
+				} else {
+					// Features without options: apply all effects immediately
+					const scopeId = `feature:${feature.name}`;
+					revertChanges(get(character_store), scopeId); // just in case
 
-				const scopeId = `feature:${feature.name}`;
-				revertChanges(get(character_store), scopeId); // just in case
+					// Collect updates from all effects (no user choices needed)
+					const update: Record<string, any> = {};
+					const modify: Record<string, number> = {};
 
-				// Collect updates from static effects
-				const update: Record<string, any> = {};
-				const modify: Record<string, number> = {};
+					for (const effect of feature.effects || []) {
+						const target = effect.target;
+						const value = effect.value;
 
-				for (const effect of feature.effects || []) {
-					const target = effect.target;
-					const value = effect.value;
-
-					switch (effect.action) {
-						case "add": {
-							const arr = Array.isArray(value) ? value : [value];
-							if (!update[target]) update[target] = [];
-							update[target].push(...arr);
-							break;
-						}
-						case "set": {
-							update[target] = value;
-							break;
-						}
-						case "modify": {
-							const amount = Number(value);
-							if (!isNaN(amount)) {
-								modify[target] = (modify[target] ?? 0) + amount;
+						switch (effect.action) {
+							case "add": {
+								const arr = Array.isArray(value) ? value : [value];
+								if (!update[target]) update[target] = [];
+								update[target].push(...arr);
+								break;
 							}
-							break;
+							case "set": {
+								update[target] = value;
+								break;
+							}
+							case "modify": {
+								const amount = Number(value);
+								if (!isNaN(amount)) {
+									modify[target] = (modify[target] ?? 0) + amount;
+								}
+								break;
+							}
 						}
 					}
-				}
 
-				// ✅ Only apply the feature if its effects exist
-				// (no auto-push into features[] unless the effect targets it)
-				applyChoice(scopeId, update, modify);
+					// Apply the feature effects
+					applyChoice(scopeId, update, modify);
+				}
 			}
 
 			bumpVersion();

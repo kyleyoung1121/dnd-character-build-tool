@@ -728,7 +728,7 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		gap: 1rem;
+		gap: 0.5rem; /* reduced gap between species */
 	}
 
 	/* Responsive columns behavior */
@@ -796,7 +796,7 @@
 		width: 100%; /* fill column */
 		min-width: 220px; /* optional: ensure not too narrow on small screens */
 		box-sizing: border-box;
-		margin-bottom: 1rem; /* space between species */
+		margin-bottom: 0.25rem; /* reduced space between species */
 	}
 
 	.parent-race-button {

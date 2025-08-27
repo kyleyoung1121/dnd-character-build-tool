@@ -10,7 +10,7 @@ export const weaponCategories = {
 	'martial-ranged': martialRangedWeapons,
 	'martial-all': [...martialMeleeWeapons, ...martialRangedWeapons],
 	'simple-all': simpleWeapons,
-	'simple-melee': simpleWeapons.filter(w => !['Light crossbow', 'Shortbow', 'Sling'].includes(w)),
+	'simple-melee': simpleWeapons.filter((w) => !['Light crossbow', 'Shortbow', 'Sling'].includes(w)),
 	'simple-ranged': ['Light crossbow', 'Shortbow', 'Sling']
 };
 
@@ -20,16 +20,34 @@ export function getWeaponsByCategory(category: string): string[] {
 
 // Weapon property helpers for better organization
 export const twoHandedWeapons = [
-	'Glaive', 'Greataxe', 'Greatsword', 'Halberd', 'Lance', 'Maul', 'Pike',
-	'Heavy crossbow', 'Longbow'
+	'Glaive',
+	'Greataxe',
+	'Greatsword',
+	'Halberd',
+	'Lance',
+	'Maul',
+	'Pike',
+	'Heavy crossbow',
+	'Longbow'
 ];
 
 export const versatileWeapons = [
-	'Battleaxe', 'Longsword', 'Trident', 'Warhammer', 'Quarterstaff', 'Spear'
+	'Battleaxe',
+	'Longsword',
+	'Trident',
+	'Warhammer',
+	'Quarterstaff',
+	'Spear'
 ];
 
 export const lightWeapons = [
-	'Handaxe', 'Light hammer', 'Sickle', 'Scimitar', 'Shortsword', 'Dagger', 'Dart'
+	'Handaxe',
+	'Light hammer',
+	'Sickle',
+	'Scimitar',
+	'Shortsword',
+	'Dagger',
+	'Dart'
 ];
 
 export function isWeaponTwoHanded(weapon: string): boolean {

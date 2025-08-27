@@ -1,6 +1,7 @@
 import { base } from '$app/paths';
-import type { ClassData } from '$lib/data/types/ClassData';
+import type { ClassData, EquipmentChoice } from '$lib/data/types/ClassData';
 import type { FeaturePrompt } from '$lib/data/types/Features';
+import { simpleWeapons } from '$lib/data/equipment/weapons';
 
 const proficienciesPrompt: FeaturePrompt = {
 	id: 'ranger_proficiencies_01',
@@ -150,8 +151,73 @@ export const ranger: ClassData = {
 	armorProficiencies: ['Light Armor', 'Medium Armor', 'Shields'],
 	weaponProficiencies: ['Simple Weapons', 'Martial Weapons'],
 	startingEquipment: {
-		fixed: ["Explorer's pack"],
-		choices: []
+		fixed: ['Longbow', 'Quiver of 20 arrows'],
+		choices: [
+			{
+				name: 'Armor',
+				description: 'Choose your armor',
+				options: [
+					{
+						label: 'Scale mail',
+						items: ['Scale mail']
+					},
+					{
+						label: 'Leather armor',
+						items: ['Leather armor']
+					}
+				]
+			} as EquipmentChoice,
+			{
+				name: 'Melee Weapons',
+				description: 'Choose your melee weapons',
+				options: [
+					{
+						label: 'Two shortswords',
+						items: ['Shortsword', 'Shortsword']
+					},
+					{
+						label: 'Two simple melee weapons',
+						items: [],
+						subChoices: [
+							{
+								name: 'First Simple Melee Weapon',
+								description: 'Choose your first simple melee weapon',
+								type: 'weapon-list',
+								category: 'simple-melee',
+								options: simpleWeapons.filter((w) => w.type === 'melee').map((w) => w.name),
+								count: 1
+							},
+							{
+								name: 'Second Simple Melee Weapon',
+								description: 'Choose your second simple melee weapon',
+								type: 'weapon-list',
+								category: 'simple-melee',
+								options: simpleWeapons.filter((w) => w.type === 'melee').map((w) => w.name),
+								count: 1
+							}
+						]
+					}
+				]
+			} as EquipmentChoice,
+			{
+				name: 'Equipment Pack',
+				description: 'Choose your adventure kit',
+				options: [
+					{
+						label: "Dungeoneer's pack",
+						items: [
+							"Dungeoneer's pack (includes: backpack, crowbar, hammer, 10 pitons, 10 torches, tinderbox, 10 days of rations, waterskin, 50 feet of hempen rope)"
+						]
+					},
+					{
+						label: "Explorer's pack",
+						items: [
+							"Explorer's pack (includes: backpack, bedroll, mess kit, tinderbox, 10 torches, 10 days of rations, waterskin, 50 feet of hempen rope)"
+						]
+					}
+				]
+			} as EquipmentChoice
+		]
 	},
 	classFeatures: [proficienciesPrompt, ...classFeaturesPrompt]
 };

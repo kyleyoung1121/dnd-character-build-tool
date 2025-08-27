@@ -1,5 +1,5 @@
 import { base } from '$app/paths';
-import type { ClassData } from '$lib/data/types/ClassData';
+import type { ClassData, EquipmentChoice } from '$lib/data/types/ClassData';
 import type { FeaturePrompt } from '$lib/data/types/Features';
 
 const proficienciesPrompt: FeaturePrompt = {
@@ -190,8 +190,61 @@ export const rogue: ClassData = {
 	armorProficiencies: ['Light Armor'],
 	weaponProficiencies: ['Simple Weapons', 'Hand Crossbows', 'Longswords', 'Rapiers', 'Shortswords'],
 	startingEquipment: {
-		fixed: ["Explorer's pack"],
-		choices: []
+		fixed: ['Leather armor', 'Dagger', 'Dagger', "Thieves' tools"],
+		choices: [
+			{
+				name: 'Primary Weapon',
+				description: 'Choose your main melee weapon',
+				options: [
+					{
+						label: 'Rapier',
+						items: ['Rapier']
+					},
+					{
+						label: 'Shortsword',
+						items: ['Shortsword']
+					}
+				]
+			} as EquipmentChoice,
+			{
+				name: 'Ranged Weapon',
+				description: 'Choose your ranged option',
+				options: [
+					{
+						label: 'Shortbow and quiver of 20 arrows',
+						items: ['Shortbow', 'Quiver', '20 arrows']
+					},
+					{
+						label: 'Shortsword',
+						items: ['Shortsword']
+					}
+				]
+			} as EquipmentChoice,
+			{
+				name: 'Equipment Pack',
+				description: 'Choose your adventure kit',
+				options: [
+					{
+						label: "Burglar's pack",
+						items: [
+							"Burglar's pack (includes: backpack, 1,000 ball bearings, 10 feet of string, bell, 5 candles, crowbar, hammer, 10 pitons, hooded lantern, 2 oil flasks, 5 days rations, tinderbox, waterskin, 50 feet of hempen rope)"
+						]
+					},
+					{
+						label: "Dungeoneer's pack",
+						items: [
+							"Dungeoneer's pack (includes: backpack, crowbar, hammer, 10 pitons, 10 torches, tinderbox, 10 days of rations, waterskin, 50 feet of hempen rope)"
+						]
+					},
+					{
+						label: "Explorer's pack",
+						items: [
+							"Explorer's pack (includes: backpack, bedroll, mess kit, tinderbox, 10 torches, 10 days of rations, waterskin, 50 feet of hempen rope)"
+						]
+					}
+				]
+			} as EquipmentChoice
+		]
 	},
 	classFeatures: [proficienciesPrompt, ...classFeaturesPrompt, rogueArchetypePrompt]
 };

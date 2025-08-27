@@ -1,6 +1,7 @@
 import { base } from '$app/paths';
-import type { ClassData } from '$lib/data/types/ClassData';
+import type { ClassData, EquipmentChoice } from '$lib/data/types/ClassData';
 import type { FeaturePrompt } from '$lib/data/types/Features';
+import { martialWeapons, simpleWeapons } from '$lib/data/equipment/weapons';
 
 const proficienciesPrompt: FeaturePrompt = {
 	id: 'paladin_proficiencies_01',
@@ -244,8 +245,93 @@ export const paladin: ClassData = {
 	armorProficiencies: ['All Armor', 'Shields'],
 	weaponProficiencies: ['Simple Weapons', 'Martial Weapons'],
 	startingEquipment: {
-		fixed: ["Explorer's pack"],
-		choices: []
+		fixed: ['Chain mail', 'Holy symbol'],
+		choices: [
+			{
+				name: 'Primary Weapons',
+				description: 'Choose your weapon configuration',
+				options: [
+					{
+						label: 'Martial weapon and shield',
+						items: ['Shield'],
+						subChoices: [
+							{
+								name: 'Martial Weapon',
+								description: 'Choose a martial weapon',
+								type: 'weapon-list',
+								category: 'martial',
+								options: martialWeapons.map((w) => w.name),
+								count: 1
+							}
+						]
+					},
+					{
+						label: 'Two martial weapons',
+						items: [],
+						subChoices: [
+							{
+								name: 'First Martial Weapon',
+								description: 'Choose your first martial weapon',
+								type: 'weapon-list',
+								category: 'martial',
+								options: martialWeapons.map((w) => w.name),
+								count: 1
+							},
+							{
+								name: 'Second Martial Weapon',
+								description: 'Choose your second martial weapon',
+								type: 'weapon-list',
+								category: 'martial',
+								options: martialWeapons.map((w) => w.name),
+								count: 1
+							}
+						]
+					}
+				]
+			} as EquipmentChoice,
+			{
+				name: 'Secondary Weapon',
+				description: 'Choose your ranged or secondary weapon',
+				options: [
+					{
+						label: 'Five javelins',
+						items: ['5 Javelins']
+					},
+					{
+						label: 'Simple melee weapon',
+						items: [],
+						subChoices: [
+							{
+								name: 'Simple Melee Weapon',
+								description: 'Choose a simple melee weapon',
+								type: 'weapon-list',
+								category: 'simple-melee',
+								options: simpleWeapons.filter((w) => w.type === 'melee').map((w) => w.name),
+								count: 1
+							}
+						]
+					}
+				]
+			} as EquipmentChoice,
+			{
+				name: 'Equipment Pack',
+				description: 'Choose your adventure kit',
+				options: [
+					{
+						label: "Priest's pack",
+						items: [
+							"Priest's pack (includes: backpack, blanket, 10 candles, tinderbox, alms box, 2 blocks of incense, censer, vestments, 2 days of rations, waterskin)"
+						]
+					},
+					{
+						label: "Explorer's pack",
+						items: [
+							"Explorer's pack (includes: backpack, bedroll, mess kit, tinderbox, 10 torches, 10 days of rations, waterskin, 50 feet of hempen rope)"
+						]
+					}
+				]
+			} as EquipmentChoice
+		]
 	},
 	classFeatures: [proficienciesPrompt, ...classFeaturesPrompt, sacredOathPrompt]
 };

@@ -56,7 +56,7 @@
 	let currentBackground: BackgroundData | null = null;
 	let equipmentChoices: Record<number, EquipmentChoiceState> = {};
 	let backgroundEquipmentChoices: Record<string, number> = {};
-	
+
 	// Reactive variables for subchoice resolution
 	let subchoiceResolution: Record<number, boolean> = {};
 	let availableSubchoices: Record<number, EquipmentSubChoice[]> = {};
@@ -65,10 +65,9 @@
 	$: {
 		const className = $character_store.class;
 		currentClass = className ? classLookup[className] : null;
-		
+
 		// Restore equipment choices from character store when class changes
 		if (currentClass) {
-			console.log('🔄 Class changed, attempting to restore equipment choices for:', className);
 			restoreEquipmentChoicesFromStore();
 		}
 	}
@@ -79,17 +78,22 @@
 			? backgrounds.find((bg) => bg.name === backgroundName) || null
 			: null;
 	}
-	
+
 	// Reactive statements for subchoice resolution
 	$: {
 		if (currentClass?.startingEquipment?.choices) {
 			subchoiceResolution = {};
 			availableSubchoices = {};
-			
+
 			currentClass.startingEquipment.choices.forEach((choice, choiceIndex) => {
-				if (isEquipmentChoice(choice) && equipmentChoices[choiceIndex]?.selectedOption !== undefined) {
+				if (
+					isEquipmentChoice(choice) &&
+					equipmentChoices[choiceIndex]?.selectedOption !== undefined
+				) {
 					const selectedOption = choice.options[equipmentChoices[choiceIndex].selectedOption!];
-					subchoiceResolution[choiceIndex] = Boolean(selectedOption.subChoices && selectedOption.subChoices.length > 0);
+					subchoiceResolution[choiceIndex] = Boolean(
+						selectedOption.subChoices && selectedOption.subChoices.length > 0
+					);
 					availableSubchoices[choiceIndex] = selectedOption.subChoices || [];
 				} else {
 					subchoiceResolution[choiceIndex] = false;
@@ -101,136 +105,119 @@
 
 	// Restore equipment choices from character store
 	function restoreEquipmentChoicesFromStore() {
-		if (!currentClass?.startingEquipment?.choices) {
-			console.log('❌ No class or equipment choices to restore');
-			return;
-		}
-		
+		if (!currentClass?.startingEquipment?.choices) return;
+
 		// Look for existing equipment choices in the character store's provenance
 		const char = get(character_store);
-		if (!char._provenance) {
-			console.log('❌ No provenance data found');
-			return;
-		}
-		
-		console.log('🔍 Checking provenance for equipment choices:', char._provenance);
+		if (!char._provenance) return;
+
 		const newEquipmentChoices: Record<number, EquipmentChoiceState> = {};
-		
+
 		// Restore each equipment choice
 		currentClass.startingEquipment.choices.forEach((choice, choiceIndex) => {
 			const scopeId = `class_equipment_${choiceIndex}`;
 			const provenanceData = char._provenance![scopeId];
-			
-			console.log(`🔍 Checking choice ${choiceIndex} (${scopeId}):`, provenanceData);
+
 			if (provenanceData) {
-				console.log(`🔍 Provenance data keys:`, JSON.stringify(Object.keys(provenanceData)));
-				console.log(`🔍 selectedOption:`, provenanceData.selectedOption);
-				console.log(`🔍 subChoiceSelections:`, provenanceData.subChoiceSelections);
-				console.log(`🔍 inventory:`, provenanceData.inventory);
-				console.log(`🔍 _set:`, provenanceData._set);
-				console.log(`🔍 _prevScalars:`, provenanceData._prevScalars);
-				console.log(`🔍 Full object:`, JSON.stringify(provenanceData, null, 2));
-			}
-			console.log(`🔍 Choice structure:`, choice);
-			console.log(`🔍 isEquipmentChoice result:`, isEquipmentChoice(choice));
-			
-			if (provenanceData) {
-				console.log(`🚨 Attempting restore regardless of type (debug mode)`);
-				// Temporarily bypass type guard for debugging
 				if (isEquipmentChoice(choice)) {
 					// Access data from _set property (character store wraps our data)
 					const actualData = provenanceData._set || provenanceData;
-					console.log(`🔍 Actual data to restore:`, actualData);
-					
+
 					// Check if we have the new selection state format
 					if (actualData.selectedOption !== undefined) {
-						console.log(`✅ Restoring new format for choice ${choiceIndex}:`, actualData.selectedOption, actualData.subChoiceSelections);
 						// Restore from stored selection state (new format)
 						newEquipmentChoices[choiceIndex] = {
 							selectedOption: actualData.selectedOption,
 							subChoiceSelections: actualData.subChoiceSelections || {}
 						};
 					} else if (actualData.inventory) {
-						console.log(`🔄 Using legacy format for choice ${choiceIndex}:`, actualData.inventory);
 						// Fallback to reverse-engineering from inventory (legacy format)
 						const inventory = actualData.inventory as string[];
-					
-					// Find which option matches the current inventory
-					for (let optionIndex = 0; optionIndex < choice.options.length; optionIndex++) {
-						const option = choice.options[optionIndex];
-						
-						// Check if this option could produce the current inventory
-						if (doesOptionMatchInventory(option, inventory)) {
-							// Restore the main selection
-							newEquipmentChoices[choiceIndex] = {
-								selectedOption: optionIndex,
-								subChoiceSelections: extractSubChoiceSelections(option, inventory)
-							};
-							break;
+
+						// Find which option matches the current inventory
+						for (let optionIndex = 0; optionIndex < choice.options.length; optionIndex++) {
+							const option = choice.options[optionIndex];
+
+							// Check if this option could produce the current inventory
+							if (doesOptionMatchInventory(option, inventory)) {
+								// Restore the main selection
+								newEquipmentChoices[choiceIndex] = {
+									selectedOption: optionIndex,
+									subChoiceSelections: extractSubChoiceSelections(option, inventory)
+								};
+								break;
+							}
 						}
 					}
+				} else {
 				}
 			} else {
-				console.log(`❌ isEquipmentChoice failed for choice ${choiceIndex}`);
-			}
-			} else {
-				console.log(`❌ No provenance data for choice ${choiceIndex}`);
 			}
 		});
-		
+
 		// Only update if we found any choices to restore
 		if (Object.keys(newEquipmentChoices).length > 0) {
-			console.log('✅ Restoring equipment choices:', newEquipmentChoices);
 			equipmentChoices = { ...equipmentChoices, ...newEquipmentChoices };
 		} else {
-			console.log('❌ No equipment choices found to restore');
 		}
 	}
-	
+
 	// Check if an option could produce the given inventory
 	function doesOptionMatchInventory(option: EquipmentOption, inventory: string[]): boolean {
 		// Get all possible items from this option
 		const possibleItems: string[] = [];
-		
+
 		// Add direct items
 		if (option.items) {
 			possibleItems.push(...option.items);
 		}
-		
+
 		// Add all possible subchoice items
 		if (option.subChoices) {
 			for (const subChoice of option.subChoices) {
 				possibleItems.push(...subChoice.options);
 			}
 		}
-		
+
 		// Check if all inventory items could come from this option
-		return inventory.every(item => possibleItems.includes(item));
+		return inventory.every((item) => possibleItems.includes(item));
 	}
-	
+
 	// Extract subchoice selections from inventory
-	function extractSubChoiceSelections(option: EquipmentOption, inventory: string[]): Record<string, string[]> {
+	function extractSubChoiceSelections(
+		option: EquipmentOption,
+		inventory: string[]
+	): Record<string, string[]> {
 		const subChoiceSelections: Record<string, string[]> = {};
-		
+
 		if (!option.subChoices) return subChoiceSelections;
-		
+
 		// For each subchoice, find which items from inventory belong to it
 		for (const subChoice of option.subChoices) {
-			const matchingItems = inventory.filter(item => subChoice.options.includes(item));
+			const matchingItems = inventory.filter((item) => subChoice.options.includes(item));
 			if (matchingItems.length > 0) {
 				subChoiceSelections[subChoice.name] = matchingItems;
 			}
 		}
-		
+
 		return subChoiceSelections;
 	}
 
 	// Type guard functions
-	function isEquipmentChoice(choice: EquipmentChoice | SimpleEquipmentChoice): choice is EquipmentChoice {
-		return 'options' in choice && choice.options.length > 0 && typeof choice.options[0] === 'object' && 'label' in choice.options[0];
+	function isEquipmentChoice(
+		choice: EquipmentChoice | SimpleEquipmentChoice
+	): choice is EquipmentChoice {
+		return (
+			'options' in choice &&
+			choice.options.length > 0 &&
+			typeof choice.options[0] === 'object' &&
+			'label' in choice.options[0]
+		);
 	}
 
-	function isSimpleEquipmentChoice(choice: EquipmentChoice | SimpleEquipmentChoice): choice is SimpleEquipmentChoice {
+	function isSimpleEquipmentChoice(
+		choice: EquipmentChoice | SimpleEquipmentChoice
+	): choice is SimpleEquipmentChoice {
 		return 'options' in choice && choice.options.length > 0 && Array.isArray(choice.options[0]);
 	}
 
@@ -251,11 +238,11 @@
 
 		const choice = currentClass.startingEquipment.choices[choiceIndex] as EquipmentChoice;
 		const selectedOption = choice.options[optionIndex];
-		
+
 		// Clear any previous selections for this choice first
 		const scopeId = `class_equipment_${choiceIndex}`;
 		applyChoice(scopeId, { inventory: [] });
-		
+
 		// Create a completely new object to force reactivity
 		const newEquipmentChoices = { ...equipmentChoices };
 		newEquipmentChoices[choiceIndex] = {
@@ -270,7 +257,7 @@
 			subChoiceSelections: {},
 			inventory: []
 		};
-		console.log(`💾 Storing main selection for choice ${choiceIndex}:`, selectionState);
+
 		applyChoice(scopeId, selectionState);
 
 		// If this option has direct items (no subchoices), apply immediately
@@ -282,14 +269,18 @@
 	}
 
 	// Handle sub-choice selection
-	function handleSubChoiceSelection(choiceIndex: number, subChoiceName: string, selectedItems: string[]) {
+	function handleSubChoiceSelection(
+		choiceIndex: number,
+		subChoiceName: string,
+		selectedItems: string[]
+	) {
 		if (!currentClass || !equipmentChoices[choiceIndex]) return;
 
 		const choice = currentClass.startingEquipment.choices[choiceIndex] as EquipmentChoice;
 		const selectedOptionIndex = equipmentChoices[choiceIndex].selectedOption;
-		
+
 		if (selectedOptionIndex === undefined) return;
-		
+
 		const selectedOption = choice.options[selectedOptionIndex];
 
 		// Create completely new object to force reactivity
@@ -312,19 +303,21 @@
 		};
 
 		// Check if all subchoices are resolved
-		const allSubChoicesResolved = selectedOption.subChoices?.every(subChoice => 
-			newEquipmentChoices[choiceIndex].subChoiceSelections![subChoice.name]?.length > 0
-		) ?? true;
+		const allSubChoicesResolved =
+			selectedOption.subChoices?.every(
+				(subChoice) =>
+					newEquipmentChoices[choiceIndex].subChoiceSelections![subChoice.name]?.length > 0
+			) ?? true;
 
 		if (allSubChoicesResolved) {
 			// Collect all selected items
 			let allItems: string[] = [];
-			
+
 			// Add direct items if any
 			if (selectedOption.items) {
 				allItems.push(...selectedOption.items);
 			}
-			
+
 			// Add subchoice selections
 			if (selectedOption.subChoices && newEquipmentChoices[choiceIndex].subChoiceSelections) {
 				for (const subChoice of selectedOption.subChoices) {
@@ -339,7 +332,7 @@
 		}
 
 		// Store the selection state in provenance
-		console.log(`💾 Storing subchoice selection for choice ${choiceIndex}:`, selectionState);
+
 		applyChoice(scopeId, selectionState);
 	}
 
@@ -360,10 +353,10 @@
 	// Check if a subchoice needs resolution
 	function needsSubChoiceResolution(choiceIndex: number): boolean {
 		if (equipmentChoices[choiceIndex]?.selectedOption === undefined) return false;
-		
+
 		const choice = currentClass?.startingEquipment.choices[choiceIndex] as EquipmentChoice;
 		if (!choice || !isEquipmentChoice(choice)) return false;
-		
+
 		const selectedOption = choice.options[equipmentChoices[choiceIndex].selectedOption!];
 		return Boolean(selectedOption.subChoices && selectedOption.subChoices.length > 0);
 	}
@@ -371,25 +364,16 @@
 	// Get subchoices for the currently selected option
 	function getSubChoicesForSelection(choiceIndex: number): EquipmentSubChoice[] {
 		if (equipmentChoices[choiceIndex]?.selectedOption === undefined) return [];
-		
+
 		const choice = currentClass?.startingEquipment.choices[choiceIndex] as EquipmentChoice;
 		if (!choice || !isEquipmentChoice(choice)) return [];
-		
+
 		const selectedOption = choice.options[equipmentChoices[choiceIndex].selectedOption!];
 		return selectedOption.subChoices || [];
 	}
 </script>
 
 <div class="main-content">
-	<div class="intro-text">
-		<h1>Equipment</h1>
-		<p>
-			Select your starting equipment based on your class and background. Equipment choices will
-			automatically update your character sheet.
-		</p>
-
-	</div>
-
 	{#if !$character_store.class}
 		<div class="no-selection">
 			<h2>No Class Selected</h2>
@@ -416,14 +400,11 @@
 			{#if currentClass.startingEquipment.fixed.length > 0}
 				<div class="equipment-group">
 					<h3>Standard Equipment</h3>
-					<p class="fixed-equipment-note">
-						This equipment is automatically added when you select your class.
-					</p>
+
 					<div class="equipment-list">
 						{#each currentClass.startingEquipment.fixed as item}
 							<div class="equipment-item class-equipment">
 								<span class="item-name">{item}</span>
-								<span class="item-type">Auto-added</span>
 							</div>
 						{/each}
 					</div>
@@ -459,17 +440,20 @@
 										<div class="subchoice-group">
 											<h4>{subChoice.name}</h4>
 											<p class="subchoice-description">{subChoice.description}</p>
-											
+
 											{#if subChoice.type === 'weapon-list'}
 												<div class="weapon-selection">
-													<select 
-														value={equipmentChoices[choiceIndex]?.subChoiceSelections?.[subChoice.name]?.[0] || ''}
+													<select
+														value={equipmentChoices[choiceIndex]?.subChoiceSelections?.[
+															subChoice.name
+														]?.[0] || ''}
 														class="subchoice-select"
-			
 														on:change={(e) => {
 															const target = e.target as HTMLSelectElement;
 															if (target.value) {
-																handleSubChoiceSelection(choiceIndex, subChoice.name, [target.value]);
+																handleSubChoiceSelection(choiceIndex, subChoice.name, [
+																	target.value
+																]);
 															}
 														}}
 													>
@@ -481,13 +465,17 @@
 												</div>
 											{:else if subChoice.type === 'simple-list'}
 												<div class="simple-selection">
-													<select 
+													<select
 														class="subchoice-select"
-														value={equipmentChoices[choiceIndex]?.subChoiceSelections?.[subChoice.name]?.[0] || ''}
+														value={equipmentChoices[choiceIndex]?.subChoiceSelections?.[
+															subChoice.name
+														]?.[0] || ''}
 														on:change={(e) => {
 															const target = e.target as HTMLSelectElement;
 															if (target.value) {
-																handleSubChoiceSelection(choiceIndex, subChoice.name, [target.value]);
+																handleSubChoiceSelection(choiceIndex, subChoice.name, [
+																	target.value
+																]);
 															}
 														}}
 													>
@@ -563,14 +551,11 @@
 				{#if currentBackground.startingEquipment.fixed.length > 0}
 					<div class="equipment-group">
 						<h3>Fixed Equipment</h3>
-						<p class="background-note">
-							This equipment is automatically added when you select your background.
-						</p>
+
 						<div class="equipment-list">
 							{#each currentBackground.startingEquipment.fixed as item}
 								<div class="equipment-item background">
 									<span class="item-name">{item}</span>
-									<span class="item-type">Auto-added</span>
 								</div>
 							{/each}
 						</div>
@@ -628,14 +613,11 @@
 				<!-- Fallback to old equipment format -->
 				<div class="equipment-group">
 					<h3>Background Equipment</h3>
-					<p class="background-note">
-						This equipment is automatically added when you select your background.
-					</p>
+
 					<div class="equipment-list">
 						{#each currentBackground.equipment as item}
 							<div class="equipment-item background">
 								<span class="item-name">{item}</span>
-								<span class="item-type">From Background</span>
 							</div>
 						{/each}
 					</div>

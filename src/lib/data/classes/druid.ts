@@ -1,6 +1,7 @@
 import { base } from '$app/paths';
-import type { ClassData } from '$lib/data/types/ClassData';
+import type { ClassData, EquipmentChoice } from '$lib/data/types/ClassData';
 import type { FeaturePrompt } from '$lib/data/types/Features';
+import { simpleWeapons } from '$lib/data/equipment/weapons';
 
 const proficienciesPrompt: FeaturePrompt = {
 	name: 'Skill Proficiencies',
@@ -157,8 +158,57 @@ export const druid: ClassData = {
 		'Spears'
 	],
 	startingEquipment: {
-		fixed: ["Explorer's pack"],
-		choices: []
+		fixed: ['Leather armor', "Explorer's pack"],
+		choices: [
+			{
+				name: 'Primary Equipment',
+				description: 'Choose your primary equipment',
+				options: [
+					{
+						label: 'Wooden shield',
+						items: ['Wooden shield']
+					},
+					{
+						label: 'Simple weapon',
+						items: [],
+						subChoices: [
+							{
+								name: 'Simple Weapon',
+								description: 'Choose a simple weapon',
+								type: 'weapon-list',
+								category: 'simple',
+								options: simpleWeapons.map((w) => w.name),
+								count: 1
+							}
+						]
+					}
+				]
+			} as EquipmentChoice,
+			{
+				name: 'Melee Weapon',
+				description: 'Choose your melee weapon',
+				options: [
+					{
+						label: 'Scimitar',
+						items: ['Scimitar']
+					},
+					{
+						label: 'Simple melee weapon',
+						items: [],
+						subChoices: [
+							{
+								name: 'Simple Melee Weapon',
+								description: 'Choose a simple melee weapon',
+								type: 'weapon-list',
+								category: 'simple-melee',
+								options: simpleWeapons.filter((w) => w.type === 'melee').map((w) => w.name),
+								count: 1
+							}
+						]
+					}
+				]
+			} as EquipmentChoice
+		]
 	},
 	classFeatures: [proficienciesPrompt, ...classFeaturesPrompt, druidCirclePrompt]
 };

@@ -1,6 +1,7 @@
 import { base } from '$app/paths';
-import type { ClassData } from '$lib/data/types/ClassData';
+import type { ClassData, EquipmentChoice } from '$lib/data/types/ClassData';
 import type { FeaturePrompt } from '$lib/data/types/Features';
+import { simpleWeapons } from '$lib/data/equipment/weapons';
 
 const proficienciesPrompt: FeaturePrompt = {
 	id: 'warlock_proficiencies',
@@ -156,8 +157,85 @@ export const warlock: ClassData = {
 	armorProficiencies: ['Light Armor'],
 	weaponProficiencies: ['Simple Weapons'],
 	startingEquipment: {
-		fixed: ["Explorer's pack"],
-		choices: []
+		fixed: ['Leather armor', '2 Daggers'],
+		choices: [
+			{
+				name: 'Ranged Weapon',
+				description: 'Choose your ranged weapon or primary weapon',
+				options: [
+					{
+						label: 'Light crossbow and 20 bolts',
+						items: ['Light crossbow', '20 crossbow bolts']
+					},
+					{
+						label: 'Simple weapon',
+						items: [],
+						subChoices: [
+							{
+								name: 'Simple Weapon',
+								description: 'Choose a simple weapon',
+								type: 'weapon-list',
+								category: 'simple',
+								options: simpleWeapons.map((w) => w.name),
+								count: 1
+							}
+						]
+					}
+				]
+			} as EquipmentChoice,
+			{
+				name: 'Secondary Weapon',
+				description: 'Choose your secondary simple weapon',
+				options: [
+					{
+						label: 'Simple weapon',
+						items: [],
+						subChoices: [
+							{
+								name: 'Simple Weapon',
+								description: 'Choose a simple weapon',
+								type: 'weapon-list',
+								category: 'simple',
+								options: simpleWeapons.map((w) => w.name),
+								count: 1
+							}
+						]
+					}
+				]
+			} as EquipmentChoice,
+			{
+				name: 'Spellcasting Focus',
+				description: 'Choose your spellcasting focus',
+				options: [
+					{
+						label: 'Component pouch',
+						items: ['Component pouch']
+					},
+					{
+						label: 'Arcane focus',
+						items: ['Arcane focus']
+					}
+				]
+			} as EquipmentChoice,
+			{
+				name: 'Equipment Pack',
+				description: 'Choose your adventure kit',
+				options: [
+					{
+						label: "Scholar's pack",
+						items: [
+							"Scholar's pack (includes: backpack, book of lore, ink bottle, ink pen, 10 sheets of parchment, little bag of sand, small knife)"
+						]
+					},
+					{
+						label: "Dungeoneer's pack",
+						items: [
+							"Dungeoneer's pack (includes: backpack, crowbar, hammer, 10 pitons, 10 torches, tinderbox, 10 days of rations, waterskin, 50 feet of hempen rope)"
+						]
+					}
+				]
+			} as EquipmentChoice
+		]
 	},
 	classFeatures: [proficienciesPrompt, ...classFeaturesPrompt, otherworldlyPatronPrompt]
 };

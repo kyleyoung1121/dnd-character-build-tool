@@ -66,3 +66,17 @@ export const twoHandedWeapons = [
 	'Heavy crossbow',
 	'Longbow'
 ];
+
+// Musical instruments for equipment selection
+export const musicalInstruments = [
+	'Bagpipes',
+	'Drums',
+	'Dulcimer',
+	'Flute',
+	'Lute',
+	'Lyre',
+	'Horn',
+	'Pan flute',
+	'Shawm',
+	'Viol'
+];

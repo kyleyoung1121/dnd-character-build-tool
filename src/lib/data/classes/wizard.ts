@@ -1,5 +1,5 @@
 import { base } from '$app/paths';
-import type { ClassData } from '$lib/data/types/ClassData';
+import type { ClassData, EquipmentChoice } from '$lib/data/types/ClassData';
 import type { FeaturePrompt } from '$lib/data/types/Features';
 
 const proficienciesPrompt: FeaturePrompt = {
@@ -130,8 +130,55 @@ export const wizard: ClassData = {
 	armorProficiencies: [],
 	weaponProficiencies: ['Daggers', 'Darts', 'Slings', 'Quarterstaffs', 'Light Crossbows'],
 	startingEquipment: {
-		fixed: ["Explorer's pack"],
-		choices: []
+		fixed: ['Spellbook'],
+		choices: [
+			{
+				name: 'Primary Weapon',
+				description: 'Choose your weapon',
+				options: [
+					{
+						label: 'Quarterstaff',
+						items: ['Quarterstaff']
+					},
+					{
+						label: 'Dagger',
+						items: ['Dagger']
+					}
+				]
+			} as EquipmentChoice,
+			{
+				name: 'Spellcasting Focus',
+				description: 'Choose your spellcasting focus',
+				options: [
+					{
+						label: 'Component pouch',
+						items: ['Component pouch']
+					},
+					{
+						label: 'Arcane focus',
+						items: ['Arcane focus']
+					}
+				]
+			} as EquipmentChoice,
+			{
+				name: 'Equipment Pack',
+				description: 'Choose your adventure kit',
+				options: [
+					{
+						label: "Scholar's pack",
+						items: [
+							"Scholar's pack (includes: backpack, book of lore, ink bottle, ink pen, 10 sheets of parchment, little bag of sand, small knife)"
+						]
+					},
+					{
+						label: "Explorer's pack",
+						items: [
+							"Explorer's pack (includes: backpack, bedroll, mess kit, tinderbox, 10 torches, 10 days of rations, waterskin, 50 feet of hempen rope)"
+						]
+					}
+				]
+			} as EquipmentChoice
+		]
 	},
 	classFeatures: [proficienciesPrompt, ...classFeaturesPrompt]
 };

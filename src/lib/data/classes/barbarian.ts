@@ -253,7 +253,7 @@ export const barbarian: ClassData = {
 								description: 'Choose a martial melee weapon',
 								type: 'weapon-list',
 								category: 'martial-melee',
-								options: martialMeleeWeapons.filter(w => w !== 'Greataxe'),
+								options: martialMeleeWeapons.filter((w) => w !== 'Greataxe'),
 								count: 1
 							}
 						]
@@ -276,7 +276,9 @@ export const barbarian: ClassData = {
 								description: 'Choose a simple melee weapon',
 								type: 'weapon-list',
 								category: 'simple-melee',
-								options: simpleWeapons.filter(w => !['Light crossbow', 'Shortbow', 'Sling'].includes(w)),
+								options: simpleWeapons.filter(
+									(w) => !['Light crossbow', 'Shortbow', 'Sling'].includes(w)
+								),
 								count: 1
 							}
 						]

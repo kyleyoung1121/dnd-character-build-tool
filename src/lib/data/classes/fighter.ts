@@ -219,7 +219,7 @@ export const fighter: ClassData = {
 								description: 'Choose a one-handed martial weapon',
 								type: 'weapon-list',
 								category: 'martial-melee',
-								options: martialMeleeWeapons.filter(w => !twoHandedWeapons.includes(w)),
+								options: martialMeleeWeapons.filter((w) => !twoHandedWeapons.includes(w)),
 								count: 1
 							}
 						],

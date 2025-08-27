@@ -1,6 +1,7 @@
 import { base } from '$app/paths';
-import type { ClassData } from '$lib/data/types/ClassData';
+import type { ClassData, EquipmentChoice } from '$lib/data/types/ClassData';
 import type { FeaturePrompt } from '$lib/data/types/Features';
+import { simpleWeapons } from '../equipment/weapons';
 
 const proficienciesPrompt: FeaturePrompt = {
 	name: 'Skill Proficiencies',
@@ -153,8 +154,82 @@ export const cleric: ClassData = {
 	armorProficiencies: ['Light Armor', 'Medium Armor', 'Shields'],
 	weaponProficiencies: ['Simple Weapons'],
 	startingEquipment: {
-		fixed: ["Explorer's pack"],
-		choices: []
+		fixed: ['Shield', 'Holy symbol'],
+		choices: [
+			{
+				name: 'Primary Weapon',
+				description: 'Choose your main weapon',
+				options: [
+					{
+						label: 'Mace',
+						items: ['Mace']
+					},
+					{
+						label: 'Warhammer (if proficient)',
+						items: ['Warhammer']
+					}
+				]
+			} as EquipmentChoice,
+			{
+				name: 'Armor',
+				description: 'Choose your armor',
+				options: [
+					{
+						label: 'Scale mail',
+						items: ['Scale mail']
+					},
+					{
+						label: 'Leather armor',
+						items: ['Leather armor']
+					},
+					{
+						label: 'Chain mail (if proficient)',
+						items: ['Chain mail']
+					}
+				]
+			} as EquipmentChoice,
+			{
+				name: 'Ranged Weapon',
+				description: 'Choose your ranged option',
+				options: [
+					{
+						label: 'Light crossbow and 20 bolts',
+						items: ['Light crossbow', '20 crossbow bolts']
+					},
+					{
+						label: 'Simple weapon',
+						subChoices: [
+							{
+								name: 'Simple Weapon',
+								description: 'Choose a simple weapon',
+								type: 'weapon-list',
+								category: 'simple',
+								options: simpleWeapons,
+								count: 1
+							}
+						]
+					}
+				]
+			} as EquipmentChoice,
+			{
+				name: 'Equipment Pack',
+				description: 'Choose your adventure kit',
+				options: [
+					{
+						label: "Priest's pack",
+						items: [
+							"Priest's pack (includes: backpack, blanket, 10 candles, tinderbox, alms box, 2 blocks of incense, censer, vestments, 2 days of rations, waterskin)"
+						]
+					},
+					{
+						label: "Explorer's pack",
+						items: [
+							"Explorer's pack (includes: backpack, bedroll, mess kit, tinderbox, 10 torches, 10 days of rations, waterskin, 50 feet of hempen rope)"
+						]
+					}
+				]
+			} as EquipmentChoice
+		]
 	},
 	classFeatures: [proficienciesPrompt, ...classFeaturesPrompt, divineDomainPrompt]
 };

@@ -170,103 +170,103 @@
 				</div>
 			{/each}
 		</div>
+	{/if}
 
-		<!-- Background Equipment Section -->
-		{#if currentBackground}
-			<div class="equipment-section">
-				<div class="section-header">
-					<img src="{currentBackground.image}" alt="{currentBackground.name}" class="background-icon">
-					<h2>{currentBackground.name} Equipment</h2>
-				</div>
+	<!-- Background Equipment Section -->
+	{#if currentBackground}
+		<div class="equipment-section">
+			<div class="section-header">
+				<img src="{currentBackground.image}" alt="{currentBackground.name}" class="background-icon">
+				<h2>{currentBackground.name} Equipment</h2>
+			</div>
 
-				<!-- Check if using new startingEquipment format -->
-				{#if currentBackground.startingEquipment}
-					<!-- Fixed Background Equipment -->
-					{#if currentBackground.startingEquipment.fixed.length > 0}
-						<div class="equipment-group">
-							<h3>Fixed Equipment</h3>
-							<p class="background-note">This equipment is automatically added when you select your background.</p>
-							<div class="equipment-list">
-								{#each currentBackground.startingEquipment.fixed as item}
-									<div class="equipment-item background">
-										<span class="item-name">{item}</span>
-										<span class="item-type">Auto-added</span>
-									</div>
-								{/each}
-							</div>
-						</div>
-					{/if}
-
-					<!-- Background Equipment Choices -->
-					{#each currentBackground.startingEquipment.choices as choice, choiceIndex}
-						<div class="equipment-group">
-							<h3>{choice.name}</h3>
-							<p class="choice-description">{choice.description}</p>
-							
-							{#if choice.options.length > 3}
-								<!-- Use dropdown for many options -->
-								<div class="dropdown-container">
-									<select 
-										class="equipment-dropdown"
-										value={backgroundEquipmentChoices[choiceIndex] ?? ''}
-										on:change={(e) => handleBackgroundEquipmentChoice(choiceIndex, parseInt(e.target.value))}
-									>
-										<option value="" disabled>Choose an option...</option>
-										{#each choice.options as option, optionIndex}
-											<option value={optionIndex}>
-												{option.join(', ')}
-											</option>
-										{/each}
-									</select>
-								</div>
-							{:else}
-								<!-- Use buttons for few options -->
-								<div class="choice-options">
-									{#each choice.options as option, optionIndex}
-										<button
-											class="choice-option"
-											class:selected={backgroundEquipmentChoices[choiceIndex] === optionIndex}
-											on:click={() => handleBackgroundEquipmentChoice(choiceIndex, optionIndex)}
-										>
-											<div class="option-items">
-												{#each option as item}
-													<span class="option-item">{item}</span>
-												{/each}
-											</div>
-										</button>
-									{/each}
-								</div>
-							{/if}
-						</div>
-					{/each}
-				{:else}
-					<!-- Fallback to old equipment format -->
+			<!-- Check if using new startingEquipment format -->
+			{#if currentBackground.startingEquipment}
+				<!-- Fixed Background Equipment -->
+				{#if currentBackground.startingEquipment.fixed.length > 0}
 					<div class="equipment-group">
-						<h3>Background Equipment</h3>
+						<h3>Fixed Equipment</h3>
 						<p class="background-note">This equipment is automatically added when you select your background.</p>
 						<div class="equipment-list">
-							{#each currentBackground.equipment as item}
+							{#each currentBackground.startingEquipment.fixed as item}
 								<div class="equipment-item background">
 									<span class="item-name">{item}</span>
-									<span class="item-type">From Background</span>
+									<span class="item-type">Auto-added</span>
 								</div>
 							{/each}
 						</div>
 					</div>
 				{/if}
-			</div>
-		{:else if $character_store.background}
-			<div class="equipment-section">
-				<h2>Background Equipment</h2>
-				<p>Background equipment data is loading...</p>
-			</div>
-		{:else}
-			<div class="no-selection">
-				<h2>No Background Selected</h2>
-				<p>Select a background to see additional starting equipment.</p>
-				<a href="{base}/background" class="nav-link">Go to Background Selection</a>
-			</div>
-		{/if}
+
+				<!-- Background Equipment Choices -->
+				{#each currentBackground.startingEquipment.choices as choice, choiceIndex}
+					<div class="equipment-group">
+						<h3>{choice.name}</h3>
+						<p class="choice-description">{choice.description}</p>
+						
+						{#if choice.options.length > 3}
+							<!-- Use dropdown for many options -->
+							<div class="dropdown-container">
+								<select 
+									class="equipment-dropdown"
+									value={backgroundEquipmentChoices[choiceIndex] ?? ''}
+									on:change={(e) => handleBackgroundEquipmentChoice(choiceIndex, parseInt(e.target.value))}
+								>
+									<option value="" disabled>Choose an option...</option>
+									{#each choice.options as option, optionIndex}
+										<option value={optionIndex}>
+											{option.join(', ')}
+										</option>
+									{/each}
+								</select>
+							</div>
+						{:else}
+							<!-- Use buttons for few options -->
+							<div class="choice-options">
+								{#each choice.options as option, optionIndex}
+									<button
+										class="choice-option"
+										class:selected={backgroundEquipmentChoices[choiceIndex] === optionIndex}
+										on:click={() => handleBackgroundEquipmentChoice(choiceIndex, optionIndex)}
+									>
+										<div class="option-items">
+											{#each option as item}
+												<span class="option-item">{item}</span>
+											{/each}
+										</div>
+									</button>
+								{/each}
+							</div>
+						{/if}
+					</div>
+				{/each}
+			{:else}
+				<!-- Fallback to old equipment format -->
+				<div class="equipment-group">
+					<h3>Background Equipment</h3>
+					<p class="background-note">This equipment is automatically added when you select your background.</p>
+					<div class="equipment-list">
+						{#each currentBackground.equipment as item}
+							<div class="equipment-item background">
+								<span class="item-name">{item}</span>
+								<span class="item-type">From Background</span>
+							</div>
+						{/each}
+					</div>
+				</div>
+			{/if}
+		</div>
+	{:else if $character_store.background}
+		<div class="equipment-section">
+			<h2>Background Equipment</h2>
+			<p>Background equipment data is loading...</p>
+		</div>
+	{:else}
+		<div class="no-selection">
+			<h2>No Background Selected</h2>
+			<p>Select a background to see additional starting equipment.</p>
+			<a href="{base}/background" class="nav-link">Go to Background Selection</a>
+		</div>
 	{/if}
 
 

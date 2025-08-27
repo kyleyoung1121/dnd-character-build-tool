@@ -238,7 +238,7 @@ export const barbarian: ClassData = {
 				description: 'Choose your secondary weapons',
 				options: [
 					['Two handaxes'],
-					...simpleWeapons.map(weapon => [weapon])
+					...simpleWeapons.filter(w => w !== 'Handaxe').map(weapon => [weapon])
 				]
 			}
 		]

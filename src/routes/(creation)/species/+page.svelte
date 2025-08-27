@@ -703,8 +703,10 @@
 
 <style>
 	.main-content {
-		padding: 1.5rem;
+		padding: 2rem 1rem;
 		padding-top: 80px;
+		max-width: 1200px;
+		margin: 0 auto;
 	}
 
 	.intro-text {
@@ -720,7 +722,7 @@
 		display: flex;
 		gap: 1rem;
 		margin-top: 2rem;
-		padding: 0 1rem; /* add horizontal padding */
+		padding: 0 2rem; /* increased horizontal padding for better visual spacing */
 		width: 100%;
 		box-sizing: border-box;
 	}
@@ -737,10 +739,17 @@
 	@media (max-width: 768px) {
 		.race-cards {
 			flex-direction: column;
+			padding: 0 1rem; /* medium padding on tablets */
 		}
 		
 		.race-column {
 			flex: none;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.race-cards {
+			padding: 0 0.5rem; /* reduced padding on mobile */
 		}
 	}
 

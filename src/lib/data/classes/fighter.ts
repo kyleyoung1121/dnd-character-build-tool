@@ -196,6 +196,37 @@ export const fighter: ClassData = {
 	saves: ['Strength', 'Constitution'],
 	armorProficiencies: ['All Armor', 'Shields'],
 	weaponProficiencies: ['Simple Weapons', 'Martial Weapons'],
+	startingEquipment: {
+		fixed: [
+			'Explorer\'s pack (includes: backpack, bedroll, mess kit, tinderbox, 10 torches, 10 days of rations, waterskin, 50 feet of hempen rope)'
+		],
+		choices: [
+			{
+				name: 'Armor',
+				description: 'Choose your starting armor',
+				options: [
+					['Chain mail'],
+					['Leather armor', 'Longbow', '20 arrows']
+				]
+			},
+			{
+				name: 'Primary Weapon',
+				description: 'Choose your weapon setup',
+				options: [
+					['Any martial weapon', 'Shield'],
+					['Any martial weapon (two-handed or two martial weapons)']
+				]
+			},
+			{
+				name: 'Ranged Option',
+				description: 'Choose your ranged weapon or throwing weapons',
+				options: [
+					['Light crossbow', '20 bolts'],
+					['Two handaxes']
+				]
+			}
+		]
+	},
 	classFeatures: [
 		proficienciesPrompt,
 		...classFeaturesPrompt,

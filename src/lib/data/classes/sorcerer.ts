@@ -224,6 +224,10 @@ export const sorcerer: ClassData = {
 	saves: ['Constitution', 'Charisma'],
 	armorProficiencies: [],
 	weaponProficiencies: ['Daggers', 'Darts', 'Slings', 'Quarterstaffs', 'Light Crossbows'],
+	startingEquipment: {
+		fixed: ['Explorer\'s pack'],
+		choices: []
+	},
 	classFeatures: [
 		proficienciesPrompt,
 		...classFeaturesPrompt,

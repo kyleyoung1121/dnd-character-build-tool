@@ -167,6 +167,10 @@ export const druid: ClassData = {
 		'Slings',
 		'Spears',
 	],
+	startingEquipment: {
+		fixed: ['Explorer\'s pack'],
+		choices: []
+	},
 	classFeatures: [
 		proficienciesPrompt,
 		...classFeaturesPrompt,

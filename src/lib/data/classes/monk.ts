@@ -184,6 +184,10 @@ export const monk: ClassData = {
 	saves: ['Strength', 'Dexterity'],
 	armorProficiencies: [],
 	weaponProficiencies: ['Simple Weapons', 'Shortswords'],
+	startingEquipment: {
+		fixed: ['Explorer\'s pack'],
+		choices: []
+	},
 	classFeatures: [
 		proficienciesPrompt,
 		...classFeaturesPrompt,

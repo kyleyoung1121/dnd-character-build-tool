@@ -158,6 +158,10 @@ export const ranger: ClassData = {
 	saves: ['Strength', 'Dexterity'],
 	armorProficiencies: ['Light Armor', 'Medium Armor', 'Shields'],
 	weaponProficiencies: ['Simple Weapons', 'Martial Weapons'],
+	startingEquipment: {
+		fixed: ['Explorer\'s pack'],
+		choices: []
+	},
 	classFeatures: [
 		proficienciesPrompt,
 		...classFeaturesPrompt,

@@ -1,6 +1,7 @@
 import { base } from '$app/paths';
 import type { ClassData } from '$lib/data/types/ClassData';
 import type { FeaturePrompt } from '$lib/data/types/Features';
+import { martialMeleeWeapons, simpleWeapons } from '../equipment/weapons';
 
 const proficienciesPrompt: FeaturePrompt = {
 	name: 'Skill Proficiencies',
@@ -218,6 +219,30 @@ export const barbarian: ClassData = {
 	saves: ['Strength', 'Constitution'],
 	armorProficiencies: ['Light Armor', 'Medium Armor', 'Shields'],
 	weaponProficiencies: ['Simple Weapons', 'Martial Weapons'],
+	startingEquipment: {
+		fixed: [
+			'Explorer\'s pack (includes: backpack, bedroll, mess kit, tinderbox, 10 torches, 10 days of rations, waterskin, 50 feet of hempen rope)',
+			'Four javelins'
+		],
+		choices: [
+			{
+				name: 'Primary Weapon',
+				description: 'Choose your main melee weapon',
+				options: [
+					['Greataxe'],
+					...martialMeleeWeapons.filter(w => w !== 'Greataxe').map(weapon => [weapon])
+				]
+			},
+			{
+				name: 'Secondary Weapons',
+				description: 'Choose your secondary weapons',
+				options: [
+					['Two handaxes'],
+					...simpleWeapons.map(weapon => [weapon])
+				]
+			}
+		]
+	},
 	classFeatures: [
 		proficienciesPrompt,
 		...classFeaturesPrompt,

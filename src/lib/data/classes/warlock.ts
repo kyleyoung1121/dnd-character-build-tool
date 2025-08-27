@@ -158,6 +158,10 @@ export const warlock: ClassData = {
 	saves: ['Wisdom', 'Charisma'],
 	armorProficiencies: ['Light Armor'],
 	weaponProficiencies: ['Simple Weapons'],
+	startingEquipment: {
+		fixed: ['Explorer\'s pack'],
+		choices: []
+	},
 	classFeatures: [
 		proficienciesPrompt,
 		...classFeaturesPrompt,

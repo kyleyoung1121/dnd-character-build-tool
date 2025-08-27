@@ -402,8 +402,10 @@
 
 <style>
 	.main-content {
-		padding: 1.5rem;
+		padding: 2rem 1rem;
 		padding-top: 80px;
+		max-width: 1200px;
+		margin: 0 auto;
 	}
 
 	.intro-text {
@@ -419,7 +421,7 @@
 		grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
 		gap: 1rem;
 		margin-top: 2rem;
-		padding: 0 1rem; /* add horizontal padding */
+		padding: 0 2rem; /* increased horizontal padding for better visual spacing */
 		width: 100%;
 		align-items: start; /* align items to top of their grid area */
 		box-sizing: border-box;
@@ -430,6 +432,7 @@
 		.class-cards {
 			grid-template-columns: repeat(2, 1fr); /* 2 columns on tablets */
 			gap: 0.75rem; /* slightly smaller gap on tablets */
+			padding: 0 1rem; /* medium padding on tablets */
 		}
 	}
 

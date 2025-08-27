@@ -136,6 +136,10 @@ export const wizard: ClassData = {
 	saves: ['Intelligence', 'Wisdom'],
 	armorProficiencies: [],
 	weaponProficiencies: ['Daggers', 'Darts', 'Slings', 'Quarterstaffs', 'Light Crossbows'],
+	startingEquipment: {
+		fixed: ['Explorer\'s pack'],
+		choices: []
+	},
 	classFeatures: [
 		proficienciesPrompt,
 		...classFeaturesPrompt,

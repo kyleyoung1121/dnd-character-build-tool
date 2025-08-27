@@ -237,6 +237,10 @@ export const bard: ClassData = {
 		'Rapiers',
 		'Shortswords',
 	],
+	startingEquipment: {
+		fixed: ['Explorer\'s pack'],
+		choices: []
+	},
 	classFeatures: [
 		proficienciesPrompt,
 		...classFeaturesPrompt,

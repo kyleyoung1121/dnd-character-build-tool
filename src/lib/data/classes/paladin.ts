@@ -253,6 +253,10 @@ export const paladin: ClassData = {
 	saves: ['Wisdom', 'Charisma'],
 	armorProficiencies: ['All Armor', 'Shields'],
 	weaponProficiencies: ['Simple Weapons', 'Martial Weapons'],
+	startingEquipment: {
+		fixed: ['Explorer\'s pack'],
+		choices: []
+	},
 	classFeatures: [
 		proficienciesPrompt,
 		...classFeaturesPrompt,

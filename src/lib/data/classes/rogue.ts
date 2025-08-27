@@ -192,6 +192,10 @@ export const rogue: ClassData = {
 	saves: ['Dexterity', 'Intelligence'],
 	armorProficiencies: ['Light Armor'],
 	weaponProficiencies: ['Simple Weapons', 'Hand Crossbows', 'Longswords', 'Rapiers', 'Shortswords'],
+	startingEquipment: {
+		fixed: ['Explorer\'s pack'],
+		choices: []
+	},
 	classFeatures: [
 		proficienciesPrompt,
 		...classFeaturesPrompt,

@@ -12,7 +12,7 @@ const proficienciesPrompt: FeaturePrompt = {
 		Skills: Choose two from Arcana, Deception, History, Intimidation, Investigation, Nature, and Religion
 	`,
 	featureOptions: {
-		placeholderText: "Select skills",
+		placeholderText: 'Select skills',
 		options: [
 			'Arcana',
 			'Deception',
@@ -20,9 +20,9 @@ const proficienciesPrompt: FeaturePrompt = {
 			'Intimidation',
 			'Investigation',
 			'Nature',
-			'Religion',
+			'Religion'
 		],
-		numPicks: 2,
+		numPicks: 2
 	},
 	source: 'warlock.proficiencies',
 	effects: [
@@ -39,7 +39,7 @@ const otherworldlyPatronPrompt: FeaturePrompt = {
 	name: 'Otherworldly Patron',
 	description: 'Choose your Otherworldly Patron at 1st level.',
 	featureOptions: {
-		placeholderText: "-Choose a Patron-",
+		placeholderText: '-Choose a Patron-',
 		options: [
 			{
 				name: 'The Archfey',
@@ -56,8 +56,8 @@ const otherworldlyPatronPrompt: FeaturePrompt = {
 						`,
 						source: 'warlock.archfey',
 						effects: []
-					},
-				],
+					}
+				]
 			},
 			{
 				name: 'The Fiend',
@@ -73,8 +73,8 @@ const otherworldlyPatronPrompt: FeaturePrompt = {
 						`,
 						source: 'warlock.fiend',
 						effects: []
-					},
-				],
+					}
+				]
 			},
 			{
 				name: 'The Great Old One',
@@ -90,11 +90,11 @@ const otherworldlyPatronPrompt: FeaturePrompt = {
 						`,
 						source: 'warlock.great_old_one',
 						effects: []
-					},
-				],
-			},
+					}
+				]
+			}
 		],
-		numPicks: 1,
+		numPicks: 1
 	},
 	source: 'warlock',
 	effects: []
@@ -122,7 +122,7 @@ const eldritchInvocationsPrompt: FeaturePrompt = {
 	`,
 	source: 'warlock',
 	featureOptions: {
-		placeholderText: "Select two Invocations",
+		placeholderText: 'Select two Invocations',
 		options: [
 			'Agonizing Blast',
 			'Armor of Shadows',
@@ -131,9 +131,9 @@ const eldritchInvocationsPrompt: FeaturePrompt = {
 			'Devil’s Sight',
 			'Eldritch Sight',
 			'Fiendish Vigor',
-			'Mask of Many Faces',
+			'Mask of Many Faces'
 		],
-		numPicks: 2,
+		numPicks: 2
 	},
 	effects: [
 		{
@@ -144,10 +144,7 @@ const eldritchInvocationsPrompt: FeaturePrompt = {
 	]
 };
 
-const classFeaturesPrompt: FeaturePrompt[] = [
-	pactMagicPrompt,
-	eldritchInvocationsPrompt,
-];
+const classFeaturesPrompt: FeaturePrompt[] = [pactMagicPrompt, eldritchInvocationsPrompt];
 
 export const warlock: ClassData = {
 	name: 'Warlock',
@@ -159,12 +156,8 @@ export const warlock: ClassData = {
 	armorProficiencies: ['Light Armor'],
 	weaponProficiencies: ['Simple Weapons'],
 	startingEquipment: {
-		fixed: ['Explorer\'s pack'],
+		fixed: ["Explorer's pack"],
 		choices: []
 	},
-	classFeatures: [
-		proficienciesPrompt,
-		...classFeaturesPrompt,
-		otherworldlyPatronPrompt,
-	],
+	classFeatures: [proficienciesPrompt, ...classFeaturesPrompt, otherworldlyPatronPrompt]
 };

@@ -11,16 +11,9 @@ const proficienciesPrompt: FeaturePrompt = {
 		Skills: Choose two from Arcana, History, Insight, Investigation, Medicine, and Religion
 	`,
 	featureOptions: {
-		placeholderText: "Select skills",
-		options: [
-			'Arcana',
-			'History',
-			'Insight',
-			'Investigation',
-			'Medicine',
-			'Religion',
-		],
-		numPicks: 2,
+		placeholderText: 'Select skills',
+		options: ['Arcana', 'History', 'Insight', 'Investigation', 'Medicine', 'Religion'],
+		numPicks: 2
 	},
 	source: 'wizard.proficiencies',
 	effects: [
@@ -59,7 +52,7 @@ const arcaneTraditionPrompt: FeaturePrompt = {
 	name: 'Arcane Tradition',
 	description: 'Choose an Arcane Tradition at 2nd level.',
 	featureOptions: {
-		placeholderText: "-Choose an Arcane Tradition-",
+		placeholderText: '-Choose an Arcane Tradition-',
 		options: [
 			{
 				name: 'School of Evocation',
@@ -85,8 +78,8 @@ const arcaneTraditionPrompt: FeaturePrompt = {
 						`,
 						source: 'wizard.evocation',
 						effects: []
-					},
-				],
+					}
+				]
 			},
 			{
 				name: 'School of Illusion',
@@ -111,11 +104,11 @@ const arcaneTraditionPrompt: FeaturePrompt = {
 						`,
 						source: 'wizard.illusion',
 						effects: []
-					},
-				],
-			},
+					}
+				]
+			}
 		],
-		numPicks: 1,
+		numPicks: 1
 	},
 	source: 'wizard',
 	effects: []
@@ -124,7 +117,7 @@ const arcaneTraditionPrompt: FeaturePrompt = {
 const classFeaturesPrompt: FeaturePrompt[] = [
 	arcaneRecoveryPrompt,
 	spellcastingPrompt,
-	arcaneTraditionPrompt,
+	arcaneTraditionPrompt
 ];
 
 export const wizard: ClassData = {
@@ -137,11 +130,8 @@ export const wizard: ClassData = {
 	armorProficiencies: [],
 	weaponProficiencies: ['Daggers', 'Darts', 'Slings', 'Quarterstaffs', 'Light Crossbows'],
 	startingEquipment: {
-		fixed: ['Explorer\'s pack'],
+		fixed: ["Explorer's pack"],
 		choices: []
 	},
-	classFeatures: [
-		proficienciesPrompt,
-		...classFeaturesPrompt,
-	],
+	classFeatures: [proficienciesPrompt, ...classFeaturesPrompt]
 };

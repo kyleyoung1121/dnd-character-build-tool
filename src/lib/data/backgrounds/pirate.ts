@@ -4,10 +4,12 @@ import type { BackgroundData } from '../types/BackgroundData';
 export const pirate: BackgroundData = {
 	name: 'Pirate',
 	image: base + '/background_icons/pirate.jpg',
-	description: 'You spent your youth under the sway of a dread pirate, a ruthless cutthroat who taught you how to survive in a world of sharks and savages.',
-	flavorDescription: 'You spent your youth under the sway of a dread pirate, a ruthless cutthroat who taught you how to survive in a world of sharks and savages. You\'ve indulged in larceny on the high seas and sent more than one deserving soul to a briny grave. Fear and bloodshed are no strangers to you, and you\'ve garnered a somewhat unsavory reputation in many a port town.',
+	description:
+		'You spent your youth under the sway of a dread pirate, a ruthless cutthroat who taught you how to survive in a world of sharks and savages.',
+	flavorDescription:
+		"You spent your youth under the sway of a dread pirate, a ruthless cutthroat who taught you how to survive in a world of sharks and savages. You've indulged in larceny on the high seas and sent more than one deserving soul to a briny grave. Fear and bloodshed are no strangers to you, and you've garnered a somewhat unsavory reputation in many a port town.",
 	skillProficiencies: ['Athletics', 'Perception'],
-	toolProficiencies: ['Navigator\'s tools', 'Vehicles (water)'],
+	toolProficiencies: ["Navigator's tools", 'Vehicles (water)'],
 	equipment: [
 		'Belaying pin (club)',
 		'Silk rope (50 feet)',
@@ -16,7 +18,8 @@ export const pirate: BackgroundData = {
 		'Belt pouch with 10 gp'
 	],
 	feature: 'Bad Reputation',
-	featureDescription: 'No matter where you go, people are afraid of you due to your reputation. When you are in a civilized settlement, you can get away with minor criminal offenses, such as refusing to pay for food at a tavern or breaking down doors at a local shop, since most people will not report your activity to the authorities.',
+	featureDescription:
+		'No matter where you go, people are afraid of you due to your reputation. When you are in a civilized settlement, you can get away with minor criminal offenses, such as refusing to pay for food at a tavern or breaking down doors at a local shop, since most people will not report your activity to the authorities.',
 	backgroundFeatures: [
 		{
 			name: 'Skill Proficiencies',
@@ -34,20 +37,21 @@ export const pirate: BackgroundData = {
 		{
 			name: 'Tool Proficiencies',
 			id: 'pirate_tools',
-			description: 'You gain proficiency with navigator\'s tools and vehicles (water).',
+			description: "You gain proficiency with navigator's tools and vehicles (water).",
 			source: 'background:Pirate',
 			effects: [
 				{
 					target: 'proficiencies',
 					action: 'add',
-					value: ['Navigator\'s tools', 'Vehicles (water)']
+					value: ["Navigator's tools", 'Vehicles (water)']
 				}
 			]
 		},
 		{
 			name: 'Equipment',
 			id: 'pirate_equipment',
-			description: 'You start with a belaying pin (club), silk rope, lucky charm, common clothes, and 10 gp.',
+			description:
+				'You start with a belaying pin (club), silk rope, lucky charm, common clothes, and 10 gp.',
 			source: 'background:Pirate',
 			effects: [
 				{
@@ -66,7 +70,8 @@ export const pirate: BackgroundData = {
 		{
 			name: 'Bad Reputation',
 			id: 'pirate_feature',
-			description: 'Your fearsome reputation allows you to get away with minor criminal offenses in civilized settlements, as most people won\'t report you to authorities.',
+			description:
+				"Your fearsome reputation allows you to get away with minor criminal offenses in civilized settlements, as most people won't report you to authorities.",
 			source: 'background:Pirate',
 			effects: [
 				{

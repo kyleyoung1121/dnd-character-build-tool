@@ -5,7 +5,8 @@ export const charlatan: BackgroundData = {
 	name: 'Charlatan',
 	image: base + '/background_icons/charlatan.jpg',
 	description: 'You have always had a way with people and know what makes them tick.',
-	flavorDescription: 'A master of manipulation, you can draw out their deepest secrets and use their fears and vulnerabilities against them. You know how to make friends quickly, how to play on their sympathies, and how to play off their suspicions. But your talents weren\'t always used for ill.',
+	flavorDescription:
+		"A master of manipulation, you can draw out their deepest secrets and use their fears and vulnerabilities against them. You know how to make friends quickly, how to play on their sympathies, and how to play off their suspicions. But your talents weren't always used for ill.",
 	skillProficiencies: ['Deception', 'Sleight of Hand'],
 	toolProficiencies: ['Forgery kit', 'One type of gaming set'],
 	equipment: [
@@ -16,7 +17,8 @@ export const charlatan: BackgroundData = {
 		'Belt pouch with 15 gp'
 	],
 	feature: 'False Identity',
-	featureDescription: 'You have created a second identity that includes documentation, established acquaintances, and disguises that allow you to assume that persona. Additionally, you can forge documents including official papers and personal letters, as long as you have seen an example of the kind of document or the handwriting you are trying to copy.',
+	featureDescription:
+		'You have created a second identity that includes documentation, established acquaintances, and disguises that allow you to assume that persona. Additionally, you can forge documents including official papers and personal letters, as long as you have seen an example of the kind of document or the handwriting you are trying to copy.',
 	backgroundFeatures: [
 		{
 			name: 'Skill Proficiencies',
@@ -71,7 +73,8 @@ export const charlatan: BackgroundData = {
 		{
 			name: 'False Identity',
 			id: 'charlatan_feature',
-			description: 'You have created a second identity with documentation and disguises. You can also forge documents when you\'ve seen examples.',
+			description:
+				"You have created a second identity with documentation and disguises. You can also forge documents when you've seen examples.",
 			source: 'background:Charlatan',
 			effects: [
 				{

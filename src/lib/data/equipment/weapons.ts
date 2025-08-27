@@ -12,7 +12,7 @@ export const simpleWeapons = [
 	'Quarterstaff',
 	'Sickle',
 	'Spear',
-	
+
 	// Ranged weapons
 	'Light crossbow',
 	'Shortbow',
@@ -48,11 +48,21 @@ export const martialRangedWeapons = [
 	'Net'
 ];
 
-export const martialWeapons = [
-	...martialMeleeWeapons,
-	...martialRangedWeapons
-];
+export const martialWeapons = [...martialMeleeWeapons, ...martialRangedWeapons];
 
-export const simpleWielding = simpleWeapons.filter(weapon => 
-	!['Light crossbow', 'Shortbow', 'Sling'].includes(weapon)
+export const simpleWielding = simpleWeapons.filter(
+	(weapon) => !['Light crossbow', 'Shortbow', 'Sling'].includes(weapon)
 );
+
+// Two-handed weapons that cannot be used with shields
+export const twoHandedWeapons = [
+	'Glaive',
+	'Greataxe',
+	'Greatsword',
+	'Halberd',
+	'Lance',
+	'Maul',
+	'Pike',
+	'Heavy crossbow',
+	'Longbow'
+];

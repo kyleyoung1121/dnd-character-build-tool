@@ -17,7 +17,7 @@ import { urchin } from './urchin';
 
 // Variants
 import { gladiator } from './gladiator'; // variant of Entertainer
-// import { guildMerchant } from './guild_merchant'; // variant of Guild Artisan  
+// import { guildMerchant } from './guild_merchant'; // variant of Guild Artisan
 import { knight } from './knight'; // variant of Noble
 import { pirate } from './pirate'; // variant of Sailor
 // import { spy } from './spy'; // variant of Criminal
@@ -38,8 +38,8 @@ export const allBackgrounds = [
 	sage,
 	sailor,
 	soldier,
-	urchin,
-	
+	urchin
+
 	// Additional variants can be added later
 	// guildMerchant,
 	// spy

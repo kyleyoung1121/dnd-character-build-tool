@@ -5,6 +5,7 @@
 Successfully cloned and set up the SvelteKit-based D&D character builder project from GitHub repository: https://github.com/kyleyoung1121/dnd-character-build-tool
 
 **Tech Stack Confirmed:**
+
 - SvelteKit + TypeScript
 - Tailwind CSS v4.0 (latest version)
 - Vite 7.0.6 as build tool
@@ -47,17 +48,18 @@ The tab system uses SvelteKit's routing with a shared layout for the creation fl
 
 ```javascript
 export let navItems = [
-    { name: "Class", href: base + "/class" },
-    { name: "Race", href: base + "/race" },
-    { name: "Abilities", href: base + "/abilities" },
-    { name: "Background", href: base + "/background" },
-    { name: "Equipment", href: base + "/equipment" },
-    { name: "Spells", href: base + "/spells" },
-    { name: "Export", href: base + "/export" }
+	{ name: 'Class', href: base + '/class' },
+	{ name: 'Race', href: base + '/race' },
+	{ name: 'Abilities', href: base + '/abilities' },
+	{ name: 'Background', href: base + '/background' },
+	{ name: 'Equipment', href: base + '/equipment' },
+	{ name: 'Spells', href: base + '/spells' },
+	{ name: 'Export', href: base + '/export' }
 ];
 ```
 
 **Features:**
+
 - Fixed navigation bar at top of screen
 - Clean, accessible navigation with hover effects
 - Consistent styling across all creation pages
@@ -70,36 +72,41 @@ export let navItems = [
 **Key Features:**
 
 ### 1. Class Cards with Visual Icons
+
 - 12 D&D classes supported (barbarian, bard, cleric, druid, fighter, monk, paladin, ranger, rogue, sorcerer, warlock, wizard)
 - Each class has dedicated icon from `static/class_icons/`
 - Rich class descriptions and mechanical details
 
 ### 2. Dynamic Feature Selection System
+
 - **FeaturePrompt Interface:** Sophisticated system for handling class features
 - **Interactive Selections:** Dropdown menus for skills, subclass options, etc.
 - **Nested Features:** Subclass features appear dynamically based on selections
 - **Global Conflict Resolution:** Prevents duplicate selections across features
 
 ### 3. Subclass Support
+
 **Example - Barbarian Subclasses:**
+
 - **Berserker Path:** Frenzy ability with exhaustion mechanics
 - **Totem Warrior Path:** Spirit Seeker + Totem Spirit selection system
 
 **Technical Implementation:**
+
 ```typescript
 interface FeaturePrompt {
-    name: string;
-    id: string;
-    description: string;
-    featureOptions?: SelectOptions;
-    source: string;
-    effects?: FeatureEffect[];
+	name: string;
+	id: string;
+	description: string;
+	featureOptions?: SelectOptions;
+	source: string;
+	effects?: FeatureEffect[];
 }
 
 interface FeatureEffect {
-    target: string;        // Character property to modify
-    action: FeatureAction; // "add", "remove", "set", "modify"
-    value: any;           // Value to apply (supports {userChoice} templating)
+	target: string; // Character property to modify
+	action: FeatureAction; // "add", "remove", "set", "modify"
+	value: any; // Value to apply (supports {userChoice} templating)
 }
 ```
 
@@ -108,14 +115,16 @@ interface FeatureEffect {
 **Location:** `src/routes/(creation)/race/+page.svelte`
 
 **Supported Races:**
+
 - **Human:** Standard + Variant Human
 - **Elf:** High Elf, Wood Elf, Dark Elf
-- **Dwarf:** Hill Dwarf, Mountain Dwarf  
+- **Dwarf:** Hill Dwarf, Mountain Dwarf
 - **Halfling:** Lightfoot, Stout
 - **Gnome:** Forest Gnome, Rock Gnome
 - **Dragonborn, Half-Elf, Half-Orc, Tiefling**
 
 **Features:**
+
 - Visual race cards with icons from `static/race_icons/`
 - Subrace selection system similar to subclass mechanics
 - Racial trait application through the same effect system
@@ -130,60 +139,65 @@ interface FeatureEffect {
 **Interactive Features:** Require user choices via dropdown menus
 
 ### Feature Types:
+
 1. **Simple Selections:** Choose from predefined list (skills, languages)
 2. **Complex Options:** Nested subfeatures that unlock based on choice
 3. **Templated Effects:** Use `{userChoice}` placeholder for dynamic values
 
 **Example - Barbarian Skill Selection:**
+
 ```typescript
 const proficienciesPrompt: FeaturePrompt = {
-    name: 'Skill Proficiencies',
-    featureOptions: {
-        placeholderText: "Select 2 skills",
-        options: ['Animal Handling', 'Athletics', 'Intimidation', 'Nature', 'Perception', 'Survival'],
-        numPicks: 2,
-    },
-    effects: [{
-        target: "skills",
-        action: "add", 
-        value: "{userChoice}"
-    }]
+	name: 'Skill Proficiencies',
+	featureOptions: {
+		placeholderText: 'Select 2 skills',
+		options: ['Animal Handling', 'Athletics', 'Intimidation', 'Nature', 'Perception', 'Survival'],
+		numPicks: 2
+	},
+	effects: [
+		{
+			target: 'skills',
+			action: 'add',
+			value: '{userChoice}'
+		}
+	]
 };
 ```
 
 ## Data Storage & Loading Mechanisms
 
 ### Character Store System
+
 **Location:** `src/lib/stores/character_store.ts`
 
 ```typescript
 export type Character = {
-    name: string;
-    race: string;
-    class: string;
-    background: string;
-    alignment: string;
-    // Ability scores
-    strength: number | null;
-    dexterity: number | null;
-    // ... other abilities
-    // Collections
-    proficiencies: string[];
-    languages: string[];
-    skills: string[];
-    features: string[];
-    inventory: string[];
-    attacks: Attack[];
-    spells?: string[];
-    // Computed stats
-    hp: number | null;
-    ac: number | null;
-    speed: number | null;
-    size: string | null;
-    // Metadata for change tracking
-    _provenance?: {
-        [scopeId: string]: Partial<Character>;
-    };
+	name: string;
+	race: string;
+	class: string;
+	background: string;
+	alignment: string;
+	// Ability scores
+	strength: number | null;
+	dexterity: number | null;
+	// ... other abilities
+	// Collections
+	proficiencies: string[];
+	languages: string[];
+	skills: string[];
+	features: string[];
+	inventory: string[];
+	attacks: Attack[];
+	spells?: string[];
+	// Computed stats
+	hp: number | null;
+	ac: number | null;
+	speed: number | null;
+	size: string | null;
+	// Metadata for change tracking
+	_provenance?: {
+		[scopeId: string]: Partial<Character>;
+	};
 };
 ```
 
@@ -195,6 +209,7 @@ export type Character = {
 4. **Reactive Updates:** Svelte stores automatically update UI when character changes
 
 ### Change Management System
+
 **Location:** `src/lib/stores/character_store_helpers.ts`
 
 - `applyChoice(scopeId, updates, modifications)`: Apply changes with tracking
@@ -204,20 +219,25 @@ export type Character = {
 ## Key Technical Innovations
 
 ### 1. Dynamic Feature Revelation
+
 Subclass features appear/disappear based on selections without page reload
 
 ### 2. Template System
+
 `{userChoice}` placeholders allow flexible feature definitions
 
-### 3. Comprehensive Conflict Resolution  
+### 3. Comprehensive Conflict Resolution
+
 System prevents selecting the same skill twice across different features
 
 ### 4. Clean State Reversions
+
 Can change class/subclass without losing unrelated character progress
 
 ## Development Environment Setup
 
 ✅ **Successfully Configured for Clacky:**
+
 - Modified `vite.config.ts` with `allowedHosts: ['.clackypaas.com']`
 - Removed GitHub Pages base path configuration
 - Created `/home/runner/.clackyai/.environments.yaml` with proper commands
@@ -226,14 +246,16 @@ Can change class/subclass without losing unrelated character progress
 ## Current Status
 
 ✅ **Project is fully operational:**
+
 - Running on http://localhost:5173/
 - No compilation errors
 - Type checking passes (2 minor CSS warnings only)
 - All major systems functional
 
 **Ready for analysis and enhancement of:**
+
 - Tab navigation improvements
-- Feature card enhancements  
+- Feature card enhancements
 - Additional class/race options
 - UI/UX refinements
 - Export functionality extensions

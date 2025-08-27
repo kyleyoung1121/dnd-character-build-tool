@@ -12,23 +12,16 @@ const proficienciesPrompt: FeaturePrompt = {
 		Skills: Choose two from Athletics, Insight, Intimidation, Medicine, Persuasion, and Religion
 	`,
 	featureOptions: {
-		placeholderText: "Select skills",
-		options: [
-			'Athletics',
-			'Insight',
-			'Intimidation',
-			'Medicine',
-			'Persuasion',
-			'Religion',
-		],
-		numPicks: 2,
+		placeholderText: 'Select skills',
+		options: ['Athletics', 'Insight', 'Intimidation', 'Medicine', 'Persuasion', 'Religion'],
+		numPicks: 2
 	},
-	source: "paladin.proficiencies",
+	source: 'paladin.proficiencies',
 	effects: [
 		{
-			target: "skills",
-			action: "add",
-			value: "{userChoice}"
+			target: 'skills',
+			action: 'add',
+			value: '{userChoice}'
 		}
 	]
 };
@@ -40,12 +33,12 @@ const divineSensePrompt: FeaturePrompt = {
 		As an action, you can open your awareness to detect good and evil until the start of your next turn. 
 		You can use this feature a number of times equal to 1 + your Charisma modifier per long rest.
 	`,
-	source: "paladin",
+	source: 'paladin',
 	effects: [
 		{
-			target: "features",
-			action: "add",
-			value: "Divine Sense"
+			target: 'features',
+			action: 'add',
+			value: 'Divine Sense'
 		}
 	]
 };
@@ -58,12 +51,12 @@ const layOnHandsPrompt: FeaturePrompt = {
 		With that pool, you can restore a total number of hit points equal to your Paladin level × 5.
 		As an action, you can touch a creature to restore any number of hit points remaining in the pool.
 	`,
-	source: "paladin",
+	source: 'paladin',
 	effects: [
 		{
-			target: "features",
-			action: "add",
-			value: "Lay on Hands"
+			target: 'features',
+			action: 'add',
+			value: 'Lay on Hands'
 		}
 	]
 };
@@ -73,21 +66,16 @@ const fightingStylePrompt: FeaturePrompt = {
 	name: 'Fighting Style',
 	description: 'Choose a fighting style to enhance your combat ability.',
 	featureOptions: {
-		placeholderText: "-Choose a Fighting Style-",
-		options: [
-			'Defense',
-			'Dueling',
-			'Great Weapon Fighting',
-			'Protection'
-		],
+		placeholderText: '-Choose a Fighting Style-',
+		options: ['Defense', 'Dueling', 'Great Weapon Fighting', 'Protection'],
 		numPicks: 1
 	},
-	source: "paladin",
+	source: 'paladin',
 	effects: [
 		{
-			target: "features",
-			action: "add",
-			value: "{userChoice} Fighting Style"
+			target: 'features',
+			action: 'add',
+			value: '{userChoice} Fighting Style'
 		}
 	]
 };
@@ -99,12 +87,12 @@ const spellcastingPrompt: FeaturePrompt = {
 		You can cast prepared paladin spells using Charisma as your spellcasting ability. 
 		At level 3, you gain access to 1st-level paladin spells.
 	`,
-	source: "paladin",
+	source: 'paladin',
 	effects: [
 		{
-			target: "features",
-			action: "add",
-			value: "Spellcasting"
+			target: 'features',
+			action: 'add',
+			value: 'Spellcasting'
 		}
 	]
 };
@@ -116,12 +104,12 @@ const divineSmitePrompt: FeaturePrompt = {
 		When you hit a creature with a melee weapon attack, you can expend one spell slot to deal radiant damage in addition to the weapon's damage.
 		The extra damage is 2d8 for a 1st-level spell slot, plus 1d8 for each spell level higher than 1st.
 	`,
-	source: "paladin",
+	source: 'paladin',
 	effects: [
 		{
-			target: "features",
-			action: "add",
-			value: "Divine Smite"
+			target: 'features',
+			action: 'add',
+			value: 'Divine Smite'
 		}
 	]
 };
@@ -131,7 +119,7 @@ const sacredOathPrompt: FeaturePrompt = {
 	name: 'Sacred Oath',
 	description: 'Choose a Sacred Oath at 3rd level.',
 	featureOptions: {
-		placeholderText: "-Choose an Oath-",
+		placeholderText: '-Choose an Oath-',
 		options: [
 			{
 				name: 'Oath of Devotion',
@@ -140,13 +128,14 @@ const sacredOathPrompt: FeaturePrompt = {
 					{
 						id: 'paladin_oath_devotion_01',
 						name: 'Oath Spells',
-						description: 'You gain oath-specific spells at certain levels (not applicable at level 3).',
+						description:
+							'You gain oath-specific spells at certain levels (not applicable at level 3).',
 						source: 'paladin.oath_devotion',
 						effects: [
 							{
-								target: "features",
-								action: "add",
-								value: "Oath Spells"
+								target: 'features',
+								action: 'add',
+								value: 'Oath Spells'
 							}
 						]
 					},
@@ -157,9 +146,9 @@ const sacredOathPrompt: FeaturePrompt = {
 						source: 'paladin.oath_devotion',
 						effects: [
 							{
-								target: "features",
-								action: "add",
-								value: "Sacred Weapon"
+								target: 'features',
+								action: 'add',
+								value: 'Sacred Weapon'
 							}
 						]
 					},
@@ -170,9 +159,9 @@ const sacredOathPrompt: FeaturePrompt = {
 						source: 'paladin.oath_devotion',
 						effects: [
 							{
-								target: "features",
-								action: "add",
-								value: "Turn the Unholy"
+								target: 'features',
+								action: 'add',
+								value: 'Turn the Unholy'
 							}
 						]
 					}
@@ -185,13 +174,14 @@ const sacredOathPrompt: FeaturePrompt = {
 					{
 						id: 'paladin_oath_ancients_01',
 						name: 'Oath Spells',
-						description: 'You gain oath-specific spells at certain levels (not applicable at level 3).',
+						description:
+							'You gain oath-specific spells at certain levels (not applicable at level 3).',
 						source: 'paladin.oath_ancients',
 						effects: [
 							{
-								target: "features",
-								action: "add",
-								value: "Oath Spells"
+								target: 'features',
+								action: 'add',
+								value: 'Oath Spells'
 							}
 						]
 					},
@@ -202,9 +192,9 @@ const sacredOathPrompt: FeaturePrompt = {
 						source: 'paladin.oath_ancients',
 						effects: [
 							{
-								target: "features",
-								action: "add",
-								value: "Nature’s Wrath"
+								target: 'features',
+								action: 'add',
+								value: 'Nature’s Wrath'
 							}
 						]
 					},
@@ -215,9 +205,9 @@ const sacredOathPrompt: FeaturePrompt = {
 						source: 'paladin.oath_ancients',
 						effects: [
 							{
-								target: "features",
-								action: "add",
-								value: "Turn the Faithless"
+								target: 'features',
+								action: 'add',
+								value: 'Turn the Faithless'
 							}
 						]
 					}
@@ -226,12 +216,12 @@ const sacredOathPrompt: FeaturePrompt = {
 		],
 		numPicks: 1
 	},
-	source: "paladin",
+	source: 'paladin',
 	effects: [
 		{
-			target: "subclass",
-			action: "set",
-			value: "{userChoice}"
+			target: 'subclass',
+			action: 'set',
+			value: '{userChoice}'
 		}
 	]
 };
@@ -241,7 +231,7 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 	layOnHandsPrompt,
 	fightingStylePrompt,
 	spellcastingPrompt,
-	divineSmitePrompt,
+	divineSmitePrompt
 ];
 
 export const paladin: ClassData = {
@@ -254,12 +244,8 @@ export const paladin: ClassData = {
 	armorProficiencies: ['All Armor', 'Shields'],
 	weaponProficiencies: ['Simple Weapons', 'Martial Weapons'],
 	startingEquipment: {
-		fixed: ['Explorer\'s pack'],
+		fixed: ["Explorer's pack"],
 		choices: []
 	},
-	classFeatures: [
-		proficienciesPrompt,
-		...classFeaturesPrompt,
-		sacredOathPrompt,
-	],
+	classFeatures: [proficienciesPrompt, ...classFeaturesPrompt, sacredOathPrompt]
 };

@@ -1,6 +1,10 @@
 <script lang="ts">
 	import type { FeaturePrompt } from '$lib/data/types/Features';
-	import { clearNestedFeatureSelections, effectNeedsChoice, getNestedPrompts } from './feature-card-utils';
+	import {
+		clearNestedFeatureSelections,
+		effectNeedsChoice,
+		getNestedPrompts
+	} from './feature-card-utils';
 	import { applyChoice, revertChanges } from '$lib/stores/character_store_helpers';
 	import { get } from 'svelte/store';
 	import { conflicts } from '$lib/stores/conflict_store';
@@ -12,7 +16,6 @@
 	export let expandedFeatures: Set<string>;
 	export let selectionVersion: number;
 	export let characterStore: any;
-
 
 	// Events
 	export let onBumpVersion: () => void;
@@ -89,9 +92,12 @@
 		}
 	}
 
-
-
-	function applyFeatureEffects(feature: FeaturePrompt, choice: string, scopeId: string, index: number) {
+	function applyFeatureEffects(
+		feature: FeaturePrompt,
+		choice: string,
+		scopeId: string,
+		index: number
+	) {
 		// Prepare containers for ONLY the effects that depend on this choice
 		const update: Record<string, any> = {};
 		const modify: Record<string, number> = {};
@@ -102,10 +108,10 @@
 
 			// Replace {userChoice} anywhere in target or value with the chosen value.
 			const replaceUC = (s: any, isTarget = false) => {
-				if (typeof s !== "string") return s;
+				if (typeof s !== 'string') return s;
 				let replaced = s.replace(/\{userChoice\}/g, choice);
 				if (isTarget) {
-					replaced = replaced.toLowerCase().replace(/\s+/g, "_");
+					replaced = replaced.toLowerCase().replace(/\s+/g, '_');
 				}
 				return replaced;
 			};
@@ -114,17 +120,17 @@
 			const value = replaceUC(effect.value);
 
 			switch (effect.action) {
-				case "add": {
+				case 'add': {
 					const arr = Array.isArray(value) ? value : [value];
 					if (!update[target]) update[target] = [];
 					update[target].push(...arr);
 					break;
 				}
-				case "set": {
+				case 'set': {
 					update[target] = value;
 					break;
 				}
-				case "modify": {
+				case 'modify': {
 					const amount = Number(value);
 					if (!isNaN(amount)) {
 						modify[target] = (modify[target] ?? 0) + amount;
@@ -154,17 +160,17 @@
 				const value = effect.value;
 
 				switch (effect.action) {
-					case "add": {
+					case 'add': {
 						const arr = Array.isArray(value) ? value : [value];
 						if (!nestedUpdate[target]) nestedUpdate[target] = [];
 						nestedUpdate[target].push(...arr);
 						break;
 					}
-					case "set": {
+					case 'set': {
 						nestedUpdate[target] = value;
 						break;
 					}
-					case "modify": {
+					case 'modify': {
 						const amount = Number(value);
 						if (!isNaN(amount)) {
 							nestedModify[target] = (nestedModify[target] ?? 0) + amount;

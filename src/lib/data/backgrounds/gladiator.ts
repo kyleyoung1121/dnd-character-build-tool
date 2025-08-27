@@ -4,8 +4,10 @@ import type { BackgroundData } from '../types/BackgroundData';
 export const gladiator: BackgroundData = {
 	name: 'Gladiator',
 	image: base + '/background_icons/gladiator.jpg',
-	description: 'A gladiator is as much an entertainer as any minstrel or circus performer, trained to make the arts of combat into a spectacle the crowd can enjoy.',
-	flavorDescription: 'A gladiator is as much an entertainer as any minstrel or circus performer, trained to make the arts of combat into a spectacle the crowd can enjoy. This kind of flashy combat is your entertainer routine, though you might also have some skills as a tumbler or actor. Using your By Popular Demand feature, you can find a place to perform in any place that features combat for entertainment—perhaps a gladiatorial arena or secret pit fighting club.',
+	description:
+		'A gladiator is as much an entertainer as any minstrel or circus performer, trained to make the arts of combat into a spectacle the crowd can enjoy.',
+	flavorDescription:
+		'A gladiator is as much an entertainer as any minstrel or circus performer, trained to make the arts of combat into a spectacle the crowd can enjoy. This kind of flashy combat is your entertainer routine, though you might also have some skills as a tumbler or actor. Using your By Popular Demand feature, you can find a place to perform in any place that features combat for entertainment—perhaps a gladiatorial arena or secret pit fighting club.',
 	skillProficiencies: ['Acrobatics', 'Performance'],
 	toolProficiencies: ['Disguise kit', 'One type of unusual weapon'],
 	equipment: [
@@ -15,7 +17,8 @@ export const gladiator: BackgroundData = {
 		'Belt pouch with 15 gp'
 	],
 	feature: 'By Popular Demand',
-	featureDescription: 'You can always find a place to perform, usually in gladiatorial arenas, fighting pits, or similar venues. At such a place, you receive free lodging and food of a modest or comfortable standard (depending on the quality of the establishment), as long as you perform each night. In addition, your performance makes you something of a local figure. When strangers recognize you in a town where you have performed, they typically take a liking to you.',
+	featureDescription:
+		'You can always find a place to perform, usually in gladiatorial arenas, fighting pits, or similar venues. At such a place, you receive free lodging and food of a modest or comfortable standard (depending on the quality of the establishment), as long as you perform each night. In addition, your performance makes you something of a local figure. When strangers recognize you in a town where you have performed, they typically take a liking to you.',
 	backgroundFeatures: [
 		{
 			name: 'Skill Proficiencies',
@@ -74,7 +77,8 @@ export const gladiator: BackgroundData = {
 		{
 			name: 'By Popular Demand',
 			id: 'gladiator_feature',
-			description: 'You can find performance venues in gladiatorial arenas and fighting pits, receiving lodging and food. Your combat performances make you a recognizable local figure.',
+			description:
+				'You can find performance venues in gladiatorial arenas and fighting pits, receiving lodging and food. Your combat performances make you a recognizable local figure.',
 			source: 'background:Gladiator',
 			effects: [
 				{

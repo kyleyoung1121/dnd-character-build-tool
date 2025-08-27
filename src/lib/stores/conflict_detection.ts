@@ -23,11 +23,11 @@ export type ConflictDetectionResult = {
 export function detectConflicts(): ConflictDetectionResult {
 	const character = get(character_store);
 	const conflicts: Conflict[] = [];
-	
+
 	if (!character._provenance) {
 		return { hasConflicts: false, conflicts: [], tabsNeedingAttention: [] };
 	}
-	
+
 	// Group all additions by field type and value
 	const additions: Record<ConflictType, Record<string, string[]>> = {
 		skill: {},
@@ -35,17 +35,17 @@ export function detectConflicts(): ConflictDetectionResult {
 		language: {},
 		feature: {}
 	};
-	
+
 	// Analyze each scope's provenance
 	for (const [scopeId, prov] of Object.entries(character._provenance)) {
 		// Handle both old flat format and new structured format
-		const changes = ('_set' in prov && prov._set) ? prov._set : prov;
+		const changes = '_set' in prov && prov._set ? prov._set : prov;
 		if (!changes) continue;
-		
+
 		// Check each field type for additions
 		for (const [fieldName, fieldValues] of Object.entries(changes)) {
 			if (!Array.isArray(fieldValues)) continue;
-			
+
 			let conflictType: ConflictType;
 			switch (fieldName) {
 				case 'skills':
@@ -63,7 +63,7 @@ export function detectConflicts(): ConflictDetectionResult {
 				default:
 					continue; // skip non-array fields or unknown types
 			}
-			
+
 			// Track what this scope added
 			for (const value of fieldValues) {
 				if (!additions[conflictType][value]) {
@@ -73,7 +73,7 @@ export function detectConflicts(): ConflictDetectionResult {
 			}
 		}
 	}
-	
+
 	// Find conflicts (values added by multiple sources)
 	for (const [conflictType, valueMap] of Object.entries(additions)) {
 		for (const [value, sources] of Object.entries(valueMap)) {
@@ -88,12 +88,10 @@ export function detectConflicts(): ConflictDetectionResult {
 			}
 		}
 	}
-	
+
 	// Get unique list of tabs needing attention
-	const tabsNeedingAttention = [...new Set(
-		conflicts.flatMap(c => c.affectedTabs || [])
-	)];
-	
+	const tabsNeedingAttention = [...new Set(conflicts.flatMap((c) => c.affectedTabs || []))];
+
 	return {
 		hasConflicts: conflicts.length > 0,
 		conflicts,
@@ -108,10 +106,10 @@ export function detectConflicts(): ConflictDetectionResult {
 function getTabsFromSources(sources: string[]): string[] {
 	const tabs = new Set<string>();
 	const changeableTabs = new Set<string>();
-	
+
 	// First pass: identify all tabs involved and which ones are user-changeable
 	for (const source of sources) {
-		if (source.startsWith('class:') || source.startsWith('feature:') && isClassFeature(source)) {
+		if (source.startsWith('class:') || (source.startsWith('feature:') && isClassFeature(source))) {
 			tabs.add('class');
 			// Class features with user choices should be prioritized
 			if (isUserChangeableClassFeature(source)) {
@@ -128,13 +126,13 @@ function getTabsFromSources(sources: string[]): string[] {
 			changeableTabs.add('background'); // Most background features are choices
 		}
 	}
-	
+
 	// Prioritize user-changeable tabs, but include all involved tabs for context
 	const result = Array.from(tabs);
 	const changeable = Array.from(changeableTabs);
-	
+
 	// Sort so changeable tabs come first (these get the red warning)
-	return [...changeable, ...result.filter(tab => !changeable.includes(tab))];
+	return [...changeable, ...result.filter((tab) => !changeable.includes(tab))];
 }
 
 /**
@@ -142,11 +140,12 @@ function getTabsFromSources(sources: string[]): string[] {
  */
 function isUserChangeableClassFeature(scopeId: string): boolean {
 	// Features that involve user selection (have indices like :0, :1)
-	return /:\d+$/.test(scopeId) && (
-		scopeId.includes('Skill Proficiencies') ||
-		scopeId.includes('Bonus Proficiencies') ||
-		scopeId.includes('Expertise') ||
-		scopeId.includes('college_of_lore')
+	return (
+		/:\d+$/.test(scopeId) &&
+		(scopeId.includes('Skill Proficiencies') ||
+			scopeId.includes('Bonus Proficiencies') ||
+			scopeId.includes('Expertise') ||
+			scopeId.includes('college_of_lore'))
 	);
 }
 
@@ -155,10 +154,11 @@ function isUserChangeableClassFeature(scopeId: string): boolean {
  */
 function isUserChangeableSpeciesFeature(scopeId: string): boolean {
 	// Most species features are automatic, but some have choices
-	return /:\d+$/.test(scopeId) && (
-		scopeId.includes('Tool Proficiency') ||
-		scopeId.includes('Cantrip') ||
-		scopeId.includes('Draconic Ancestry')
+	return (
+		/:\d+$/.test(scopeId) &&
+		(scopeId.includes('Tool Proficiency') ||
+			scopeId.includes('Cantrip') ||
+			scopeId.includes('Draconic Ancestry'))
 	);
 }
 
@@ -169,11 +169,13 @@ function isUserChangeableSpeciesFeature(scopeId: string): boolean {
 function isClassFeature(scopeId: string): boolean {
 	// Class features are typically selected after choosing a class
 	// Common class skill features
-	return scopeId.includes('Skill Proficiencies') || 
-		   scopeId.includes('Skills') ||
-		   scopeId.includes('Bonus Proficiencies') ||
-		   scopeId.includes('Expertise') ||
-		   scopeId.includes('college_of_lore');
+	return (
+		scopeId.includes('Skill Proficiencies') ||
+		scopeId.includes('Skills') ||
+		scopeId.includes('Bonus Proficiencies') ||
+		scopeId.includes('Expertise') ||
+		scopeId.includes('college_of_lore')
+	);
 }
 
 /**
@@ -182,15 +184,17 @@ function isClassFeature(scopeId: string): boolean {
  */
 function isSpeciesFeature(scopeId: string): boolean {
 	// Species features are typically named after species traits
-	return scopeId.includes('Keen Senses') ||
-		   scopeId.includes('Fey Ancestry') ||
-		   scopeId.includes('Trance') ||
-		   scopeId.includes('Darkvision') ||
-		   scopeId.includes('Dwarven') ||
-		   scopeId.includes('Elven') ||
-		   scopeId.includes('Halfling') ||
-		   scopeId.includes('Draconic') ||
-		   scopeId.includes('Tool Proficiency');
+	return (
+		scopeId.includes('Keen Senses') ||
+		scopeId.includes('Fey Ancestry') ||
+		scopeId.includes('Trance') ||
+		scopeId.includes('Darkvision') ||
+		scopeId.includes('Dwarven') ||
+		scopeId.includes('Elven') ||
+		scopeId.includes('Halfling') ||
+		scopeId.includes('Draconic') ||
+		scopeId.includes('Tool Proficiency')
+	);
 }
 
 /**
@@ -199,9 +203,7 @@ function isSpeciesFeature(scopeId: string): boolean {
  */
 export function getConflictsForTab(tabName: string): Conflict[] {
 	const result = detectConflicts();
-	return result.conflicts.filter(conflict => 
-		conflict.affectedTabs?.includes(tabName)
-	);
+	return result.conflicts.filter((conflict) => conflict.affectedTabs?.includes(tabName));
 }
 
 /**
@@ -209,37 +211,33 @@ export function getConflictsForTab(tabName: string): Conflict[] {
  */
 export function getConflictsByType(type: ConflictType): Conflict[] {
 	const result = detectConflicts();
-	return result.conflicts.filter(conflict => conflict.type === type);
+	return result.conflicts.filter((conflict) => conflict.type === type);
 }
 
 /**
  * Checks if a specific value would cause a conflict if added by a given source
  * Useful for real-time validation during selection
  */
-export function wouldCauseConflict(
-	type: ConflictType, 
-	value: string, 
-	newSource: string
-): boolean {
+export function wouldCauseConflict(type: ConflictType, value: string, newSource: string): boolean {
 	const character = get(character_store);
-	
+
 	if (!character._provenance) return false;
-	
+
 	// Check if any other source has already added this value
 	for (const [scopeId, prov] of Object.entries(character._provenance)) {
 		if (scopeId === newSource) continue; // same source is fine
-		
-		const changes = ('_set' in prov && prov._set) ? prov._set : prov;
+
+		const changes = '_set' in prov && prov._set ? prov._set : prov;
 		if (!changes) continue;
-		
+
 		const fieldName = getFieldNameForType(type);
 		const fieldValues = changes[fieldName];
-		
+
 		if (Array.isArray(fieldValues) && fieldValues.includes(value)) {
 			return true; // conflict found
 		}
 	}
-	
+
 	return false;
 }
 
@@ -248,11 +246,16 @@ export function wouldCauseConflict(
  */
 function getFieldNameForType(type: ConflictType): keyof Character {
 	switch (type) {
-		case 'skill': return 'skills';
-		case 'proficiency': return 'proficiencies';
-		case 'language': return 'languages';
-		case 'feature': return 'features';
-		default: throw new Error(`Unknown conflict type: ${type}`);
+		case 'skill':
+			return 'skills';
+		case 'proficiency':
+			return 'proficiencies';
+		case 'language':
+			return 'languages';
+		case 'feature':
+			return 'features';
+		default:
+			throw new Error(`Unknown conflict type: ${type}`);
 	}
 }
 
@@ -261,12 +264,13 @@ function getFieldNameForType(type: ConflictType): keyof Character {
  */
 export function getUserActionableConflicts(): Conflict[] {
 	const result = detectConflicts();
-	return result.conflicts.filter(conflict => {
+	return result.conflicts.filter((conflict) => {
 		// Check if any source in this conflict is user-changeable
-		return conflict.sources.some(source => 
-			isUserChangeableClassFeature(source) || 
-			isUserChangeableRaceFeature(source) ||
-			source.includes('background')
+		return conflict.sources.some(
+			(source) =>
+				isUserChangeableClassFeature(source) ||
+				isUserChangeableRaceFeature(source) ||
+				source.includes('background')
 		);
 	});
 }
@@ -276,16 +280,17 @@ export function getUserActionableConflicts(): Conflict[] {
  * Prioritizes tabs where users can make changes
  */
 export function getPrimaryResolutionTab(conflict: Conflict): string | null {
-	const changeableSources = conflict.sources.filter(source =>
-		isUserChangeableClassFeature(source) || 
-		isUserChangeableRaceFeature(source) ||
-		source.includes('background')
+	const changeableSources = conflict.sources.filter(
+		(source) =>
+			isUserChangeableClassFeature(source) ||
+			isUserChangeableRaceFeature(source) ||
+			source.includes('background')
 	);
-	
+
 	if (changeableSources.length === 0) {
 		return null; // No user-changeable sources
 	}
-	
+
 	// Return the first changeable tab
 	for (const source of changeableSources) {
 		if (source.startsWith('class:') || isClassFeature(source)) {
@@ -296,6 +301,6 @@ export function getPrimaryResolutionTab(conflict: Conflict): string | null {
 			return 'background';
 		}
 	}
-	
+
 	return null;
 }

@@ -1,9 +1,9 @@
 <script lang="ts">
 	import type { FeaturePrompt, ComplexOption } from '$lib/data/types/Features';
-	import { 
-		isFeatureIncomplete, 
-		getNestedPrompts, 
-		getGloballyAvailableOptions 
+	import {
+		isFeatureIncomplete,
+		getNestedPrompts,
+		getGloballyAvailableOptions
 	} from './feature-card-utils';
 	import { activeConflicts } from '$lib/stores/conflict_store';
 
@@ -14,7 +14,7 @@
 	export let selectionVersion: number;
 	export let characterStore: any;
 	export let nested: boolean = false;
-	
+
 	// Event handlers - passed down from parent
 	export let onSelectOption: (feature: FeaturePrompt, index: number, value: string) => void;
 	export let onToggleExpand: (featureName: string) => void;
@@ -25,19 +25,19 @@
 	$: isComplete = !isIncomplete && feature.featureOptions;
 	$: nestedPrompts = getNestedPrompts(feature, featureSelections[feature.name] || []);
 	$: hasConflicts = checkFeatureHasConflicts(feature.name);
-	
+
 	function checkFeatureHasConflicts(featureName: string): boolean {
 		if (!$activeConflicts.hasConflicts) return false;
-		
+
 		// Check if any conflicts involve scopes related to this feature
-		return $activeConflicts.conflicts.some(conflict => 
-			conflict.sources.some(source => source.includes(featureName))
+		return $activeConflicts.conflicts.some((conflict) =>
+			conflict.sources.some((source) => source.includes(featureName))
 		);
 	}
-	
+
 	function getConflictType(featureName: string): 'user-changeable' | 'automatic' | 'none' {
 		if (!hasConflicts) return 'none';
-		
+
 		// Determine if this feature represents a user choice or automatic grant
 		if (feature.featureOptions) {
 			return 'user-changeable'; // Has dropdown options = user can change
@@ -58,7 +58,11 @@
 	}
 </script>
 
-<div class="feature-card {isIncomplete ? 'incomplete' : isComplete ? 'complete' : ''} {nested ? 'nested' : ''}">
+<div
+	class="feature-card {isIncomplete ? 'incomplete' : isComplete ? 'complete' : ''} {nested
+		? 'nested'
+		: ''}"
+>
 	<button
 		class="feature-header"
 		class:has-conflicts={hasConflicts}
@@ -68,11 +72,13 @@
 		<span class="feature-name">
 			{feature.name}
 			{#if hasConflicts}
-				<span 
-					class="conflict-badge" 
+				<span
+					class="conflict-badge"
 					class:user-changeable={getConflictType(feature.name) === 'user-changeable'}
 					class:automatic={getConflictType(feature.name) === 'automatic'}
-					title={getConflictType(feature.name) === 'user-changeable' ? 'You can change this selection to resolve conflicts' : 'This feature conflicts with your other selections'}
+					title={getConflictType(feature.name) === 'user-changeable'
+						? 'You can change this selection to resolve conflicts'
+						: 'This feature conflicts with your other selections'}
 				>
 					{#if getConflictType(feature.name) === 'user-changeable'}
 						⚠️
@@ -206,30 +212,31 @@
 		font-weight: bold;
 		padding-left: 1rem;
 	}
-	
+
 	/* Conflict indicators */
 	.feature-header.has-conflicts {
 		background-color: #fef2f2;
 		border-left: 4px solid #dc2626;
 		padding-left: 0.75rem;
 	}
-	
+
 	.conflict-badge {
 		margin-left: 0.5rem;
 		font-size: 1rem;
 		cursor: help;
 	}
-	
+
 	.conflict-badge.user-changeable {
 		animation: pulse-warning 2s infinite;
 	}
-	
+
 	.conflict-badge.automatic {
 		opacity: 0.8;
 	}
-	
+
 	@keyframes pulse-warning {
-		0%, 100% {
+		0%,
+		100% {
 			opacity: 1;
 		}
 		50% {

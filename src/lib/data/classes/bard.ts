@@ -12,20 +12,35 @@ const proficienciesPrompt: FeaturePrompt = {
 		Skills: Choose any three
 	`,
 	featureOptions: {
-		placeholderText: "Select 3 skills",
+		placeholderText: 'Select 3 skills',
 		options: [
-			'Acrobatics', 'Animal Handling', 'Arcana', 'Athletics', 'Deception', 'History', 'Insight',
-			'Intimidation', 'Investigation', 'Medicine', 'Nature', 'Perception', 'Performance',
-			'Persuasion', 'Religion', 'Sleight of Hand', 'Stealth', 'Survival',
+			'Acrobatics',
+			'Animal Handling',
+			'Arcana',
+			'Athletics',
+			'Deception',
+			'History',
+			'Insight',
+			'Intimidation',
+			'Investigation',
+			'Medicine',
+			'Nature',
+			'Perception',
+			'Performance',
+			'Persuasion',
+			'Religion',
+			'Sleight of Hand',
+			'Stealth',
+			'Survival'
 		],
-		numPicks: 3,
+		numPicks: 3
 	},
-	source: "bard.proficiencies",
+	source: 'bard.proficiencies',
 	effects: [
 		{
-			target: "skills",
-			action: "add",
-			value: "{userChoice}"
+			target: 'skills',
+			action: 'add',
+			value: '{userChoice}'
 		}
 	]
 };
@@ -39,12 +54,12 @@ const bardicInspirationPrompt: FeaturePrompt = {
 		This die can be added to ability checks, attack rolls, or saving throws.
 		You can use this feature a number of times equal to your Charisma modifier (minimum of once), and regain all uses on a long rest.
 	`,
-	source: "bard",
+	source: 'bard',
 	effects: [
 		{
-			target: "features",
-			action: "add",
-			value: "Bardic Inspiration"
+			target: 'features',
+			action: 'add',
+			value: 'Bardic Inspiration'
 		}
 	]
 };
@@ -57,12 +72,12 @@ const spellcastingPrompt: FeaturePrompt = {
 		You know four 1st-level spells of your choice.
 		You can cast spells using Charisma as your spellcasting ability.
 	`,
-	source: "bard",
+	source: 'bard',
 	effects: [
 		{
-			target: "features",
-			action: "add",
-			value: "Spellcasting"
+			target: 'features',
+			action: 'add',
+			value: 'Spellcasting'
 		}
 	]
 };
@@ -73,12 +88,12 @@ const jackOfAllTradesPrompt: FeaturePrompt = {
 	description: `
 		Starting at 2nd level, you can add half your proficiency bonus, rounded down, to any ability check you make that doesn’t already include your proficiency bonus.
 	`,
-	source: "bard",
+	source: 'bard',
 	effects: [
 		{
-			target: "features",
-			action: "add",
-			value: "Jack of All Trades"
+			target: 'features',
+			action: 'add',
+			value: 'Jack of All Trades'
 		}
 	]
 };
@@ -90,12 +105,12 @@ const songOfRestPrompt: FeaturePrompt = {
 		Beginning at 2nd level, you can use soothing music or oration to help revitalize your wounded allies during a short rest. 
 		If you or any friendly creatures who can hear your performance regain hit points by spending Hit Dice at the end of the short rest, each of those creatures regains an extra 1d6 hit points.
 	`,
-	source: "bard",
+	source: 'bard',
 	effects: [
 		{
-			target: "features",
-			action: "add",
-			value: "Song of Rest"
+			target: 'features',
+			action: 'add',
+			value: 'Song of Rest'
 		}
 	]
 };
@@ -105,10 +120,10 @@ const bardCollegePrompt: FeaturePrompt = {
 	id: 'bard_subclass_01',
 	description: 'Choose a Bard College at 3rd level.',
 	featureOptions: {
-		placeholderText: "-Choose a College-",
+		placeholderText: '-Choose a College-',
 		options: [
 			{
-				name: "College of Lore",
+				name: 'College of Lore',
 				optionDescription: `
 					You learn additional magical secrets and gain Cutting Words to hinder foes.
 				`,
@@ -118,20 +133,35 @@ const bardCollegePrompt: FeaturePrompt = {
 						id: 'bard_lore_skills_01',
 						description: 'You gain proficiency with three skills of your choice.',
 						featureOptions: {
-							placeholderText: "Select three skills",
+							placeholderText: 'Select three skills',
 							options: [
-								'Acrobatics','Animal Handling','Arcana','Athletics','Deception','History','Insight',
-								'Intimidation','Investigation','Medicine','Nature','Perception','Performance',
-								'Persuasion','Religion','Sleight of Hand','Stealth','Survival',
+								'Acrobatics',
+								'Animal Handling',
+								'Arcana',
+								'Athletics',
+								'Deception',
+								'History',
+								'Insight',
+								'Intimidation',
+								'Investigation',
+								'Medicine',
+								'Nature',
+								'Perception',
+								'Performance',
+								'Persuasion',
+								'Religion',
+								'Sleight of Hand',
+								'Stealth',
+								'Survival'
 							],
-							numPicks: 3,
+							numPicks: 3
 						},
 						source: 'bard.college_of_lore',
 						effects: [
 							{
-								target: "skills",
-								action: "add",
-								value: "{userChoice}"
+								target: 'skills',
+								action: 'add',
+								value: '{userChoice}'
 							}
 						]
 					},
@@ -145,16 +175,16 @@ const bardCollegePrompt: FeaturePrompt = {
 						source: 'bard.college_of_lore',
 						effects: [
 							{
-								target: "features",
-								action: "add",
-								value: "Cutting Words"
+								target: 'features',
+								action: 'add',
+								value: 'Cutting Words'
 							}
 						]
 					}
 				]
 			},
 			{
-				name: "College of Valor",
+				name: 'College of Valor',
 				optionDescription: `
 					You gain proficiency with medium armor, shields, and martial weapons. 
 					You can inspire others to fight with valor.
@@ -167,19 +197,19 @@ const bardCollegePrompt: FeaturePrompt = {
 						source: 'bard.college_of_valor',
 						effects: [
 							{
-								target: "proficiencies",
-								action: "add",
-								value: "Medium Armor"
+								target: 'proficiencies',
+								action: 'add',
+								value: 'Medium Armor'
 							},
 							{
-								target: "proficiencies",
-								action: "add",
-								value: "Shields"
+								target: 'proficiencies',
+								action: 'add',
+								value: 'Shields'
 							},
 							{
-								target: "proficiencies",
-								action: "add",
-								value: "Martial Weapons"
+								target: 'proficiencies',
+								action: 'add',
+								value: 'Martial Weapons'
 							}
 						]
 					},
@@ -193,33 +223,32 @@ const bardCollegePrompt: FeaturePrompt = {
 						source: 'bard.college_of_valor',
 						effects: [
 							{
-								target: "features",
-								action: "add",
-								value: "Combat Inspiration"
+								target: 'features',
+								action: 'add',
+								value: 'Combat Inspiration'
 							}
 						]
 					}
 				]
 			}
 		],
-		numPicks: 1,
+		numPicks: 1
 	},
-	source: "bard",
+	source: 'bard',
 	effects: [
 		{
-			target: "subclass",
-			action: "set",
-			value: "{userChoice}"
+			target: 'subclass',
+			action: 'set',
+			value: '{userChoice}'
 		}
 	]
 };
-
 
 const classFeaturesPrompt: FeaturePrompt[] = [
 	bardicInspirationPrompt,
 	spellcastingPrompt,
 	jackOfAllTradesPrompt,
-	songOfRestPrompt,
+	songOfRestPrompt
 ];
 
 export const bard: ClassData = {
@@ -230,20 +259,10 @@ export const bard: ClassData = {
 	primaryAbility: 'Charisma',
 	saves: ['Dexterity', 'Charisma'],
 	armorProficiencies: ['Light Armor'],
-	weaponProficiencies: [
-		'Simple Weapons',
-		'Hand Crossbows',
-		'Longswords',
-		'Rapiers',
-		'Shortswords',
-	],
+	weaponProficiencies: ['Simple Weapons', 'Hand Crossbows', 'Longswords', 'Rapiers', 'Shortswords'],
 	startingEquipment: {
-		fixed: ['Explorer\'s pack'],
+		fixed: ["Explorer's pack"],
 		choices: []
 	},
-	classFeatures: [
-		proficienciesPrompt,
-		...classFeaturesPrompt,
-		bardCollegePrompt,
-	],
+	classFeatures: [proficienciesPrompt, ...classFeaturesPrompt, bardCollegePrompt]
 };

@@ -1,9 +1,9 @@
 <script lang="ts">
-
+	import { get } from 'svelte/store';
 	import { character_store } from '$lib/stores/character_store';
 	import { applyChoice } from '$lib/stores/character_store_helpers';
 	import { base } from '$app/paths';
-	
+
 	// Import class data
 	import { fighter } from '$lib/data/classes/fighter';
 	import { barbarian } from '$lib/data/classes/barbarian';
@@ -17,79 +17,377 @@
 	import { sorcerer } from '$lib/data/classes/sorcerer';
 	import { warlock } from '$lib/data/classes/warlock';
 	import { wizard } from '$lib/data/classes/wizard';
-	
+
 	// Import background data
 	import { backgrounds } from '$lib/data/backgrounds';
-	
-	import type { ClassData, EquipmentChoice } from '$lib/data/types/ClassData';
+
+	import type {
+		ClassData,
+		EquipmentChoice,
+		SimpleEquipmentChoice,
+		EquipmentOption,
+		EquipmentSubChoice
+	} from '$lib/data/types/ClassData';
 	import type { BackgroundData } from '$lib/data/types/BackgroundData';
 
 	// Create class lookup
 	const classLookup: Record<string, ClassData> = {
-		'Fighter': fighter,
-		'Barbarian': barbarian,
-		'Bard': bard,
-		'Cleric': cleric,
-		'Druid': druid,
-		'Monk': monk,
-		'Paladin': paladin,
-		'Ranger': ranger,
-		'Rogue': rogue,
-		'Sorcerer': sorcerer,
-		'Warlock': warlock,
-		'Wizard': wizard
+		Fighter: fighter,
+		Barbarian: barbarian,
+		Bard: bard,
+		Cleric: cleric,
+		Druid: druid,
+		Monk: monk,
+		Paladin: paladin,
+		Ranger: ranger,
+		Rogue: rogue,
+		Sorcerer: sorcerer,
+		Warlock: warlock,
+		Wizard: wizard
 	};
+
+	// Equipment choice state management
+	interface EquipmentChoiceState {
+		selectedOption?: number;
+		subChoiceSelections?: Record<string, string[]>; // subchoice name -> selected items
+	}
 
 	let currentClass: ClassData | null = null;
 	let currentBackground: BackgroundData | null = null;
-	let equipmentChoices: Record<string, number> = {};
+	let equipmentChoices: Record<number, EquipmentChoiceState> = {};
 	let backgroundEquipmentChoices: Record<string, number> = {};
+	
+	// Reactive variables for subchoice resolution
+	let subchoiceResolution: Record<number, boolean> = {};
+	let availableSubchoices: Record<number, EquipmentSubChoice[]> = {};
 
 	// Reactive statements to get current selections
 	$: {
 		const className = $character_store.class;
 		currentClass = className ? classLookup[className] : null;
+		
+		// Restore equipment choices from character store when class changes
+		if (currentClass) {
+			console.log('🔄 Class changed, attempting to restore equipment choices for:', className);
+			restoreEquipmentChoicesFromStore();
+		}
 	}
 
 	$: {
 		const backgroundName = $character_store.background;
-		currentBackground = backgroundName ? backgrounds.find(bg => bg.name === backgroundName) || null : null;
+		currentBackground = backgroundName
+			? backgrounds.find((bg) => bg.name === backgroundName) || null
+			: null;
+	}
+	
+	// Reactive statements for subchoice resolution
+	$: {
+		if (currentClass?.startingEquipment?.choices) {
+			subchoiceResolution = {};
+			availableSubchoices = {};
+			
+			currentClass.startingEquipment.choices.forEach((choice, choiceIndex) => {
+				if (isEquipmentChoice(choice) && equipmentChoices[choiceIndex]?.selectedOption !== undefined) {
+					const selectedOption = choice.options[equipmentChoices[choiceIndex].selectedOption!];
+					subchoiceResolution[choiceIndex] = Boolean(selectedOption.subChoices && selectedOption.subChoices.length > 0);
+					availableSubchoices[choiceIndex] = selectedOption.subChoices || [];
+				} else {
+					subchoiceResolution[choiceIndex] = false;
+					availableSubchoices[choiceIndex] = [];
+				}
+			});
+		}
 	}
 
-	function handleEquipmentChoice(choiceIndex: number, optionIndex: number) {
+	// Restore equipment choices from character store
+	function restoreEquipmentChoicesFromStore() {
+		if (!currentClass?.startingEquipment?.choices) {
+			console.log('❌ No class or equipment choices to restore');
+			return;
+		}
+		
+		// Look for existing equipment choices in the character store's provenance
+		const char = get(character_store);
+		if (!char._provenance) {
+			console.log('❌ No provenance data found');
+			return;
+		}
+		
+		console.log('🔍 Checking provenance for equipment choices:', char._provenance);
+		const newEquipmentChoices: Record<number, EquipmentChoiceState> = {};
+		
+		// Restore each equipment choice
+		currentClass.startingEquipment.choices.forEach((choice, choiceIndex) => {
+			const scopeId = `class_equipment_${choiceIndex}`;
+			const provenanceData = char._provenance![scopeId];
+			
+			console.log(`🔍 Checking choice ${choiceIndex} (${scopeId}):`, provenanceData);
+			if (provenanceData) {
+				console.log(`🔍 Provenance data keys:`, JSON.stringify(Object.keys(provenanceData)));
+				console.log(`🔍 selectedOption:`, provenanceData.selectedOption);
+				console.log(`🔍 subChoiceSelections:`, provenanceData.subChoiceSelections);
+				console.log(`🔍 inventory:`, provenanceData.inventory);
+				console.log(`🔍 _set:`, provenanceData._set);
+				console.log(`🔍 _prevScalars:`, provenanceData._prevScalars);
+				console.log(`🔍 Full object:`, JSON.stringify(provenanceData, null, 2));
+			}
+			console.log(`🔍 Choice structure:`, choice);
+			console.log(`🔍 isEquipmentChoice result:`, isEquipmentChoice(choice));
+			
+			if (provenanceData) {
+				console.log(`🚨 Attempting restore regardless of type (debug mode)`);
+				// Temporarily bypass type guard for debugging
+				if (isEquipmentChoice(choice)) {
+					// Access data from _set property (character store wraps our data)
+					const actualData = provenanceData._set || provenanceData;
+					console.log(`🔍 Actual data to restore:`, actualData);
+					
+					// Check if we have the new selection state format
+					if (actualData.selectedOption !== undefined) {
+						console.log(`✅ Restoring new format for choice ${choiceIndex}:`, actualData.selectedOption, actualData.subChoiceSelections);
+						// Restore from stored selection state (new format)
+						newEquipmentChoices[choiceIndex] = {
+							selectedOption: actualData.selectedOption,
+							subChoiceSelections: actualData.subChoiceSelections || {}
+						};
+					} else if (actualData.inventory) {
+						console.log(`🔄 Using legacy format for choice ${choiceIndex}:`, actualData.inventory);
+						// Fallback to reverse-engineering from inventory (legacy format)
+						const inventory = actualData.inventory as string[];
+					
+					// Find which option matches the current inventory
+					for (let optionIndex = 0; optionIndex < choice.options.length; optionIndex++) {
+						const option = choice.options[optionIndex];
+						
+						// Check if this option could produce the current inventory
+						if (doesOptionMatchInventory(option, inventory)) {
+							// Restore the main selection
+							newEquipmentChoices[choiceIndex] = {
+								selectedOption: optionIndex,
+								subChoiceSelections: extractSubChoiceSelections(option, inventory)
+							};
+							break;
+						}
+					}
+				}
+			} else {
+				console.log(`❌ isEquipmentChoice failed for choice ${choiceIndex}`);
+			}
+			} else {
+				console.log(`❌ No provenance data for choice ${choiceIndex}`);
+			}
+		});
+		
+		// Only update if we found any choices to restore
+		if (Object.keys(newEquipmentChoices).length > 0) {
+			console.log('✅ Restoring equipment choices:', newEquipmentChoices);
+			equipmentChoices = { ...equipmentChoices, ...newEquipmentChoices };
+		} else {
+			console.log('❌ No equipment choices found to restore');
+		}
+	}
+	
+	// Check if an option could produce the given inventory
+	function doesOptionMatchInventory(option: EquipmentOption, inventory: string[]): boolean {
+		// Get all possible items from this option
+		const possibleItems: string[] = [];
+		
+		// Add direct items
+		if (option.items) {
+			possibleItems.push(...option.items);
+		}
+		
+		// Add all possible subchoice items
+		if (option.subChoices) {
+			for (const subChoice of option.subChoices) {
+				possibleItems.push(...subChoice.options);
+			}
+		}
+		
+		// Check if all inventory items could come from this option
+		return inventory.every(item => possibleItems.includes(item));
+	}
+	
+	// Extract subchoice selections from inventory
+	function extractSubChoiceSelections(option: EquipmentOption, inventory: string[]): Record<string, string[]> {
+		const subChoiceSelections: Record<string, string[]> = {};
+		
+		if (!option.subChoices) return subChoiceSelections;
+		
+		// For each subchoice, find which items from inventory belong to it
+		for (const subChoice of option.subChoices) {
+			const matchingItems = inventory.filter(item => subChoice.options.includes(item));
+			if (matchingItems.length > 0) {
+				subChoiceSelections[subChoice.name] = matchingItems;
+			}
+		}
+		
+		return subChoiceSelections;
+	}
+
+	// Type guard functions
+	function isEquipmentChoice(choice: EquipmentChoice | SimpleEquipmentChoice): choice is EquipmentChoice {
+		return 'options' in choice && choice.options.length > 0 && typeof choice.options[0] === 'object' && 'label' in choice.options[0];
+	}
+
+	function isSimpleEquipmentChoice(choice: EquipmentChoice | SimpleEquipmentChoice): choice is SimpleEquipmentChoice {
+		return 'options' in choice && choice.options.length > 0 && Array.isArray(choice.options[0]);
+	}
+
+	// Handle simple equipment choices (legacy format)
+	function handleSimpleEquipmentChoice(choiceIndex: number, optionIndex: number) {
 		if (!currentClass) return;
-		
-		equipmentChoices[choiceIndex] = optionIndex;
-		
-		// Apply the equipment choice to character store
-		const choice = currentClass.startingEquipment.choices[choiceIndex];
+
+		const choice = currentClass.startingEquipment.choices[choiceIndex] as SimpleEquipmentChoice;
 		const selectedOption = choice.options[optionIndex];
-		
+
 		const scopeId = `class_equipment_${choiceIndex}`;
 		applyChoice(scopeId, { inventory: selectedOption });
 	}
 
+	// Handle main option selection for enhanced equipment choices
+	function handleMainOptionSelection(choiceIndex: number, optionIndex: number) {
+		if (!currentClass) return;
+
+		const choice = currentClass.startingEquipment.choices[choiceIndex] as EquipmentChoice;
+		const selectedOption = choice.options[optionIndex];
+		
+		// Clear any previous selections for this choice first
+		const scopeId = `class_equipment_${choiceIndex}`;
+		applyChoice(scopeId, { inventory: [] });
+		
+		// Create a completely new object to force reactivity
+		const newEquipmentChoices = { ...equipmentChoices };
+		newEquipmentChoices[choiceIndex] = {
+			selectedOption: optionIndex,
+			subChoiceSelections: {}
+		};
+		equipmentChoices = newEquipmentChoices;
+
+		// Store the selection state in provenance for persistence
+		const selectionState = {
+			selectedOption: optionIndex,
+			subChoiceSelections: {},
+			inventory: []
+		};
+		console.log(`💾 Storing main selection for choice ${choiceIndex}:`, selectionState);
+		applyChoice(scopeId, selectionState);
+
+		// If this option has direct items (no subchoices), apply immediately
+		if (selectedOption.items && !selectedOption.subChoices) {
+			selectionState.inventory = selectedOption.items;
+			applyChoice(scopeId, selectionState);
+		}
+		// If it has subchoices, wait for user to select those
+	}
+
+	// Handle sub-choice selection
+	function handleSubChoiceSelection(choiceIndex: number, subChoiceName: string, selectedItems: string[]) {
+		if (!currentClass || !equipmentChoices[choiceIndex]) return;
+
+		const choice = currentClass.startingEquipment.choices[choiceIndex] as EquipmentChoice;
+		const selectedOptionIndex = equipmentChoices[choiceIndex].selectedOption;
+		
+		if (selectedOptionIndex === undefined) return;
+		
+		const selectedOption = choice.options[selectedOptionIndex];
+
+		// Create completely new object to force reactivity
+		const newEquipmentChoices = { ...equipmentChoices };
+		newEquipmentChoices[choiceIndex] = {
+			...equipmentChoices[choiceIndex],
+			subChoiceSelections: {
+				...equipmentChoices[choiceIndex].subChoiceSelections,
+				[subChoiceName]: selectedItems
+			}
+		};
+		equipmentChoices = newEquipmentChoices;
+
+		// Always store the current selection state (even if incomplete)
+		const scopeId = `class_equipment_${choiceIndex}`;
+		const selectionState = {
+			selectedOption: selectedOptionIndex,
+			subChoiceSelections: newEquipmentChoices[choiceIndex].subChoiceSelections!,
+			inventory: [] as string[]
+		};
+
+		// Check if all subchoices are resolved
+		const allSubChoicesResolved = selectedOption.subChoices?.every(subChoice => 
+			newEquipmentChoices[choiceIndex].subChoiceSelections![subChoice.name]?.length > 0
+		) ?? true;
+
+		if (allSubChoicesResolved) {
+			// Collect all selected items
+			let allItems: string[] = [];
+			
+			// Add direct items if any
+			if (selectedOption.items) {
+				allItems.push(...selectedOption.items);
+			}
+			
+			// Add subchoice selections
+			if (selectedOption.subChoices && newEquipmentChoices[choiceIndex].subChoiceSelections) {
+				for (const subChoice of selectedOption.subChoices) {
+					const selections = newEquipmentChoices[choiceIndex].subChoiceSelections![subChoice.name];
+					if (selections) {
+						allItems.push(...selections);
+					}
+				}
+			}
+
+			selectionState.inventory = allItems;
+		}
+
+		// Store the selection state in provenance
+		console.log(`💾 Storing subchoice selection for choice ${choiceIndex}:`, selectionState);
+		applyChoice(scopeId, selectionState);
+	}
+
+	// Handle background equipment choice (legacy support)
 	function handleBackgroundEquipmentChoice(choiceIndex: number, optionIndex: number) {
 		if (!currentBackground?.startingEquipment) return;
-		
+
 		backgroundEquipmentChoices[choiceIndex] = optionIndex;
-		
+
 		// Apply the background equipment choice to character store
 		const choice = currentBackground.startingEquipment.choices[choiceIndex];
 		const selectedOption = choice.options[optionIndex];
-		
+
 		const scopeId = `background_equipment_${choiceIndex}`;
 		applyChoice(scopeId, { inventory: selectedOption });
 	}
 
-	// Note: Fixed class equipment should be added when class is selected, not here
-	// This page only handles equipment choices that require user input
+	// Check if a subchoice needs resolution
+	function needsSubChoiceResolution(choiceIndex: number): boolean {
+		if (equipmentChoices[choiceIndex]?.selectedOption === undefined) return false;
+		
+		const choice = currentClass?.startingEquipment.choices[choiceIndex] as EquipmentChoice;
+		if (!choice || !isEquipmentChoice(choice)) return false;
+		
+		const selectedOption = choice.options[equipmentChoices[choiceIndex].selectedOption!];
+		return Boolean(selectedOption.subChoices && selectedOption.subChoices.length > 0);
+	}
+
+	// Get subchoices for the currently selected option
+	function getSubChoicesForSelection(choiceIndex: number): EquipmentSubChoice[] {
+		if (equipmentChoices[choiceIndex]?.selectedOption === undefined) return [];
+		
+		const choice = currentClass?.startingEquipment.choices[choiceIndex] as EquipmentChoice;
+		if (!choice || !isEquipmentChoice(choice)) return [];
+		
+		const selectedOption = choice.options[equipmentChoices[choiceIndex].selectedOption!];
+		return selectedOption.subChoices || [];
+	}
 </script>
 
 <div class="main-content">
 	<div class="intro-text">
 		<h1>Equipment</h1>
-		<p>Select your starting equipment based on your class and background. Equipment choices will automatically update your character sheet.</p>
+		<p>
+			Select your starting equipment based on your class and background. Equipment choices will
+			automatically update your character sheet.
+		</p>
+
 	</div>
 
 	{#if !$character_store.class}
@@ -101,13 +399,16 @@
 	{:else if !currentClass?.startingEquipment}
 		<div class="no-equipment">
 			<h2>Equipment Not Available</h2>
-			<p>Starting equipment data is not yet available for {$character_store.class}. This will be added soon!</p>
+			<p>
+				Starting equipment data is not yet available for {$character_store.class}. This will be
+				added soon!
+			</p>
 		</div>
 	{:else}
 		<!-- Class Equipment Section -->
 		<div class="equipment-section">
 			<div class="section-header">
-				<img src="{currentClass.image}" alt="{currentClass.name}" class="class-icon">
+				<img src={currentClass.image} alt={currentClass.name} class="class-icon" />
 				<h2>{currentClass.name} Starting Equipment</h2>
 			</div>
 
@@ -115,7 +416,9 @@
 			{#if currentClass.startingEquipment.fixed.length > 0}
 				<div class="equipment-group">
 					<h3>Standard Equipment</h3>
-					<p class="fixed-equipment-note">This equipment is automatically added when you select your class.</p>
+					<p class="fixed-equipment-note">
+						This equipment is automatically added when you select your class.
+					</p>
 					<div class="equipment-list">
 						{#each currentClass.startingEquipment.fixed as item}
 							<div class="equipment-item class-equipment">
@@ -132,40 +435,114 @@
 				<div class="equipment-group">
 					<h3>{choice.name}</h3>
 					<p class="choice-description">{choice.description}</p>
-					
-					{#if choice.options.length > 3}
-						<!-- Use dropdown for many options -->
-						<div class="dropdown-container">
-							<select 
-								class="equipment-dropdown"
-								value={equipmentChoices[choiceIndex] ?? ''}
-								on:change={(e) => handleEquipmentChoice(choiceIndex, parseInt(e.target.value))}
-							>
-								<option value="" disabled>Choose an option...</option>
+
+					{#if isEquipmentChoice(choice)}
+						<!-- Enhanced Equipment Choice -->
+						<div class="enhanced-choice">
+							<!-- Main Option Selection -->
+							<div class="main-options">
 								{#each choice.options as option, optionIndex}
-									<option value={optionIndex}>
-										{option.join(', ')}
-									</option>
+									<button
+										class="choice-option"
+										class:selected={equipmentChoices[choiceIndex]?.selectedOption === optionIndex}
+										on:click={() => handleMainOptionSelection(choiceIndex, optionIndex)}
+									>
+										{option.label}
+									</button>
 								{/each}
-							</select>
+							</div>
+
+							<!-- Sub-choice Resolution -->
+							{#if subchoiceResolution[choiceIndex]}
+								<div class="subchoices-container">
+									{#each availableSubchoices[choiceIndex] as subChoice}
+										<div class="subchoice-group">
+											<h4>{subChoice.name}</h4>
+											<p class="subchoice-description">{subChoice.description}</p>
+											
+											{#if subChoice.type === 'weapon-list'}
+												<div class="weapon-selection">
+													<select 
+														value={equipmentChoices[choiceIndex]?.subChoiceSelections?.[subChoice.name]?.[0] || ''}
+														class="subchoice-select"
+			
+														on:change={(e) => {
+															const target = e.target as HTMLSelectElement;
+															if (target.value) {
+																handleSubChoiceSelection(choiceIndex, subChoice.name, [target.value]);
+															}
+														}}
+													>
+														<option value="">Choose {subChoice.name.toLowerCase()}...</option>
+														{#each subChoice.options as weapon}
+															<option value={weapon}>{weapon}</option>
+														{/each}
+													</select>
+												</div>
+											{:else if subChoice.type === 'simple-list'}
+												<div class="simple-selection">
+													<select 
+														class="subchoice-select"
+														value={equipmentChoices[choiceIndex]?.subChoiceSelections?.[subChoice.name]?.[0] || ''}
+														on:change={(e) => {
+															const target = e.target as HTMLSelectElement;
+															if (target.value) {
+																handleSubChoiceSelection(choiceIndex, subChoice.name, [target.value]);
+															}
+														}}
+													>
+														<option value="">Choose {subChoice.name.toLowerCase()}...</option>
+														{#each subChoice.options as item}
+															<option value={item}>{item}</option>
+														{/each}
+													</select>
+												</div>
+											{/if}
+										</div>
+									{/each}
+								</div>
+							{/if}
 						</div>
-					{:else}
-						<!-- Use buttons for few options -->
-						<div class="choice-options">
-							{#each choice.options as option, optionIndex}
-								<button
-									class="choice-option"
-									class:selected={equipmentChoices[choiceIndex] === optionIndex}
-									on:click={() => handleEquipmentChoice(choiceIndex, optionIndex)}
+					{:else if isSimpleEquipmentChoice(choice)}
+						<!-- Legacy Simple Equipment Choice -->
+						{#if choice.options.length > 3}
+							<!-- Use dropdown for many options -->
+							<div class="dropdown-container">
+								<select
+									class="equipment-dropdown"
+									value=""
+									on:change={(e) => {
+										const target = e.target as HTMLSelectElement;
+										if (target.value) {
+											handleSimpleEquipmentChoice(choiceIndex, parseInt(target.value));
+										}
+									}}
 								>
-									<div class="option-items">
-										{#each option as item}
-											<span class="option-item">{item}</span>
-										{/each}
-									</div>
-								</button>
-							{/each}
-						</div>
+									<option value="" disabled>Choose an option...</option>
+									{#each choice.options as option, optionIndex}
+										<option value={optionIndex}>
+											{option.join(', ')}
+										</option>
+									{/each}
+								</select>
+							</div>
+						{:else}
+							<!-- Use buttons for few options -->
+							<div class="choice-options">
+								{#each choice.options as option, optionIndex}
+									<button
+										class="choice-option"
+										on:click={() => handleSimpleEquipmentChoice(choiceIndex, optionIndex)}
+									>
+										<div class="option-items">
+											{#each option as item}
+												<span class="option-item">{item}</span>
+											{/each}
+										</div>
+									</button>
+								{/each}
+							</div>
+						{/if}
 					{/if}
 				</div>
 			{/each}
@@ -176,7 +553,7 @@
 	{#if currentBackground}
 		<div class="equipment-section">
 			<div class="section-header">
-				<img src="{currentBackground.image}" alt="{currentBackground.name}" class="background-icon">
+				<img src={currentBackground.image} alt={currentBackground.name} class="background-icon" />
 				<h2>{currentBackground.name} Equipment</h2>
 			</div>
 
@@ -186,7 +563,9 @@
 				{#if currentBackground.startingEquipment.fixed.length > 0}
 					<div class="equipment-group">
 						<h3>Fixed Equipment</h3>
-						<p class="background-note">This equipment is automatically added when you select your background.</p>
+						<p class="background-note">
+							This equipment is automatically added when you select your background.
+						</p>
 						<div class="equipment-list">
 							{#each currentBackground.startingEquipment.fixed as item}
 								<div class="equipment-item background">
@@ -203,14 +582,19 @@
 					<div class="equipment-group">
 						<h3>{choice.name}</h3>
 						<p class="choice-description">{choice.description}</p>
-						
+
 						{#if choice.options.length > 3}
 							<!-- Use dropdown for many options -->
 							<div class="dropdown-container">
-								<select 
+								<select
 									class="equipment-dropdown"
 									value={backgroundEquipmentChoices[choiceIndex] ?? ''}
-									on:change={(e) => handleBackgroundEquipmentChoice(choiceIndex, parseInt(e.target.value))}
+									on:change={(e) => {
+										const target = e.target as HTMLSelectElement;
+										if (target.value) {
+											handleBackgroundEquipmentChoice(choiceIndex, parseInt(target.value));
+										}
+									}}
 								>
 									<option value="" disabled>Choose an option...</option>
 									{#each choice.options as option, optionIndex}
@@ -244,7 +628,9 @@
 				<!-- Fallback to old equipment format -->
 				<div class="equipment-group">
 					<h3>Background Equipment</h3>
-					<p class="background-note">This equipment is automatically added when you select your background.</p>
+					<p class="background-note">
+						This equipment is automatically added when you select your background.
+					</p>
 					<div class="equipment-list">
 						{#each currentBackground.equipment as item}
 							<div class="equipment-item background">
@@ -268,8 +654,6 @@
 			<a href="{base}/background" class="nav-link">Go to Background Selection</a>
 		</div>
 	{/if}
-
-
 </div>
 
 <style>
@@ -287,96 +671,72 @@
 
 	.intro-text h1 {
 		font-size: 2.5rem;
-		color: #333;
-		margin-bottom: 0.5rem;
+		font-weight: 700;
+		margin-bottom: 1rem;
+		color: #1f2937;
 	}
 
 	.intro-text p {
 		font-size: 1.1rem;
-		color: #666;
+		color: #6b7280;
 		max-width: 600px;
 		margin: 0 auto;
 	}
 
-	.no-selection, .no-equipment {
-		text-align: center;
-		padding: 2rem;
-		background-color: #f8f9fa;
-		border-radius: 8px;
-		margin: 2rem 0;
-	}
-
-	.no-selection h2, .no-equipment h2 {
-		color: #6c757d;
-		margin-bottom: 1rem;
-	}
-
-	.nav-link {
-		display: inline-block;
-		padding: 0.75rem 1.5rem;
-		background-color: #007bff;
-		color: white;
-		text-decoration: none;
-		border-radius: 4px;
-		margin-top: 1rem;
-		transition: background-color 0.2s;
-	}
-
-	.nav-link:hover {
-		background-color: #0056b3;
-	}
-
 	.equipment-section {
-		background-color: #fff;
-		border: 2px solid #ddd;
-		border-radius: 8px;
-		padding: 1.5rem;
-		margin: 2rem 0;
-		box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+		background: white;
+		border-radius: 12px;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+		margin-bottom: 2rem;
+		overflow: hidden;
 	}
 
 	.section-header {
 		display: flex;
 		align-items: center;
 		gap: 1rem;
-		margin-bottom: 1.5rem;
-		padding-bottom: 1rem;
-		border-bottom: 2px solid #eee;
+		padding: 1.5rem;
+		background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+		border-bottom: 1px solid #e5e7eb;
 	}
 
-	.class-icon, .background-icon {
+	.class-icon,
+	.background-icon {
 		width: 48px;
 		height: 48px;
+		border-radius: 8px;
 		object-fit: cover;
-		border-radius: 4px;
 	}
 
 	.section-header h2 {
-		color: #333;
+		font-size: 1.5rem;
+		font-weight: 600;
+		color: #1f2937;
 		margin: 0;
-		font-size: 1.8rem;
 	}
 
 	.equipment-group {
-		margin-bottom: 2rem;
+		padding: 1.5rem;
+		border-bottom: 1px solid #f3f4f6;
+	}
+
+	.equipment-group:last-child {
+		border-bottom: none;
 	}
 
 	.equipment-group h3 {
-		color: #555;
+		font-size: 1.25rem;
+		font-weight: 600;
+		color: #1f2937;
 		margin-bottom: 0.5rem;
-		font-size: 1.3rem;
 	}
 
-	.choice-description {
-		color: #666;
-		font-style: italic;
+	.choice-description,
+	.fixed-equipment-note,
+	.background-note {
+		color: #6b7280;
 		margin-bottom: 1rem;
-	}
-
-	.background-note, .fixed-equipment-note {
-		color: #666;
 		font-size: 0.9rem;
-		margin-bottom: 1rem;
 	}
 
 	.equipment-list {
@@ -389,32 +749,43 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		padding: 0.75rem 1rem;
-		background-color: #f8f9fa;
-		border-radius: 4px;
-		border-left: 4px solid #28a745;
-	}
-
-	.equipment-item.background {
-		border-left-color: #6f42c1;
+		padding: 0.75rem;
+		background: #f9fafb;
+		border-radius: 6px;
+		border-left: 4px solid #d1d5db;
 	}
 
 	.equipment-item.class-equipment {
-		border-left-color: #28a745;
-		position: relative;
+		border-left-color: #3b82f6;
+	}
+
+	.equipment-item.background {
+		border-left-color: #10b981;
 	}
 
 	.item-name {
 		font-weight: 500;
-		color: #333;
+		color: #1f2937;
 	}
 
 	.item-type {
-		font-size: 0.85rem;
-		color: #666;
-		background-color: #e9ecef;
+		font-size: 0.875rem;
+		color: #6b7280;
+		background: #e5e7eb;
 		padding: 0.25rem 0.5rem;
-		border-radius: 12px;
+		border-radius: 4px;
+	}
+
+	.enhanced-choice {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.main-options {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
 	}
 
 	.choice-options {
@@ -424,26 +795,106 @@
 	}
 
 	.choice-option {
-		display: block;
-		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
 		padding: 1rem;
-		border: 2px solid #ddd;
+		background: white;
+		border: 2px solid #e5e7eb;
 		border-radius: 8px;
-		background-color: #fff;
 		cursor: pointer;
-		transition: all 0.2s;
+		transition: all 0.2s ease;
 		text-align: left;
+		width: 100%;
 	}
 
 	.choice-option:hover {
-		border-color: #007bff;
-		background-color: #f8f9ff;
+		border-color: #3b82f6;
+		box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
 	}
 
 	.choice-option.selected {
-		border-color: #007bff;
-		background-color: #e3f2fd;
-		box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+		border-color: #3b82f6;
+		background: #eff6ff;
+		box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+	}
+
+	.subchoices-container {
+		background: #f0f9ff;
+		border-radius: 8px;
+		padding: 1.5rem;
+		border: 2px solid #3b82f6;
+		margin-top: 1rem;
+		box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
+		animation: slideIn 0.3s ease-out;
+	}
+
+	@keyframes slideIn {
+		from {
+			opacity: 0;
+			transform: translateY(-10px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	.subchoice-group {
+		margin-bottom: 1rem;
+	}
+
+	.subchoice-group:last-child {
+		margin-bottom: 0;
+	}
+
+	.subchoice-group h4 {
+		font-size: 1rem;
+		font-weight: 600;
+		color: #1f2937;
+		margin-bottom: 0.25rem;
+	}
+
+	.subchoice-description {
+		font-size: 0.875rem;
+		color: #6b7280;
+		margin-bottom: 0.75rem;
+	}
+
+	.subchoice-select {
+		width: 100%;
+		padding: 0.75rem;
+		border: 1px solid #d1d5db;
+		border-radius: 6px;
+		background: white;
+		font-size: 0.875rem;
+		cursor: pointer;
+	}
+
+	.subchoice-select:focus {
+		outline: none;
+		border-color: #3b82f6;
+		box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+	}
+
+	.dropdown-container {
+		margin-top: 0.5rem;
+	}
+
+	.equipment-dropdown {
+		width: 100%;
+		padding: 0.75rem;
+		border: 1px solid #d1d5db;
+		border-radius: 6px;
+		background: white;
+		font-size: 0.875rem;
+		cursor: pointer;
+	}
+
+	.equipment-dropdown:focus {
+		outline: none;
+		border-color: #3b82f6;
+		box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 	}
 
 	.option-items {
@@ -453,68 +904,56 @@
 	}
 
 	.option-item {
-		background-color: #e9ecef;
+		background: #f3f4f6;
 		padding: 0.25rem 0.5rem;
 		border-radius: 4px;
-		font-size: 0.9rem;
-		color: #495057;
+		font-size: 0.875rem;
+		color: #374151;
 	}
 
-	.choice-option.selected .option-item {
-		background-color: #bbdefb;
-		color: #1565c0;
+	.no-selection,
+	.no-equipment {
+		text-align: center;
+		padding: 3rem 1rem;
+		background: white;
+		border-radius: 12px;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 	}
 
-	/* Dropdown Styles */
-	.dropdown-container {
-		margin-top: 1rem;
+	.no-selection h2,
+	.no-equipment h2 {
+		font-size: 1.5rem;
+		color: #1f2937;
+		margin-bottom: 1rem;
 	}
 
-	.equipment-dropdown {
-		width: 100%;
-		padding: 0.75rem;
-		border: 2px solid #ddd;
-		border-radius: 8px;
-		background-color: #fff;
-		font-size: 1rem;
-		color: #333;
-		cursor: pointer;
-		transition: border-color 0.2s, box-shadow 0.2s;
+	.no-selection p,
+	.no-equipment p {
+		color: #6b7280;
+		margin-bottom: 1.5rem;
 	}
 
-	.equipment-dropdown:focus {
-		outline: none;
-		border-color: #007bff;
-		box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+	.nav-link {
+		display: inline-block;
+		padding: 0.75rem 1.5rem;
+		background: #3b82f6;
+		color: white;
+		text-decoration: none;
+		border-radius: 6px;
+		font-weight: 500;
+		transition: background-color 0.2s ease;
 	}
 
-	.equipment-dropdown:hover {
-		border-color: #aaa;
+	.nav-link:hover {
+		background: #2563eb;
 	}
 
-	.equipment-dropdown option {
-		padding: 0.5rem;
-	}
-
-	/* Responsive Design */
-	@media (max-width: 768px) {
-		.main-content {
-			padding: 1rem 0.5rem;
-			padding-top: 80px;
-		}
-
-		.section-header {
-			flex-direction: column;
-			text-align: center;
-			gap: 0.5rem;
-		}
-
+	@media (min-width: 768px) {
+		.main-options,
 		.choice-options {
-			gap: 0.5rem;
-		}
-
-		.choice-option {
-			padding: 0.75rem;
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+			gap: 1rem;
 		}
 	}
 </style>

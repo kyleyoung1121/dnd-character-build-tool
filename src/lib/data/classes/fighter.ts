@@ -1,6 +1,7 @@
 import { base } from '$app/paths';
-import type { ClassData } from '$lib/data/types/ClassData';
+import type { ClassData, EquipmentChoice } from '$lib/data/types/ClassData';
 import type { FeaturePrompt } from '$lib/data/types/Features';
+import { martialMeleeWeapons, twoHandedWeapons } from '../equipment/weapons';
 
 const proficienciesPrompt: FeaturePrompt = {
 	name: 'Skill Proficiencies',
@@ -12,7 +13,7 @@ const proficienciesPrompt: FeaturePrompt = {
 		Skills: Choose two from Acrobatics, Animal Handling, Athletics, History, Insight, Intimidation, Perception, Survival
 	`,
 	featureOptions: {
-		placeholderText: "Select two skills",
+		placeholderText: 'Select two skills',
 		options: [
 			'Acrobatics',
 			'Animal Handling',
@@ -21,16 +22,16 @@ const proficienciesPrompt: FeaturePrompt = {
 			'Insight',
 			'Intimidation',
 			'Perception',
-			'Survival',
+			'Survival'
 		],
-		numPicks: 2,
+		numPicks: 2
 	},
-	source: "fighter.proficiencies",
+	source: 'fighter.proficiencies',
 	effects: [
 		{
-			target: "skills",
-			action: "add",
-			value: "{userChoice}"
+			target: 'skills',
+			action: 'add',
+			value: '{userChoice}'
 		}
 	]
 };
@@ -40,7 +41,7 @@ const fightingStylePrompt: FeaturePrompt = {
 	id: 'fighter_style_01',
 	description: 'Choose a fighting style that suits your combat approach.',
 	featureOptions: {
-		placeholderText: "-Choose a Fighting Style-",
+		placeholderText: '-Choose a Fighting Style-',
 		options: [
 			{
 				name: 'Archery',
@@ -52,7 +53,8 @@ const fightingStylePrompt: FeaturePrompt = {
 			},
 			{
 				name: 'Dueling',
-				optionDescription: 'When wielding a melee weapon in one hand and no other weapons, gain +2 to damage rolls.'
+				optionDescription:
+					'When wielding a melee weapon in one hand and no other weapons, gain +2 to damage rolls.'
 			},
 			{
 				name: 'Great Weapon Fighting',
@@ -60,21 +62,23 @@ const fightingStylePrompt: FeaturePrompt = {
 			},
 			{
 				name: 'Protection',
-				optionDescription: 'Use your reaction to impose disadvantage on an attack against an ally within 5 feet.'
+				optionDescription:
+					'Use your reaction to impose disadvantage on an attack against an ally within 5 feet.'
 			},
 			{
 				name: 'Two-Weapon Fighting',
-				optionDescription: 'Add your ability modifier to the damage of the second attack when engaging in two-weapon fighting.'
-			},
+				optionDescription:
+					'Add your ability modifier to the damage of the second attack when engaging in two-weapon fighting.'
+			}
 		],
-		numPicks: 1,
+		numPicks: 1
 	},
-	source: "fighter",
+	source: 'fighter',
 	effects: [
 		{
-			target: "features",
-			action: "add",
-			value: "{userChoice} Fighting Style"
+			target: 'features',
+			action: 'add',
+			value: '{userChoice} Fighting Style'
 		}
 	]
 };
@@ -87,10 +91,8 @@ const secondWindPrompt: FeaturePrompt = {
 		On your turn, you can use a bonus action to regain hit points equal to 1d10 + your fighter level.
 		Once used, must finish a short or long rest before using again.
 	`,
-	source: "fighter",
-	effects: [
-		{ target: "features", action: "add", value: "Second Wind" }
-	]
+	source: 'fighter',
+	effects: [{ target: 'features', action: 'add', value: 'Second Wind' }]
 };
 
 const actionSurgePrompt: FeaturePrompt = {
@@ -100,10 +102,8 @@ const actionSurgePrompt: FeaturePrompt = {
 		Starting at 2nd level, you can take one additional action on your turn. 
 		Once used, must finish a short or long rest before using again.
 	`,
-	source: "fighter",
-	effects: [
-		{ target: "features", action: "add", value: "Action Surge" }
-	]
+	source: 'fighter',
+	effects: [{ target: 'features', action: 'add', value: 'Action Surge' }]
 };
 
 const martialArchetypePrompt: FeaturePrompt = {
@@ -111,80 +111,72 @@ const martialArchetypePrompt: FeaturePrompt = {
 	id: 'fighter_archetype_01',
 	description: 'Choose a Martial Archetype at 3rd level.',
 	featureOptions: {
-		placeholderText: "-Choose an Archetype-",
+		placeholderText: '-Choose an Archetype-',
 		options: [
 			{
-				name: "Champion",
-				optionDescription: "Focused on raw physical power and improving critical hits.",
+				name: 'Champion',
+				optionDescription: 'Focused on raw physical power and improving critical hits.',
 				nestedPrompts: [
 					{
 						name: 'Improved Critical',
 						id: 'fighter_champion_critical_01',
 						description: 'Weapon attacks score a critical hit on 19 or 20.',
-						source: "fighter.champion",
-						effects: [
-							{ target: "features", action: "add", value: "Improved Critical" }
-						]
+						source: 'fighter.champion',
+						effects: [{ target: 'features', action: 'add', value: 'Improved Critical' }]
 					}
 				]
 			},
 			{
-				name: "Battle Master",
-				optionDescription: "A master of martial techniques, using maneuvers to control the battlefield.",
+				name: 'Battle Master',
+				optionDescription:
+					'A master of martial techniques, using maneuvers to control the battlefield.',
 				nestedPrompts: [
 					{
 						name: 'Combat Superiority',
 						id: 'fighter_battle_master_01',
-						description: "Gain maneuvers and superiority dice to enhance attacks.",
-						source: "fighter.battle_master",
-						effects: [
-							{ target: "features", action: "add", value: "Combat Superiority" }
-						]
+						description: 'Gain maneuvers and superiority dice to enhance attacks.',
+						source: 'fighter.battle_master',
+						effects: [{ target: 'features', action: 'add', value: 'Combat Superiority' }]
 					}
 				]
 			},
 			{
-				name: "Eldritch Knight",
-				optionDescription: "Blend magic with combat.",
+				name: 'Eldritch Knight',
+				optionDescription: 'Blend magic with combat.',
 				nestedPrompts: [
 					{
 						name: 'Weapon Bond',
 						id: 'fighter_eldritch_weapon_bond_01',
-						description: "Bond with weapons to summon them to your hand.",
-						source: "fighter.eldritch_knight",
-						effects: [
-							{ target: "features", action: "add", value: "Weapon Bond" }
-						]
+						description: 'Bond with weapons to summon them to your hand.',
+						source: 'fighter.eldritch_knight',
+						effects: [{ target: 'features', action: 'add', value: 'Weapon Bond' }]
 					},
 					{
 						name: 'Spellcasting',
 						id: 'fighter_eldritch_spellcasting_01',
-						description: "Learn a limited number of wizard spells.",
-						source: "fighter.eldritch_knight",
-						effects: [
-							{ target: "features", action: "add", value: "Eldritch Knight Spellcasting" }
-						]
+						description: 'Learn a limited number of wizard spells.',
+						source: 'fighter.eldritch_knight',
+						effects: [{ target: 'features', action: 'add', value: 'Eldritch Knight Spellcasting' }]
 					}
 				]
 			}
 		],
-		numPicks: 1,
+		numPicks: 1
 	},
-	source: "fighter",
+	source: 'fighter',
 	effects: [
 		{
-			target: "subclass",
-			action: "set",
-			value: "{userChoice}"
+			target: 'subclass',
+			action: 'set',
+			value: '{userChoice}'
 		}
 	]
 };
 
-
 const classFeaturesPrompt: FeaturePrompt[] = [
 	fightingStylePrompt,
 	secondWindPrompt,
-	actionSurgePrompt,
+	actionSurgePrompt
 ];
 
 export const fighter: ClassData = {
@@ -198,38 +190,79 @@ export const fighter: ClassData = {
 	weaponProficiencies: ['Simple Weapons', 'Martial Weapons'],
 	startingEquipment: {
 		fixed: [
-			'Explorer\'s pack (includes: backpack, bedroll, mess kit, tinderbox, 10 torches, 10 days of rations, waterskin, 50 feet of hempen rope)'
+			"Explorer's pack (includes: backpack, bedroll, mess kit, tinderbox, 10 torches, 10 days of rations, waterskin, 50 feet of hempen rope)"
 		],
 		choices: [
 			{
 				name: 'Armor',
 				description: 'Choose your starting armor',
 				options: [
-					['Chain mail'],
-					['Leather armor', 'Longbow', '20 arrows']
+					{
+						label: 'Chain mail',
+						items: ['Chain mail']
+					},
+					{
+						label: 'Leather armor, longbow, and arrows',
+						items: ['Leather armor', 'Longbow', '20 arrows']
+					}
 				]
-			},
+			} as EquipmentChoice,
 			{
-				name: 'Primary Weapon',
-				description: 'Choose your weapon setup',
+				name: 'Primary Weapon Setup',
+				description: 'Choose your main weapon configuration',
 				options: [
-					['Any martial weapon', 'Shield'],
-					['Any martial weapon (two-handed or two martial weapons)']
+					{
+						label: 'Martial weapon and shield',
+						subChoices: [
+							{
+								name: 'Martial Weapon',
+								description: 'Choose a one-handed martial weapon',
+								type: 'weapon-list',
+								category: 'martial-melee',
+								options: martialMeleeWeapons.filter(w => !twoHandedWeapons.includes(w)),
+								count: 1
+							}
+						],
+						items: ['Shield'] // Shield is always included with this choice
+					},
+					{
+						label: 'Two martial weapons',
+						subChoices: [
+							{
+								name: 'Primary Martial Weapon',
+								description: 'Choose your first martial weapon',
+								type: 'weapon-list',
+								category: 'martial-melee',
+								options: martialMeleeWeapons,
+								count: 1
+							},
+							{
+								name: 'Secondary Martial Weapon',
+								description: 'Choose your second martial weapon',
+								type: 'weapon-list',
+								category: 'martial-melee',
+								options: martialMeleeWeapons,
+								count: 1
+							}
+						]
+					}
 				]
-			},
+			} as EquipmentChoice,
 			{
 				name: 'Ranged Option',
 				description: 'Choose your ranged weapon or throwing weapons',
 				options: [
-					['Light crossbow', '20 bolts'],
-					['Two handaxes']
+					{
+						label: 'Light crossbow and bolts',
+						items: ['Light crossbow', '20 bolts']
+					},
+					{
+						label: 'Two handaxes',
+						items: ['Handaxe', 'Handaxe']
+					}
 				]
-			}
+			} as EquipmentChoice
 		]
 	},
-	classFeatures: [
-		proficienciesPrompt,
-		...classFeaturesPrompt,
-		martialArchetypePrompt,
-	],
+	classFeatures: [proficienciesPrompt, ...classFeaturesPrompt, martialArchetypePrompt]
 };

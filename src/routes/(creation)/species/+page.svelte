@@ -26,10 +26,7 @@
 	import { character_store } from '$lib/stores/character_store';
 	import FeatureCardList from '$lib/components/FeatureCardList.svelte';
 	import ConflictWarning from '$lib/components/ConflictWarning.svelte';
-	import { 
-		isFeatureIncomplete,
-		effectNeedsChoice 
-	} from '$lib/components/feature-card-utils';
+	import { isFeatureIncomplete, effectNeedsChoice } from '$lib/components/feature-card-utils';
 
 	// --- NEW: species group type ---
 	interface SpeciesGroup {
@@ -70,7 +67,6 @@
 		tiefling
 	];
 
-
 	let selectedSpecies: SpeciesData | null = null;
 	let selectedSpeciesData: SpeciesData | null = null;
 
@@ -84,16 +80,16 @@
 
 	// Responsive column distribution
 	let isMobile = false;
-	
+
 	// Reactive distributions for different screen sizes
 	$: column1Species = isMobile ? species : species.slice(0, 3);
 	$: column2Species = isMobile ? [] : species.slice(3, 6);
 	$: column3Species = isMobile ? [] : species.slice(6);
-	
+
 	// Track window width for responsiveness
 	let windowWidth = 768; // default to desktop
 	$: isMobile = windowWidth <= 768;
-	
+
 	function updateWindowWidth() {
 		windowWidth = window.innerWidth;
 	}
@@ -109,8 +105,6 @@
 		selectionVersion = (selectionVersion + 1) % 1_000_000;
 	}
 
-
-
 	// Current feature list for the selected race
 	$: mergedFeatures = selectedSpeciesData ? [...(selectedSpeciesData.speciesFeatures || [])] : [];
 
@@ -119,8 +113,6 @@
 		feature,
 		incomplete: isFeatureIncomplete(feature, featureSelections)
 	}));
-
-
 
 	// Helper function needed by onMount
 	function ensureArrayLen(arr: (string | null)[], len: number) {
@@ -166,13 +158,6 @@
 
 		applyChoice(`feature:${feature.name}:static`, update, modify);
 	}
-
-
-
-
-
-
-
 
 	function removeSelectedSpecies() {
 		if (selectedSpeciesData) {
@@ -245,17 +230,17 @@
 						const value = effect.value;
 
 						switch (effect.action) {
-							case "add": {
+							case 'add': {
 								const arr = Array.isArray(value) ? value : [value];
 								if (!update[target]) update[target] = [];
 								update[target].push(...arr);
 								break;
 							}
-							case "set": {
+							case 'set': {
 								update[target] = value;
 								break;
 							}
-							case "modify": {
+							case 'modify': {
 								const amount = Number(value);
 								if (!isNaN(amount)) {
 									modify[target] = (modify[target] ?? 0) + amount;
@@ -274,23 +259,22 @@
 		}
 	}
 
-
-
-
 	// --- onMount for feature restoration ---
 	onMount(() => {
 		// Set up window resize listener for responsive behavior
 		updateWindowWidth();
 		window.addEventListener('resize', updateWindowWidth);
-		
+
 		const state = get(character_store);
 
 		if (state.race) {
 			// Find race or subrace
-			let found: SpeciesData | SpeciesGroup | undefined = species.find((r) => r.name === state.race);
+			let found: SpeciesData | SpeciesGroup | undefined = species.find(
+				(r) => r.name === state.race
+			);
 			if (!found) {
 				for (const speciesItem of species) {
-					if ("subraces" in speciesItem) {
+					if ('subraces' in speciesItem) {
 						const sub = speciesItem.subraces.find((sr) => sr.name === state.race);
 						if (sub) {
 							found = sub;
@@ -300,7 +284,7 @@
 				}
 			}
 
-			if (found && !("subraces" in found)) {
+			if (found && !('subraces' in found)) {
 				selectedSpeciesData = found;
 				featureSelections = {};
 
@@ -314,21 +298,19 @@
 					}
 				}
 
-				const toSnakeCase = (str: string) => str.toLowerCase().replace(/\s+/g, "_");
+				const toSnakeCase = (str: string) => str.toLowerCase().replace(/\s+/g, '_');
 
 				// Restore dynamic selections from provenance
 				const prov = state._provenance || {};
 				for (const key of Object.keys(prov)) {
-					if (!key.startsWith("feature:")) continue;
-					const parts = key.split(":"); // feature:FeatureName:<index|static>
+					if (!key.startsWith('feature:')) continue;
+					const parts = key.split(':'); // feature:FeatureName:<index|static>
 					if (parts.length < 3) continue;
 					const featureName = parts[1];
 					const indexStr = parts[2];
-					if (indexStr === "static") continue;
+					if (indexStr === 'static') continue;
 
-					const index = Number.isFinite(parseInt(indexStr, 10))
-						? parseInt(indexStr, 10)
-						: null;
+					const index = Number.isFinite(parseInt(indexStr, 10)) ? parseInt(indexStr, 10) : null;
 					if (index === null) continue;
 
 					const stored: any = prov[key];
@@ -340,7 +322,7 @@
 					// Build map: snake_case => label
 					const optionMap = new Map(
 						opts.map((o) => {
-							const label = typeof o === "string" ? o : o.name;
+							const label = typeof o === 'string' ? o : o.name;
 							return [toSnakeCase(label), label];
 						})
 					);
@@ -371,7 +353,7 @@
 										break;
 									}
 								}
-							} else if (typeof arr === "string") {
+							} else if (typeof arr === 'string') {
 								const maybe = tryRestoreFromValue(arr);
 								if (maybe) restored = maybe;
 							}
@@ -407,26 +389,21 @@
 				bumpVersion();
 			}
 		}
-		
+
 		// Return cleanup function at the end
 		return () => {
 			window.removeEventListener('resize', updateWindowWidth);
 		};
 	});
-
-
-
-
 </script>
-
-
 
 <div class="main-content">
 	<!-- Show conflict warnings for this tab -->
 	<ConflictWarning tabName="species" />
-	
+
 	<p class="intro-text">
-		There are many different species your character can be, each with their own special traits and abilities.
+		There are many different species your character can be, each with their own special traits and
+		abilities.
 	</p>
 
 	{#if !selectedSpeciesData}
@@ -437,65 +414,58 @@
 					{#if 'subraces' in speciesInfo}
 						<!-- Parent race container -->
 						<div class="parent-race-container">
-						<!-- Parent race button -->
-						<button
-							type="button"
-							class="race-card parent-race-button"
-							on:click={() => toggleSpeciesExpand(speciesInfo.name)}
-							aria-expanded={expandedSpecies.has(speciesInfo.name)}
-						>
-							<div class="card-left">
-								<img src={speciesInfo.image} alt={`${speciesInfo.name} icon`} />
-								<span>{speciesInfo.name}</span>
-							</div>
-							<img
-								class="card-arrow"
-								src="{base}/basic_icons/blue_next.png"
-								alt="toggle subraces"
-							/>
-						</button>
+							<!-- Parent race button -->
+							<button
+								type="button"
+								class="race-card parent-race-button"
+								on:click={() => toggleSpeciesExpand(speciesInfo.name)}
+								aria-expanded={expandedSpecies.has(speciesInfo.name)}
+							>
+								<div class="card-left">
+									<img src={speciesInfo.image} alt={`${speciesInfo.name} icon`} />
+									<span>{speciesInfo.name}</span>
+								</div>
+								<img
+									class="card-arrow"
+									src="{base}/basic_icons/blue_next.png"
+									alt="toggle subraces"
+								/>
+							</button>
 
-						{#if expandedSpecies.has(speciesInfo.name)}
-							<div class="subrace-cards-container">
-								{#each speciesInfo.subraces as subrace}
-									<button
-										class="race-card subrace-card"
-										on:click={() => (selectedSpecies = subrace)}
-									>
-										<div class="card-left">
-											<img src={subrace.image} alt={`${subrace.name} icon`} />
-											<span>{subrace.name}</span>
-										</div>
-										<img
-											class="card-arrow"
-											src="{base}/basic_icons/blue_next.png"
-											alt="next arrow"
-										/>
-									</button>
-								{/each}
-							</div>
-						{/if}
-					</div>
-				{:else}
-					<!-- Single race container -->
-					<div class="parent-race-container">
-						<button
-							class="race-card"
-							on:click={() => (selectedSpecies = speciesInfo)}
-						>
-							<div class="card-left">
-								<img src={speciesInfo.image} alt={`${speciesInfo.name} icon`} />
-								<span>{speciesInfo.name}</span>
-							</div>
-							<img
-								class="card-arrow"
-								src="{base}/basic_icons/blue_next.png"
-								alt="next arrow"
-							/>
-						</button>
-					</div>
-				{/if}
-			{/each}
+							{#if expandedSpecies.has(speciesInfo.name)}
+								<div class="subrace-cards-container">
+									{#each speciesInfo.subraces as subrace}
+										<button
+											class="race-card subrace-card"
+											on:click={() => (selectedSpecies = subrace)}
+										>
+											<div class="card-left">
+												<img src={subrace.image} alt={`${subrace.name} icon`} />
+												<span>{subrace.name}</span>
+											</div>
+											<img
+												class="card-arrow"
+												src="{base}/basic_icons/blue_next.png"
+												alt="next arrow"
+											/>
+										</button>
+									{/each}
+								</div>
+							{/if}
+						</div>
+					{:else}
+						<!-- Single race container -->
+						<div class="parent-race-container">
+							<button class="race-card" on:click={() => (selectedSpecies = speciesInfo)}>
+								<div class="card-left">
+									<img src={speciesInfo.image} alt={`${speciesInfo.name} icon`} />
+									<span>{speciesInfo.name}</span>
+								</div>
+								<img class="card-arrow" src="{base}/basic_icons/blue_next.png" alt="next arrow" />
+							</button>
+						</div>
+					{/if}
+				{/each}
 			</div>
 
 			<!-- Column 2 -->
@@ -504,65 +474,58 @@
 					{#if 'subraces' in speciesInfo}
 						<!-- Parent race container -->
 						<div class="parent-race-container">
-						<!-- Parent race button -->
-						<button
-							type="button"
-							class="race-card parent-race-button"
-							on:click={() => toggleSpeciesExpand(speciesInfo.name)}
-							aria-expanded={expandedSpecies.has(speciesInfo.name)}
-						>
-							<div class="card-left">
-								<img src={speciesInfo.image} alt={`${speciesInfo.name} icon`} />
-								<span>{speciesInfo.name}</span>
-							</div>
-							<img
-								class="card-arrow"
-								src="{base}/basic_icons/blue_next.png"
-								alt="toggle subraces"
-							/>
-						</button>
+							<!-- Parent race button -->
+							<button
+								type="button"
+								class="race-card parent-race-button"
+								on:click={() => toggleSpeciesExpand(speciesInfo.name)}
+								aria-expanded={expandedSpecies.has(speciesInfo.name)}
+							>
+								<div class="card-left">
+									<img src={speciesInfo.image} alt={`${speciesInfo.name} icon`} />
+									<span>{speciesInfo.name}</span>
+								</div>
+								<img
+									class="card-arrow"
+									src="{base}/basic_icons/blue_next.png"
+									alt="toggle subraces"
+								/>
+							</button>
 
-						{#if expandedSpecies.has(speciesInfo.name)}
-							<div class="subrace-cards-container">
-								{#each speciesInfo.subraces as subrace}
-									<button
-										class="race-card subrace-card"
-										on:click={() => (selectedSpecies = subrace)}
-									>
-										<div class="card-left">
-											<img src={subrace.image} alt={`${subrace.name} icon`} />
-											<span>{subrace.name}</span>
-										</div>
-										<img
-											class="card-arrow"
-											src="{base}/basic_icons/blue_next.png"
-											alt="next arrow"
-										/>
-									</button>
-								{/each}
-							</div>
-						{/if}
-					</div>
-				{:else}
-					<!-- Single race container -->
-					<div class="parent-race-container">
-						<button
-							class="race-card"
-							on:click={() => (selectedSpecies = speciesInfo)}
-						>
-							<div class="card-left">
-								<img src={speciesInfo.image} alt={`${speciesInfo.name} icon`} />
-								<span>{speciesInfo.name}</span>
-							</div>
-							<img
-								class="card-arrow"
-								src="{base}/basic_icons/blue_next.png"
-								alt="next arrow"
-							/>
-						</button>
-					</div>
-				{/if}
-			{/each}
+							{#if expandedSpecies.has(speciesInfo.name)}
+								<div class="subrace-cards-container">
+									{#each speciesInfo.subraces as subrace}
+										<button
+											class="race-card subrace-card"
+											on:click={() => (selectedSpecies = subrace)}
+										>
+											<div class="card-left">
+												<img src={subrace.image} alt={`${subrace.name} icon`} />
+												<span>{subrace.name}</span>
+											</div>
+											<img
+												class="card-arrow"
+												src="{base}/basic_icons/blue_next.png"
+												alt="next arrow"
+											/>
+										</button>
+									{/each}
+								</div>
+							{/if}
+						</div>
+					{:else}
+						<!-- Single race container -->
+						<div class="parent-race-container">
+							<button class="race-card" on:click={() => (selectedSpecies = speciesInfo)}>
+								<div class="card-left">
+									<img src={speciesInfo.image} alt={`${speciesInfo.name} icon`} />
+									<span>{speciesInfo.name}</span>
+								</div>
+								<img class="card-arrow" src="{base}/basic_icons/blue_next.png" alt="next arrow" />
+							</button>
+						</div>
+					{/if}
+				{/each}
 			</div>
 
 			<!-- Column 3 -->
@@ -571,70 +534,61 @@
 					{#if 'subraces' in speciesInfo}
 						<!-- Parent race container -->
 						<div class="parent-race-container">
-						<!-- Parent race button -->
-						<button
-							type="button"
-							class="race-card parent-race-button"
-							on:click={() => toggleSpeciesExpand(speciesInfo.name)}
-							aria-expanded={expandedSpecies.has(speciesInfo.name)}
-						>
-							<div class="card-left">
-								<img src={speciesInfo.image} alt={`${speciesInfo.name} icon`} />
-								<span>{speciesInfo.name}</span>
-							</div>
-							<img
-								class="card-arrow"
-								src="{base}/basic_icons/blue_next.png"
-								alt="toggle subraces"
-							/>
-						</button>
+							<!-- Parent race button -->
+							<button
+								type="button"
+								class="race-card parent-race-button"
+								on:click={() => toggleSpeciesExpand(speciesInfo.name)}
+								aria-expanded={expandedSpecies.has(speciesInfo.name)}
+							>
+								<div class="card-left">
+									<img src={speciesInfo.image} alt={`${speciesInfo.name} icon`} />
+									<span>{speciesInfo.name}</span>
+								</div>
+								<img
+									class="card-arrow"
+									src="{base}/basic_icons/blue_next.png"
+									alt="toggle subraces"
+								/>
+							</button>
 
-						{#if expandedSpecies.has(speciesInfo.name)}
-							<div class="subrace-cards-container">
-								{#each speciesInfo.subraces as subrace}
-									<button
-										class="race-card subrace-card"
-										on:click={() => (selectedSpecies = subrace)}
-									>
-										<div class="card-left">
-											<img src={subrace.image} alt={`${subrace.name} icon`} />
-											<span>{subrace.name}</span>
-										</div>
-										<img
-											class="card-arrow"
-											src="{base}/basic_icons/blue_next.png"
-											alt="next arrow"
-										/>
-									</button>
-								{/each}
-							</div>
-						{/if}
-					</div>
-				{:else}
-					<!-- Single race container -->
-					<div class="parent-race-container">
-						<button
-							class="race-card"
-							on:click={() => (selectedSpecies = speciesInfo)}
-						>
-							<div class="card-left">
-								<img src={speciesInfo.image} alt={`${speciesInfo.name} icon`} />
-								<span>{speciesInfo.name}</span>
-							</div>
-							<img
-								class="card-arrow"
-								src="{base}/basic_icons/blue_next.png"
-								alt="next arrow"
-							/>
-						</button>
-					</div>
-				{/if}
-			{/each}
+							{#if expandedSpecies.has(speciesInfo.name)}
+								<div class="subrace-cards-container">
+									{#each speciesInfo.subraces as subrace}
+										<button
+											class="race-card subrace-card"
+											on:click={() => (selectedSpecies = subrace)}
+										>
+											<div class="card-left">
+												<img src={subrace.image} alt={`${subrace.name} icon`} />
+												<span>{subrace.name}</span>
+											</div>
+											<img
+												class="card-arrow"
+												src="{base}/basic_icons/blue_next.png"
+												alt="next arrow"
+											/>
+										</button>
+									{/each}
+								</div>
+							{/if}
+						</div>
+					{:else}
+						<!-- Single race container -->
+						<div class="parent-race-container">
+							<button class="race-card" on:click={() => (selectedSpecies = speciesInfo)}>
+								<div class="card-left">
+									<img src={speciesInfo.image} alt={`${speciesInfo.name} icon`} />
+									<span>{speciesInfo.name}</span>
+								</div>
+								<img class="card-arrow" src="{base}/basic_icons/blue_next.png" alt="next arrow" />
+							</button>
+						</div>
+					{/if}
+				{/each}
 			</div>
 		</div>
 	{/if}
-
-
 
 	{#if selectedSpecies}
 		<!-- Popup Preview -->
@@ -690,16 +644,15 @@
 			<!-- Use shared feature card components -->
 			<FeatureCardList
 				features={mergedFeatures}
-				bind:featureSelections={featureSelections}
-				bind:expandedFeatures={expandedFeatures}
-				selectionVersion={selectionVersion}
+				bind:featureSelections
+				bind:expandedFeatures
+				{selectionVersion}
 				characterStore={character_store}
 				onBumpVersion={() => selectionVersion++}
 			/>
 		</div>
 	{/if}
 </div>
-
 
 <style>
 	.main-content {
@@ -741,7 +694,7 @@
 			flex-direction: column;
 			padding: 0 1rem; /* medium padding on tablets */
 		}
-		
+
 		.race-column {
 			flex: none;
 		}
@@ -788,7 +741,6 @@
 		margin-left: auto;
 		transition: transform 0.2s ease;
 	}
-
 
 	.race-card:hover,
 	.race-card:focus {
@@ -927,7 +879,7 @@
 		height: 60px;
 		object-fit: contain;
 		border-radius: 6px;
-		box-shadow: 0 0 5px rgba(0,0,0,0.1);
+		box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 	}
 
 	.selected-race-text {
@@ -953,8 +905,6 @@
 	.remove-race-button:hover {
 		background-color: #fdd;
 	}
-
-
 
 	.popup-footer {
 		padding: 12px 16px;
@@ -992,7 +942,4 @@
 	.add-button:hover {
 		background-color: #1b4d20;
 	}
-
-
-
 </style>

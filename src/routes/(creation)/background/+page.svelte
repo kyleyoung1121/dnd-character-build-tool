@@ -3,10 +3,8 @@
 	import { onMount } from 'svelte';
 	import FeatureCardList from '$lib/components/FeatureCardList.svelte';
 	import ConflictWarning from '$lib/components/ConflictWarning.svelte';
-	import { 
-		isFeatureIncomplete
-	} from '$lib/components/feature-card-utils';
-	
+	import { isFeatureIncomplete } from '$lib/components/feature-card-utils';
+
 	// Import all backgrounds
 	import { backgrounds } from '$lib/data/backgrounds/index';
 	import type { BackgroundData } from '$lib/data/types/BackgroundData';
@@ -67,11 +65,11 @@
 
 			const prefixes = [
 				`background:${selectedBackgroundData.name}`,
-				...allFeatureNames.map(f => `feature:${f}`)
+				...allFeatureNames.map((f) => `feature:${f}`)
 			];
 
 			for (const key of provKeys) {
-				if (prefixes.some(prefix => key.startsWith(prefix))) {
+				if (prefixes.some((prefix) => key.startsWith(prefix))) {
 					revertChanges(state, key);
 				}
 			}
@@ -111,17 +109,17 @@
 					const value = effect.value;
 
 					switch (effect.action) {
-						case "add": {
+						case 'add': {
 							const arr = Array.isArray(value) ? value : [value];
 							if (!update[target]) update[target] = [];
 							update[target].push(...arr);
 							break;
 						}
-						case "set": {
+						case 'set': {
 							update[target] = value;
 							break;
 						}
-						case "modify": {
+						case 'modify': {
 							modify[target] = (modify[target] || 0) + value;
 							break;
 						}
@@ -146,8 +144,6 @@
 		}
 	}
 
-
-
 	// Helper function needed by onMount
 	function ensureArrayLen(arr: (string | null)[], len: number) {
 		if (arr.length < len) {
@@ -163,13 +159,13 @@
 		if (!state.background) return;
 
 		// Find selected background
-		const found = backgrounds.find(bg => bg.name === state.background);
+		const found = backgrounds.find((bg) => bg.name === state.background);
 		if (!found) return;
 
 		selectedBackgroundData = found;
 		featureSelections = {};
 
-		const toSnakeCase = (str: string) => str.toLowerCase().replace(/\s+/g, "_");
+		const toSnakeCase = (str: string) => str.toLowerCase().replace(/\s+/g, '_');
 
 		// Helper: convert stored snake_case value to display label
 		const tryRestoreFromValue = (val: string, optionMap: Map<string, string>) => {
@@ -192,7 +188,10 @@
 
 			const opts = feature.featureOptions?.options || [];
 			const optionMap = new Map(
-				opts.map(o => [toSnakeCase(typeof o === 'string' ? o : o.name), typeof o === 'string' ? o : o.name])
+				opts.map((o) => [
+					toSnakeCase(typeof o === 'string' ? o : o.name),
+					typeof o === 'string' ? o : o.name
+				])
 			);
 
 			const prov = state._provenance || {};
@@ -218,7 +217,7 @@
 									break;
 								}
 							}
-						} else if (typeof arr === "string") {
+						} else if (typeof arr === 'string') {
 							const maybe = tryRestoreFromValue(arr, optionMap);
 							if (maybe) restored = maybe;
 						}
@@ -243,11 +242,11 @@
 
 			// Recurse into nested prompts if any
 			if (feature.featureOptions?.options) {
-				feature.featureOptions.options.forEach(o => {
-					if (typeof o !== "string" && o.nestedPrompts) {
-						const selectedVal = featureSelections[feature.name].find(v => v === o.name);
+				feature.featureOptions.options.forEach((o) => {
+					if (typeof o !== 'string' && o.nestedPrompts) {
+						const selectedVal = featureSelections[feature.name].find((v) => v === o.name);
 						if (selectedVal) {
-							o.nestedPrompts.forEach(nested => restoreFeatureSelection(nested));
+							o.nestedPrompts.forEach((nested) => restoreFeatureSelection(nested));
 						}
 					}
 				});
@@ -255,23 +254,22 @@
 		};
 
 		// Restore all top-level features
-		found.backgroundFeatures?.forEach(feature => restoreFeatureSelection(feature));
+		found.backgroundFeatures?.forEach((feature) => restoreFeatureSelection(feature));
 
 		// Trigger Svelte reactivity
 		featureSelections = { ...featureSelections };
 		bumpVersion();
 	});
-
 </script>
 
 <div class="main-content">
 	<!-- Show conflict warnings for this tab -->
 	<ConflictWarning tabName="background" />
-	
+
 	<p class="intro-text">
-		Your character's background reveals where you came from, how you became an adventurer, 
-		and your place in the world. Backgrounds provide skill proficiencies, languages, equipment, 
-		and special features that reflect your past experiences.
+		Your character's background reveals where you came from, how you became an adventurer, and your
+		place in the world. Backgrounds provide skill proficiencies, languages, equipment, and special
+		features that reflect your past experiences.
 	</p>
 
 	{#if !selectedBackgroundData}
@@ -282,11 +280,7 @@
 						<img src={backgroundInfo.image} alt={`${backgroundInfo.name} icon`} />
 						<span>{backgroundInfo.name}</span>
 					</div>
-					<img
-						class="card-arrow"
-						src="{base}/basic_icons/blue_next.png"
-						alt="next arrow"
-					/>
+					<img class="card-arrow" src="{base}/basic_icons/blue_next.png" alt="next arrow" />
 				</button>
 			{/each}
 		</div>
@@ -304,27 +298,27 @@
 				<div class="popup-body">
 					<h2>{selectedBackground.name}</h2>
 					<p class="description">{selectedBackground.description}</p>
-					
+
 					<div class="background-details">
 						<div class="detail-section">
 							<h4>Skill Proficiencies</h4>
 							<p>{selectedBackground.skillProficiencies.join(', ')}</p>
 						</div>
-						
+
 						{#if selectedBackground.languageCount}
 							<div class="detail-section">
 								<h4>Languages</h4>
 								<p>{selectedBackground.languageCount} of your choice</p>
 							</div>
 						{/if}
-						
+
 						{#if selectedBackground.toolProficiencies && selectedBackground.toolProficiencies.length > 0}
 							<div class="detail-section">
 								<h4>Tool Proficiencies</h4>
 								<p>{selectedBackground.toolProficiencies.join(', ')}</p>
 							</div>
 						{/if}
-						
+
 						<div class="detail-section">
 							<h4>Equipment</h4>
 							<ul>
@@ -376,9 +370,9 @@
 			<!-- Use shared feature card components -->
 			<FeatureCardList
 				features={mergedFeatures}
-				bind:featureSelections={featureSelections}
-				bind:expandedFeatures={expandedFeatures}
-				selectionVersion={selectionVersion}
+				bind:featureSelections
+				bind:expandedFeatures
+				{selectionVersion}
 				characterStore={character_store}
 				onBumpVersion={() => selectionVersion++}
 			/>
@@ -590,7 +584,8 @@
 		border-top: 1px solid #ddd;
 	}
 
-	.cancel-button, .add-button {
+	.cancel-button,
+	.add-button {
 		padding: 8px 16px;
 		border: none;
 		border-radius: 4px;

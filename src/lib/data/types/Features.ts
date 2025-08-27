@@ -13,11 +13,7 @@ export interface FeatureEffect {
 	value: any;
 }
 
-export type FeatureAction =
-	| "add"
-	| "remove"
-	| "set"
-	| "modify";
+export type FeatureAction = 'add' | 'remove' | 'set' | 'modify';
 
 export type SelectOptions = {
 	placeholderText: string;

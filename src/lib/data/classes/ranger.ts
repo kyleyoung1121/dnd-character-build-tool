@@ -12,7 +12,7 @@ const proficienciesPrompt: FeaturePrompt = {
 		Skills: Choose three from Animal Handling, Athletics, Insight, Investigation, Nature, Perception, Stealth, and Survival
 	`,
 	featureOptions: {
-		placeholderText: "Select skills",
+		placeholderText: 'Select skills',
 		options: [
 			'Animal Handling',
 			'Athletics',
@@ -21,16 +21,16 @@ const proficienciesPrompt: FeaturePrompt = {
 			'Nature',
 			'Perception',
 			'Stealth',
-			'Survival',
+			'Survival'
 		],
-		numPicks: 3,
+		numPicks: 3
 	},
-	source: "ranger.proficiencies",
+	source: 'ranger.proficiencies',
 	effects: [
 		{
-			target: "skills",
-			action: "add",
-			value: "{userChoice}"
+			target: 'skills',
+			action: 'add',
+			value: '{userChoice}'
 		}
 	]
 };
@@ -40,21 +40,16 @@ const fightingStylePrompt: FeaturePrompt = {
 	name: 'Fighting Style',
 	description: 'Choose a fighting style to suit your combat approach.',
 	featureOptions: {
-		placeholderText: "-Choose a Fighting Style-",
-		options: [
-			'Archery',
-			'Defense',
-			'Dueling',
-			'Two-Weapon Fighting'
-		],
+		placeholderText: '-Choose a Fighting Style-',
+		options: ['Archery', 'Defense', 'Dueling', 'Two-Weapon Fighting'],
 		numPicks: 1
 	},
-	source: "ranger",
+	source: 'ranger',
 	effects: [
 		{
-			target: "features",
-			action: "add",
-			value: "{userChoice} Fighting Style"
+			target: 'features',
+			action: 'add',
+			value: '{userChoice} Fighting Style'
 		}
 	]
 };
@@ -66,12 +61,12 @@ const spellcastingPrompt: FeaturePrompt = {
 		You have learned to cast ranger spells using Wisdom as your spellcasting ability. 
 		At level 3, you know three 1st-level spells and have two 1st-level spell slots.
 	`,
-	source: "ranger",
+	source: 'ranger',
 	effects: [
 		{
-			target: "features",
-			action: "add",
-			value: "Spellcasting"
+			target: 'features',
+			action: 'add',
+			value: 'Spellcasting'
 		}
 	]
 };
@@ -81,7 +76,7 @@ const rangerArchetypePrompt: FeaturePrompt = {
 	name: 'Ranger Archetype',
 	description: 'Choose a Ranger Archetype at 3rd level.',
 	featureOptions: {
-		placeholderText: "-Choose an Archetype-",
+		placeholderText: '-Choose an Archetype-',
 		options: [
 			{
 				name: 'Hunter',
@@ -92,20 +87,16 @@ const rangerArchetypePrompt: FeaturePrompt = {
 						name: 'Hunter’s Prey',
 						description: `Choose one of the following options:`,
 						featureOptions: {
-							placeholderText: "-Choose an Option-",
-							options: [
-								'Colossus Slayer',
-								'Giant Killer',
-								'Horde Breaker'
-							],
+							placeholderText: '-Choose an Option-',
+							options: ['Colossus Slayer', 'Giant Killer', 'Horde Breaker'],
 							numPicks: 1
 						},
 						source: 'ranger.hunter',
 						effects: [
 							{
-								target: "features",
-								action: "add",
-								value: "{userChoice}"
+								target: 'features',
+								action: 'add',
+								value: '{userChoice}'
 							}
 						]
 					}
@@ -122,9 +113,9 @@ const rangerArchetypePrompt: FeaturePrompt = {
 						source: 'ranger.beast_master',
 						effects: [
 							{
-								target: "features",
-								action: "add",
-								value: "Ranger’s Companion"
+								target: 'features',
+								action: 'add',
+								value: 'Ranger’s Companion'
 							}
 						]
 					}
@@ -133,12 +124,12 @@ const rangerArchetypePrompt: FeaturePrompt = {
 		],
 		numPicks: 1
 	},
-	source: "ranger",
+	source: 'ranger',
 	effects: [
 		{
-			target: "subclass",
-			action: "set",
-			value: "{userChoice}"
+			target: 'subclass',
+			action: 'set',
+			value: '{userChoice}'
 		}
 	]
 };
@@ -146,7 +137,7 @@ const rangerArchetypePrompt: FeaturePrompt = {
 const classFeaturesPrompt: FeaturePrompt[] = [
 	fightingStylePrompt,
 	spellcastingPrompt,
-	rangerArchetypePrompt,
+	rangerArchetypePrompt
 ];
 
 export const ranger: ClassData = {
@@ -159,11 +150,8 @@ export const ranger: ClassData = {
 	armorProficiencies: ['Light Armor', 'Medium Armor', 'Shields'],
 	weaponProficiencies: ['Simple Weapons', 'Martial Weapons'],
 	startingEquipment: {
-		fixed: ['Explorer\'s pack'],
+		fixed: ["Explorer's pack"],
 		choices: []
 	},
-	classFeatures: [
-		proficienciesPrompt,
-		...classFeaturesPrompt,
-	],
+	classFeatures: [proficienciesPrompt, ...classFeaturesPrompt]
 };

@@ -3,9 +3,7 @@
 	import { onMount } from 'svelte';
 	import FeatureCardList from '$lib/components/FeatureCardList.svelte';
 	import ConflictWarning from '$lib/components/ConflictWarning.svelte';
-	import { 
-		isFeatureIncomplete
-	} from '$lib/components/feature-card-utils';
+	import { isFeatureIncomplete } from '$lib/components/feature-card-utils';
 	import { barbarian } from '$lib/data/classes/barbarian';
 	import { bard } from '$lib/data/classes/bard';
 	import { cleric } from '$lib/data/classes/cleric';
@@ -26,8 +24,18 @@
 	import { character_store } from '$lib/stores/character_store';
 
 	const classes: ClassData[] = [
-		barbarian, bard, cleric, druid, fighter, monk,
-		paladin, ranger, rogue, sorcerer, warlock, wizard
+		barbarian,
+		bard,
+		cleric,
+		druid,
+		fighter,
+		monk,
+		paladin,
+		ranger,
+		rogue,
+		sorcerer,
+		warlock,
+		wizard
 	];
 
 	let selectedClass: ClassData | null = null;
@@ -45,33 +53,14 @@
 		selectionVersion = (selectionVersion + 1) % 1_000_000;
 	}
 
-
-
 	// Current feature list for the selected class
-	$: mergedFeatures = selectedClassData
-		? [...(selectedClassData.classFeatures || [])]
-		: [];
+	$: mergedFeatures = selectedClassData ? [...(selectedClassData.classFeatures || [])] : [];
 
 	// make sure this lives in <script> and stays after isFeatureIncomplete is defined
 	$: featureStatuses = mergedFeatures.map((feature) => ({
-	feature,
-	incomplete: isFeatureIncomplete(feature, featureSelections) // <-- pass the map
+		feature,
+		incomplete: isFeatureIncomplete(feature, featureSelections) // <-- pass the map
 	}));
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	function removeSelectedClass() {
 		if (selectedClassData) {
@@ -98,11 +87,11 @@
 
 			const prefixes = [
 				`class:${selectedClassData.name}`,
-				...allFeatureNames.map(f => `feature:${f}`)
+				...allFeatureNames.map((f) => `feature:${f}`)
 			];
 
 			for (const key of provKeys) {
-				if (prefixes.some(prefix => key.startsWith(prefix))) {
+				if (prefixes.some((prefix) => key.startsWith(prefix))) {
 					revertChanges(state, key);
 				}
 			}
@@ -114,7 +103,6 @@
 		expandedFeatures = new Set();
 		bumpVersion();
 	}
-
 
 	function confirmAddClass() {
 		if (selectedClass) {
@@ -143,17 +131,17 @@
 					const value = effect.value;
 
 					switch (effect.action) {
-						case "add": {
+						case 'add': {
 							const arr = Array.isArray(value) ? value : [value];
 							if (!update[target]) update[target] = [];
 							update[target].push(...arr);
 							break;
 						}
-						case "set": {
+						case 'set': {
 							update[target] = value;
 							break;
 						}
-						case "modify": {
+						case 'modify': {
 							const amount = Number(value);
 							if (!isNaN(amount)) {
 								modify[target] = (modify[target] ?? 0) + amount;
@@ -170,7 +158,6 @@
 			bumpVersion();
 		}
 	}
-
 
 	function calculateMaxHP(hitDie: string | undefined) {
 		if (!hitDie) return 'N/A';
@@ -190,13 +177,6 @@
 		}
 	}
 
-
-
-
-
-
-
-
 	// --- onMount for class feature restoration ---
 	onMount(() => {
 		const state = get(character_store);
@@ -204,13 +184,13 @@
 		if (!state.class) return;
 
 		// Find selected class
-		const found = classes.find(c => c.name === state.class);
+		const found = classes.find((c) => c.name === state.class);
 		if (!found) return;
 
 		selectedClassData = found;
 		featureSelections = {};
 
-		const toSnakeCase = (str: string) => str.toLowerCase().replace(/\s+/g, "_");
+		const toSnakeCase = (str: string) => str.toLowerCase().replace(/\s+/g, '_');
 
 		// Helper: convert stored snake_case value to display label
 		const tryRestoreFromValue = (val: string, optionMap: Map<string, string>) => {
@@ -233,7 +213,10 @@
 
 			const opts = feature.featureOptions?.options || [];
 			const optionMap = new Map(
-				opts.map(o => [toSnakeCase(typeof o === 'string' ? o : o.name), typeof o === 'string' ? o : o.name])
+				opts.map((o) => [
+					toSnakeCase(typeof o === 'string' ? o : o.name),
+					typeof o === 'string' ? o : o.name
+				])
 			);
 
 			const prov = state._provenance || {};
@@ -259,7 +242,7 @@
 									break;
 								}
 							}
-						} else if (typeof arr === "string") {
+						} else if (typeof arr === 'string') {
 							const maybe = tryRestoreFromValue(arr, optionMap);
 							if (maybe) restored = maybe;
 						}
@@ -284,11 +267,11 @@
 
 			// Recurse into nested prompts if any
 			if (feature.featureOptions?.options) {
-				feature.featureOptions.options.forEach(o => {
-					if (typeof o !== "string" && o.nestedPrompts) {
-						const selectedVal = featureSelections[feature.name].find(v => v === o.name);
+				feature.featureOptions.options.forEach((o) => {
+					if (typeof o !== 'string' && o.nestedPrompts) {
+						const selectedVal = featureSelections[feature.name].find((v) => v === o.name);
 						if (selectedVal) {
-							o.nestedPrompts.forEach(nested => restoreFeatureSelection(nested));
+							o.nestedPrompts.forEach((nested) => restoreFeatureSelection(nested));
 						}
 					}
 				});
@@ -296,23 +279,22 @@
 		};
 
 		// Restore all top-level features
-		found.classFeatures?.forEach(feature => restoreFeatureSelection(feature));
+		found.classFeatures?.forEach((feature) => restoreFeatureSelection(feature));
 
 		// Trigger Svelte reactivity
 		featureSelections = { ...featureSelections };
 		bumpVersion();
 	});
-
 </script>
 
 <div class="main-content">
 	<!-- Show conflict warnings for this tab -->
 	<ConflictWarning tabName="class" />
-	
+
 	<p class="intro-text">
-		In Dungeons & Dragons, your character's class determines what they can do.
-		It marks what role your character will play in your party of adventurers.
-		Each class has strengths and weaknesses, so its important to use teamwork!
+		In Dungeons & Dragons, your character's class determines what they can do. It marks what role
+		your character will play in your party of adventurers. Each class has strengths and weaknesses,
+		so its important to use teamwork!
 	</p>
 
 	{#if !selectedClassData}
@@ -323,11 +305,7 @@
 						<img src={classInfo.image} alt={`${classInfo.name} icon`} />
 						<span>{classInfo.name}</span>
 					</div>
-					<img
-						class="card-arrow"
-						src="{base}/basic_icons/blue_next.png"
-						alt="next arrow"
-					/>
+					<img class="card-arrow" src="{base}/basic_icons/blue_next.png" alt="next arrow" />
 				</button>
 			{/each}
 		</div>
@@ -388,17 +366,15 @@
 			<!-- Use shared feature card components -->
 			<FeatureCardList
 				features={mergedFeatures}
-				bind:featureSelections={featureSelections}
-				bind:expandedFeatures={expandedFeatures}
-				selectionVersion={selectionVersion}
+				bind:featureSelections
+				bind:expandedFeatures
+				{selectionVersion}
 				characterStore={character_store}
 				onBumpVersion={() => selectionVersion++}
 			/>
 		</div>
 	{/if}
 </div>
-
-
 
 <style>
 	.main-content {
@@ -568,7 +544,7 @@
 		height: 60px;
 		object-fit: contain;
 		border-radius: 6px;
-		box-shadow: 0 0 5px rgba(0,0,0,0.1);
+		box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 	}
 
 	.selected-class-text {
@@ -613,8 +589,6 @@
 		transition: border-color 0.2s ease; /* smooth transition when state changes */
 	}
 
-
-
 	.popup-footer {
 		padding: 12px 16px;
 		display: flex;
@@ -651,6 +625,4 @@
 	.add-button:hover {
 		background-color: #1b4d20;
 	}
-
-
 </style>

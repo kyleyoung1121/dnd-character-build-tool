@@ -5,18 +5,15 @@ export const noble: BackgroundData = {
 	name: 'Noble',
 	image: base + '/background_icons/noble.jpg',
 	description: 'You understand wealth, power, and privilege.',
-	flavorDescription: 'You carry a noble title, and your family owns land, collects taxes, and wields significant political influence. You might be a pampered aristocrat unfamiliar with work or discomfort, a former merchant just elevated to the nobility, or a disinherited scoundrel with a disproportionate sense of entitlement.',
+	flavorDescription:
+		'You carry a noble title, and your family owns land, collects taxes, and wields significant political influence. You might be a pampered aristocrat unfamiliar with work or discomfort, a former merchant just elevated to the nobility, or a disinherited scoundrel with a disproportionate sense of entitlement.',
 	skillProficiencies: ['History', 'Persuasion'],
 	toolProficiencies: ['One type of gaming set'],
 	languageCount: 1,
-	equipment: [
-		'Fine clothes',
-		'Signet ring',
-		'Scroll of pedigree',
-		'Purse with 25 gp'
-	],
+	equipment: ['Fine clothes', 'Signet ring', 'Scroll of pedigree', 'Purse with 25 gp'],
 	feature: 'Position of Privilege',
-	featureDescription: 'Thanks to your noble birth, people are inclined to think the best of you. You are welcome in high society, and people assume you have the right to be wherever you are. The common folk make every effort to accommodate you and avoid your displeasure, and other people of high birth treat you as a member of the same social sphere.',
+	featureDescription:
+		'Thanks to your noble birth, people are inclined to think the best of you. You are welcome in high society, and people assume you have the right to be wherever you are. The common folk make every effort to accommodate you and avoid your displeasure, and other people of high birth treat you as a member of the same social sphere.',
 	backgroundFeatures: [
 		{
 			name: 'Skill Proficiencies',
@@ -56,7 +53,24 @@ export const noble: BackgroundData = {
 			source: 'background:Noble',
 			featureOptions: {
 				placeholderText: 'Select 1 language',
-				options: ['Common', 'Dwarvish', 'Elvish', 'Giant', 'Gnomish', 'Goblin', 'Halfling', 'Orc', 'Abyssal', 'Celestial', 'Draconic', 'Deep Speech', 'Infernal', 'Primordial', 'Sylvan', 'Undercommon'],
+				options: [
+					'Common',
+					'Dwarvish',
+					'Elvish',
+					'Giant',
+					'Gnomish',
+					'Goblin',
+					'Halfling',
+					'Orc',
+					'Abyssal',
+					'Celestial',
+					'Draconic',
+					'Deep Speech',
+					'Infernal',
+					'Primordial',
+					'Sylvan',
+					'Undercommon'
+				],
 				numPicks: 1
 			},
 			effects: [
@@ -76,19 +90,15 @@ export const noble: BackgroundData = {
 				{
 					target: 'inventory',
 					action: 'add',
-					value: [
-						'Fine clothes',
-						'Signet ring',
-						'Scroll of pedigree',
-						'Purse with 25 gp'
-					]
+					value: ['Fine clothes', 'Signet ring', 'Scroll of pedigree', 'Purse with 25 gp']
 				}
 			]
 		},
 		{
 			name: 'Position of Privilege',
 			id: 'noble_feature',
-			description: 'People are inclined to think the best of you. You are welcome in high society and the common folk make every effort to accommodate you.',
+			description:
+				'People are inclined to think the best of you. You are welcome in high society and the common folk make every effort to accommodate you.',
 			source: 'background:Noble',
 			effects: [
 				{

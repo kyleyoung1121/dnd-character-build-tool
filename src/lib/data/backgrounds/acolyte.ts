@@ -4,8 +4,10 @@ import type { BackgroundData } from '../types/BackgroundData';
 export const acolyte: BackgroundData = {
 	name: 'Acolyte',
 	image: base + '/background_icons/acolyte.jpg',
-	description: 'You have spent your life in service to a temple of a specific god or pantheon of gods.',
-	flavorDescription: 'You acted as an intermediary between the holy and mortal worlds, performing sacred rites and offering sacrifices in order to conduct worshipers into the presence of the divine. You are not necessarily a cleric - performing sacred rites is not the same thing as channeling divine power.',
+	description:
+		'You have spent your life in service to a temple of a specific god or pantheon of gods.',
+	flavorDescription:
+		'You acted as an intermediary between the holy and mortal worlds, performing sacred rites and offering sacrifices in order to conduct worshipers into the presence of the divine. You are not necessarily a cleric - performing sacred rites is not the same thing as channeling divine power.',
 	skillProficiencies: ['Insight', 'Religion'],
 	languageCount: 2,
 	equipment: [
@@ -17,7 +19,8 @@ export const acolyte: BackgroundData = {
 		'Belt pouch with 15 gp'
 	],
 	feature: 'Shelter of the Faithful',
-	featureDescription: 'As an acolyte, you command respect from worshipers of your faith. You can perform ceremonies for your deity. You and your companions can expect free healing and care at temples, shrines, or other established presences of your faith (though you must provide components for spells). Those who share your religion will support you at a modest lifestyle.',
+	featureDescription:
+		'As an acolyte, you command respect from worshipers of your faith. You can perform ceremonies for your deity. You and your companions can expect free healing and care at temples, shrines, or other established presences of your faith (though you must provide components for spells). Those who share your religion will support you at a modest lifestyle.',
 	backgroundFeatures: [
 		{
 			name: 'Skill Proficiencies',
@@ -39,7 +42,24 @@ export const acolyte: BackgroundData = {
 			source: 'background:Acolyte',
 			featureOptions: {
 				placeholderText: 'Select 2 languages',
-				options: ['Common', 'Dwarvish', 'Elvish', 'Giant', 'Gnomish', 'Goblin', 'Halfling', 'Orc', 'Abyssal', 'Celestial', 'Draconic', 'Deep Speech', 'Infernal', 'Primordial', 'Sylvan', 'Undercommon'],
+				options: [
+					'Common',
+					'Dwarvish',
+					'Elvish',
+					'Giant',
+					'Gnomish',
+					'Goblin',
+					'Halfling',
+					'Orc',
+					'Abyssal',
+					'Celestial',
+					'Draconic',
+					'Deep Speech',
+					'Infernal',
+					'Primordial',
+					'Sylvan',
+					'Undercommon'
+				],
 				numPicks: 2
 			},
 			effects: [
@@ -53,7 +73,8 @@ export const acolyte: BackgroundData = {
 		{
 			name: 'Equipment',
 			id: 'acolyte_equipment',
-			description: 'You start with holy symbol, prayer book, incense, vestments, common clothes, and 15 gp.',
+			description:
+				'You start with holy symbol, prayer book, incense, vestments, common clothes, and 15 gp.',
 			source: 'background:Acolyte',
 			effects: [
 				{
@@ -73,7 +94,8 @@ export const acolyte: BackgroundData = {
 		{
 			name: 'Shelter of the Faithful',
 			id: 'acolyte_feature',
-			description: 'You command respect from worshipers of your faith and can expect free healing and care at temples. Those who share your religion will support you at a modest lifestyle.',
+			description:
+				'You command respect from worshipers of your faith and can expect free healing and care at temples. Those who share your religion will support you at a modest lifestyle.',
 			source: 'background:Acolyte',
 			effects: [
 				{

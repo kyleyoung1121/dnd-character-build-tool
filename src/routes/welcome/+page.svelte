@@ -7,14 +7,18 @@
 	}
 </script>
 
-<div class="min-h-screen flex flex-col items-center justify-center text-center px-4 bg-gray-100">
-	<h1 class="text-3xl md:text-4xl font-bold mb-6">Welcome to the Ethics and Dragons Character Builder!</h1>
-	<p class="text-lg md:text-xl text-gray-700 mb-8 max-w-xl">
-		What kind of character do you want to play? What are they good at? (magic, nature, being sneaky, fighting) What species could they be?
+<div class="flex min-h-screen flex-col items-center justify-center bg-gray-100 px-4 text-center">
+	<h1 class="mb-6 text-3xl font-bold md:text-4xl">
+		Welcome to the Ethics and Dragons Character Builder!
+	</h1>
+	<p class="mb-8 max-w-xl text-lg text-gray-700 md:text-xl">
+		What kind of character do you want to play? What are they good at? (magic, nature, being sneaky,
+		fighting) What species could they be?
 	</p>
-	<button 
-		on:click={start} 
-		class="px-6 py-3 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition">
+	<button
+		on:click={start}
+		class="rounded-lg bg-blue-600 px-6 py-3 text-white shadow-md transition hover:bg-blue-700"
+	>
 		Start Character Creation
 	</button>
 </div>

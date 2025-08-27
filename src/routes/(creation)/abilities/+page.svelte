@@ -3,55 +3,97 @@
 	import { get } from 'svelte/store';
 
 	const standardArray = [15, 14, 13, 12, 10, 8];
-	const stats = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
+	const stats = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
 
 	// Simplified class ability score recommendations
 	const classRecommendations: Record<string, { abilities: string[] }> = {
-		'Barbarian': { abilities: ['strength', 'constitution', 'dexterity'] },
-		'Bard': { abilities: ['charisma', 'dexterity', 'constitution'] },
-		'Cleric': { abilities: ['wisdom', 'constitution', 'strength'] },
-		'Druid': { abilities: ['wisdom', 'constitution', 'dexterity'] },
-		'Fighter': { abilities: ['strength', 'dexterity', 'constitution'] },
-		'Monk': { abilities: ['dexterity', 'wisdom', 'constitution'] },
-		'Paladin': { abilities: ['strength', 'charisma', 'constitution'] },
-		'Ranger': { abilities: ['dexterity', 'wisdom', 'constitution'] },
-		'Rogue': { abilities: ['dexterity', 'constitution', 'wisdom'] },
-		'Sorcerer': { abilities: ['charisma', 'constitution', 'dexterity'] },
-		'Warlock': { abilities: ['charisma', 'constitution', 'dexterity'] },
-		'Wizard': { abilities: ['intelligence', 'constitution', 'dexterity'] }
+		Barbarian: { abilities: ['strength', 'constitution', 'dexterity'] },
+		Bard: { abilities: ['charisma', 'dexterity', 'constitution'] },
+		Cleric: { abilities: ['wisdom', 'constitution', 'strength'] },
+		Druid: { abilities: ['wisdom', 'constitution', 'dexterity'] },
+		Fighter: { abilities: ['strength', 'dexterity', 'constitution'] },
+		Monk: { abilities: ['dexterity', 'wisdom', 'constitution'] },
+		Paladin: { abilities: ['strength', 'charisma', 'constitution'] },
+		Ranger: { abilities: ['dexterity', 'wisdom', 'constitution'] },
+		Rogue: { abilities: ['dexterity', 'constitution', 'wisdom'] },
+		Sorcerer: { abilities: ['charisma', 'constitution', 'dexterity'] },
+		Warlock: { abilities: ['charisma', 'constitution', 'dexterity'] },
+		Wizard: { abilities: ['intelligence', 'constitution', 'dexterity'] }
 	};
 
 	// Ability score information for popups
-	const abilityInfo: Record<string, { title: string, description: string, affects: string[] }> = {
+	const abilityInfo: Record<string, { title: string; description: string; affects: string[] }> = {
 		strength: {
 			title: 'Strength',
-			description: 'Measures your character\'s physical power and raw muscle. Strength determines how much you can carry and influences melee weapon attacks.',
-			affects: ['Melee weapon attack rolls', 'Melee weapon damage rolls', 'Carrying capacity', 'Athletics skill checks', 'Jumping distance']
+			description:
+				"Measures your character's physical power and raw muscle. Strength determines how much you can carry and influences melee weapon attacks.",
+			affects: [
+				'Melee weapon attack rolls',
+				'Melee weapon damage rolls',
+				'Carrying capacity',
+				'Athletics skill checks',
+				'Jumping distance'
+			]
 		},
 		dexterity: {
 			title: 'Dexterity',
-			description: 'Measures agility, reflexes, and balance. Dexterity affects your Armor Class, initiative, and ranged attacks.',
-			affects: ['Armor Class (when not wearing heavy armor)', 'Initiative rolls', 'Ranged weapon attacks', 'Acrobatics and Stealth skills', 'Dexterity saving throws']
+			description:
+				'Measures agility, reflexes, and balance. Dexterity affects your Armor Class, initiative, and ranged attacks.',
+			affects: [
+				'Armor Class (when not wearing heavy armor)',
+				'Initiative rolls',
+				'Ranged weapon attacks',
+				'Acrobatics and Stealth skills',
+				'Dexterity saving throws'
+			]
 		},
 		constitution: {
 			title: 'Constitution',
-			description: 'Measures health, stamina, and vital force. Constitution affects your hit points and resistance to disease and poison.',
-			affects: ['Hit points per level', 'Constitution saving throws', 'Concentration checks', 'Resistance to disease and poison', 'Death saving throws']
+			description:
+				'Measures health, stamina, and vital force. Constitution affects your hit points and resistance to disease and poison.',
+			affects: [
+				'Hit points per level',
+				'Constitution saving throws',
+				'Concentration checks',
+				'Resistance to disease and poison',
+				'Death saving throws'
+			]
 		},
 		intelligence: {
 			title: 'Intelligence',
-			description: 'Measures reasoning ability, memory, and analytical thinking. Intelligence determines your ability to learn and recall information.',
-			affects: ['Number of languages known', 'Investigation and History skills', 'Wizard spell preparation', 'Intelligence saving throws', 'General knowledge and reasoning']
+			description:
+				'Measures reasoning ability, memory, and analytical thinking. Intelligence determines your ability to learn and recall information.',
+			affects: [
+				'Number of languages known',
+				'Investigation and History skills',
+				'Wizard spell preparation',
+				'Intelligence saving throws',
+				'General knowledge and reasoning'
+			]
 		},
 		wisdom: {
 			title: 'Wisdom',
-			description: 'Measures awareness, intuition, and attunement to surroundings. Wisdom affects perception and insight into others.',
-			affects: ['Perception and Insight skills', 'Wisdom saving throws', 'Cleric and Druid spell preparation', 'Passive Perception', 'Animal Handling and Survival']
+			description:
+				'Measures awareness, intuition, and attunement to surroundings. Wisdom affects perception and insight into others.',
+			affects: [
+				'Perception and Insight skills',
+				'Wisdom saving throws',
+				'Cleric and Druid spell preparation',
+				'Passive Perception',
+				'Animal Handling and Survival'
+			]
 		},
 		charisma: {
 			title: 'Charisma',
-			description: 'Measures force of personality, leadership ability, and confidence. Charisma affects social interactions and certain spellcasting.',
-			affects: ['Social skill checks (Persuasion, Deception, Intimidation)', 'Charisma saving throws', 'Bard, Sorcerer, Warlock spells', 'Leadership and performance', 'Number of followers/hirelings']
+			description:
+				'Measures force of personality, leadership ability, and confidence. Charisma affects social interactions and certain spellcasting.',
+			affects: [
+				'Social skill checks (Persuasion, Deception, Intimidation)',
+				'Charisma saving throws',
+				'Bard, Sorcerer, Warlock spells',
+				'Leadership and performance',
+				'Number of followers/hirelings'
+			]
 		}
 	};
 
@@ -59,7 +101,7 @@
 	let showPopup = false;
 	let popupAbility: string | null = null;
 	let popupPosition = { x: 0, y: 0 };
-	
+
 	// Modifier popup state management
 	let showModifierPopup = false;
 	let modifierPopupPosition = { x: 0, y: 0 };
@@ -71,10 +113,10 @@
 		const padding = 20;
 		const viewportWidth = window.innerWidth;
 		const viewportHeight = window.innerHeight;
-		
+
 		let x = event.clientX + 10;
 		let y = event.clientY - 10;
-		
+
 		// Keep popup within viewport bounds
 		if (x + maxWidth > viewportWidth - padding) {
 			x = event.clientX - maxWidth - 10;
@@ -85,11 +127,11 @@
 		if (y > viewportHeight - 200) {
 			y = viewportHeight - 200;
 		}
-		
+
 		popupPosition.x = Math.max(padding, x);
 		popupPosition.y = Math.max(padding, y);
 		showPopup = true;
-		
+
 		// Add keyboard listener for escape key
 		document.addEventListener('keydown', handleKeydown);
 	}
@@ -106,17 +148,17 @@
 		// Remove keyboard listener
 		document.removeEventListener('keydown', handleKeydown);
 	}
-	
+
 	function showModifierInfo(event: MouseEvent) {
 		// Position popup relative to viewport, with bounds checking
 		const maxWidth = 300;
 		const padding = 20;
 		const viewportWidth = window.innerWidth;
 		const viewportHeight = window.innerHeight;
-		
+
 		let x = event.clientX + 10;
 		let y = event.clientY - 10;
-		
+
 		// Keep popup within viewport bounds
 		if (x + maxWidth > viewportWidth - padding) {
 			x = event.clientX - maxWidth - 10;
@@ -127,21 +169,21 @@
 		if (y > viewportHeight - 300) {
 			y = viewportHeight - 300;
 		}
-		
+
 		modifierPopupPosition.x = Math.max(padding, x);
 		modifierPopupPosition.y = Math.max(padding, y);
 		showModifierPopup = true;
-		
+
 		// Add keyboard listener for escape key
 		document.addEventListener('keydown', handleModifierKeydown);
 	}
-	
+
 	function handleModifierKeydown(event: KeyboardEvent) {
 		if (event.key === 'Escape') {
 			hideModifierInfo();
 		}
 	}
-	
+
 	function hideModifierInfo() {
 		showModifierPopup = false;
 		// Remove keyboard listener
@@ -152,11 +194,16 @@
 	$: currentCharacter = $character_store;
 	$: selectedClass = currentCharacter.class;
 	$: selectedSubclass = currentCharacter.subclass;
-	
+
 	// Dynamic class recommendations (handles Rogue Arcane Trickster)
-	$: classRecommendation = selectedClass ? getClassRecommendation(selectedClass, selectedSubclass) : null;
-	
-	function getClassRecommendation(className: string, subclass?: string): { abilities: string[] } | null {
+	$: classRecommendation = selectedClass
+		? getClassRecommendation(selectedClass, selectedSubclass)
+		: null;
+
+	function getClassRecommendation(
+		className: string,
+		subclass?: string
+	): { abilities: string[] } | null {
 		if (className === 'Rogue' && subclass === 'Arcane Trickster') {
 			return { abilities: ['dexterity', 'constitution', 'intelligence'] };
 		}
@@ -182,35 +229,32 @@
 		charisma: 0
 	};
 
+	$: {
+		const state = get(character_store) as any; // <-- treat as 'any' for TS
+		const provenance = state._provenance ?? {};
 
+		// Reset bonuses
+		bonuses = {
+			strength: 0,
+			dexterity: 0,
+			constitution: 0,
+			intelligence: 0,
+			wisdom: 0,
+			charisma: 0
+		};
 
-    $: {
-        const state = get(character_store) as any; // <-- treat as 'any' for TS
-        const provenance = state._provenance ?? {};
-
-        // Reset bonuses
-        bonuses = {
-            strength: 0,
-            dexterity: 0,
-            constitution: 0,
-            intelligence: 0,
-            wisdom: 0,
-            charisma: 0
-        };
-
-        // Sum all _mods
-        for (const key in provenance) {
-            const mods = provenance[key]?._mods;
-            if (mods) {
-                for (const stat of stats) {
-                    if (mods[stat] != null) {
-                        bonuses[stat] += mods[stat];
-                    }
-                }
-            }
-        }
-    }
-
+		// Sum all _mods
+		for (const key in provenance) {
+			const mods = provenance[key]?._mods;
+			if (mods) {
+				for (const stat of stats) {
+					if (mods[stat] != null) {
+						bonuses[stat] += mods[stat];
+					}
+				}
+			}
+		}
+	}
 
 	// Used scores for dropdown filtering
 	$: usedScores = Object.values(selectedScores).filter((s) => s !== null);
@@ -220,7 +264,6 @@
 		return mod >= 0 ? `+${mod}` : `${mod}`;
 	}
 </script>
-
 
 <div class="container">
 	<!-- Class Recommendation Card -->
@@ -244,14 +287,14 @@
 
 	<div class="card ability-card mt-4">
 		<!-- Table Header -->
-		<div class="grid grid-cols-5 gap-4 font-bold border-b pb-2 text-gray-700">
+		<div class="grid grid-cols-5 gap-4 border-b pb-2 font-bold text-gray-700">
 			<div class="text-center">Ability</div>
 			<div class="text-center">Score</div>
 			<div class="text-center">Species Bonus</div>
 			<div class="text-center">Total</div>
 			<div class="text-center">
-				<button 
-					class="modifier-header-btn cursor-pointer hover:text-indigo-600 hover:underline focus:outline-none focus:text-indigo-600 transition-colors"
+				<button
+					class="modifier-header-btn cursor-pointer transition-colors hover:text-indigo-600 hover:underline focus:text-indigo-600 focus:outline-none"
 					on:click={(e) => showModifierInfo(e)}
 					title="Click for more information about modifiers"
 				>
@@ -262,9 +305,11 @@
 
 		<!-- Table Rows -->
 		{#each stats as stat}
-			<div class="grid grid-cols-5 gap-4 items-center py-3 border-b hover:bg-gray-50 transition-colors">
-				<button 
-					class="ability-name-btn capitalize font-medium text-gray-800 text-center cursor-pointer hover:text-indigo-600 hover:underline focus:outline-none focus:text-indigo-600 transition-colors"
+			<div
+				class="grid grid-cols-5 items-center gap-4 border-b py-3 transition-colors hover:bg-gray-50"
+			>
+				<button
+					class="ability-name-btn cursor-pointer text-center font-medium text-gray-800 capitalize transition-colors hover:text-indigo-600 hover:underline focus:text-indigo-600 focus:outline-none"
 					on:click={(e) => showAbilityInfo(stat, e)}
 					title="Click for more information about {stat}"
 				>
@@ -274,7 +319,7 @@
 				<!-- Dropdown -->
 				<select
 					bind:value={selectedScores[stat]}
-					class="border rounded px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-indigo-200"
+					class="w-full rounded border px-2 py-1 focus:ring-2 focus:ring-indigo-200 focus:outline-none"
 				>
 					<option value={null}>--</option>
 					{#each standardArray as num}
@@ -285,7 +330,7 @@
 				</select>
 
 				<!-- Bonus -->
-				<div class="text-center text-gray-700 font-semibold">
+				<div class="text-center font-semibold text-gray-700">
 					{#if bonuses[stat] > 0}
 						+{bonuses[stat]}
 					{:else if bonuses[stat] < 0}
@@ -296,13 +341,15 @@
 				</div>
 
 				<!-- Total -->
-				<div class="text-center text-gray-800 font-semibold">
-					{selectedScores[stat] !== null ? selectedScores[stat] + (bonuses[stat] ?? 0) : ""}
+				<div class="text-center font-semibold text-gray-800">
+					{selectedScores[stat] !== null ? selectedScores[stat] + (bonuses[stat] ?? 0) : ''}
 				</div>
 
 				<!-- Modifier -->
-				<div class="text-center font-mono text-indigo-600 font-bold">
-					{selectedScores[stat] !== null ? getModifier(selectedScores[stat] + (bonuses[stat] ?? 0)) : ""}
+				<div class="text-center font-mono font-bold text-indigo-600">
+					{selectedScores[stat] !== null
+						? getModifier(selectedScores[stat] + (bonuses[stat] ?? 0))
+						: ''}
 				</div>
 			</div>
 		{/each}
@@ -311,8 +358,8 @@
 
 <!-- Ability Info Popup -->
 {#if showPopup && popupAbility && abilityInfo[popupAbility]}
-	<div 
-		class="ability-info-popup" 
+	<div
+		class="ability-info-popup"
 		style="left: {popupPosition.x}px; top: {popupPosition.y}px;"
 		on:click={hideAbilityInfo}
 		on:keydown={(e) => e.key === 'Escape' && hideAbilityInfo()}
@@ -346,8 +393,8 @@
 
 <!-- Modifier Info Popup -->
 {#if showModifierPopup}
-	<div 
-		class="ability-info-popup" 
+	<div
+		class="ability-info-popup"
 		style="left: {modifierPopupPosition.x}px; top: {modifierPopupPosition.y}px;"
 		on:click={hideModifierInfo}
 		on:keydown={(e) => e.key === 'Escape' && hideModifierInfo()}
@@ -360,7 +407,10 @@
 				<button class="popup-close" on:click={hideModifierInfo}>×</button>
 			</div>
 			<div class="popup-body">
-				<p class="popup-description">Modifiers represent the bonus or penalty you add to dice rolls based on your ability scores.</p>
+				<p class="popup-description">
+					Modifiers represent the bonus or penalty you add to dice rolls based on your ability
+					scores.
+				</p>
 				<div class="popup-section">
 					<div class="modifier-table">
 						<div class="modifier-table-header">
@@ -622,8 +672,6 @@
 	.popup-affects-list li:last-child {
 		margin-bottom: 0;
 	}
-
-
 
 	/* Validation card styles */
 	.validation-card {

@@ -12,16 +12,16 @@ const proficienciesPrompt: FeaturePrompt = {
 		Skills: Choose two from History, Insight, Medicine, Persuasion, Religion
 	`,
 	featureOptions: {
-		placeholderText: "Select two skills",
+		placeholderText: 'Select two skills',
 		options: ['History', 'Insight', 'Medicine', 'Persuasion', 'Religion'],
-		numPicks: 2,
+		numPicks: 2
 	},
-	source: "cleric.proficiencies",
+	source: 'cleric.proficiencies',
 	effects: [
 		{
-			target: "skills",
-			action: "add",
-			value: "{userChoice}"
+			target: 'skills',
+			action: 'add',
+			value: '{userChoice}'
 		}
 	]
 };
@@ -33,12 +33,12 @@ const spellcastingPrompt: FeaturePrompt = {
 		You can prepare and cast spells using Wisdom as your spellcasting ability. 
 		You know three cantrips and have prepared a number of spells equal to your Wisdom modifier + cleric level.
 	`,
-	source: "cleric",
+	source: 'cleric',
 	effects: [
 		{
-			target: "features",
-			action: "add",
-			value: "Spellcasting"
+			target: 'features',
+			action: 'add',
+			value: 'Spellcasting'
 		}
 	]
 };
@@ -50,12 +50,12 @@ const channelDivinityPrompt: FeaturePrompt = {
 		Starting at 2nd level, you can use Channel Divinity to fuel magical effects. 
 		You have one use per short or long rest.
 	`,
-	source: "cleric",
+	source: 'cleric',
 	effects: [
 		{
-			target: "features",
-			action: "add",
-			value: "Channel Divinity"
+			target: 'features',
+			action: 'add',
+			value: 'Channel Divinity'
 		}
 	]
 };
@@ -63,99 +63,85 @@ const channelDivinityPrompt: FeaturePrompt = {
 const divineDomainPrompt: FeaturePrompt = {
 	name: 'Divine Domain',
 	id: 'cleric_divine_domain_01',
-	description: 'Choose a Divine Domain at 1st level. Your choice grants domain features at 1st and 2nd level.',
+	description:
+		'Choose a Divine Domain at 1st level. Your choice grants domain features at 1st and 2nd level.',
 	featureOptions: {
-		placeholderText: "-Choose a Domain-",
+		placeholderText: '-Choose a Domain-',
 		options: [
 			{
-				name: "Life Domain",
+				name: 'Life Domain',
 				optionDescription: `The Life Domain emphasizes healing and protection.`,
 				nestedPrompts: [
 					{
-						name: "Bonus Proficiencies",
-						id: "cleric_life_armor_01",
-						description: "You gain proficiency with heavy armor.",
-						source: "cleric.life_domain",
-						effects: [
-							{ target: "proficiencies", action: "add", value: "Heavy Armor" }
-						]
+						name: 'Bonus Proficiencies',
+						id: 'cleric_life_armor_01',
+						description: 'You gain proficiency with heavy armor.',
+						source: 'cleric.life_domain',
+						effects: [{ target: 'proficiencies', action: 'add', value: 'Heavy Armor' }]
 					},
 					{
-						name: "Disciple of Life",
-						id: "cleric_life_healing_01",
+						name: 'Disciple of Life',
+						id: 'cleric_life_healing_01',
 						description: `Your healing spells are more effective, adding extra hit points.`,
-						source: "cleric.life_domain",
-						effects: [
-							{ target: "features", action: "add", value: "Disciple of Life" }
-						]
+						source: 'cleric.life_domain',
+						effects: [{ target: 'features', action: 'add', value: 'Disciple of Life' }]
 					}
 				]
 			},
 			{
-				name: "Light Domain",
+				name: 'Light Domain',
 				optionDescription: `The Light Domain harnesses the power of fire and radiance.`,
 				nestedPrompts: [
 					{
-						name: "Bonus Cantrip",
-						id: "cleric_light_cantrip_01",
-						description: "You learn the Light cantrip.",
-						source: "cleric.light_domain",
-						effects: [
-							{ target: "spells", action: "add", value: "Light" }
-						]
+						name: 'Bonus Cantrip',
+						id: 'cleric_light_cantrip_01',
+						description: 'You learn the Light cantrip.',
+						source: 'cleric.light_domain',
+						effects: [{ target: 'spells', action: 'add', value: 'Light' }]
 					},
 					{
-						name: "Warding Flare",
-						id: "cleric_light_flare_01",
+						name: 'Warding Flare',
+						id: 'cleric_light_flare_01',
 						description: `You can impose disadvantage on an attacker as a reaction.`,
-						source: "cleric.light_domain",
-						effects: [
-							{ target: "features", action: "add", value: "Warding Flare" }
-						]
+						source: 'cleric.light_domain',
+						effects: [{ target: 'features', action: 'add', value: 'Warding Flare' }]
 					}
 				]
 			},
 			{
-				name: "Trickery Domain",
+				name: 'Trickery Domain',
 				optionDescription: `The Trickery Domain focuses on deception and stealth.`,
 				nestedPrompts: [
 					{
-						name: "Bonus Proficiencies",
-						id: "cleric_trickery_skill_01",
-						description: "You gain proficiency with the Stealth skill.",
-						source: "cleric.trickery_domain",
-						effects: [
-							{ target: "skills", action: "add", value: "Stealth" }
-						]
+						name: 'Bonus Proficiencies',
+						id: 'cleric_trickery_skill_01',
+						description: 'You gain proficiency with the Stealth skill.',
+						source: 'cleric.trickery_domain',
+						effects: [{ target: 'skills', action: 'add', value: 'Stealth' }]
 					},
 					{
-						name: "Blessing of the Trickster",
-						id: "cleric_trickery_feature_01",
+						name: 'Blessing of the Trickster',
+						id: 'cleric_trickery_feature_01',
 						description: `You can grant advantage on Stealth checks to an ally.`,
-						source: "cleric.trickery_domain",
-						effects: [
-							{ target: "features", action: "add", value: "Blessing of the Trickster" }
-						]
+						source: 'cleric.trickery_domain',
+						effects: [{ target: 'features', action: 'add', value: 'Blessing of the Trickster' }]
 					}
 				]
 			}
 		],
-		numPicks: 1,
+		numPicks: 1
 	},
-	source: "cleric",
+	source: 'cleric',
 	effects: [
 		{
-			target: "subclass",
-			action: "set",
-			value: "{userChoice}"
+			target: 'subclass',
+			action: 'set',
+			value: '{userChoice}'
 		}
 	]
 };
 
-const classFeaturesPrompt: FeaturePrompt[] = [
-	spellcastingPrompt,
-	channelDivinityPrompt,
-];
+const classFeaturesPrompt: FeaturePrompt[] = [spellcastingPrompt, channelDivinityPrompt];
 
 export const cleric: ClassData = {
 	name: 'Cleric',
@@ -167,12 +153,8 @@ export const cleric: ClassData = {
 	armorProficiencies: ['Light Armor', 'Medium Armor', 'Shields'],
 	weaponProficiencies: ['Simple Weapons'],
 	startingEquipment: {
-		fixed: ['Explorer\'s pack'],
+		fixed: ["Explorer's pack"],
 		choices: []
 	},
-	classFeatures: [
-		proficienciesPrompt,
-		...classFeaturesPrompt,
-		divineDomainPrompt,
-	],
+	classFeatures: [proficienciesPrompt, ...classFeaturesPrompt, divineDomainPrompt]
 };

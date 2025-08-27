@@ -5,7 +5,8 @@ export const sage: BackgroundData = {
 	name: 'Sage',
 	image: base + '/background_icons/sage.jpg',
 	description: 'You spent years learning the lore of the multiverse.',
-	flavorDescription: 'You scoured manuscripts, studied scrolls, and listened to the greatest experts on the subjects that interest you. Your efforts have made you a master in your fields of study. You might be a librarian, wizard\'s apprentice, or student of an obscure school of magical theory.',
+	flavorDescription:
+		"You scoured manuscripts, studied scrolls, and listened to the greatest experts on the subjects that interest you. Your efforts have made you a master in your fields of study. You might be a librarian, wizard's apprentice, or student of an obscure school of magical theory.",
 	skillProficiencies: ['Arcana', 'History'],
 	languageCount: 2,
 	equipment: [
@@ -17,7 +18,8 @@ export const sage: BackgroundData = {
 		'Belt pouch with 10 gp'
 	],
 	feature: 'Researcher',
-	featureDescription: 'When you attempt to learn or recall a piece of lore, if you do not know that information, you often know where and from whom you can obtain it. Usually, this information comes from a library, scriptorium, university, or a sage or other learned person or creature.',
+	featureDescription:
+		'When you attempt to learn or recall a piece of lore, if you do not know that information, you often know where and from whom you can obtain it. Usually, this information comes from a library, scriptorium, university, or a sage or other learned person or creature.',
 	backgroundFeatures: [
 		{
 			name: 'Skill Proficiencies',
@@ -39,7 +41,24 @@ export const sage: BackgroundData = {
 			source: 'background:Sage',
 			featureOptions: {
 				placeholderText: 'Select 2 languages',
-				options: ['Common', 'Dwarvish', 'Elvish', 'Giant', 'Gnomish', 'Goblin', 'Halfling', 'Orc', 'Abyssal', 'Celestial', 'Draconic', 'Deep Speech', 'Infernal', 'Primordial', 'Sylvan', 'Undercommon'],
+				options: [
+					'Common',
+					'Dwarvish',
+					'Elvish',
+					'Giant',
+					'Gnomish',
+					'Goblin',
+					'Halfling',
+					'Orc',
+					'Abyssal',
+					'Celestial',
+					'Draconic',
+					'Deep Speech',
+					'Infernal',
+					'Primordial',
+					'Sylvan',
+					'Undercommon'
+				],
 				numPicks: 2
 			},
 			effects: [
@@ -53,7 +72,8 @@ export const sage: BackgroundData = {
 		{
 			name: 'Equipment',
 			id: 'sage_equipment',
-			description: 'You start with ink, quill, small knife, letter from dead colleague, common clothes, and 10 gp.',
+			description:
+				'You start with ink, quill, small knife, letter from dead colleague, common clothes, and 10 gp.',
 			source: 'background:Sage',
 			effects: [
 				{
@@ -73,7 +93,8 @@ export const sage: BackgroundData = {
 		{
 			name: 'Researcher',
 			id: 'sage_feature',
-			description: 'When you don\'t know information, you often know where and from whom you can obtain it, usually from libraries, universities, or other learned persons.',
+			description:
+				"When you don't know information, you often know where and from whom you can obtain it, usually from libraries, universities, or other learned persons.",
 			source: 'background:Sage',
 			effects: [
 				{

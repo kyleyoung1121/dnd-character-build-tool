@@ -5,16 +5,14 @@ export const criminal: BackgroundData = {
 	name: 'Criminal',
 	image: base + '/background_icons/criminal.jpg',
 	description: 'You are an experienced criminal with a history of breaking the law.',
-	flavorDescription: "You have spent a lot of time among other criminals and still have contacts within the criminal underworld. You're far closer than most people to the world of murder, theft, and violence that pervades the underbelly of civilization, and you have survived by flouting the rules and regulations of society.",
+	flavorDescription:
+		"You have spent a lot of time among other criminals and still have contacts within the criminal underworld. You're far closer than most people to the world of murder, theft, and violence that pervades the underbelly of civilization, and you have survived by flouting the rules and regulations of society.",
 	skillProficiencies: ['Deception', 'Stealth'],
-	toolProficiencies: ['One type of gaming set', 'Thieves\' tools'],
-	equipment: [
-		'Crowbar',
-		'Dark common clothes with hood',
-		'Belt pouch with 15 gp'
-	],
+	toolProficiencies: ['One type of gaming set', "Thieves' tools"],
+	equipment: ['Crowbar', 'Dark common clothes with hood', 'Belt pouch with 15 gp'],
 	feature: 'Criminal Contact',
-	featureDescription: 'You have a reliable and trustworthy contact who acts as your liaison to a network of other criminals. You know how to get messages to and from your contact, even over great distances; specifically, you know the local messengers, corrupt caravan masters, and seedy sailors who can deliver messages for you.',
+	featureDescription:
+		'You have a reliable and trustworthy contact who acts as your liaison to a network of other criminals. You know how to get messages to and from your contact, even over great distances; specifically, you know the local messengers, corrupt caravan masters, and seedy sailors who can deliver messages for you.',
 	backgroundFeatures: [
 		{
 			name: 'Skill Proficiencies',
@@ -32,7 +30,7 @@ export const criminal: BackgroundData = {
 		{
 			name: 'Tool Proficiencies',
 			id: 'criminal_tools',
-			description: 'You gain proficiency with one type of gaming set and thieves\' tools.',
+			description: "You gain proficiency with one type of gaming set and thieves' tools.",
 			source: 'background:Criminal',
 			featureOptions: {
 				placeholderText: 'Select 1 gaming set',
@@ -43,7 +41,7 @@ export const criminal: BackgroundData = {
 				{
 					target: 'proficiencies',
 					action: 'add',
-					value: ['{userChoice}', 'Thieves\' tools']
+					value: ['{userChoice}', "Thieves' tools"]
 				}
 			]
 		},
@@ -56,18 +54,15 @@ export const criminal: BackgroundData = {
 				{
 					target: 'inventory',
 					action: 'add',
-					value: [
-						'Crowbar',
-						'Dark common clothes with hood',
-						'Belt pouch with 15 gp'
-					]
+					value: ['Crowbar', 'Dark common clothes with hood', 'Belt pouch with 15 gp']
 				}
 			]
 		},
 		{
 			name: 'Criminal Contact',
 			id: 'criminal_feature',
-			description: 'You have a reliable contact within the criminal underworld who can deliver messages and provide information about criminal activities.',
+			description:
+				'You have a reliable contact within the criminal underworld who can deliver messages and provide information about criminal activities.',
 			source: 'background:Criminal',
 			effects: [
 				{

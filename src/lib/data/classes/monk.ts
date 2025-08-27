@@ -12,23 +12,16 @@ const proficienciesPrompt: FeaturePrompt = {
 		Skills: Choose two from Acrobatics, Athletics, History, Insight, Religion, and Stealth
 	`,
 	featureOptions: {
-		placeholderText: "Select skills",
-		options: [
-			'Acrobatics',
-			'Athletics',
-			'History',
-			'Insight',
-			'Religion',
-			'Stealth',
-		],
-		numPicks: 2,
+		placeholderText: 'Select skills',
+		options: ['Acrobatics', 'Athletics', 'History', 'Insight', 'Religion', 'Stealth'],
+		numPicks: 2
 	},
-	source: "monk.proficiencies",
+	source: 'monk.proficiencies',
 	effects: [
 		{
-			target: "skills",
-			action: "add",
-			value: "{userChoice}"
+			target: 'skills',
+			action: 'add',
+			value: '{userChoice}'
 		}
 	]
 };
@@ -41,12 +34,12 @@ const martialArtsPrompt: FeaturePrompt = {
 		You can roll a d4 in place of the normal damage of your unarmed strike or monk weapon. This die increases as you level.
 		When you use the Attack action with an unarmed strike or monk weapon on your turn, you can make one unarmed strike as a bonus action.
 	`,
-	source: "monk",
+	source: 'monk',
 	effects: [
 		{
-			target: "features",
-			action: "add",
-			value: "Martial Arts"
+			target: 'features',
+			action: 'add',
+			value: 'Martial Arts'
 		}
 	]
 };
@@ -59,12 +52,12 @@ const kiPrompt: FeaturePrompt = {
 		You have a number of ki points equal to your monk level, which you can spend to use features like Flurry of Blows, Patient Defense, and Step of the Wind.
 		Ki points are regained after a short or long rest.
 	`,
-	source: "monk",
+	source: 'monk',
 	effects: [
 		{
-			target: "features",
-			action: "add",
-			value: "Ki"
+			target: 'features',
+			action: 'add',
+			value: 'Ki'
 		}
 	]
 };
@@ -75,12 +68,12 @@ const unarmoredMovementPrompt: FeaturePrompt = {
 	description: `
 		Starting at 2nd level, your speed increases by 10 feet while you are not wearing armor or wielding a shield.
 	`,
-	source: "monk",
+	source: 'monk',
 	effects: [
 		{
-			target: "features",
-			action: "add",
-			value: "Unarmored Movement"
+			target: 'features',
+			action: 'add',
+			value: 'Unarmored Movement'
 		}
 	]
 };
@@ -90,7 +83,7 @@ const monasticTraditionPrompt: FeaturePrompt = {
 	name: 'Monastic Tradition',
 	description: 'Choose a monastic tradition (subclass) at 3rd level.',
 	featureOptions: {
-		placeholderText: "-Choose a Tradition-",
+		placeholderText: '-Choose a Tradition-',
 		options: [
 			{
 				name: 'Way of the Open Hand',
@@ -105,12 +98,12 @@ const monasticTraditionPrompt: FeaturePrompt = {
 							- It must make a Strength saving throw or be pushed 15 feet away.
 							- It can’t take reactions until the end of your next turn.
 						`,
-						source: "monk.open_hand",
+						source: 'monk.open_hand',
 						effects: [
 							{
-								target: "features",
-								action: "add",
-								value: "Open Hand Technique"
+								target: 'features',
+								action: 'add',
+								value: 'Open Hand Technique'
 							}
 						]
 					}
@@ -126,12 +119,12 @@ const monasticTraditionPrompt: FeaturePrompt = {
 						description: `
 							You can use your ki to cast certain spells like darkness, darkvision, pass without trace, and silence.
 						`,
-						source: "monk.shadow",
+						source: 'monk.shadow',
 						effects: [
 							{
-								target: "features",
-								action: "add",
-								value: "Shadow Arts"
+								target: 'features',
+								action: 'add',
+								value: 'Shadow Arts'
 							}
 						]
 					}
@@ -145,35 +138,31 @@ const monasticTraditionPrompt: FeaturePrompt = {
 						id: 'monk_elements_disciple_01',
 						name: 'Disciple of the Elements',
 						description: `You can spend ki points to cast elemental disciplines.`,
-						source: "monk.four_elements",
+						source: 'monk.four_elements',
 						effects: [
 							{
-								target: "features",
-								action: "add",
-								value: "Disciple of the Elements"
+								target: 'features',
+								action: 'add',
+								value: 'Disciple of the Elements'
 							}
 						]
 					}
 				]
 			}
 		],
-		numPicks: 1,
+		numPicks: 1
 	},
-	source: "monk",
+	source: 'monk',
 	effects: [
 		{
-			target: "subclass",
-			action: "set",
-			value: "{userChoice}"
+			target: 'subclass',
+			action: 'set',
+			value: '{userChoice}'
 		}
 	]
 };
 
-const classFeaturesPrompt: FeaturePrompt[] = [
-	martialArtsPrompt,
-	kiPrompt,
-	unarmoredMovementPrompt,
-];
+const classFeaturesPrompt: FeaturePrompt[] = [martialArtsPrompt, kiPrompt, unarmoredMovementPrompt];
 
 export const monk: ClassData = {
 	name: 'Monk',
@@ -185,12 +174,8 @@ export const monk: ClassData = {
 	armorProficiencies: [],
 	weaponProficiencies: ['Simple Weapons', 'Shortswords'],
 	startingEquipment: {
-		fixed: ['Explorer\'s pack'],
+		fixed: ["Explorer's pack"],
 		choices: []
 	},
-	classFeatures: [
-		proficienciesPrompt,
-		...classFeaturesPrompt,
-		monasticTraditionPrompt,
-	],
+	classFeatures: [proficienciesPrompt, ...classFeaturesPrompt, monasticTraditionPrompt]
 };

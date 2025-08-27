@@ -4,8 +4,10 @@ import type { BackgroundData } from '../types/BackgroundData';
 export const entertainer: BackgroundData = {
 	name: 'Entertainer',
 	image: base + '/background_icons/entertainer.jpg',
-	description: 'You thrive in front of an audience and know how to entrance them, entertain them, and even inspire them.',
-	flavorDescription: 'Your poetics can stir the hearts of those who hear you, awakening grief or joy, laughter or anger. Your music raises their spirits or captures their sorrow. Your dance steps captivate, your humor cuts to the quick. Whatever techniques you use, your art is your life.',
+	description:
+		'You thrive in front of an audience and know how to entrance them, entertain them, and even inspire them.',
+	flavorDescription:
+		'Your poetics can stir the hearts of those who hear you, awakening grief or joy, laughter or anger. Your music raises their spirits or captures their sorrow. Your dance steps captivate, your humor cuts to the quick. Whatever techniques you use, your art is your life.',
 	skillProficiencies: ['Acrobatics', 'Performance'],
 	toolProficiencies: ['Disguise kit', 'One type of musical instrument'],
 	equipment: [
@@ -40,7 +42,8 @@ export const entertainer: BackgroundData = {
 		]
 	},
 	feature: 'By Popular Demand',
-	featureDescription: 'You can always find a place to perform, usually in an inn or tavern but possibly with a circus, at a theater, or even in a noble\'s court. At such a place, you receive free lodging and food of a modest or comfortable standard (depending on the quality of the establishment), as long as you perform each night. In addition, your performance makes you something of a local figure. When strangers recognize you in a town where you have performed, they typically take a liking to you.',
+	featureDescription:
+		"You can always find a place to perform, usually in an inn or tavern but possibly with a circus, at a theater, or even in a noble's court. At such a place, you receive free lodging and food of a modest or comfortable standard (depending on the quality of the establishment), as long as you perform each night. In addition, your performance makes you something of a local figure. When strangers recognize you in a town where you have performed, they typically take a liking to you.",
 	backgroundFeatures: [
 		{
 			name: 'Skill Proficiencies',
@@ -62,7 +65,18 @@ export const entertainer: BackgroundData = {
 			source: 'background:Entertainer',
 			featureOptions: {
 				placeholderText: 'Select 1 musical instrument',
-				options: ['Bagpipes', 'Drums', 'Dulcimer', 'Flute', 'Lute', 'Lyre', 'Horn', 'Pan flute', 'Shawm', 'Viol'],
+				options: [
+					'Bagpipes',
+					'Drums',
+					'Dulcimer',
+					'Flute',
+					'Lute',
+					'Lyre',
+					'Horn',
+					'Pan flute',
+					'Shawm',
+					'Viol'
+				],
 				numPicks: 1
 			},
 			effects: [
@@ -93,7 +107,8 @@ export const entertainer: BackgroundData = {
 		{
 			name: 'By Popular Demand',
 			id: 'entertainer_feature',
-			description: 'You can always find a place to perform and receive free lodging and food. Your performances make you a local figure that strangers take a liking to.',
+			description:
+				'You can always find a place to perform and receive free lodging and food. Your performances make you a local figure that strangers take a liking to.',
 			source: 'background:Entertainer',
 			effects: [
 				{

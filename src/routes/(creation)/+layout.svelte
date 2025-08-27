@@ -5,13 +5,13 @@
 	import { onMount } from 'svelte';
 
 	export let navItems = [
-		{ name: "Class", href: base + "/class", id: "class" },
-		{ name: "Species", href: base + "/species", id: "species" },
-		{ name: "Abilities", href: base + "/abilities", id: "abilities" },
-		{ name: "Background", href: base + "/background", id: "background" },
-		{ name: "Equipment", href: base + "/equipment", id: "equipment" },
-		{ name: "Spells", href: base + "/spells", id: "spells" },
-		{ name: "Export", href: base + "/export", id: "export" }
+		{ name: 'Class', href: base + '/class', id: 'class' },
+		{ name: 'Species', href: base + '/species', id: 'species' },
+		{ name: 'Abilities', href: base + '/abilities', id: 'abilities' },
+		{ name: 'Background', href: base + '/background', id: 'background' },
+		{ name: 'Equipment', href: base + '/equipment', id: 'equipment' },
+		{ name: 'Spells', href: base + '/spells', id: 'spells' },
+		{ name: 'Export', href: base + '/export', id: 'export' }
 	];
 
 	// Mark current tab as visited when navigating
@@ -37,10 +37,12 @@
 	<ul>
 		{#each navItems as item}
 			<li>
-				<a href="{item.href}" class:has-conflict={hasConflict(item.id)}>
+				<a href={item.href} class:has-conflict={hasConflict(item.id)}>
 					{item.name}
 					{#if hasConflict(item.id)}
-						<span class="conflict-indicator" title="This tab has conflicts that need attention">⚠️</span>
+						<span class="conflict-indicator" title="This tab has conflicts that need attention"
+							>⚠️</span
+						>
 					{/if}
 				</a>
 			</li>
@@ -54,7 +56,7 @@
 	nav {
 		background-color: #1e293b; /* dark blue-gray background */
 		padding: 1rem 2rem;
-		box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 		position: fixed;
 		top: 0;
 		left: 0;
@@ -62,14 +64,13 @@
 		z-index: 1000;
 	}
 
-
 	nav ul {
 		display: flex;
 		list-style: none;
 		margin: 0;
 		padding: 0;
 		gap: 1.5rem;
-        justify-content: center;
+		justify-content: center;
 	}
 
 	nav li {
@@ -108,7 +109,8 @@
 	}
 
 	@keyframes pulse-warning {
-		0%, 100% {
+		0%,
+		100% {
 			opacity: 1;
 		}
 		50% {

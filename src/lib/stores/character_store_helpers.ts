@@ -11,58 +11,58 @@ import { character_store, type Character } from './character_store';
 // NOTE: We keep backward compatibility with the old "flat" provenance shape.
 
 export function applyChoice(
-scopeId: string,
-changes: Partial<Character> = {},
-mods?: Record<string, number>
+	scopeId: string,
+	changes: Partial<Character> = {},
+	mods?: Record<string, number>
 ) {
-character_store.update((char) => {
-	// If this scope already applied something, revert it first (fresh apply)
-	if (char._provenance?.[scopeId]) {
-	char = revertChanges(char, scopeId);
-	}
+	character_store.update((char) => {
+		// If this scope already applied something, revert it first (fresh apply)
+		if (char._provenance?.[scopeId]) {
+			char = revertChanges(char, scopeId);
+		}
 
-	const prevScalars: Partial<Character> = {};
-	const modsPrev: Partial<Character> = {};
+		const prevScalars: Partial<Character> = {};
+		const modsPrev: Partial<Character> = {};
 
-	// 1) Apply "set / add" style updates (backward compatible)
-	for (const [key, value] of Object.entries(changes)) {
-	const typedKey = key as keyof Character;
-	const current = char[typedKey] as any;
+		// 1) Apply "set / add" style updates (backward compatible)
+		for (const [key, value] of Object.entries(changes)) {
+			const typedKey = key as keyof Character;
+			const current = char[typedKey] as any;
 
-	if (Array.isArray(current) && Array.isArray(value)) {
-		// ADD semantics for arrays
-		(char[typedKey] as any) = [...current, ...value];
-	} else {
-		// SET semantics for scalars (remember prior value for perfect revert)
-		prevScalars[typedKey] = current as any;
-		(char[typedKey] as any) = value as any;
-	}
-	}
+			if (Array.isArray(current) && Array.isArray(value)) {
+				// ADD semantics for arrays
+				(char[typedKey] as any) = [...current, ...value];
+			} else {
+				// SET semantics for scalars (remember prior value for perfect revert)
+				prevScalars[typedKey] = current as any;
+				(char[typedKey] as any) = value as any;
+			}
+		}
 
-	// 2) Apply numeric MODIFICATIONS with exact restore
-	if (mods) {
-	for (const [key, rawDelta] of Object.entries(mods)) {
-		const typedKey = key as keyof Character;
-		const before = char[typedKey] as any; // may be number | null
-		modsPrev[typedKey] = before;
+		// 2) Apply numeric MODIFICATIONS with exact restore
+		if (mods) {
+			for (const [key, rawDelta] of Object.entries(mods)) {
+				const typedKey = key as keyof Character;
+				const before = char[typedKey] as any; // may be number | null
+				modsPrev[typedKey] = before;
 
-		const delta = Number(rawDelta) || 0;
-		const base = typeof before === 'number' ? before : 0;
-		(char[typedKey] as any) = base + delta;
-	}
-	}
+				const delta = Number(rawDelta) || 0;
+				const base = typeof before === 'number' ? before : 0;
+				(char[typedKey] as any) = base + delta;
+			}
+		}
 
-	// 3) Provenance
-	char._provenance ??= {};
-	char._provenance[scopeId] = {
-		_set: Object.keys(changes).length ? changes : null,
-		_prevScalars: Object.keys(prevScalars).length ? prevScalars : null,
-		_mods: mods && Object.keys(mods).length ? mods : null,
-		_modsPrev: Object.keys(modsPrev).length ? modsPrev : null
-	} as any;
+		// 3) Provenance
+		char._provenance ??= {};
+		char._provenance[scopeId] = {
+			_set: Object.keys(changes).length ? changes : null,
+			_prevScalars: Object.keys(prevScalars).length ? prevScalars : null,
+			_mods: mods && Object.keys(mods).length ? mods : null,
+			_modsPrev: Object.keys(modsPrev).length ? modsPrev : null
+		} as any;
 
-	return char;
-});
+		return char;
+	});
 }
 
 export function revertChanges(char: Character, scopeId: string): Character {
@@ -74,16 +74,16 @@ export function revertChanges(char: Character, scopeId: string): Character {
 	if (!('_set' in prov) && !('_mods' in prov)) {
 		// Keep provenance reference for analysis BEFORE deletion
 		const provenanceForAnalysis = char._provenance;
-		
+
 		for (const [key, value] of Object.entries(prov)) {
 			const typedKey = key as keyof Character;
 			if (Array.isArray(char[typedKey]) && Array.isArray(value)) {
 				// Use smart removal that preserves items from other sources
 				(char[typedKey] as any) = smartRemoveFromArray(
-					char[typedKey] as any, 
-					value, 
-					scopeId, 
-					key, 
+					char[typedKey] as any,
+					value,
+					scopeId,
+					key,
 					provenanceForAnalysis
 				);
 			} else {
@@ -103,7 +103,7 @@ export function revertChanges(char: Character, scopeId: string): Character {
 
 	// IMPORTANT: Keep a reference to provenance BEFORE deletion for smart removal
 	const provenanceForAnalysis = char._provenance;
-	
+
 	// 1) Revert sets/adds with smart logic
 	if (_set) {
 		for (const [key, value] of Object.entries(_set)) {
@@ -112,10 +112,10 @@ export function revertChanges(char: Character, scopeId: string): Character {
 				// Use smart removal that preserves items from other sources
 				// Use provenanceForAnalysis BEFORE we delete the scope
 				(char[typedKey] as any) = smartRemoveFromArray(
-					char[typedKey] as any, 
-					value, 
-					scopeId, 
-					key, 
+					char[typedKey] as any,
+					value,
+					scopeId,
+					key,
 					provenanceForAnalysis
 				);
 			} else {
@@ -166,11 +166,11 @@ function smartRemoveFromArray(
 
 	// Build a map of how many times each scope contributed each item
 	const itemContributions: Record<string, Record<string, number>> = {}; // item -> {scopeId -> count}
-	
+
 	for (const [scopeId, prov] of Object.entries(allProvenance)) {
-		const changes = ('_set' in prov && prov._set) ? prov._set : prov;
+		const changes = '_set' in prov && prov._set ? prov._set : prov;
 		if (!changes || !Array.isArray(changes[fieldName])) continue;
-		
+
 		for (const item of changes[fieldName]) {
 			if (!itemContributions[item]) {
 				itemContributions[item] = {};
@@ -178,23 +178,23 @@ function smartRemoveFromArray(
 			itemContributions[item][scopeId] = (itemContributions[item][scopeId] || 0) + 1;
 		}
 	}
-	
+
 	// Calculate how many instances we should remove for each item
 	const instancesToRemove: Record<string, number> = {};
 	for (const item of itemsToRemove) {
 		const contributions = itemContributions[item] || {};
 		instancesToRemove[item] = contributions[targetScopeId] || 0;
 	}
-	
+
 	// Rebuild array by removing the correct number of instances
 	const newArray: string[] = [];
 	const itemsRemovedCount: Record<string, number> = {};
-	
+
 	for (const item of currentArray) {
 		if (itemsToRemove.includes(item)) {
 			const shouldRemove = instancesToRemove[item] || 0;
 			const alreadyRemoved = itemsRemovedCount[item] || 0;
-			
+
 			if (alreadyRemoved < shouldRemove) {
 				// Remove this instance (contributed by target scope)
 				itemsRemovedCount[item] = alreadyRemoved + 1;
@@ -208,7 +208,7 @@ function smartRemoveFromArray(
 			newArray.push(item);
 		}
 	}
-	
+
 	return newArray;
 }
 
@@ -223,15 +223,15 @@ export function applyChoiceWithConflictCheck(
 ): { applied: boolean; conflicts?: import('./conflict_detection').Conflict[] } {
 	// Check what conflicts would be created by this change
 	const potentialConflicts: import('./conflict_detection').Conflict[] = [];
-	
+
 	// For now, we'll apply the change and then check for conflicts
 	// In the future, we could do pre-validation here
 	applyChoice(scopeId, changes, mods);
-	
+
 	// Check for conflicts after applying
 	const { detectConflicts } = require('./conflict_detection');
 	const result = detectConflicts();
-	
+
 	return {
 		applied: true,
 		conflicts: result.conflicts.length > 0 ? result.conflicts : undefined
@@ -242,21 +242,24 @@ export function applyChoiceWithConflictCheck(
  * Get a summary of what each scope has contributed to the character
  * Useful for debugging and conflict resolution UI
  */
-export function getProvenanceSummary(): Record<string, { 
-	skills: string[], 
-	proficiencies: string[], 
-	languages: string[], 
-	features: string[] 
-}> {
+export function getProvenanceSummary(): Record<
+	string,
+	{
+		skills: string[];
+		proficiencies: string[];
+		languages: string[];
+		features: string[];
+	}
+> {
 	const char = get(character_store);
 	const summary: Record<string, any> = {};
-	
+
 	if (!char._provenance) return summary;
-	
+
 	for (const [scopeId, prov] of Object.entries(char._provenance)) {
-		const changes = ('_set' in prov && prov._set) ? prov._set : prov;
+		const changes = '_set' in prov && prov._set ? prov._set : prov;
 		if (!changes) continue;
-		
+
 		summary[scopeId] = {
 			skills: Array.isArray(changes.skills) ? [...changes.skills] : [],
 			proficiencies: Array.isArray(changes.proficiencies) ? [...changes.proficiencies] : [],
@@ -264,6 +267,6 @@ export function getProvenanceSummary(): Record<string, {
 			features: Array.isArray(changes.features) ? [...changes.features] : []
 		};
 	}
-	
+
 	return summary;
 }

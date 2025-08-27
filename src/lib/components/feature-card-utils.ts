@@ -123,7 +123,7 @@ export function clearNestedFeatureSelections(
 	selections: Record<string, (string | null)[]>
 ): Record<string, (string | null)[]> {
 	if (!feature.featureOptions) return selections;
-	
+
 	const newSelections = { ...selections };
 	let mutated = false;
 
@@ -133,7 +133,7 @@ export function clearNestedFeatureSelections(
 			delete newSelections[nestedFeature.name];
 			mutated = true;
 		}
-		
+
 		// Recursively clear any deeper nested selections
 		if (nestedFeature.featureOptions) {
 			for (const option of nestedFeature.featureOptions.options) {

@@ -1,11 +1,10 @@
 import { writable } from 'svelte/store';
 
-
 export type Attack = {
 	weapon: string;
 	attack_type: number;
 	damage_die: string;
-	damage_type: string; 
+	damage_type: string;
 };
 
 export type Character = {
@@ -15,12 +14,12 @@ export type Character = {
 	background: string;
 	alignment: string;
 
-	strength: number | null
-	dexterity: number | null
-	constitution: number | null
-	intelligence: number | null
-	wisdom: number | null
-	charisma: number | null
+	strength: number | null;
+	dexterity: number | null;
+	constitution: number | null;
+	intelligence: number | null;
+	wisdom: number | null;
+	charisma: number | null;
 
 	proficiencies: string[];
 	languages: string[];
@@ -51,7 +50,7 @@ export const character_store = writable<Character>({
 	subclass: '',
 	background: '',
 	alignment: '',
-	
+
 	strength: 0,
 	dexterity: 0,
 	constitution: 0,
@@ -69,5 +68,5 @@ export const character_store = writable<Character>({
 	hp: null,
 	ac: null,
 	speed: null,
-	size: null,
+	size: null
 });

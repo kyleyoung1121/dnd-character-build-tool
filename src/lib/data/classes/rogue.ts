@@ -12,7 +12,7 @@ const proficienciesPrompt: FeaturePrompt = {
 		Skills: Choose four from Acrobatics, Athletics, Deception, Insight, Intimidation, Investigation, Perception, Performance, Persuasion, Sleight of Hand, Stealth
 	`,
 	featureOptions: {
-		placeholderText: "Select skills",
+		placeholderText: 'Select skills',
 		options: [
 			'Acrobatics',
 			'Athletics',
@@ -24,16 +24,16 @@ const proficienciesPrompt: FeaturePrompt = {
 			'Performance',
 			'Persuasion',
 			'Sleight of Hand',
-			'Stealth',
+			'Stealth'
 		],
-		numPicks: 4,
+		numPicks: 4
 	},
 	source: 'rogue.proficiencies',
 	effects: [
 		{
-			target: "skills",
-			action: "add",
-			value: "{userChoice}"
+			target: 'skills',
+			action: 'add',
+			value: '{userChoice}'
 		}
 	]
 };
@@ -49,9 +49,9 @@ const sneakAttackPrompt: FeaturePrompt = {
 	source: 'rogue',
 	effects: [
 		{
-			target: "features",
-			action: "add",
-			value: "Sneak Attack"
+			target: 'features',
+			action: 'add',
+			value: 'Sneak Attack'
 		}
 	]
 };
@@ -66,9 +66,9 @@ const cunningActionPrompt: FeaturePrompt = {
 	source: 'rogue',
 	effects: [
 		{
-			target: "features",
-			action: "add",
-			value: "Cunning Action"
+			target: 'features',
+			action: 'add',
+			value: 'Cunning Action'
 		}
 	]
 };
@@ -78,7 +78,7 @@ const rogueArchetypePrompt: FeaturePrompt = {
 	name: 'Roguish Archetype',
 	description: 'Choose a Roguish Archetype at 3rd level.',
 	featureOptions: {
-		placeholderText: "-Choose an Archetype-",
+		placeholderText: '-Choose an Archetype-',
 		options: [
 			{
 				name: 'Thief',
@@ -91,9 +91,9 @@ const rogueArchetypePrompt: FeaturePrompt = {
 						source: 'rogue.thief',
 						effects: [
 							{
-								target: "features",
-								action: "add",
-								value: "Fast Hands"
+								target: 'features',
+								action: 'add',
+								value: 'Fast Hands'
 							}
 						]
 					},
@@ -105,13 +105,13 @@ const rogueArchetypePrompt: FeaturePrompt = {
 						source: 'rogue.thief',
 						effects: [
 							{
-								target: "features",
-								action: "add",
-								value: "Second-Story Work"
+								target: 'features',
+								action: 'add',
+								value: 'Second-Story Work'
 							}
 						]
-					},
-				],
+					}
+				]
 			},
 			{
 				name: 'Assassin',
@@ -125,13 +125,13 @@ const rogueArchetypePrompt: FeaturePrompt = {
 						source: 'rogue.assassin',
 						effects: [
 							{
-								target: "features",
-								action: "add",
-								value: "Assassinate"
+								target: 'features',
+								action: 'add',
+								value: 'Assassinate'
 							}
 						]
-					},
-				],
+					}
+				]
 			},
 			{
 				name: 'Arcane Trickster',
@@ -144,9 +144,9 @@ const rogueArchetypePrompt: FeaturePrompt = {
 						source: 'rogue.arcane_trickster',
 						effects: [
 							{
-								target: "features",
-								action: "add",
-								value: "Arcane Trickster Spellcasting"
+								target: 'features',
+								action: 'add',
+								value: 'Arcane Trickster Spellcasting'
 							}
 						]
 					},
@@ -157,31 +157,28 @@ const rogueArchetypePrompt: FeaturePrompt = {
 						source: 'rogue.arcane_trickster',
 						effects: [
 							{
-								target: "features",
-								action: "add",
-								value: "Mage Hand Legerdemain"
+								target: 'features',
+								action: 'add',
+								value: 'Mage Hand Legerdemain'
 							}
 						]
-					},
-				],
-			},
+					}
+				]
+			}
 		],
-		numPicks: 1,
+		numPicks: 1
 	},
 	source: 'rogue',
 	effects: [
 		{
-			target: "subclass",
-			action: "set",
-			value: "{userChoice}"
+			target: 'subclass',
+			action: 'set',
+			value: '{userChoice}'
 		}
 	]
 };
 
-const classFeaturesPrompt: FeaturePrompt[] = [
-	sneakAttackPrompt,
-	cunningActionPrompt,
-];
+const classFeaturesPrompt: FeaturePrompt[] = [sneakAttackPrompt, cunningActionPrompt];
 
 export const rogue: ClassData = {
 	name: 'Rogue',
@@ -193,12 +190,8 @@ export const rogue: ClassData = {
 	armorProficiencies: ['Light Armor'],
 	weaponProficiencies: ['Simple Weapons', 'Hand Crossbows', 'Longswords', 'Rapiers', 'Shortswords'],
 	startingEquipment: {
-		fixed: ['Explorer\'s pack'],
+		fixed: ["Explorer's pack"],
 		choices: []
 	},
-	classFeatures: [
-		proficienciesPrompt,
-		...classFeaturesPrompt,
-		rogueArchetypePrompt,
-	],
+	classFeatures: [proficienciesPrompt, ...classFeaturesPrompt, rogueArchetypePrompt]
 };

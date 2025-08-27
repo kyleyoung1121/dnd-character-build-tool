@@ -1,7 +1,9 @@
 # Feature Card Refactor Plan
 
 ## Problem
+
 The class and race pages both implement nearly identical feature card systems with duplicated:
+
 - HTML structure and styling
 - Helper functions (isFeatureIncomplete, getGloballyAvailableOptions, etc.)
 - State management logic
@@ -12,6 +14,7 @@ This leads to maintenance issues where changes must be made in multiple places.
 ## Solution Architecture
 
 ### 1. Shared Component Structure
+
 ```
 src/lib/components/
 ├── FeatureCard.svelte          # Main reusable component
@@ -20,20 +23,22 @@ src/lib/components/
 ```
 
 ### 2. FeatureCard.svelte Interface
+
 ```typescript
 export interface FeatureCardProps {
-  feature: FeaturePrompt;
-  featureSelections: Record<string, (string | null)[]>;
-  expandedFeatures: Set<string>;
-  selectionVersion: number;
-  onSelectOption: (feature: FeaturePrompt, index: number, value: string) => void;
-  onToggleExpand: (featureName: string) => void;
-  getAvailableOptions: (feature: FeaturePrompt, index: number) => (string | ComplexOption)[];
-  nested?: boolean;  // For styling differences
+	feature: FeaturePrompt;
+	featureSelections: Record<string, (string | null)[]>;
+	expandedFeatures: Set<string>;
+	selectionVersion: number;
+	onSelectOption: (feature: FeaturePrompt, index: number, value: string) => void;
+	onToggleExpand: (featureName: string) => void;
+	getAvailableOptions: (feature: FeaturePrompt, index: number) => (string | ComplexOption)[];
+	nested?: boolean; // For styling differences
 }
 ```
 
 ### 3. Shared Utilities (feature-card-utils.ts)
+
 - `isFeatureIncomplete(feature, selections)`
 - `getGloballyAvailableOptions(feature, index, selections, characterStore)`
 - `getNestedPrompts(feature, selectedOptions)`
@@ -41,15 +46,16 @@ export interface FeatureCardProps {
 - `ensureArrayLen(arr, len)`
 
 ### 4. FeatureCardList.svelte Interface
+
 ```typescript
 export interface FeatureCardListProps {
-  features: FeaturePrompt[];
-  featureSelections: Record<string, (string | null)[]>;
-  expandedFeatures: Set<string>;
-  selectionVersion: number;
-  onSelectOption: (feature: FeaturePrompt, index: number, value: string) => void;
-  onToggleExpand: (featureName: string) => void;
-  onBumpVersion: () => void;
+	features: FeaturePrompt[];
+	featureSelections: Record<string, (string | null)[]>;
+	expandedFeatures: Set<string>;
+	selectionVersion: number;
+	onSelectOption: (feature: FeaturePrompt, index: number, value: string) => void;
+	onToggleExpand: (featureName: string) => void;
+	onBumpVersion: () => void;
 }
 ```
 
@@ -63,6 +69,7 @@ export interface FeatureCardListProps {
 6. **Test & Optimize** - Ensure no functionality is lost
 
 ## Benefits
+
 - ✅ Single source of truth for feature card logic
 - ✅ Consistent styling and behavior
 - ✅ Easier maintenance and bug fixes

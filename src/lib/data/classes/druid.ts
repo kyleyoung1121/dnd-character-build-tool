@@ -12,7 +12,7 @@ const proficienciesPrompt: FeaturePrompt = {
 		Skills: Choose two from Arcana, Animal Handling, Insight, Medicine, Nature, Perception, Religion, Survival
 	`,
 	featureOptions: {
-		placeholderText: "Select two skills",
+		placeholderText: 'Select two skills',
 		options: [
 			'Arcana',
 			'Animal Handling',
@@ -21,16 +21,16 @@ const proficienciesPrompt: FeaturePrompt = {
 			'Nature',
 			'Perception',
 			'Religion',
-			'Survival',
+			'Survival'
 		],
-		numPicks: 2,
+		numPicks: 2
 	},
-	source: "druid.proficiencies",
+	source: 'druid.proficiencies',
 	effects: [
 		{
-			target: "skills",
-			action: "add",
-			value: "{userChoice}"
+			target: 'skills',
+			action: 'add',
+			value: '{userChoice}'
 		}
 	]
 };
@@ -42,12 +42,12 @@ const spellcastingPrompt: FeaturePrompt = {
 		You can prepare and cast spells using Wisdom as your spellcasting ability. 
 		You know two cantrips and prepare a number of spells equal to your Wisdom modifier + druid level.
 	`,
-	source: "druid",
+	source: 'druid',
 	effects: [
 		{
-			target: "features",
-			action: "add",
-			value: "Spellcasting"
+			target: 'features',
+			action: 'add',
+			value: 'Spellcasting'
 		}
 	]
 };
@@ -59,12 +59,12 @@ const wildShapePrompt: FeaturePrompt = {
 		Starting at 2nd level, you can use your action to magically assume the shape of a beast you have seen before.
 		You can use this feature twice per short or long rest.
 	`,
-	source: "druid",
+	source: 'druid',
 	effects: [
 		{
-			target: "features",
-			action: "add",
-			value: "Wild Shape"
+			target: 'features',
+			action: 'add',
+			value: 'Wild Shape'
 		}
 	]
 };
@@ -74,79 +74,68 @@ const druidCirclePrompt: FeaturePrompt = {
 	id: 'druid_circle_01',
 	description: 'Choose a Druid Circle at 2nd level.',
 	featureOptions: {
-		placeholderText: "-Choose a Circle-",
+		placeholderText: '-Choose a Circle-',
 		options: [
 			{
-				name: "Circle of the Land",
+				name: 'Circle of the Land',
 				optionDescription: `Your magic draws on the energy of the land, granting you additional spells.`,
 				nestedPrompts: [
 					{
-						name: "Bonus Cantrip",
-						id: "druid_land_cantrip_01",
-						description: "You learn one additional druid cantrip.",
-						source: "druid.circle_of_the_land",
-						effects: [
-							{ target: "spells", action: "add", value: "User chooses one druid cantrip" }
-						]
+						name: 'Bonus Cantrip',
+						id: 'druid_land_cantrip_01',
+						description: 'You learn one additional druid cantrip.',
+						source: 'druid.circle_of_the_land',
+						effects: [{ target: 'spells', action: 'add', value: 'User chooses one druid cantrip' }]
 					},
 					{
-						name: "Natural Recovery",
-						id: "druid_land_recovery_01",
+						name: 'Natural Recovery',
+						id: 'druid_land_recovery_01',
 						description: `
 							You can regain some expended spell slots during a short rest.
 						`,
-						source: "druid.circle_of_the_land",
-						effects: [
-							{ target: "features", action: "add", value: "Natural Recovery" }
-						]
+						source: 'druid.circle_of_the_land',
+						effects: [{ target: 'features', action: 'add', value: 'Natural Recovery' }]
 					}
-				],
+				]
 			},
 			{
-				name: "Circle of the Moon",
+				name: 'Circle of the Moon',
 				optionDescription: `You are a fierce shapeshifter, able to transform into more powerful beasts.`,
 				nestedPrompts: [
 					{
-						name: "Combat Wild Shape",
-						id: "druid_moon_combat_shape_01",
+						name: 'Combat Wild Shape',
+						id: 'druid_moon_combat_shape_01',
 						description: `
 							You can use Wild Shape as a bonus action and transform into stronger creatures.
 						`,
-						source: "druid.circle_of_the_moon",
-						effects: [
-							{ target: "features", action: "add", value: "Combat Wild Shape" }
-						]
+						source: 'druid.circle_of_the_moon',
+						effects: [{ target: 'features', action: 'add', value: 'Combat Wild Shape' }]
 					},
 					{
-						name: "Circle Forms",
-						id: "druid_moon_circle_forms_01",
+						name: 'Circle Forms',
+						id: 'druid_moon_circle_forms_01',
 						description: `
 							You can transform into beasts with a higher challenge rating than normal.
 						`,
-						source: "druid.circle_of_the_moon",
-						effects: [
-							{ target: "features", action: "add", value: "Circle Forms" }
-						]
-					},
-				],
-			},
+						source: 'druid.circle_of_the_moon',
+						effects: [{ target: 'features', action: 'add', value: 'Circle Forms' }]
+					}
+				]
+			}
 		],
-		numPicks: 1,
+		numPicks: 1
 	},
-	source: "druid",
+	source: 'druid',
 	effects: [
 		{
-			target: "subclass",
-			action: "set",
-			value: "{userChoice}"
+			target: 'subclass',
+			action: 'set',
+			value: '{userChoice}'
 		}
 	]
 };
 
-const classFeaturesPrompt: FeaturePrompt[] = [
-	spellcastingPrompt,
-	wildShapePrompt,
-];
+const classFeaturesPrompt: FeaturePrompt[] = [spellcastingPrompt, wildShapePrompt];
 
 export const druid: ClassData = {
 	name: 'Druid',
@@ -165,15 +154,11 @@ export const druid: ClassData = {
 		'Quarterstaffs',
 		'Scimitars',
 		'Slings',
-		'Spears',
+		'Spears'
 	],
 	startingEquipment: {
-		fixed: ['Explorer\'s pack'],
+		fixed: ["Explorer's pack"],
 		choices: []
 	},
-	classFeatures: [
-		proficienciesPrompt,
-		...classFeaturesPrompt,
-		druidCirclePrompt,
-	],
+	classFeatures: [proficienciesPrompt, ...classFeaturesPrompt, druidCirclePrompt]
 };

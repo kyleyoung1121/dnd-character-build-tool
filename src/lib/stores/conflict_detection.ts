@@ -79,6 +79,7 @@ export function detectConflicts(): ConflictDetectionResult {
 		for (const [value, sources] of Object.entries(valueMap)) {
 			if (sources.length > 1) {
 				const affectedTabs = getTabsFromSources(sources);
+
 				conflicts.push({
 					type: conflictType as ConflictType,
 					value,
@@ -108,12 +109,18 @@ function getTabsFromSources(sources: string[]): string[] {
 	const changeableTabs = new Set<string>();
 
 	// First pass: identify all tabs involved and which ones are user-changeable
+	// Check in priority order: background first, then species, then class
 	for (const source of sources) {
-		if (source.startsWith('class:') || (source.startsWith('feature:') && isClassFeature(source))) {
-			tabs.add('class');
-			// Class features with user choices should be prioritized
-			if (isUserChangeableClassFeature(source)) {
-				changeableTabs.add('class');
+		// Check background first (most specific)
+		if (
+			source.startsWith('background:') ||
+			source.includes('background') ||
+			isBackgroundFeature(source)
+		) {
+			tabs.add('background');
+			// Most background features are user choices
+			if (isUserChangeableBackgroundFeature(source)) {
+				changeableTabs.add('background');
 			}
 		} else if (source.startsWith('race:') || isSpeciesFeature(source)) {
 			tabs.add('species');
@@ -121,9 +128,15 @@ function getTabsFromSources(sources: string[]): string[] {
 			if (isUserChangeableSpeciesFeature(source)) {
 				changeableTabs.add('species');
 			}
-		} else if (source.includes('background')) {
-			tabs.add('background');
-			changeableTabs.add('background'); // Most background features are choices
+		} else if (
+			source.startsWith('class:') ||
+			(source.startsWith('feature:') && isClassFeature(source))
+		) {
+			tabs.add('class');
+			// Class features with user choices should be prioritized
+			if (isUserChangeableClassFeature(source)) {
+				changeableTabs.add('class');
+			}
 		}
 	}
 
@@ -167,6 +180,11 @@ function isUserChangeableSpeciesFeature(scopeId: string): boolean {
  * Class features include skills from bard, fighter, etc.
  */
 function isClassFeature(scopeId: string): boolean {
+	// Don't mistake background features for class features
+	if (isBackgroundFeature(scopeId)) {
+		return false;
+	}
+
 	// Class features are typically selected after choosing a class
 	// Common class skill features
 	return (
@@ -195,6 +213,121 @@ function isSpeciesFeature(scopeId: string): boolean {
 		scopeId.includes('Draconic') ||
 		scopeId.includes('Tool Proficiency')
 	);
+}
+
+/**
+ * Check if a feature scope belongs to a background
+ * Background features include skill proficiencies, tool proficiencies, languages, etc.
+ */
+function isBackgroundFeature(scopeId: string): boolean {
+	// Direct background scope IDs
+	if (scopeId.startsWith('background:')) {
+		return true;
+	}
+
+	// Check if this is a feature scope ID that belongs to a background
+	if (scopeId.startsWith('feature:')) {
+		const character = get(character_store);
+
+		// Must have a background selected
+		if (!character.background) {
+			return false;
+		}
+
+		// Check if there's a background: scope in provenance (background was selected)
+		const hasBackgroundScope =
+			character._provenance &&
+			Object.keys(character._provenance).some((key) => key.startsWith('background:'));
+
+		if (!hasBackgroundScope) {
+			return false;
+		}
+
+		// Get the feature name part
+		const featureName = scopeId.split(':')[1];
+
+		// If this feature name is 'Skill Proficiencies' and we have a background,
+		// we need to check if this specific scope ID was created after the background
+		// or if it matches typical background skill patterns
+		if (featureName === 'Skill Proficiencies') {
+			// This is tricky - both classes and backgrounds can have 'Skill Proficiencies'
+			// We'll use a heuristic: if there's exactly one 'feature:Skill Proficiencies'
+			// and one class skill selection pattern, then this is likely the background one
+
+			// Count skill-related scopes
+			const skillScopes = Object.keys(character._provenance || {}).filter(
+				(key) => key.includes('Skill') || key.includes('skill')
+			);
+
+			// If we see feature:Skill Proficiencies without index, it's likely background
+			return scopeId === 'feature:Skill Proficiencies';
+		}
+
+		// Other background-specific feature names that are unlikely to be from classes
+		const backgroundOnlyFeatures = [
+			'Tool Proficiencies',
+			'Equipment',
+			'Languages',
+			'Criminal Contact',
+			'Shelter of the Faithful',
+			'False Identity',
+			'By Popular Demand',
+			'Rustic Hospitality',
+			'Position of Privilege'
+		];
+
+		return backgroundOnlyFeatures.includes(featureName);
+	}
+
+	// Legacy detection for background names in scope IDs
+	return (
+		scopeId.includes('Acolyte') ||
+		scopeId.includes('Charlatan') ||
+		scopeId.includes('Criminal') ||
+		scopeId.includes('Entertainer') ||
+		scopeId.includes('Folk Hero') ||
+		scopeId.includes('Gladiator') ||
+		scopeId.includes('Guild Artisan') ||
+		scopeId.includes('Hermit') ||
+		scopeId.includes('Knight') ||
+		scopeId.includes('Noble') ||
+		scopeId.includes('Outlander') ||
+		scopeId.includes('Pirate') ||
+		scopeId.includes('Sage') ||
+		scopeId.includes('Sailor') ||
+		scopeId.includes('Soldier') ||
+		scopeId.includes('Urchin')
+	);
+}
+
+/**
+ * Check if a background feature represents a user choice
+ */
+function isUserChangeableBackgroundFeature(scopeId: string): boolean {
+	// Must be a background feature first
+	if (!isBackgroundFeature(scopeId)) {
+		return false;
+	}
+
+	// Direct background selection is not user-changeable for conflict resolution
+	if (scopeId.startsWith('background:')) {
+		return false;
+	}
+
+	// Background features with user choices typically have indices
+	if (scopeId.startsWith('feature:')) {
+		// Features with indices (like Tool Proficiencies:0) are user-changeable
+		if (/:\d+$/.test(scopeId)) {
+			return true;
+		}
+
+		// Fixed background features (like Skill Proficiencies without index) are not changeable
+		// These are automatic grants from the background
+		return false;
+	}
+
+	// Fallback for legacy scope IDs
+	return /:\d+$/.test(scopeId);
 }
 
 /**
@@ -269,8 +402,8 @@ export function getUserActionableConflicts(): Conflict[] {
 		return conflict.sources.some(
 			(source) =>
 				isUserChangeableClassFeature(source) ||
-				isUserChangeableRaceFeature(source) ||
-				source.includes('background')
+				isUserChangeableSpeciesFeature(source) ||
+				isUserChangeableBackgroundFeature(source)
 		);
 	});
 }
@@ -283,8 +416,8 @@ export function getPrimaryResolutionTab(conflict: Conflict): string | null {
 	const changeableSources = conflict.sources.filter(
 		(source) =>
 			isUserChangeableClassFeature(source) ||
-			isUserChangeableRaceFeature(source) ||
-			source.includes('background')
+			isUserChangeableSpeciesFeature(source) ||
+			isUserChangeableBackgroundFeature(source)
 	);
 
 	if (changeableSources.length === 0) {
@@ -295,9 +428,13 @@ export function getPrimaryResolutionTab(conflict: Conflict): string | null {
 	for (const source of changeableSources) {
 		if (source.startsWith('class:') || isClassFeature(source)) {
 			return 'class';
-		} else if (source.startsWith('race:') || isRaceFeature(source)) {
-			return 'race';
-		} else if (source.includes('background')) {
+		} else if (
+			source.startsWith('race:') ||
+			source.startsWith('species:') ||
+			isSpeciesFeature(source)
+		) {
+			return 'species';
+		} else if (source.startsWith('background:') || isBackgroundFeature(source)) {
 			return 'background';
 		}
 	}

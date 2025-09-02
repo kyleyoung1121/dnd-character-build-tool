@@ -383,6 +383,7 @@
 <style>
 	.main-content {
 		padding: 2rem 1rem;
+		padding-top: 80px;
 		max-width: 1200px;
 		margin: 0 auto;
 	}
@@ -651,20 +652,19 @@
 	}
 
 	.remove-background-button {
-		background: #dc3545;
-		color: white;
-		border: none;
-		padding: 0.5rem 0.75rem;
-		border-radius: 4px;
+		font-size: 1.5rem;
 		cursor: pointer;
-		font-weight: bold;
-		font-size: 1.2rem;
-		line-height: 1;
+		background: none;
+		border: none;
+		color: #c00;
+		padding: 4px 8px;
+		border-radius: 4px;
+		transition: background-color 0.2s ease;
 		margin-left: auto;
 		flex-shrink: 0;
 	}
 
 	.remove-background-button:hover {
-		background: #c82333;
+		background-color: #fdd;
 	}
 </style>

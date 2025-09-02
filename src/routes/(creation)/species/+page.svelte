@@ -906,6 +906,29 @@
 		background-color: #fdd;
 	}
 
+	/* Feature card styling for popup content */
+	.feature-card {
+		border: 1px solid #ddd;
+		border-radius: 6px;
+		padding: 12px;
+		margin-bottom: 12px;
+		background-color: #f9f9f9;
+	}
+
+	.feature-card h4 {
+		margin: 0 0 8px 0;
+		font-size: 1rem;
+		font-weight: bold;
+		color: #333;
+	}
+
+	.feature-card p {
+		margin: 0;
+		font-size: 0.9rem;
+		color: #555;
+		line-height: 1.4;
+	}
+
 	.popup-footer {
 		padding: 12px 16px;
 		display: flex;

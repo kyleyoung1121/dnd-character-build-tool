@@ -46,3 +46,12 @@
 
 	<pre>{JSON.stringify(character, null, 2)}</pre>
 </div>
+
+<style>
+	.main-content {
+		padding: 2rem 1rem;
+		padding-top: 80px;
+		max-width: 1200px;
+		margin: 0 auto;
+	}
+</style>

@@ -15,6 +15,11 @@
 		(conflict) => conflict.affectedTabs?.includes(tabName) ?? false
 	);
 
+	// Track conflicts for this specific tab
+	$: if (tabConflicts.length > 0) {
+		// Conflicts detected for this tab
+	}
+
 	function getConflictDescription(conflict) {
 		const typeMap = {
 			skill: 'Skill',
@@ -26,11 +31,98 @@
 		const typeLabel = typeMap[conflict.type] || conflict.type;
 		const sourceDescriptions = conflict.sources.map((source) => {
 			// Convert source IDs to human-readable descriptions
+
+			// Class sources
+			if (source.startsWith('class:')) {
+				const className = source.split(':')[1];
+				return `${className} class`;
+			}
 			if (source.startsWith('bard.')) return 'Bard class';
-			if (source.startsWith('high_elf.')) return 'High Elf race';
-			if (source.startsWith('hill_dwarf.')) return 'Hill Dwarf race';
 			if (source.startsWith('fighter.')) return 'Fighter class';
-			// Add more mappings as needed
+			if (source.startsWith('cleric.')) return 'Cleric class';
+			if (source.startsWith('rogue.')) return 'Rogue class';
+			if (source.startsWith('ranger.')) return 'Ranger class';
+			if (source.startsWith('wizard.')) return 'Wizard class';
+			if (source.startsWith('sorcerer.')) return 'Sorcerer class';
+			if (source.startsWith('warlock.')) return 'Warlock class';
+			if (source.startsWith('paladin.')) return 'Paladin class';
+			if (source.startsWith('barbarian.')) return 'Barbarian class';
+			if (source.startsWith('monk.')) return 'Monk class';
+			if (source.startsWith('druid.')) return 'Druid class';
+
+			// Species sources
+			if (source.startsWith('race:') || source.startsWith('species:')) {
+				const speciesName = source.split(':')[1];
+				return `${speciesName} species`;
+			}
+			if (source.startsWith('high_elf.')) return 'High Elf species';
+			if (source.startsWith('hill_dwarf.')) return 'Hill Dwarf species';
+			if (source.startsWith('wood_elf.')) return 'Wood Elf species';
+			if (source.startsWith('dark_elf.')) return 'Dark Elf species';
+			if (source.startsWith('mountain_dwarf.')) return 'Mountain Dwarf species';
+			if (source.startsWith('lightfoot_halfling.')) return 'Lightfoot Halfling species';
+			if (source.startsWith('stout_halfling.')) return 'Stout Halfling species';
+			if (source.startsWith('rock_gnome.')) return 'Rock Gnome species';
+			if (source.startsWith('forest_gnome.')) return 'Forest Gnome species';
+			if (source.startsWith('half_elf.')) return 'Half-Elf species';
+			if (source.startsWith('half_orc.')) return 'Half-Orc species';
+			if (source.startsWith('dragonborn.')) return 'Dragonborn species';
+			if (source.startsWith('tiefling.')) return 'Tiefling species';
+			if (source.startsWith('human.')) return 'Human species';
+			if (source.startsWith('variant_human.')) return 'Variant Human species';
+
+			// Background sources
+			if (source.startsWith('background:')) {
+				const backgroundName = source.split(':')[1];
+				return `${backgroundName} background`;
+			}
+
+			// Feature sources - need to distinguish between class, background, and species features
+			if (source.startsWith('feature:')) {
+				const featureName = source.split(':')[1];
+
+				// Check if this is a background feature by examining the feature name and pattern
+				if (featureName === 'Skill Proficiencies') {
+					// Heuristic: if it's exactly 'feature:Skill Proficiencies' (no index),
+					// it's likely from background. Class skills usually have indices.
+					if (source === 'feature:Skill Proficiencies') {
+						return 'Background skill selection';
+					} else {
+						return 'Class skill selection';
+					}
+				}
+
+				// Background-specific features
+				if (
+					[
+						'Tool Proficiencies',
+						'Equipment',
+						'Languages',
+						'Criminal Contact',
+						'Shelter of the Faithful',
+						'False Identity',
+						'By Popular Demand',
+						'Rustic Hospitality',
+						'Position of Privilege'
+					].includes(featureName)
+				) {
+					return 'Background feature';
+				}
+
+				// Species-specific features
+				if (source.includes('Keen Senses')) return 'Elf keen senses';
+				if (source.includes('Lucky')) return 'Halfling lucky';
+				if (source.includes('Brave')) return 'Halfling brave';
+				if (source.includes('Draconic Ancestry')) return 'Dragonborn ancestry';
+				if (source.includes('Fey Ancestry')) return 'Elf fey ancestry';
+
+				// Class features - remaining skill proficiencies with indices
+				if (source.includes('Skill Proficiencies')) return 'Class skill selection';
+
+				return `${featureName} feature`;
+			}
+
+			// Default fallback
 			return source;
 		});
 

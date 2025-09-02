@@ -78,12 +78,12 @@
 					class:automatic={getConflictType(feature.name) === 'automatic'}
 					title={getConflictType(feature.name) === 'user-changeable'
 						? 'You can change this selection to resolve conflicts'
-						: 'This feature conflicts with your other selections'}
+						: 'This feature conflicts with your other selections, but has no alternative options'}
 				>
 					{#if getConflictType(feature.name) === 'user-changeable'}
 						⚠️
 					{:else}
-						ℹ️
+						🔒
 					{/if}
 				</span>
 			{/if}
@@ -223,15 +223,16 @@
 	.conflict-badge {
 		margin-left: 0.5rem;
 		font-size: 1rem;
-		cursor: help;
 	}
 
 	.conflict-badge.user-changeable {
 		animation: pulse-warning 2s infinite;
+		cursor: help;
 	}
 
 	.conflict-badge.automatic {
-		opacity: 0.8;
+		opacity: 0.7;
+		cursor: default;
 	}
 
 	@keyframes pulse-warning {

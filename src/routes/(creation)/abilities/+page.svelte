@@ -470,8 +470,8 @@
 
 	/* Class Recommendation Card Styles */
 	.class-recommendation-card {
-		background: linear-gradient(to right, #eff6ff, #e0e7ff);
-		border-left: 4px solid #6366f1;
+		background: linear-gradient(to right, #f9f9f9, #f0f0f0);
+		border-left: 4px solid #888;
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 		padding: 1.25rem;
 	}
@@ -479,7 +479,7 @@
 	.class-rec-header h2 {
 		font-size: 1.25rem;
 		font-weight: 700;
-		color: #312e81;
+		color: #333;
 		margin-bottom: 0;
 	}
 
@@ -502,7 +502,7 @@
 	.priority-label {
 		font-weight: 600;
 		font-size: 0.875rem;
-		color: #6366f1;
+		color: #666;
 	}
 
 	.ability-list {
@@ -516,9 +516,9 @@
 		border-radius: 9999px;
 		font-size: 0.75rem;
 		font-weight: 600;
-		border: 1px solid #6366f1;
-		background-color: #eef2ff;
-		color: #4338ca;
+		border: 1px solid #888;
+		background-color: #f0f0f0;
+		color: #444;
 	}
 
 	/* Fighter-specific styles */
@@ -596,7 +596,7 @@
 	}
 
 	.popup-header {
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		background: linear-gradient(135deg, #555 0%, #777 100%);
 		color: white;
 		padding: 0.75rem 1rem;
 		display: flex;
@@ -666,7 +666,7 @@
 		border-radius: 6px;
 		font-size: 0.8rem;
 		color: #374151;
-		border-left: 3px solid #6366f1;
+		border-left: 3px solid #888;
 	}
 
 	.popup-affects-list li:last-child {

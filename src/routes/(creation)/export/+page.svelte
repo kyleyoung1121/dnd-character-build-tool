@@ -36,12 +36,12 @@
 	<p>This is just a test to see what's in <code>character_store</code>.</p>
 
 	<button on:click={runDebug} style="background: blue; color: white; padding: 10px; margin: 10px;"
-		>🔍 Debug Conflicts</button
+		>Debug Conflicts</button
 	>
 	<button
 		on:click={() => testBardHighElfConflict()}
 		style="background: green; color: white; padding: 10px; margin: 10px;"
-		>🧪 Test Bard+Elf Conflict</button
+		>Test Bard+Elf Conflict</button
 	>
 
 	<pre>{JSON.stringify(character, null, 2)}</pre>

@@ -642,7 +642,7 @@
 	.main-content {
 		padding: 2rem 1rem;
 		padding-top: 80px;
-		max-width: 1200px;
+		max-width: 50vw;
 		margin: 0 auto;
 	}
 

@@ -3,6 +3,7 @@
 	import { page } from '$app/stores';
 	import { activeConflicts, markTabAsVisited } from '$lib/stores/conflict_store';
 	import { character_store, hasSpellAccess } from '$lib/stores/character_store';
+	import NotificationToast from '$lib/components/NotificationToast.svelte';
 	import { onMount } from 'svelte';
 
 	const baseNavItems = [
@@ -58,6 +59,8 @@
 		{/each}
 	</ul>
 </nav>
+
+<NotificationToast />
 
 <slot />
 

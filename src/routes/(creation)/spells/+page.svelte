@@ -80,10 +80,11 @@
 							});
 						} else if (
 							access.source === 'subclass' &&
-							access.sourceName.includes('Oath') &&
+							(access.sourceName.includes('Oath') ||
+								access.sourceName.includes('Circle of the Land')) &&
 							existingSpell.source === 'class'
 						) {
-							// Replace class source with oath source for oath spells to show proper tags
+							// Replace class source with subclass source for oath/circle spells to show proper tags
 							existingSpell.source = access.source;
 							existingSpell.sourceName = access.sourceName;
 							existingSpell.chooseable = access.chooseable !== false;
@@ -109,10 +110,11 @@
 							});
 						} else if (
 							access.source === 'subclass' &&
-							access.sourceName.includes('Oath') &&
+							(access.sourceName.includes('Oath') ||
+								access.sourceName.includes('Circle of the Land')) &&
 							existingSpell.source === 'class'
 						) {
-							// Replace class source with oath source for oath spells to show proper tags
+							// Replace class source with subclass source for oath/circle spells to show proper tags
 							existingSpell.source = access.source;
 							existingSpell.sourceName = access.sourceName;
 							existingSpell.chooseable = access.chooseable !== false;
@@ -369,7 +371,8 @@
 			}
 		});
 
-		// Add subclass-based sources (both chooseable and auto-granted)
+		// Add subclass-based sources (group by sourceName to combine auto and chooseable entries)
+		const subclassSources = new Map();
 		spellAccess.forEach((access) => {
 			if (access.source === 'subclass') {
 				// Check if this subclass source has any spells or cantrips
@@ -379,15 +382,26 @@
 					(access.chooseFrom && access.chooseFrom.length > 0);
 
 				if (hasSpells) {
-					sources.push({
-						id: `${access.source}-${access.sourceName}`,
-						name: access.sourceName,
-						type: 'subclass',
-						sourceName: access.sourceName,
-						requiresChoices: access.chooseable === true
-					});
+					const existing = subclassSources.get(access.sourceName);
+					if (existing) {
+						// Combine with existing entry - mark as requiring choices if any entry is chooseable
+						existing.requiresChoices = existing.requiresChoices || access.chooseable === true;
+					} else {
+						// Create new entry
+						subclassSources.set(access.sourceName, {
+							id: `${access.source}-${access.sourceName}`,
+							name: access.sourceName,
+							type: 'subclass',
+							sourceName: access.sourceName,
+							requiresChoices: access.chooseable === true
+						});
+					}
 				}
 			}
+		});
+		// Add all grouped subclass sources to the sources array
+		subclassSources.forEach((source) => {
+			sources.push(source);
 		});
 
 		// Add feature-based sources

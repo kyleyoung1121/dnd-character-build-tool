@@ -1,31 +1,42 @@
 import { get } from 'svelte/store';
 import { character_store, type Character } from './character_store';
+import { getSpellAccessForCharacter, getSpellsByLevel, type Spell } from '$lib/data/spells';
 
-export type ConflictType = 'skill' | 'proficiency' | 'language' | 'feature';
+export type ConflictType = 'skill' | 'proficiency' | 'language' | 'feature' | 'spell_limit';
+
+export type SpellLimitViolation = {
+	level: string; // 'cantrips', 'level1', 'level2'
+	selected: number;
+	limit: number;
+	excess: number;
+};
 
 export type Conflict = {
 	type: ConflictType;
 	value: string;
-	sources: string[]; // e.g., ['bard.proficiencies', 'high_elf.keen_senses']
+	sources?: string[]; // e.g., ['bard.proficiencies', 'high_elf.keen_senses'] - for regular conflicts
+	violations?: SpellLimitViolation[]; // for spell limit conflicts
+	causes?: string[]; // what changes caused this (for spell limits)
 	affectedTabs?: string[]; // e.g., ['class', 'race'] - tabs that need user attention
 };
 
-export type ConflictDetectionResult = {
+/**
+ * Check for conflicts in character build - overlapping sources granting the same value
+ */
+export function detectConflicts(): {
 	hasConflicts: boolean;
 	conflicts: Conflict[];
-	tabsNeedingAttention: string[]; // unique list of tabs with conflicts
-};
-
-/**
- * Detects conflicts in the character store by analyzing what different scopes have added
- * Returns conflicts and which tabs need user attention
- */
-export function detectConflicts(): ConflictDetectionResult {
+	tabsNeedingAttention: string[];
+} {
 	const character = get(character_store);
 	const conflicts: Conflict[] = [];
 
-	if (!character._provenance) {
-		return { hasConflicts: false, conflicts: [], tabsNeedingAttention: [] };
+	if (!character) {
+		return {
+			hasConflicts: false,
+			conflicts: [],
+			tabsNeedingAttention: []
+		};
 	}
 
 	// Group all additions by field type and value
@@ -33,10 +44,19 @@ export function detectConflicts(): ConflictDetectionResult {
 		skill: {},
 		proficiency: {},
 		language: {},
-		feature: {}
+		feature: {},
+		spell_limit: {} // Not used for additions, but required for type consistency
 	};
 
 	// Analyze each scope's provenance
+	if (!character._provenance) {
+		return {
+			hasConflicts: false,
+			conflicts: [],
+			tabsNeedingAttention: []
+		};
+	}
+
 	for (const [scopeId, prov] of Object.entries(character._provenance)) {
 		// Handle both old flat format and new structured format
 		const changes = '_set' in prov && prov._set ? prov._set : prov;
@@ -76,6 +96,7 @@ export function detectConflicts(): ConflictDetectionResult {
 
 	// Find conflicts (values added by multiple sources)
 	for (const [conflictType, valueMap] of Object.entries(additions)) {
+		if (conflictType === 'spell_limit') continue; // Skip spell_limit as it's handled separately
 		for (const [value, sources] of Object.entries(valueMap)) {
 			if (sources.length > 1) {
 				const affectedTabs = getTabsFromSources(sources);
@@ -90,6 +111,10 @@ export function detectConflicts(): ConflictDetectionResult {
 		}
 	}
 
+	// Check for spell limit violations
+	const spellLimitConflicts = detectSpellLimitViolations(character);
+	conflicts.push(...spellLimitConflicts);
+
 	// Get unique list of tabs needing attention
 	const tabsNeedingAttention = [...new Set(conflicts.flatMap((c) => c.affectedTabs || []))];
 
@@ -98,6 +123,203 @@ export function detectConflicts(): ConflictDetectionResult {
 		conflicts,
 		tabsNeedingAttention
 	};
+}
+
+/**
+ * Detect spell limit violations
+ */
+function detectSpellLimitViolations(character: Character): Conflict[] {
+	const conflicts: Conflict[] = [];
+
+	// Only check if character has spells selected
+	if (!character._provenance?.['spell_selections']) {
+		return conflicts;
+	}
+
+	// Get spell selections from character store
+	const spellSelectionsData = character._provenance['spell_selections'];
+	const actualData = (spellSelectionsData as any)?._set || spellSelectionsData;
+	if (!actualData?.spells || !Array.isArray(actualData.spells)) {
+		return conflicts;
+	}
+
+	const selectedSpells = new Set(actualData.spells as string[]);
+
+	// Calculate current spell limits (mirroring the logic from spells page)
+	const spellLimits = calculateSpellLimits(character);
+
+	// Count selected spells by level
+	const spellCounts = countSelectedSpells(character, selectedSpells);
+
+	// Check for violations
+	const violations: SpellLimitViolation[] = [];
+
+	// Check cantrips
+	if (spellCounts.cantrips > spellLimits.cantrips) {
+		violations.push({
+			level: 'cantrips',
+			selected: spellCounts.cantrips,
+			limit: spellLimits.cantrips,
+			excess: spellCounts.cantrips - spellLimits.cantrips
+		});
+	}
+
+	// Check spell levels (considering shared vs separate limits)
+	if (spellLimits.isSharedLimits) {
+		const totalLeveled = spellCounts.level1 + spellCounts.level2;
+		if (totalLeveled > spellLimits.sharedLeveled) {
+			violations.push({
+				level: 'leveled',
+				selected: totalLeveled,
+				limit: spellLimits.sharedLeveled,
+				excess: totalLeveled - spellLimits.sharedLeveled
+			});
+		}
+	} else {
+		// Separate limits
+		if (spellCounts.level1 > spellLimits.level1) {
+			violations.push({
+				level: 'level1',
+				selected: spellCounts.level1,
+				limit: spellLimits.level1,
+				excess: spellCounts.level1 - spellLimits.level1
+			});
+		}
+
+		if (spellCounts.level2 > spellLimits.level2) {
+			violations.push({
+				level: 'level2',
+				selected: spellCounts.level2,
+				limit: spellLimits.level2,
+				excess: spellCounts.level2 - spellLimits.level2
+			});
+		}
+	}
+
+	// If we have violations, create a conflict
+	if (violations.length > 0) {
+		// Try to determine what caused this (if we can detect recent changes)
+		const causes = determineSpellLimitCauses(character);
+
+		conflicts.push({
+			type: 'spell_limit',
+			value: `${violations.length} spell limit violation${violations.length > 1 ? 's' : ''}`,
+			violations,
+			causes,
+			affectedTabs: ['spells']
+		});
+	}
+
+	return conflicts;
+}
+
+/**
+ * Calculate spell limits for a character (mirroring spells page logic)
+ */
+function calculateSpellLimits(character: Character) {
+	const spellAccess = getSpellAccess(character);
+	const limits = {
+		cantrips: 0,
+		level1: 0,
+		level2: 0,
+		sharedLeveled: 0,
+		isSharedLimits: false
+	};
+
+	spellAccess.forEach((access) => {
+		if (access.chooseable !== false) {
+			// Only count class and subclass access toward limits
+			const countsTowardLimits =
+				access.source === 'class' || access.source === 'subclass' || access.source === 'feature';
+
+			if (access.chooseCantripCount !== undefined || access.chooseSpellCount !== undefined) {
+				if (access.chooseFrom && access.chooseFrom.length > 0) {
+					// Handle cantrip limits
+					if (access.chooseCantripCount !== undefined && countsTowardLimits) {
+						limits.cantrips += access.chooseCantripCount;
+					}
+
+					// Handle leveled spell limits
+					if (access.chooseSpellCount !== undefined && countsTowardLimits) {
+						// For simplicity, assume this can choose both level 1 and 2 spells (shared limits)
+						// This matches the typical D&D behavior for most classes
+						limits.isSharedLimits = true;
+						limits.sharedLeveled += access.chooseSpellCount;
+					}
+				}
+			}
+			// Legacy format support
+			else if (access.chooseCount && countsTowardLimits) {
+				if (access.chooseFrom && access.chooseFrom.length > 0) {
+					limits.cantrips += access.chooseCount;
+					limits.isSharedLimits = true;
+					limits.sharedLeveled += access.chooseCount;
+				}
+			}
+		}
+	});
+
+	return limits;
+}
+
+/**
+ * Count selected spells by level using proper spell data
+ */
+function countSelectedSpells(character: Character, selectedSpells: Set<string>) {
+	const counts = {
+		cantrips: 0,
+		level1: 0,
+		level2: 0
+	};
+
+	// Get all spells by level to look up selected spells
+	const cantrips = getSpellsByLevel(0);
+	const level1Spells = getSpellsByLevel(1);
+	const level2Spells = getSpellsByLevel(2);
+
+	// Create lookup maps for faster searching
+	const cantripNames = new Set(cantrips.map((s) => s.name));
+	const level1Names = new Set(level1Spells.map((s) => s.name));
+	const level2Names = new Set(level2Spells.map((s) => s.name));
+
+	for (const spellName of selectedSpells) {
+		if (cantripNames.has(spellName)) {
+			counts.cantrips++;
+		} else if (level1Names.has(spellName)) {
+			counts.level1++;
+		} else if (level2Names.has(spellName)) {
+			counts.level2++;
+		}
+		// Note: Spells above level 2 are ignored since we only track up to level 2
+	}
+
+	return counts;
+}
+
+/**
+ * Get spell access for character (using the same logic as spells page)
+ */
+function getSpellAccess(character: Character) {
+	return getSpellAccessForCharacter(character);
+}
+
+/**
+ * Try to determine what caused spell limit violations
+ */
+function determineSpellLimitCauses(character: Character): string[] {
+	const causes: string[] = [];
+
+	// Check if subclass changed recently (heuristic)
+	if (character.subclass) {
+		causes.push(`Subclass: ${character.subclass}`);
+	}
+
+	// Check if class changed
+	if (character.class) {
+		causes.push(`Class: ${character.class}`);
+	}
+
+	return causes;
 }
 
 /**
@@ -180,123 +402,26 @@ function isUserChangeableSpeciesFeature(scopeId: string): boolean {
  * Class features include skills from bard, fighter, etc.
  */
 function isClassFeature(scopeId: string): boolean {
-	// Don't mistake background features for class features
-	if (isBackgroundFeature(scopeId)) {
-		return false;
-	}
-
-	// Class features are typically selected after choosing a class
-	// Common class skill features
-	return (
-		scopeId.includes('Skill Proficiencies') ||
-		scopeId.includes('Skills') ||
-		scopeId.includes('Bonus Proficiencies') ||
-		scopeId.includes('Expertise') ||
-		scopeId.includes('college_of_lore')
+	return /^(class:|feature:)(bard|fighter|ranger|rogue|wizard|paladin|cleric|barbarian|druid|monk|sorcerer|warlock)/i.test(
+		scopeId
 	);
 }
 
 /**
  * Check if a feature scope belongs to a species
- * Species features include Keen Senses, Fey Ancestry, etc.
  */
 function isSpeciesFeature(scopeId: string): boolean {
-	// Species features are typically named after species traits
-	return (
-		scopeId.includes('Keen Senses') ||
-		scopeId.includes('Fey Ancestry') ||
-		scopeId.includes('Trance') ||
-		scopeId.includes('Darkvision') ||
-		scopeId.includes('Dwarven') ||
-		scopeId.includes('Elven') ||
-		scopeId.includes('Halfling') ||
-		scopeId.includes('Draconic') ||
-		scopeId.includes('Tool Proficiency')
+	return /^(feature:)(high_elf|variant_human|half_elf|dragonborn|drow|deep_gnome|wood_elf|lightfoot_halfling|stout_halfling|half_orc|githyanki|custom_lineage)/i.test(
+		scopeId
 	);
 }
 
 /**
  * Check if a feature scope belongs to a background
- * Background features include skill proficiencies, tool proficiencies, languages, etc.
  */
 function isBackgroundFeature(scopeId: string): boolean {
-	// Direct background scope IDs
-	if (scopeId.startsWith('background:')) {
-		return true;
-	}
-
-	// Check if this is a feature scope ID that belongs to a background
-	if (scopeId.startsWith('feature:')) {
-		const character = get(character_store);
-
-		// Must have a background selected
-		if (!character.background) {
-			return false;
-		}
-
-		// Check if there's a background: scope in provenance (background was selected)
-		const hasBackgroundScope =
-			character._provenance &&
-			Object.keys(character._provenance).some((key) => key.startsWith('background:'));
-
-		if (!hasBackgroundScope) {
-			return false;
-		}
-
-		// Get the feature name part
-		const featureName = scopeId.split(':')[1];
-
-		// If this feature name is 'Skill Proficiencies' and we have a background,
-		// we need to check if this specific scope ID was created after the background
-		// or if it matches typical background skill patterns
-		if (featureName === 'Skill Proficiencies') {
-			// This is tricky - both classes and backgrounds can have 'Skill Proficiencies'
-			// We'll use a heuristic: if there's exactly one 'feature:Skill Proficiencies'
-			// and one class skill selection pattern, then this is likely the background one
-
-			// Count skill-related scopes
-			const skillScopes = Object.keys(character._provenance || {}).filter(
-				(key) => key.includes('Skill') || key.includes('skill')
-			);
-
-			// If we see feature:Skill Proficiencies without index, it's likely background
-			return scopeId === 'feature:Skill Proficiencies';
-		}
-
-		// Other background-specific feature names that are unlikely to be from classes
-		const backgroundOnlyFeatures = [
-			'Tool Proficiencies',
-			'Equipment',
-			'Languages',
-			'Criminal Contact',
-			'Shelter of the Faithful',
-			'False Identity',
-			'By Popular Demand',
-			'Rustic Hospitality',
-			'Position of Privilege'
-		];
-
-		return backgroundOnlyFeatures.includes(featureName);
-	}
-
-	// Legacy detection for background names in scope IDs
-	return (
-		scopeId.includes('Acolyte') ||
-		scopeId.includes('Charlatan') ||
-		scopeId.includes('Criminal') ||
-		scopeId.includes('Entertainer') ||
-		scopeId.includes('Folk Hero') ||
-		scopeId.includes('Gladiator') ||
-		scopeId.includes('Guild Artisan') ||
-		scopeId.includes('Hermit') ||
-		scopeId.includes('Knight') ||
-		scopeId.includes('Noble') ||
-		scopeId.includes('Outlander') ||
-		scopeId.includes('Pirate') ||
-		scopeId.includes('Sage') ||
-		scopeId.includes('Sailor') ||
-		scopeId.includes('Soldier') ||
-		scopeId.includes('Urchin')
+	return /^(feature:)(acolyte|criminal|folk_hero|noble|sage|soldier|charlatan|entertainer|guild_artisan|hermit|outlander|sailor|urchin|custom_background)/i.test(
+		scopeId
 	);
 }
 
@@ -304,140 +429,6 @@ function isBackgroundFeature(scopeId: string): boolean {
  * Check if a background feature represents a user choice
  */
 function isUserChangeableBackgroundFeature(scopeId: string): boolean {
-	// Must be a background feature first
-	if (!isBackgroundFeature(scopeId)) {
-		return false;
-	}
-
-	// Direct background selection is not user-changeable for conflict resolution
-	if (scopeId.startsWith('background:')) {
-		return false;
-	}
-
-	// Background features with user choices typically have indices
-	if (scopeId.startsWith('feature:')) {
-		// Features with indices (like Tool Proficiencies:0) are user-changeable
-		if (/:\d+$/.test(scopeId)) {
-			return true;
-		}
-
-		// Fixed background features (like Skill Proficiencies without index) are not changeable
-		// These are automatic grants from the background
-		return false;
-	}
-
-	// Fallback for legacy scope IDs
-	return /:\d+$/.test(scopeId);
-}
-
-/**
- * Gets conflicts that affect a specific tab
- * Useful for showing warnings on individual tabs
- */
-export function getConflictsForTab(tabName: string): Conflict[] {
-	const result = detectConflicts();
-	return result.conflicts.filter((conflict) => conflict.affectedTabs?.includes(tabName));
-}
-
-/**
- * Gets conflicts of a specific type (e.g., just skill conflicts)
- */
-export function getConflictsByType(type: ConflictType): Conflict[] {
-	const result = detectConflicts();
-	return result.conflicts.filter((conflict) => conflict.type === type);
-}
-
-/**
- * Checks if a specific value would cause a conflict if added by a given source
- * Useful for real-time validation during selection
- */
-export function wouldCauseConflict(type: ConflictType, value: string, newSource: string): boolean {
-	const character = get(character_store);
-
-	if (!character._provenance) return false;
-
-	// Check if any other source has already added this value
-	for (const [scopeId, prov] of Object.entries(character._provenance)) {
-		if (scopeId === newSource) continue; // same source is fine
-
-		const changes = '_set' in prov && prov._set ? prov._set : prov;
-		if (!changes) continue;
-
-		const fieldName = getFieldNameForType(type);
-		const fieldValues = changes[fieldName];
-
-		if (Array.isArray(fieldValues) && fieldValues.includes(value)) {
-			return true; // conflict found
-		}
-	}
-
-	return false;
-}
-
-/**
- * Helper to map conflict types to character store field names
- */
-function getFieldNameForType(type: ConflictType): keyof Character {
-	switch (type) {
-		case 'skill':
-			return 'skills';
-		case 'proficiency':
-			return 'proficiencies';
-		case 'language':
-			return 'languages';
-		case 'feature':
-			return 'features';
-		default:
-			throw new Error(`Unknown conflict type: ${type}`);
-	}
-}
-
-/**
- * Gets conflicts where the user can take action (has changeable selections)
- */
-export function getUserActionableConflicts(): Conflict[] {
-	const result = detectConflicts();
-	return result.conflicts.filter((conflict) => {
-		// Check if any source in this conflict is user-changeable
-		return conflict.sources.some(
-			(source) =>
-				isUserChangeableClassFeature(source) ||
-				isUserChangeableSpeciesFeature(source) ||
-				isUserChangeableBackgroundFeature(source)
-		);
-	});
-}
-
-/**
- * Gets the primary tab users should visit to resolve conflicts
- * Prioritizes tabs where users can make changes
- */
-export function getPrimaryResolutionTab(conflict: Conflict): string | null {
-	const changeableSources = conflict.sources.filter(
-		(source) =>
-			isUserChangeableClassFeature(source) ||
-			isUserChangeableSpeciesFeature(source) ||
-			isUserChangeableBackgroundFeature(source)
-	);
-
-	if (changeableSources.length === 0) {
-		return null; // No user-changeable sources
-	}
-
-	// Return the first changeable tab
-	for (const source of changeableSources) {
-		if (source.startsWith('class:') || isClassFeature(source)) {
-			return 'class';
-		} else if (
-			source.startsWith('race:') ||
-			source.startsWith('species:') ||
-			isSpeciesFeature(source)
-		) {
-			return 'species';
-		} else if (source.startsWith('background:') || isBackgroundFeature(source)) {
-			return 'background';
-		}
-	}
-
-	return null;
+	// Most background features are user choices
+	return /:\d+$/.test(scopeId) && isBackgroundFeature(scopeId);
 }

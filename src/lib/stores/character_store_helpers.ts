@@ -213,28 +213,43 @@ function smartRemoveFromArray(
 }
 
 /**
+ * Enhanced applyChoice that checks for spell limit violations and shows immediate feedback
+ * This is specifically for class/subclass changes that might affect spell limits
+ * Temporarily disabled to fix circular import issues
+ */
+export function applyChoiceWithSpellLimitCheck(
+	scopeId: string,
+	changes: Partial<Character> = {},
+	mods?: Record<string, number>
+): {
+	applied: boolean;
+	spellLimitViolations?: import('./conflict_detection').SpellLimitViolation[];
+} {
+	// Apply the change normally for now
+	applyChoice(scopeId, changes, mods);
+
+	// TODO: Re-implement spell limit checking without circular imports
+	return {
+		applied: true
+	};
+}
+
+/**
  * Enhanced applyChoice that checks for conflicts before applying
  * Returns conflict information if conflicts would be created
+ * Temporarily disabled to fix circular import issues
  */
 export function applyChoiceWithConflictCheck(
 	scopeId: string,
 	changes: Partial<Character> = {},
 	mods?: Record<string, number>
 ): { applied: boolean; conflicts?: import('./conflict_detection').Conflict[] } {
-	// Check what conflicts would be created by this change
-	const potentialConflicts: import('./conflict_detection').Conflict[] = [];
-
-	// For now, we'll apply the change and then check for conflicts
-	// In the future, we could do pre-validation here
+	// Apply the change normally for now
 	applyChoice(scopeId, changes, mods);
 
-	// Check for conflicts after applying
-	const { detectConflicts } = require('./conflict_detection');
-	const result = detectConflicts();
-
+	// TODO: Re-implement conflict checking without circular imports
 	return {
-		applied: true,
-		conflicts: result.conflicts.length > 0 ? result.conflicts : undefined
+		applied: true
 	};
 }
 

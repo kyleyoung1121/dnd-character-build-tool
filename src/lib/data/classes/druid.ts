@@ -1,7 +1,7 @@
 import { base } from '$app/paths';
 import type { ClassData, EquipmentChoice } from '$lib/data/types/ClassData';
 import type { FeaturePrompt } from '$lib/data/types/Features';
-import { simpleWeapons } from '$lib/data/equipment/weapons';
+import { getWeaponsByCategory } from '$lib/data/equipment/weapon-utils';
 
 const proficienciesPrompt: FeaturePrompt = {
 	name: 'Skill Proficiencies',
@@ -78,23 +78,217 @@ const druidCirclePrompt: FeaturePrompt = {
 		placeholderText: '-Choose a Circle-',
 		options: [
 			{
-				name: 'Circle of the Land',
-				optionDescription: `Your magic draws on the energy of the land, granting you additional spells.`,
+				name: 'Circle of the Land (Arctic)',
+				optionDescription: 'Your magic draws on the energy of frigid lands, granting you spells of ice and survival.',
 				nestedPrompts: [
 					{
 						name: 'Bonus Cantrip',
-						id: 'druid_land_cantrip_01',
+						id: 'druid_arctic_cantrip_01',
 						description: 'You learn one additional druid cantrip.',
-						source: 'druid.circle_of_the_land',
+						source: 'druid.circle_of_the_land_arctic',
 						effects: [{ target: 'spells', action: 'add', value: 'User chooses one druid cantrip' }]
 					},
 					{
+						name: 'Circle Spells',
+						id: 'druid_arctic_spells_01',
+						description: 'You gain Arctic-specific spells that are always prepared and do not count against your prepared spells limit.',
+						source: 'druid.circle_of_the_land_arctic',
+						effects: [{ target: 'features', action: 'add', value: 'Circle Spells' }]
+					},
+					{
 						name: 'Natural Recovery',
-						id: 'druid_land_recovery_01',
-						description: `
-							You can regain some expended spell slots during a short rest.
-						`,
-						source: 'druid.circle_of_the_land',
+						id: 'druid_arctic_recovery_01',
+						description: 'You can regain some expended spell slots during a short rest.',
+						source: 'druid.circle_of_the_land_arctic',
+						effects: [{ target: 'features', action: 'add', value: 'Natural Recovery' }]
+					}
+				]
+			},
+			{
+				name: 'Circle of the Land (Coast)',
+				optionDescription: 'Your magic draws on the energy of coastal regions, granting you spells of water and wind.',
+				nestedPrompts: [
+					{
+						name: 'Bonus Cantrip',
+						id: 'druid_coast_cantrip_01',
+						description: 'You learn one additional druid cantrip.',
+						source: 'druid.circle_of_the_land_coast',
+						effects: [{ target: 'spells', action: 'add', value: 'User chooses one druid cantrip' }]
+					},
+					{
+						name: 'Circle Spells',
+						id: 'druid_coast_spells_01',
+						description: 'You gain Coast-specific spells that are always prepared and do not count against your prepared spells limit.',
+						source: 'druid.circle_of_the_land_coast',
+						effects: [{ target: 'features', action: 'add', value: 'Circle Spells' }]
+					},
+					{
+						name: 'Natural Recovery',
+						id: 'druid_coast_recovery_01',
+						description: 'You can regain some expended spell slots during a short rest.',
+						source: 'druid.circle_of_the_land_coast',
+						effects: [{ target: 'features', action: 'add', value: 'Natural Recovery' }]
+					}
+				]
+			},
+			{
+				name: 'Circle of the Land (Desert)',
+				optionDescription: 'Your magic draws on the energy of arid wastelands, granting you spells of heat and endurance.',
+				nestedPrompts: [
+					{
+						name: 'Bonus Cantrip',
+						id: 'druid_desert_cantrip_01',
+						description: 'You learn one additional druid cantrip.',
+						source: 'druid.circle_of_the_land_desert',
+						effects: [{ target: 'spells', action: 'add', value: 'User chooses one druid cantrip' }]
+					},
+					{
+						name: 'Circle Spells',
+						id: 'druid_desert_spells_01',
+						description: 'You gain Desert-specific spells that are always prepared and do not count against your prepared spells limit.',
+						source: 'druid.circle_of_the_land_desert',
+						effects: [{ target: 'features', action: 'add', value: 'Circle Spells' }]
+					},
+					{
+						name: 'Natural Recovery',
+						id: 'druid_desert_recovery_01',
+						description: 'You can regain some expended spell slots during a short rest.',
+						source: 'druid.circle_of_the_land_desert',
+						effects: [{ target: 'features', action: 'add', value: 'Natural Recovery' }]
+					}
+				]
+			},
+			{
+				name: 'Circle of the Land (Forest)',
+				optionDescription: 'Your magic draws on the energy of woodlands, granting you spells of growth and protection.',
+				nestedPrompts: [
+					{
+						name: 'Bonus Cantrip',
+						id: 'druid_forest_cantrip_01',
+						description: 'You learn one additional druid cantrip.',
+						source: 'druid.circle_of_the_land_forest',
+						effects: [{ target: 'spells', action: 'add', value: 'User chooses one druid cantrip' }]
+					},
+					{
+						name: 'Circle Spells',
+						id: 'druid_forest_spells_01',
+						description: 'You gain Forest-specific spells that are always prepared and do not count against your prepared spells limit.',
+						source: 'druid.circle_of_the_land_forest',
+						effects: [{ target: 'features', action: 'add', value: 'Circle Spells' }]
+					},
+					{
+						name: 'Natural Recovery',
+						id: 'druid_forest_recovery_01',
+						description: 'You can regain some expended spell slots during a short rest.',
+						source: 'druid.circle_of_the_land_forest',
+						effects: [{ target: 'features', action: 'add', value: 'Natural Recovery' }]
+					}
+				]
+			},
+			{
+				name: 'Circle of the Land (Grassland)',
+				optionDescription: 'Your magic draws on the energy of plains and meadows, granting you spells of movement and divination.',
+				nestedPrompts: [
+					{
+						name: 'Bonus Cantrip',
+						id: 'druid_grassland_cantrip_01',
+						description: 'You learn one additional druid cantrip.',
+						source: 'druid.circle_of_the_land_grassland',
+						effects: [{ target: 'spells', action: 'add', value: 'User chooses one druid cantrip' }]
+					},
+					{
+						name: 'Circle Spells',
+						id: 'druid_grassland_spells_01',
+						description: 'You gain Grassland-specific spells that are always prepared and do not count against your prepared spells limit.',
+						source: 'druid.circle_of_the_land_grassland',
+						effects: [{ target: 'features', action: 'add', value: 'Circle Spells' }]
+					},
+					{
+						name: 'Natural Recovery',
+						id: 'druid_grassland_recovery_01',
+						description: 'You can regain some expended spell slots during a short rest.',
+						source: 'druid.circle_of_the_land_grassland',
+						effects: [{ target: 'features', action: 'add', value: 'Natural Recovery' }]
+					}
+				]
+			},
+			{
+				name: 'Circle of the Land (Mountain)',
+				optionDescription: 'Your magic draws on the energy of peaks and stone, granting you spells of earth and sky.',
+				nestedPrompts: [
+					{
+						name: 'Bonus Cantrip',
+						id: 'druid_mountain_cantrip_01',
+						description: 'You learn one additional druid cantrip.',
+						source: 'druid.circle_of_the_land_mountain',
+						effects: [{ target: 'spells', action: 'add', value: 'User chooses one druid cantrip' }]
+					},
+					{
+						name: 'Circle Spells',
+						id: 'druid_mountain_spells_01',
+						description: 'You gain Mountain-specific spells that are always prepared and do not count against your prepared spells limit.',
+						source: 'druid.circle_of_the_land_mountain',
+						effects: [{ target: 'features', action: 'add', value: 'Circle Spells' }]
+					},
+					{
+						name: 'Natural Recovery',
+						id: 'druid_mountain_recovery_01',
+						description: 'You can regain some expended spell slots during a short rest.',
+						source: 'druid.circle_of_the_land_mountain',
+						effects: [{ target: 'features', action: 'add', value: 'Natural Recovery' }]
+					}
+				]
+			},
+			{
+				name: 'Circle of the Land (Swamp)',
+				optionDescription: 'Your magic draws on the energy of wetlands, granting you spells of decay and transformation.',
+				nestedPrompts: [
+					{
+						name: 'Bonus Cantrip',
+						id: 'druid_swamp_cantrip_01',
+						description: 'You learn one additional druid cantrip.',
+						source: 'druid.circle_of_the_land_swamp',
+						effects: [{ target: 'spells', action: 'add', value: 'User chooses one druid cantrip' }]
+					},
+					{
+						name: 'Circle Spells',
+						id: 'druid_swamp_spells_01',
+						description: 'You gain Swamp-specific spells that are always prepared and do not count against your prepared spells limit.',
+						source: 'druid.circle_of_the_land_swamp',
+						effects: [{ target: 'features', action: 'add', value: 'Circle Spells' }]
+					},
+					{
+						name: 'Natural Recovery',
+						id: 'druid_swamp_recovery_01',
+						description: 'You can regain some expended spell slots during a short rest.',
+						source: 'druid.circle_of_the_land_swamp',
+						effects: [{ target: 'features', action: 'add', value: 'Natural Recovery' }]
+					}
+				]
+			},
+			{
+				name: 'Circle of the Land (Underdark)',
+				optionDescription: 'Your magic draws on the energy of deep caverns, granting you spells of shadow and stone.',
+				nestedPrompts: [
+					{
+						name: 'Bonus Cantrip',
+						id: 'druid_underdark_cantrip_01',
+						description: 'You learn one additional druid cantrip.',
+						source: 'druid.circle_of_the_land_underdark',
+						effects: [{ target: 'spells', action: 'add', value: 'User chooses one druid cantrip' }]
+					},
+					{
+						name: 'Circle Spells',
+						id: 'druid_underdark_spells_01',
+						description: 'You gain Underdark-specific spells that are always prepared and do not count against your prepared spells limit.',
+						source: 'druid.circle_of_the_land_underdark',
+						effects: [{ target: 'features', action: 'add', value: 'Circle Spells' }]
+					},
+					{
+						name: 'Natural Recovery',
+						id: 'druid_underdark_recovery_01',
+						description: 'You can regain some expended spell slots during a short rest.',
+						source: 'druid.circle_of_the_land_underdark',
 						effects: [{ target: 'features', action: 'add', value: 'Natural Recovery' }]
 					}
 				]
@@ -177,7 +371,7 @@ export const druid: ClassData = {
 								description: 'Choose a simple weapon',
 								type: 'weapon-list',
 								category: 'simple',
-								options: simpleWeapons.map((w) => w.name),
+								options: getWeaponsByCategory('simple-all'),
 								count: 1
 							}
 						]
@@ -201,7 +395,7 @@ export const druid: ClassData = {
 								description: 'Choose a simple melee weapon',
 								type: 'weapon-list',
 								category: 'simple-melee',
-								options: simpleWeapons.filter((w) => w.type === 'melee').map((w) => w.name),
+								options: getWeaponsByCategory('simple-melee'),
 								count: 1
 							}
 						]

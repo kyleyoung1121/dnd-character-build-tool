@@ -49,7 +49,7 @@ const layOnHandsPrompt: FeaturePrompt = {
 	name: 'Lay on Hands',
 	description: `
 		You have a pool of healing power that replenishes when you take a long rest. 
-		With that pool, you can restore a total number of hit points equal to your Paladin level × 5.
+		With that pool, you can restore a total of 15 hit points.
 		As an action, you can touch a creature to restore any number of hit points remaining in the pool.
 	`,
 	source: 'paladin',
@@ -68,7 +68,63 @@ const fightingStylePrompt: FeaturePrompt = {
 	description: 'Choose a fighting style to enhance your combat ability.',
 	featureOptions: {
 		placeholderText: '-Choose a Fighting Style-',
-		options: ['Defense', 'Dueling', 'Great Weapon Fighting', 'Protection'],
+		options: [
+			{
+				name: 'Defense',
+				optionDescription: 'Defensive fighter who prioritizes protection.',
+				nestedPrompts: [
+					{
+						id: 'paladin_defense_style_desc',
+						name: 'Defense Fighting Style',
+						description: 'While you are wearing armor, you gain a +1 bonus to AC.',
+						source: 'paladin.fighting_style',
+						effects: []
+					}
+				]
+			},
+			{
+				name: 'Dueling',
+				optionDescription: 'Expert with one-handed weapons.',
+				nestedPrompts: [
+					{
+						id: 'paladin_dueling_style_desc',
+						name: 'Dueling Fighting Style',
+						description:
+							'When you are wielding a melee weapon in one hand and no other weapons, you gain a +2 bonus to damage rolls with that weapon.',
+						source: 'paladin.fighting_style',
+						effects: []
+					}
+				]
+			},
+			{
+				name: 'Great Weapon Fighting',
+				optionDescription: 'Master of two-handed weapons.',
+				nestedPrompts: [
+					{
+						id: 'paladin_gwf_style_desc',
+						name: 'Great Weapon Fighting Style',
+						description:
+							'When you roll a 1 or 2 on a damage die for an attack you make with a melee weapon that you are wielding with two hands, you can reroll the die and must use the new roll. The weapon must have the two-handed or versatile property for you to gain this benefit.',
+						source: 'paladin.fighting_style',
+						effects: []
+					}
+				]
+			},
+			{
+				name: 'Protection',
+				optionDescription: 'Guardian who protects allies.',
+				nestedPrompts: [
+					{
+						id: 'paladin_protection_style_desc',
+						name: 'Protection Fighting Style',
+						description:
+							'When a creature you can see attacks a target other than you that is within 5 feet of you, you can use your reaction to impose disadvantage on the attack roll. You must be wielding a shield.',
+						source: 'paladin.fighting_style',
+						effects: []
+					}
+				]
+			}
+		],
 		numPicks: 1
 	},
 	source: 'paladin',
@@ -103,7 +159,7 @@ const divineSmitePrompt: FeaturePrompt = {
 	name: 'Divine Smite',
 	description: `
 		When you hit a creature with a melee weapon attack, you can expend one spell slot to deal radiant damage in addition to the weapon's damage.
-		The extra damage is 2d8 for a 1st-level spell slot, plus 1d8 for each spell level higher than 1st.
+		The extra damage is 2d8 for a 1st-level spell slot.
 	`,
 	source: 'paladin',
 	effects: [
@@ -130,7 +186,7 @@ const sacredOathPrompt: FeaturePrompt = {
 						id: 'paladin_oath_devotion_01',
 						name: 'Oath Spells',
 						description:
-							'You gain oath-specific spells at certain levels (not applicable at level 3).',
+							"You gain oath-specific spells that are always prepared and don't count against your prepared spells limit.",
 						source: 'paladin.oath_devotion',
 						effects: [
 							{
@@ -143,7 +199,8 @@ const sacredOathPrompt: FeaturePrompt = {
 					{
 						id: 'paladin_sacred_weapon_01',
 						name: 'Sacred Weapon',
-						description: 'You can add your Charisma modifier to attack rolls with a weapon.',
+						description:
+							'As an action, you can imbue one weapon that you are holding with positive energy. For 1 minute, you add your Charisma modifier to attack rolls made with that weapon (with a minimum bonus of +1). The weapon also emits bright light in a 20-foot radius and dim light 20 feet beyond that. If the weapon is not already magical, it becomes magical for the duration. You can end this effect on your turn as part of any other action. If you are no longer holding or carrying this weapon, or if you fall unconscious, this effect ends.',
 						source: 'paladin.oath_devotion',
 						effects: [
 							{
@@ -156,7 +213,8 @@ const sacredOathPrompt: FeaturePrompt = {
 					{
 						id: 'paladin_turn_unholy_01',
 						name: 'Turn the Unholy',
-						description: 'As an action, you can censure fiends and undead.',
+						description:
+							"As an action, you present your holy symbol and speak a prayer censuring fiends and undead. Each fiend or undead that can see or hear you within 30 feet of you must make a Wisdom saving throw. If the creature fails its saving throw, it is turned for 1 minute or until it takes any damage. A turned creature must spend its turns trying to move as far away from you as it can, and it can't willingly move to a space within 30 feet of you. It also can't take reactions. For its action, it can use only the Dash action or try to escape from an effect that prevents it from moving. If there's nowhere to move, the creature can use the Dodge action.",
 						source: 'paladin.oath_devotion',
 						effects: [
 							{
@@ -176,7 +234,7 @@ const sacredOathPrompt: FeaturePrompt = {
 						id: 'paladin_oath_ancients_01',
 						name: 'Oath Spells',
 						description:
-							'You gain oath-specific spells at certain levels (not applicable at level 3).',
+							"You gain oath-specific spells that are always prepared and don't count against your prepared spells limit.",
 						source: 'paladin.oath_ancients',
 						effects: [
 							{
@@ -188,27 +246,77 @@ const sacredOathPrompt: FeaturePrompt = {
 					},
 					{
 						id: 'paladin_natures_wrath_01',
-						name: 'Nature’s Wrath',
-						description: 'You can invoke spectral guardians to hinder foes.',
+						name: "Nature's Wrath",
+						description:
+							'As an action, you can cause spectral vines to spring up and reach for a creature within 10 feet of you that you can see. The creature must succeed on a Strength or Dexterity saving throw (its choice) or be restrained. While restrained by the vines, the creature repeats the saving throw at the end of each of its turns. On a success, it frees itself and the vines vanish.',
 						source: 'paladin.oath_ancients',
 						effects: [
 							{
 								target: 'features',
 								action: 'add',
-								value: 'Nature’s Wrath'
+								value: "Nature's Wrath"
 							}
 						]
 					},
 					{
 						id: 'paladin_turn_faithless_01',
 						name: 'Turn the Faithless',
-						description: 'As an action, you can censure fey and fiends.',
+						description:
+							"As an action, you present your holy symbol and speak a prayer censuring fey and fiends. Each fey or fiend that can see or hear you within 30 feet of you must make a Wisdom saving throw. If the creature fails its saving throw, it is turned for 1 minute or until it takes any damage. A turned creature must spend its turns trying to move as far away from you as it can, and it can't willingly move to a space within 30 feet of you. It also can't take reactions. For its action, it can use only the Dash action or try to escape from an effect that prevents it from moving. If there's nowhere to move, the creature can use the Dodge action.",
 						source: 'paladin.oath_ancients',
 						effects: [
 							{
 								target: 'features',
 								action: 'add',
 								value: 'Turn the Faithless'
+							}
+						]
+					}
+				]
+			},
+			{
+				name: 'Oath of Vengeance',
+				optionDescription: `You have set aside even your own righteousness to serve the greater good.`,
+				nestedPrompts: [
+					{
+						id: 'paladin_oath_vengeance_01',
+						name: 'Oath Spells',
+						description:
+							"You gain oath-specific spells that are always prepared and don't count against your prepared spells limit.",
+						source: 'paladin.oath_vengeance',
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Oath Spells'
+							}
+						]
+					},
+					{
+						id: 'paladin_abjure_enemy_01',
+						name: 'Abjure Enemy',
+						description:
+							"As an action, you present your holy symbol and speak a prayer of denunciation, using your Channel Divinity. Choose one creature within 60 feet of you that you can see. That creature must make a Wisdom saving throw, unless it is immune to being frightened. Fiends and undead have disadvantage on this saving throw. On a failed save, the creature is frightened for 1 minute or until it takes any damage. While frightened, the creature's speed is 0, and it can't benefit from any bonus to its speed. On a successful save, the creature's speed is halved for 1 minute or until the creature takes any damage.",
+						source: 'paladin.oath_vengeance',
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Abjure Enemy'
+							}
+						]
+					},
+					{
+						id: 'paladin_vow_enmity_01',
+						name: 'Vow of Enmity',
+						description:
+							'As a bonus action, you can utter a vow of enmity against a creature you can see within 10 feet of you, using your Channel Divinity. You gain advantage on attack rolls against the creature for 1 minute or until it drops to 0 hit points or falls unconscious.',
+						source: 'paladin.oath_vengeance',
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Vow of Enmity'
 							}
 						]
 					}

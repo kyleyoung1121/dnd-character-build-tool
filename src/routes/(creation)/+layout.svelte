@@ -2,17 +2,26 @@
 	import { base } from '$app/paths';
 	import { page } from '$app/stores';
 	import { activeConflicts, markTabAsVisited } from '$lib/stores/conflict_store';
+	import { character_store, hasSpellAccess } from '$lib/stores/character_store';
 	import { onMount } from 'svelte';
 
-	export let navItems = [
+	const baseNavItems = [
 		{ name: 'Class', href: base + '/class', id: 'class' },
 		{ name: 'Species', href: base + '/species', id: 'species' },
 		{ name: 'Abilities', href: base + '/abilities', id: 'abilities' },
 		{ name: 'Background', href: base + '/background', id: 'background' },
 		{ name: 'Equipment', href: base + '/equipment', id: 'equipment' },
-		{ name: 'Spells', href: base + '/spells', id: 'spells' },
 		{ name: 'Export', href: base + '/export', id: 'export' }
 	];
+
+	// Add spells tab conditionally based on character's spell access
+	$: navItems = hasSpellAccess($character_store)
+		? [
+				...baseNavItems.slice(0, 5), // Class through Equipment
+				{ name: 'Spells', href: base + '/spells', id: 'spells' },
+				baseNavItems[5] // Export
+			]
+		: baseNavItems;
 
 	// Mark current tab as visited when navigating
 	$: if ($page.route?.id) {

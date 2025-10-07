@@ -11,6 +11,7 @@ export type Character = {
 	name: string;
 	race: string;
 	class: string;
+	characterClass?: string; // Alias for backwards compatibility
 	background: string;
 	alignment: string;
 
@@ -70,3 +71,75 @@ export const character_store = writable<Character>({
 	speed: null,
 	size: null
 });
+
+/**
+ * Determines if the character has access to spells based on class/subclass/features
+ * Used for conditional display of the Spells tab
+ */
+export function hasSpellAccess(character: Character): boolean {
+	// Import the spell access function here to avoid circular imports
+	try {
+		// Dynamic import to avoid circular dependency
+		// We'll use a simple check based on known spell access patterns
+
+		// Full spellcasters (have spells from level 1)
+		const fullCasters = ['Bard', 'Cleric', 'Druid', 'Sorcerer', 'Warlock', 'Wizard'];
+		if (fullCasters.includes(character.class)) {
+			return true;
+		}
+
+		// Half casters (get spells at level 2, so level 3 characters have spells)
+		const halfCasters = ['Paladin', 'Ranger'];
+		if (halfCasters.includes(character.class)) {
+			return true;
+		}
+
+		// Subclass casters
+		if (
+			character.subclass === 'Eldritch Knight' ||
+			character.subclass === 'Arcane Trickster' ||
+			character.subclass === 'Way of Shadow'
+		) {
+			return true;
+		}
+
+		// Racial spell access
+		if (
+			character.race === 'Tiefling' ||
+			(character.race === 'Elf' && character.subrace === 'High Elf') ||
+			(character.race === 'Gnome' && character.subrace === 'Forest Gnome')
+		) {
+			return true;
+		}
+
+		// Check for spellcasting features
+		const spellcastingFeatures = [
+			'Spellcasting',
+			'Eldritch Knight Spellcasting',
+			'Arcane Trickster Spellcasting',
+			'Spirit Seeker', // Totem Warrior Barbarian ritual spells
+			'Shadow Arts', // Way of Shadow Monk ki-based spells
+			'Pact Magic' // Warlock
+		];
+
+		if (
+			character.features &&
+			character.features.some((feature) =>
+				spellcastingFeatures.some((spellFeature) =>
+					feature.toLowerCase().includes(spellFeature.toLowerCase())
+				)
+			)
+		) {
+			return true;
+		}
+
+		return false;
+	} catch (error) {
+		// Fallback in case of import issues
+		return (
+			['Bard', 'Cleric', 'Druid', 'Sorcerer', 'Warlock', 'Wizard', 'Paladin', 'Ranger'].includes(
+				character.class
+			) || character.race === 'Tiefling'
+		);
+	}
+}

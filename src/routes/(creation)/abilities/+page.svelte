@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { character_store } from '$lib/stores/character_store';
 	import { get } from 'svelte/store';
+	import { getSpellAccessForCharacter } from '$lib/data/spells';
 
 	const standardArray = [15, 14, 13, 12, 10, 8];
 	const stats = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
@@ -105,6 +106,10 @@
 	// Modifier popup state management
 	let showModifierPopup = false;
 	let modifierPopupPosition = { x: 0, y: 0 };
+
+	// Spell limit warning state management
+	let showSpellLimitWarning = false;
+	let spellLimitWarningInfo = { currentCount: 0, newLimit: 0, excessCount: 0 };
 
 	function showAbilityInfo(ability: string, event: MouseEvent) {
 		popupAbility = ability;
@@ -219,6 +224,17 @@
 		charisma: null
 	};
 
+	// Initialize selected scores from current character state
+	$: {
+		for (const stat of stats) {
+			const statValue = (currentCharacter as any)[stat];
+			if (statValue && selectedScores[stat] === null) {
+				// Subtract bonuses to get the base score
+				selectedScores[stat] = statValue - (bonuses[stat] || 0);
+			}
+		}
+	}
+
 	// Enhanced bonus tracking with source information
 	let bonuses: Record<string, number> = {
 		strength: 0,
@@ -259,9 +275,88 @@
 	// Used scores for dropdown filtering
 	$: usedScores = Object.values(selectedScores).filter((s) => s !== null);
 
-	function getModifier(total: number): string {
-		const mod = Math.floor((total - 10) / 2);
+	// Apply ability scores to character store
+	$: {
+		const updates = {} as any;
+		let hasChanges = false;
+
+		for (const stat of stats) {
+			if (selectedScores[stat] !== null) {
+				const totalScore = selectedScores[stat] + (bonuses[stat] || 0);
+				if ((currentCharacter as any)[stat] !== totalScore) {
+					updates[stat] = totalScore;
+					hasChanges = true;
+				}
+			}
+		}
+
+		if (hasChanges) {
+			character_store.update((char) => ({ ...char, ...updates }));
+		}
+	}
+
+	// Monitor Charisma changes for Paladin spell limit validation
+	$: {
+		if (currentCharacter.class === 'Paladin' && selectedScores.charisma !== null) {
+			validatePaladinSpellLimit();
+		}
+	}
+
+	function getModifier(total: number): number {
+		return Math.floor((total - 10) / 2);
+	}
+
+	function getModifierString(total: number): string {
+		const mod = getModifier(total);
 		return mod >= 0 ? `+${mod}` : `${mod}`;
+	}
+
+	function validatePaladinSpellLimit() {
+		// Only validate if character has spells selected
+		if (!currentCharacter.spells || currentCharacter.spells.length === 0) {
+			return;
+		}
+
+		// Calculate new Charisma-based spell limit
+		const totalCharisma = (selectedScores.charisma || 10) + (bonuses.charisma || 0);
+		const charismaModifier = getModifier(totalCharisma);
+		const newSpellLimit = Math.max(1, charismaModifier + 1);
+
+		// Get current paladin spell access to determine chooseable spells
+		const tempCharacter = { ...currentCharacter, charisma: totalCharisma };
+		const spellAccess = getSpellAccessForCharacter(tempCharacter);
+		const paladinAccess = spellAccess.find(
+			(access) => access.source === 'class' && access.sourceName === 'Paladin'
+		);
+
+		if (!paladinAccess || !paladinAccess.chooseable) {
+			return;
+		}
+
+		// Count current prepared spells (excluding oath spells which are always prepared)
+		const oathSpells = spellAccess
+			.filter((access) => access.source === 'subclass' && access.sourceName?.includes('Oath'))
+			.flatMap((access) => access.spells || []);
+
+		const preparedSpells = currentCharacter.spells.filter((spell) => !oathSpells.includes(spell));
+
+		// If current prepared spells exceed new limit, show warning
+		if (preparedSpells.length > newSpellLimit) {
+			const excessCount = preparedSpells.length - newSpellLimit;
+			spellLimitWarningInfo = {
+				currentCount: preparedSpells.length,
+				newLimit: newSpellLimit,
+				excessCount: excessCount
+			};
+			showSpellLimitWarning = true;
+		} else {
+			// Hide warning if spell count is now within limits
+			showSpellLimitWarning = false;
+		}
+	}
+
+	function dismissSpellLimitWarning() {
+		showSpellLimitWarning = false;
 	}
 </script>
 
@@ -348,7 +443,7 @@
 				<!-- Modifier -->
 				<div class="text-center font-mono font-bold text-indigo-600">
 					{selectedScores[stat] !== null
-						? getModifier(selectedScores[stat] + (bonuses[stat] ?? 0))
+						? getModifierString(selectedScores[stat] + (bonuses[stat] ?? 0))
 						: ''}
 				</div>
 			</div>
@@ -418,10 +513,12 @@
 							<span class="modifier-table-label">Modifier</span>
 						</div>
 						<!-- Show score ranges with their shared modifiers -->
-						{#each [['8-9', -1], ['10-11', 0], ['12-13', 1], ['14-15', 2], ['16-17', 3], ['18-19', 4]] as [scoreRange, modifier]}
+						{#each [['8-9', -1], ['10-11', 0], ['12-13', 1], ['14-15', 2], ['16-17', 3], ['18-19', 4]] as [scoreRange, modifierValue]}
 							<div class="modifier-table-row">
 								<span class="modifier-table-score">{scoreRange}</span>
-								<span class="modifier-table-mod">{modifier >= 0 ? '+' + modifier : modifier}</span>
+								<span class="modifier-table-mod"
+									>{(modifierValue as number) >= 0 ? '+' + modifierValue : modifierValue}</span
+								>
 							</div>
 						{/each}
 					</div>
@@ -434,6 +531,33 @@
 <!-- Modifier Popup Overlay -->
 {#if showModifierPopup}
 	<div class="popup-overlay" on:click={hideModifierInfo}></div>
+{/if}
+
+<!-- Spell Limit Warning Banner -->
+{#if showSpellLimitWarning}
+	<div class="spell-limit-warning-banner">
+		<div class="warning-content">
+			<div class="warning-icon">⚠️</div>
+			<div class="warning-text">
+				<h3>Spell Limit Exceeded</h3>
+				<p>
+					Your Charisma modifier change has reduced your prepared spell limit. You currently have
+					<strong>{spellLimitWarningInfo.currentCount} prepared spells</strong> but can only prepare
+					<strong>{spellLimitWarningInfo.newLimit}</strong>. Please visit the
+					<a href="/spells">Spells page</a>
+					to remove
+					<strong
+						>{spellLimitWarningInfo.excessCount} spell{spellLimitWarningInfo.excessCount > 1
+							? 's'
+							: ''}</strong
+					>.
+				</p>
+			</div>
+			<button class="warning-dismiss" on:click={dismissSpellLimitWarning} title="Dismiss warning">
+				×
+			</button>
+		</div>
+	</div>
 {/if}
 
 <style>
@@ -827,5 +951,94 @@
 		font-size: 0.875rem;
 		font-weight: 600;
 		color: #4338ca;
+	}
+
+	/* Spell Limit Warning Banner Styles */
+	.spell-limit-warning-banner {
+		position: fixed;
+		top: 70px; /* Below navbar */
+		left: 0;
+		right: 0;
+		z-index: 1000;
+		background: linear-gradient(135deg, #fef3c7, #fde68a); /* Warm yellow gradient */
+		border: 2px solid #f59e0b; /* Orange border */
+		border-radius: 8px;
+		margin: 0 16px;
+		box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+		animation: slideDown 0.3s ease-out;
+	}
+
+	.warning-content {
+		display: flex;
+		align-items: flex-start;
+		gap: 12px;
+		padding: 16px 20px;
+	}
+
+	.warning-icon {
+		font-size: 24px;
+		flex-shrink: 0;
+		margin-top: 2px;
+	}
+
+	.warning-text {
+		flex: 1;
+	}
+
+	.warning-text h3 {
+		margin: 0 0 8px 0;
+		color: #92400e; /* Darker amber */
+		font-size: 1.1rem;
+		font-weight: 600;
+	}
+
+	.warning-text p {
+		margin: 0;
+		color: #78350f; /* Dark amber */
+		font-size: 0.95rem;
+		line-height: 1.4;
+	}
+
+	.warning-text a {
+		color: #1d4ed8; /* Blue link */
+		text-decoration: underline;
+		font-weight: 500;
+	}
+
+	.warning-text a:hover {
+		color: #1e40af;
+	}
+
+	.warning-dismiss {
+		background: none;
+		border: none;
+		color: #92400e;
+		font-size: 24px;
+		font-weight: bold;
+		cursor: pointer;
+		padding: 0;
+		width: 24px;
+		height: 24px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 4px;
+		transition: background-color 0.2s;
+		flex-shrink: 0;
+	}
+
+	.warning-dismiss:hover {
+		background-color: rgba(146, 64, 14, 0.1);
+	}
+
+	@keyframes slideDown {
+		from {
+			transform: translateY(-100%);
+			opacity: 0;
+		}
+		to {
+			transform: translateY(0);
+			opacity: 1;
+		}
 	}
 </style>

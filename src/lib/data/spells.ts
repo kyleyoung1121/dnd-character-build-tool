@@ -1994,7 +1994,8 @@ export const spellAccess: SpellAccess[] = [
 		chooseable: true,
 		chooseFrom: ['Paladin'],
 		chooseCantripCount: 0, // Paladins get no cantrips
-		chooseSpellCount: 4 // Typical prepared spells for level 3 (CHA mod 3 + half level 1)
+		chooseSpellCount: 4, // Typical prepared spells for level 3 (CHA mod 3 + half level 1)
+		maxSpellLevel: 1 // 3rd level Paladins only have access to 1st level spells
 	},
 	{
 		source: 'class',
@@ -2044,55 +2045,105 @@ export const spellAccess: SpellAccess[] = [
 		cantrips: ['Minor Illusion'], // Shadow Arts also grants minor illusion as a cantrip
 		chooseable: false // Ki-based spells from Shadow Arts feature
 	},
-	
+
 	// Cleric Domain spells (always prepared, don't count against limits)
 	{
 		source: 'subclass',
 		sourceName: 'Life Domain',
-		spells: ['Cure Wounds', 'Bless'], // 1st level domain spells
+		spells: ['Bless', 'Cure Wounds', 'Lesser Restoration', 'Spiritual Weapon'], // 1st and 2nd level domain spells
 		cantrips: [],
 		chooseable: false // Domain spells are always prepared
 	},
 	{
 		source: 'subclass',
 		sourceName: 'War Domain',
-		spells: ['Shield', 'Divine Favor'], // 1st level domain spells
+		spells: ['Divine Favor', 'Shield', 'Magic Weapon', 'Spiritual Weapon'], // 1st and 2nd level domain spells
 		cantrips: [],
 		chooseable: false // Domain spells are always prepared
 	},
-	
+
 	// Druid Circle spells (always prepared, don't count against limits)
+	// Note: Circle of the Moon doesn't grant spells, only improves Wild Shape
 	{
 		source: 'subclass',
-		sourceName: 'Circle of the Moon',
-		spells: ['Moonbeam'], // 2nd level circle spell
+		sourceName: 'Circle of the Land (Arctic)',
+		spells: ['Hold Person', 'Spike Growth'], // 2nd level Arctic circle spells
 		cantrips: [],
 		chooseable: false // Circle spells are always prepared
 	},
 	{
 		source: 'subclass',
-		sourceName: 'Circle of the Land',
-		spells: ['Spider Climb'], // 2nd level circle spell (varies by land type)
+		sourceName: 'Circle of the Land (Coast)',
+		spells: ['Mirror Image', 'Misty Step'], // 2nd level Coast circle spells
 		cantrips: [],
 		chooseable: false // Circle spells are always prepared
 	},
-	
+	{
+		source: 'subclass',
+		sourceName: 'Circle of the Land (Desert)',
+		spells: ['Blur', 'Silence'], // 2nd level Desert circle spells
+		cantrips: [],
+		chooseable: false // Circle spells are always prepared
+	},
+	{
+		source: 'subclass',
+		sourceName: 'Circle of the Land (Forest)',
+		spells: ['Barkskin', 'Spider Climb'], // 2nd level Forest circle spells
+		cantrips: [],
+		chooseable: false // Circle spells are always prepared
+	},
+	{
+		source: 'subclass',
+		sourceName: 'Circle of the Land (Grassland)',
+		spells: ['Invisibility', 'Pass without Trace'], // 2nd level Grassland circle spells
+		cantrips: [],
+		chooseable: false // Circle spells are always prepared
+	},
+	{
+		source: 'subclass',
+		sourceName: 'Circle of the Land (Mountain)',
+		spells: ['Spider Climb', 'Spike Growth'], // 2nd level Mountain circle spells
+		cantrips: [],
+		chooseable: false // Circle spells are always prepared
+	},
+	{
+		source: 'subclass',
+		sourceName: 'Circle of the Land (Swamp)',
+		spells: ['Darkness', "Melf's Acid Arrow"], // 2nd level Swamp circle spells
+		cantrips: [],
+		chooseable: false // Circle spells are always prepared
+	},
+	{
+		source: 'subclass',
+		sourceName: 'Circle of the Land (Underdark)',
+		spells: ['Spider Climb', 'Web'], // 2nd level Underdark circle spells
+		cantrips: [],
+		chooseable: false // Circle spells are always prepared
+	},
+
 	// Paladin Oath spells (always prepared, don't count against limits)
 	{
 		source: 'subclass',
 		sourceName: 'Oath of Devotion',
-		spells: ['Protection from Evil and Good', 'Sanctuary'], // 1st level oath spells
+		spells: ['Protection from Evil and Good', 'Sanctuary'], // 1st level oath spells only
 		cantrips: [],
 		chooseable: false // Oath spells are always prepared
 	},
 	{
 		source: 'subclass',
 		sourceName: 'Oath of Vengeance',
-		spells: ['Bane', 'Hunter\'s Mark'], // 1st level oath spells
+		spells: ['Bane', "Hunter's Mark"], // 1st level oath spells only
 		cantrips: [],
 		chooseable: false // Oath spells are always prepared
 	},
-	
+	{
+		source: 'subclass',
+		sourceName: 'Oath of the Ancients',
+		spells: ['Ensnaring Strike', 'Speak with Animals'], // 1st level oath spells only
+		cantrips: [],
+		chooseable: false // Oath spells are always prepared
+	},
+
 	// Monk Elemental Disciples (Way of Four Elements)
 	{
 		source: 'subclass',
@@ -2101,7 +2152,7 @@ export const spellAccess: SpellAccess[] = [
 		cantrips: [],
 		chooseable: false // Ki-based elemental disciplines
 	},
-	
+
 	// Warlock Patron Expanded Spell Lists
 	{
 		source: 'subclass',
@@ -2113,7 +2164,7 @@ export const spellAccess: SpellAccess[] = [
 	{
 		source: 'subclass',
 		sourceName: 'The Great Old One',
-		spells: ['Dissonant Whispers', 'Tasha\'s Hideous Laughter'], // 1st level GOO expanded spells
+		spells: ['Dissonant Whispers', "Tasha's Hideous Laughter"], // 1st level GOO expanded spells
 		cantrips: [],
 		chooseable: false // Expanded spell list, always known
 	},
@@ -2124,7 +2175,7 @@ export const spellAccess: SpellAccess[] = [
 		cantrips: [],
 		chooseable: false // Expanded spell list, always known
 	},
-	
+
 	// Warlock Invocations that grant spells
 	{
 		source: 'feature',
@@ -2134,7 +2185,7 @@ export const spellAccess: SpellAccess[] = [
 		chooseable: true, // Player chooses which invocations to take
 		chooseSpellCount: 2 // Approximate number of spell-granting invocations available at level 3
 	},
-	
+
 	// Warlock Pact Boon spells
 	{
 		source: 'feature',
@@ -2146,7 +2197,7 @@ export const spellAccess: SpellAccess[] = [
 		chooseCantripCount: 3, // Book of Shadows grants 3 cantrips from any class
 		chooseSpellCount: 0
 	},
-	
+
 	// Wizard School Features
 	{
 		source: 'subclass',
@@ -2170,6 +2221,11 @@ export function getSpellsByLevel(level: number, className?: string): Spell[] {
 	return filteredSpells;
 }
 
+// Calculate ability modifier from ability score
+function getAbilityModifier(abilityScore: number): number {
+	return Math.floor((abilityScore - 10) / 2);
+}
+
 export function getSpellAccessForCharacter(character: any): SpellAccess[] {
 	const access: SpellAccess[] = [];
 
@@ -2186,7 +2242,24 @@ export function getSpellAccessForCharacter(character: any): SpellAccess[] {
 		const classAccess = spellAccess.filter(
 			(sa) => sa.source === 'class' && sa.sourceName === character.class
 		);
-		access.push(...classAccess);
+
+		// Special handling for Paladin - dynamic prepared spell count
+		const processedClassAccess = classAccess.map((access) => {
+			if (access.sourceName === 'Paladin') {
+				// Calculate dynamic spell count: CHA modifier + 1 (minimum 1)
+				const charismaScore = character.charisma || 10; // Default to 10 if not set
+				const charismaModifier = getAbilityModifier(charismaScore);
+				const preparedSpellCount = Math.max(1, charismaModifier + 1);
+
+				return {
+					...access,
+					chooseSpellCount: preparedSpellCount
+				};
+			}
+			return access;
+		});
+
+		access.push(...processedClassAccess);
 	}
 
 	// Check subclass-based access

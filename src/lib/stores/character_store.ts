@@ -95,7 +95,11 @@ export function hasSpellAccess(character: Character): boolean {
 		}
 
 		// Subclass casters
-		if (character.subclass === 'Eldritch Knight' || character.subclass === 'Arcane Trickster' || character.subclass === 'Way of Shadow') {
+		if (
+			character.subclass === 'Eldritch Knight' ||
+			character.subclass === 'Arcane Trickster' ||
+			character.subclass === 'Way of Shadow'
+		) {
 			return true;
 		}
 

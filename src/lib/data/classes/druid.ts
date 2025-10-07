@@ -79,7 +79,8 @@ const druidCirclePrompt: FeaturePrompt = {
 		options: [
 			{
 				name: 'Circle of the Land (Arctic)',
-				optionDescription: 'Your magic draws on the energy of frigid lands, granting you spells of ice and survival.',
+				optionDescription:
+					'Your magic draws on the energy of frigid lands, granting you spells of ice and survival.',
 				nestedPrompts: [
 					{
 						name: 'Bonus Cantrip',
@@ -91,7 +92,8 @@ const druidCirclePrompt: FeaturePrompt = {
 					{
 						name: 'Circle Spells',
 						id: 'druid_arctic_spells_01',
-						description: 'You gain Arctic-specific spells that are always prepared and do not count against your prepared spells limit.',
+						description:
+							'You gain Arctic-specific spells that are always prepared and do not count against your prepared spells limit.',
 						source: 'druid.circle_of_the_land_arctic',
 						effects: [{ target: 'features', action: 'add', value: 'Circle Spells' }]
 					},
@@ -106,7 +108,8 @@ const druidCirclePrompt: FeaturePrompt = {
 			},
 			{
 				name: 'Circle of the Land (Coast)',
-				optionDescription: 'Your magic draws on the energy of coastal regions, granting you spells of water and wind.',
+				optionDescription:
+					'Your magic draws on the energy of coastal regions, granting you spells of water and wind.',
 				nestedPrompts: [
 					{
 						name: 'Bonus Cantrip',
@@ -118,7 +121,8 @@ const druidCirclePrompt: FeaturePrompt = {
 					{
 						name: 'Circle Spells',
 						id: 'druid_coast_spells_01',
-						description: 'You gain Coast-specific spells that are always prepared and do not count against your prepared spells limit.',
+						description:
+							'You gain Coast-specific spells that are always prepared and do not count against your prepared spells limit.',
 						source: 'druid.circle_of_the_land_coast',
 						effects: [{ target: 'features', action: 'add', value: 'Circle Spells' }]
 					},
@@ -133,7 +137,8 @@ const druidCirclePrompt: FeaturePrompt = {
 			},
 			{
 				name: 'Circle of the Land (Desert)',
-				optionDescription: 'Your magic draws on the energy of arid wastelands, granting you spells of heat and endurance.',
+				optionDescription:
+					'Your magic draws on the energy of arid wastelands, granting you spells of heat and endurance.',
 				nestedPrompts: [
 					{
 						name: 'Bonus Cantrip',
@@ -145,7 +150,8 @@ const druidCirclePrompt: FeaturePrompt = {
 					{
 						name: 'Circle Spells',
 						id: 'druid_desert_spells_01',
-						description: 'You gain Desert-specific spells that are always prepared and do not count against your prepared spells limit.',
+						description:
+							'You gain Desert-specific spells that are always prepared and do not count against your prepared spells limit.',
 						source: 'druid.circle_of_the_land_desert',
 						effects: [{ target: 'features', action: 'add', value: 'Circle Spells' }]
 					},
@@ -160,7 +166,8 @@ const druidCirclePrompt: FeaturePrompt = {
 			},
 			{
 				name: 'Circle of the Land (Forest)',
-				optionDescription: 'Your magic draws on the energy of woodlands, granting you spells of growth and protection.',
+				optionDescription:
+					'Your magic draws on the energy of woodlands, granting you spells of growth and protection.',
 				nestedPrompts: [
 					{
 						name: 'Bonus Cantrip',
@@ -172,7 +179,8 @@ const druidCirclePrompt: FeaturePrompt = {
 					{
 						name: 'Circle Spells',
 						id: 'druid_forest_spells_01',
-						description: 'You gain Forest-specific spells that are always prepared and do not count against your prepared spells limit.',
+						description:
+							'You gain Forest-specific spells that are always prepared and do not count against your prepared spells limit.',
 						source: 'druid.circle_of_the_land_forest',
 						effects: [{ target: 'features', action: 'add', value: 'Circle Spells' }]
 					},
@@ -187,7 +195,8 @@ const druidCirclePrompt: FeaturePrompt = {
 			},
 			{
 				name: 'Circle of the Land (Grassland)',
-				optionDescription: 'Your magic draws on the energy of plains and meadows, granting you spells of movement and divination.',
+				optionDescription:
+					'Your magic draws on the energy of plains and meadows, granting you spells of movement and divination.',
 				nestedPrompts: [
 					{
 						name: 'Bonus Cantrip',
@@ -199,7 +208,8 @@ const druidCirclePrompt: FeaturePrompt = {
 					{
 						name: 'Circle Spells',
 						id: 'druid_grassland_spells_01',
-						description: 'You gain Grassland-specific spells that are always prepared and do not count against your prepared spells limit.',
+						description:
+							'You gain Grassland-specific spells that are always prepared and do not count against your prepared spells limit.',
 						source: 'druid.circle_of_the_land_grassland',
 						effects: [{ target: 'features', action: 'add', value: 'Circle Spells' }]
 					},
@@ -214,7 +224,8 @@ const druidCirclePrompt: FeaturePrompt = {
 			},
 			{
 				name: 'Circle of the Land (Mountain)',
-				optionDescription: 'Your magic draws on the energy of peaks and stone, granting you spells of earth and sky.',
+				optionDescription:
+					'Your magic draws on the energy of peaks and stone, granting you spells of earth and sky.',
 				nestedPrompts: [
 					{
 						name: 'Bonus Cantrip',
@@ -226,7 +237,8 @@ const druidCirclePrompt: FeaturePrompt = {
 					{
 						name: 'Circle Spells',
 						id: 'druid_mountain_spells_01',
-						description: 'You gain Mountain-specific spells that are always prepared and do not count against your prepared spells limit.',
+						description:
+							'You gain Mountain-specific spells that are always prepared and do not count against your prepared spells limit.',
 						source: 'druid.circle_of_the_land_mountain',
 						effects: [{ target: 'features', action: 'add', value: 'Circle Spells' }]
 					},
@@ -241,7 +253,8 @@ const druidCirclePrompt: FeaturePrompt = {
 			},
 			{
 				name: 'Circle of the Land (Swamp)',
-				optionDescription: 'Your magic draws on the energy of wetlands, granting you spells of decay and transformation.',
+				optionDescription:
+					'Your magic draws on the energy of wetlands, granting you spells of decay and transformation.',
 				nestedPrompts: [
 					{
 						name: 'Bonus Cantrip',
@@ -253,7 +266,8 @@ const druidCirclePrompt: FeaturePrompt = {
 					{
 						name: 'Circle Spells',
 						id: 'druid_swamp_spells_01',
-						description: 'You gain Swamp-specific spells that are always prepared and do not count against your prepared spells limit.',
+						description:
+							'You gain Swamp-specific spells that are always prepared and do not count against your prepared spells limit.',
 						source: 'druid.circle_of_the_land_swamp',
 						effects: [{ target: 'features', action: 'add', value: 'Circle Spells' }]
 					},
@@ -268,7 +282,8 @@ const druidCirclePrompt: FeaturePrompt = {
 			},
 			{
 				name: 'Circle of the Land (Underdark)',
-				optionDescription: 'Your magic draws on the energy of deep caverns, granting you spells of shadow and stone.',
+				optionDescription:
+					'Your magic draws on the energy of deep caverns, granting you spells of shadow and stone.',
 				nestedPrompts: [
 					{
 						name: 'Bonus Cantrip',
@@ -280,7 +295,8 @@ const druidCirclePrompt: FeaturePrompt = {
 					{
 						name: 'Circle Spells',
 						id: 'druid_underdark_spells_01',
-						description: 'You gain Underdark-specific spells that are always prepared and do not count against your prepared spells limit.',
+						description:
+							'You gain Underdark-specific spells that are always prepared and do not count against your prepared spells limit.',
 						source: 'druid.circle_of_the_land_underdark',
 						effects: [{ target: 'features', action: 'add', value: 'Circle Spells' }]
 					},

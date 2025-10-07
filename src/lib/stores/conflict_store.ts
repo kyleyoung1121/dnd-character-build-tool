@@ -1,6 +1,12 @@
 import { writable, derived } from 'svelte/store';
 import { character_store } from './character_store';
-import { detectConflicts, type ConflictDetectionResult, type Conflict } from './conflict_detection';
+import { detectConflicts, type Conflict } from './conflict_detection';
+
+type ConflictDetectionResult = {
+	hasConflicts: boolean;
+	conflicts: Conflict[];
+	tabsNeedingAttention: string[];
+};
 
 /**
  * Reactive store that automatically detects conflicts when character changes

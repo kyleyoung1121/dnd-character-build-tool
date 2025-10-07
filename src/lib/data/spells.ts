@@ -36,7 +36,7 @@ export const cantrips: Spell[] = [
 		duration: 'Instantaneous',
 		description:
 			'You hurl a bubble of acid. Choose one or two creatures you can see within range. If you choose two, they must be within 5 feet of each other. A target must succeed on a Dexterity saving throw or take 1d6 acid damage.',
-		classes: ['Sorcerer', 'Wizard']
+		classes: ['Druid', 'Sorcerer', 'Wizard']
 	},
 	{
 		name: 'Blade Ward',
@@ -48,7 +48,7 @@ export const cantrips: Spell[] = [
 		duration: '1 round',
 		description:
 			'You extend your hand and trace a sigil of warding in the air. Until the end of your next turn, you have resistance against bludgeoning, piercing, and slashing damage dealt by weapon attacks.',
-		classes: ['Bard', 'Sorcerer', 'Warlock', 'Wizard']
+		classes: ['Bard', 'Druid', 'Sorcerer', 'Warlock', 'Wizard']
 	},
 	{
 		name: 'Chill Touch',
@@ -60,7 +60,7 @@ export const cantrips: Spell[] = [
 		duration: '1 round',
 		description:
 			"You create a ghostly, skeletal hand in the space of a creature within range. Make a ranged spell attack against the creature to assail it with the chill of the grave. On a hit, the target takes 1d8 necrotic damage, and it can't regain hit points until the start of your next turn. Until then, the hand clings to the target. \nIf you hit an undead target, it also has disadvantage on attack rolls against you until the end of your next turn.",
-		classes: ['Sorcerer', 'Warlock', 'Wizard']
+		classes: ['Druid', 'Sorcerer', 'Warlock', 'Wizard']
 	},
 	{
 		name: 'Dancing Lights',
@@ -671,7 +671,7 @@ export const firstLevel: Spell[] = [
 		duration: 'Concentration, up to 10 minutes',
 		description:
 			'This spell allows you to move at an incredible pace. When you cast this spell, and then as a bonus action on each of your turns until the spell ends, you can take the Dash action.',
-		classes: ['Sorcerer', 'Warlock', 'Wizard']
+		classes: ['Druid', 'Sorcerer', 'Warlock', 'Wizard']
 	},
 	{
 		name: 'Faerie Fire',
@@ -721,7 +721,7 @@ export const firstLevel: Spell[] = [
 		duration: 'Instantaneous',
 		description:
 			"You gain the service of a familiar, a spirit that takes an animal form you choose: bat, cat, crab, frog (toad), hawk, lizard, octopus, owl, poisonous snake, fish (quipper), rat, raven, sea horse, spider, or weasel. Appearing in an unoccupied space within range, the familiar has the statistics of the chosen form, though it is a celestial, fey, or fiend (your choice) instead of a beast.\nYour familiar acts independently of you, but it always obeys your commands. In combat, it rolls its own initiative and acts on its own turn. A familiar can't attack, but it can take other actions as normal.\nWhen the familiar drops to 0 hit points, it disappears, leaving behind no physical form. It reappears after you cast this spell again. As an action, you can temporarily dismiss the familiar to a pocket dimension. Alternatively, you can dismiss it forever. As an action while it is temporarily dismissed, you can cause it to reappear in any unoccupied space within 30 feet of you. Whenever the familiar drops to 0 hit points or disappears into the pocket dimension, it leaves behind in its space anything it was wearing or carrying.\nWhile your familiar is within 100 feet of you, you can communicate with it telepathically. Additionally, as an action, you can see through your familiar's eyes and hear what it hears until the start of your next turn, gaining the benefits of any special senses that the familiar has. During this time, you are deaf and blind with regard to your own senses.\nYou can't have more than one familiar at a time. If you cast this spell while you already have a familiar, you instead cause it to adopt a new form. Choose one of the forms from the above list. Your familiar transforms into the chosen creature.\nFinally, when you cast a spell with a range of touch, your familiar can deliver the spell as if it had cast the spell. Your familiar must be within 100 feet of you, and it must use its reaction to deliver the spell when you cast it. If the spell requires an attack roll, you use your attack modifier for the roll.",
-		classes: ['Wizard'],
+		classes: ['Druid', 'Wizard'],
 		ritual: true
 	},
 	{
@@ -760,7 +760,7 @@ export const firstLevel: Spell[] = [
 		duration: '1 minute',
 		description:
 			'Slick grease covers the ground in a 10-foot square centered on a point within range and turns it into difficult terrain for the duration.\nWhen the grease appears, each creature standing in its area must succeed on a Dexterity saving throw or fall prone. A creature that enters the area or ends its turn there must also succeed on a Dexterity saving throw or fall prone.',
-		classes: ['Wizard']
+		classes: ['Druid', 'Wizard']
 	},
 	{
 		name: 'Guiding Bolt',
@@ -1152,7 +1152,7 @@ export const firstLevel: Spell[] = [
 			'A beam of crackling, blue energy lances out toward a creature within range, forming a sustained arc of lightning between you and the target. Make a ranged spell attack against that creature. On a hit, the target takes 1d12 lightning damage, and on each of your turns for the duration, you can use your action to deal 1d12 lightning damage to the target automatically. The spell ends if you use your action to do anything else. The spell also ends if the target is ever outside the spell’s range or if it has total cover from you.',
 		higherLevel:
 			'When you cast this spell using a 2nd level spell slot, the initial damage increases by 1d12.',
-		classes: ['Sorcerer', 'Warlock', 'Wizard']
+		classes: ['Druid', 'Sorcerer', 'Warlock', 'Wizard']
 	},
 	{
 		name: 'Wrathful Smite',
@@ -1278,7 +1278,7 @@ export const secondLevel: Spell[] = [
 		duration: 'Concentration, up to 1 minute',
 		description:
 			"Your body becomes blurred, shifting and wavering to all who can see you. For the duration, any creature has disadvantage on attack rolls against you. An attacker is immune to this effect if it doesn't rely on sight, as with blindsight, or can see through illusions, as with truesight.",
-		classes: ['Sorcerer', 'Wizard']
+		classes: ['Druid', 'Sorcerer', 'Wizard']
 	},
 	{
 		name: 'Branding Smite',
@@ -1362,7 +1362,7 @@ export const secondLevel: Spell[] = [
 		duration: 'Concentration, up to 10 minutes',
 		description:
 			"Magical darkness spreads from a point you choose within range to fill a 15-foot-radius sphere for the duration. The darkness spreads around corners. A creature with darkvision can't see through this darkness, and nonmagical light can't illuminate it.\nIf the point you choose is on an object you are holding or one that isn't being worn or carried, the darkness emanates from the object and moves with it. Completely covering the source of the darkness with an opaque object, such as a bowl or a helm, blocks the darkness.\nIf any of this spell's area overlaps with an area of light created by a spell of 2nd level or lower, the spell that created the light is dispelled.",
-		classes: ['Sorcerer', 'Warlock', 'Wizard']
+		classes: ['Druid', 'Sorcerer', 'Warlock', 'Wizard']
 	},
 	{
 		name: 'Darkvision',
@@ -1531,7 +1531,7 @@ export const secondLevel: Spell[] = [
 		duration: 'Concentration, up to 1 hour',
 		description:
 			"A creature you touch becomes invisible until the spell ends. Anything the target is wearing or carrying is invisible as long as it is on the target's person. The spell ends for a target that attacks or casts a spell.",
-		classes: ['Bard', 'Sorcerer', 'Warlock', 'Wizard']
+		classes: ['Bard', 'Druid', 'Sorcerer', 'Warlock', 'Wizard']
 	},
 	{
 		name: 'Knock',
@@ -1629,7 +1629,7 @@ export const secondLevel: Spell[] = [
 		duration: 'Instantaneous',
 		description:
 			'A shimmering green arrow streaks toward a target within range and bursts in a spray of acid. Make a ranged spell attack against the target. On a hit, the target takes 4d4 acid damage immediately and 2d4 acid damage at the end of its next turn. On a miss, the arrow splashes the target with acid for half as much of the initial damage and no damage at the end of its next turn.',
-		classes: ['Wizard']
+		classes: ['Druid', 'Wizard']
 	},
 	{
 		name: 'Mirror Image',
@@ -1641,7 +1641,7 @@ export const secondLevel: Spell[] = [
 		duration: '1 minute',
 		description:
 			"Three illusory duplicates of yourself appear in your space. Until the spell ends, the duplicates move with you and mimic your actions, shifting position so it's impossible to track which image is real. You can use your action to dismiss the illusory duplicates.\nEach time a creature targets you with an attack during the spell's duration, roll a d20 to determine whether the attack instead targets one of your duplicates.\nIf you have three duplicates, you must roll a 6 or higher to change the attack's target to a duplicate. With two duplicates, you must roll an 8 or higher. With one duplicate, you must roll an 11 or higher.\nA duplicate's AC equals 10 + your Dexterity modifier. If an attack hits a duplicate, the duplicate is destroyed. A duplicate can be destroyed only by an attack that hits it. It ignores all other damage and effects. The spell ends when all three duplicates are destroyed.\nA creature is unaffected by this spell if it can't see, if it relies on senses other than sight, such as blindsight, or if it can perceive illusions as false, as with truesight.",
-		classes: ['Sorcerer', 'Warlock', 'Wizard']
+		classes: ['Druid', 'Sorcerer', 'Warlock', 'Wizard']
 	},
 	{
 		name: 'Misty Step',
@@ -1653,7 +1653,7 @@ export const secondLevel: Spell[] = [
 		duration: 'Instantaneous',
 		description:
 			'Briefly surrounded by silvery mist, you teleport up to 30 feet to an unoccupied space that you can see.',
-		classes: ['Sorcerer', 'Warlock', 'Wizard']
+		classes: ['Druid', 'Sorcerer', 'Warlock', 'Wizard']
 	},
 	{
 		name: 'Moonbeam',
@@ -1797,7 +1797,7 @@ export const secondLevel: Spell[] = [
 		duration: 'Concentration, up to 10 minutes',
 		description:
 			'For the duration, no sound can be created within or pass through a 20-foot-radius sphere centered on a point you choose within range. Any creature or object entirely inside the sphere is immune to thunder damage, and creatures are deafened while entirely inside it. Casting a spell that includes a verbal component is impossible there.',
-		classes: ['Bard', 'Cleric', 'Ranger'],
+		classes: ['Bard', 'Cleric', 'Druid', 'Ranger'],
 		ritual: true
 	},
 	{
@@ -1810,7 +1810,7 @@ export const secondLevel: Spell[] = [
 		duration: 'Concentration, up to 1 hour',
 		description:
 			'Until the spell ends, one willing creature you touch gains the ability to move up, down, and across vertical surfaces and upside down along ceilings, while leaving its hands free. The target also gains a climbing speed equal to its walking speed.',
-		classes: ['Sorcerer', 'Warlock', 'Wizard']
+		classes: ['Druid', 'Sorcerer', 'Warlock', 'Wizard']
 	},
 	{
 		name: 'Spike Growth',
@@ -1870,7 +1870,7 @@ export const secondLevel: Spell[] = [
 		duration: 'Concentration, up to 1 hour',
 		description:
 			"You conjure a mass of thick, sticky webbing at a point of your choice within range. The webs fill a 20-foot cube from that point for the duration. The webs are difficult terrain and lightly obscure their area.\nIf the webs aren't anchored between two solid masses (such as walls or trees) or layered across a floor, wall, or ceiling, the conjured web collapses on itself, and the spell ends at the start of your next turn. Webs layered over a flat surface have a depth of 5 feet.\nEach creature that starts its turn in the webs or that enters them during its turn must make a Dexterity saving throw. On a failed save, the creature is restrained as long as it remains in the webs or until it breaks free.\nA creature restrained by the webs can use its action to make a Strength check against your spell save DC. If it succeeds, it is no longer restrained.\nThe webs are flammable. Any 5-foot cube of webs exposed to fire burns away in 1 round, dealing 2d4 fire damage to any creature that starts its turn in the fire.",
-		classes: ['Sorcerer', 'Wizard']
+		classes: ['Druid', 'Sorcerer', 'Wizard']
 	},
 	{
 		name: 'Zone of Truth',
@@ -2119,6 +2119,80 @@ export const spellAccess: SpellAccess[] = [
 		spells: ['Spider Climb', 'Web'], // 2nd level Underdark circle spells
 		cantrips: [],
 		chooseable: false // Circle spells are always prepared
+	},
+
+	// Circle of the Land Bonus Cantrips (chooseable)
+	{
+		source: 'subclass',
+		sourceName: 'Circle of the Land (Arctic)',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Druid'],
+		chooseCantripCount: 1 // Bonus cantrip from Circle of the Land
+	},
+	{
+		source: 'subclass',
+		sourceName: 'Circle of the Land (Coast)',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Druid'],
+		chooseCantripCount: 1 // Bonus cantrip from Circle of the Land
+	},
+	{
+		source: 'subclass',
+		sourceName: 'Circle of the Land (Desert)',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Druid'],
+		chooseCantripCount: 1 // Bonus cantrip from Circle of the Land
+	},
+	{
+		source: 'subclass',
+		sourceName: 'Circle of the Land (Forest)',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Druid'],
+		chooseCantripCount: 1 // Bonus cantrip from Circle of the Land
+	},
+	{
+		source: 'subclass',
+		sourceName: 'Circle of the Land (Grassland)',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Druid'],
+		chooseCantripCount: 1 // Bonus cantrip from Circle of the Land
+	},
+	{
+		source: 'subclass',
+		sourceName: 'Circle of the Land (Mountain)',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Druid'],
+		chooseCantripCount: 1 // Bonus cantrip from Circle of the Land
+	},
+	{
+		source: 'subclass',
+		sourceName: 'Circle of the Land (Swamp)',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Druid'],
+		chooseCantripCount: 1 // Bonus cantrip from Circle of the Land
+	},
+	{
+		source: 'subclass',
+		sourceName: 'Circle of the Land (Underdark)',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Druid'],
+		chooseCantripCount: 1 // Bonus cantrip from Circle of the Land
 	},
 
 	// Paladin Oath spells (always prepared, don't count against limits)

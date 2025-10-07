@@ -5,7 +5,11 @@
 		effectNeedsChoice,
 		getNestedPrompts
 	} from './feature-card-utils';
-	import { applyChoice, revertChanges } from '$lib/stores/character_store_helpers';
+	import {
+		applyChoice,
+		revertChanges,
+		applyChoiceWithSpellLimitCheck
+	} from '$lib/stores/character_store_helpers';
 	import { get } from 'svelte/store';
 	import { conflicts } from '$lib/stores/conflict_store';
 	import FeatureCard from './FeatureCard.svelte';
@@ -141,7 +145,15 @@
 		}
 
 		// Apply the choice-dependent effects for this top-level selection
-		applyChoice(scopeId, update, modify);
+		// Check if this is a subclass change that might affect spell limits
+		const isSubclassChange = Object.keys(update).includes('subclass');
+		if (isSubclassChange) {
+			// Use spell limit checking for subclass changes
+			applyChoiceWithSpellLimitCheck(scopeId, update, modify);
+		} else {
+			// Use regular apply for other changes
+			applyChoice(scopeId, update, modify);
+		}
 
 		// Apply newly revealed static nested features (no user input) for THIS choice
 		const newlyRevealed = getNestedPrompts(feature, [choice]) || [];

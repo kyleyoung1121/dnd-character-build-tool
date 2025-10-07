@@ -21,6 +21,11 @@
 	}
 
 	function getConflictDescription(conflict) {
+		// Handle spell limit violations differently
+		if (conflict.type === 'spell_limit') {
+			return getSpellLimitDescription(conflict);
+		}
+
 		const typeMap = {
 			skill: 'Skill',
 			proficiency: 'Proficiency',
@@ -129,7 +134,31 @@
 		return `${typeLabel} "${conflict.value}" is granted by multiple sources: ${sourceDescriptions.join(', ')}`;
 	}
 
+	function getSpellLimitDescription(conflict) {
+		if (!conflict.violations || conflict.violations.length === 0) {
+			return 'Spell limit violation detected';
+		}
+
+		const violationDescriptions = conflict.violations.map((violation) => {
+			const levelName =
+				violation.level === 'cantrips'
+					? 'cantrips'
+					: violation.level === 'leveled'
+						? 'leveled spells'
+						: `level ${violation.level.replace('level', '')} spells`;
+
+			return `${violation.selected}/${violation.limit} ${levelName} (${violation.excess} over limit)`;
+		});
+
+		return `Spell limits exceeded: ${violationDescriptions.join(', ')}`;
+	}
+
 	function getResolutionSuggestion(conflict) {
+		// Handle spell limit violations differently
+		if (conflict.type === 'spell_limit') {
+			return getSpellLimitResolution(conflict);
+		}
+
 		const primaryTab = getPrimaryResolutionTab(conflict);
 
 		if (primaryTab) {
@@ -139,6 +168,18 @@
 
 		// If no user-changeable source, provide different guidance
 		return 'This conflict involves automatic grants. Consider changing your other selections.';
+	}
+
+	function getSpellLimitResolution(conflict) {
+		let message = 'Go to the Spells tab and deselect excess spells.';
+
+		// Add specific cause information if available
+		if (conflict.causes && conflict.causes.length > 0) {
+			const causeInfo = conflict.causes.join(', ');
+			message += ` This was caused by: ${causeInfo}.`;
+		}
+
+		return message;
 	}
 
 	// Removed resolution functions - now using simple guidance approach

@@ -1,1 +1,0 @@
-import{w as e}from"./GyQv_478.js";const a=e({name:"",race:"",class:"",subclass:"",background:"",alignment:"",strength:0,dexterity:0,constitution:0,intelligence:0,wisdom:0,charisma:0,proficiencies:[],languages:[],skills:[],features:[],inventory:[],attacks:[],spells:[],hp:null,ac:null,speed:null,size:null});export{a as c};

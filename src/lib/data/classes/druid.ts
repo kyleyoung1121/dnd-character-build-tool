@@ -41,7 +41,7 @@ const spellcastingPrompt: FeaturePrompt = {
 	id: 'druid_spellcasting_01',
 	description: `
 		You can prepare and cast spells using Wisdom as your spellcasting ability. 
-		You know two cantrips and prepare a number of spells equal to your Wisdom modifier + druid level.
+		You know two cantrips and prepare a number of spells equal to your Wisdom modifier + your druid level (minimum of 1 prepared spell).
 	`,
 	source: 'druid',
 	effects: [
@@ -57,8 +57,11 @@ const wildShapePrompt: FeaturePrompt = {
 	name: 'Wild Shape',
 	id: 'druid_wild_shape_01',
 	description: `
-		Starting at 2nd level, you can use your action to magically assume the shape of a beast you have seen before.
-		You can use this feature twice per short or long rest.
+		You can use your action to magically assume the shape of a beast that you have seen before. You can use this feature twice, and you regain expended uses when you finish a short or long rest.<br><br>
+		• You can't transform into a beast that has a flying or swimming speed.<br>
+		• You can stay in a beast shape for up to 1 hour. You can revert to your normal form earlier by using a bonus action.<br>
+		• Your game statistics are replaced by the statistics of the beast, but you retain your alignment, personality, and Intelligence, Wisdom, and Charisma scores. When you transform, you assume the beast's hit points. When you revert to your normal form, you return to the number of hit points you had before you transformed. However, if you revert as a result of dropping to 0 hit points, any excess damage carries over to your normal form.<br>
+		• You can't cast spells, and your ability to speak or take any action that requires hands is limited to the capabilities of your beast form.
 	`,
 	source: 'druid',
 	effects: [
@@ -73,7 +76,7 @@ const wildShapePrompt: FeaturePrompt = {
 const druidCirclePrompt: FeaturePrompt = {
 	name: 'Druid Circle',
 	id: 'druid_circle_01',
-	description: 'Choose a Druid Circle at 2nd level.',
+	description: 'Choose a Druid Circle.',
 	featureOptions: {
 		placeholderText: '-Choose a Circle-',
 		options: [
@@ -100,7 +103,8 @@ const druidCirclePrompt: FeaturePrompt = {
 					{
 						name: 'Natural Recovery',
 						id: 'druid_arctic_recovery_01',
-						description: 'You can regain some expended spell slots during a short rest.',
+						description:
+							"You can regain some expended spell slots during a short rest. You can recover spell slots with a combined level equal to or less than 2. You can't use this feature again until you finish a long rest.",
 						source: 'druid.circle_of_the_land_arctic',
 						effects: [{ target: 'features', action: 'add', value: 'Natural Recovery' }]
 					}
@@ -129,7 +133,8 @@ const druidCirclePrompt: FeaturePrompt = {
 					{
 						name: 'Natural Recovery',
 						id: 'druid_coast_recovery_01',
-						description: 'You can regain some expended spell slots during a short rest.',
+						description:
+							"You can regain some expended spell slots during a short rest. You can recover spell slots with a combined level equal to or less than 2. You can't use this feature again until you finish a long rest.",
 						source: 'druid.circle_of_the_land_coast',
 						effects: [{ target: 'features', action: 'add', value: 'Natural Recovery' }]
 					}
@@ -158,7 +163,8 @@ const druidCirclePrompt: FeaturePrompt = {
 					{
 						name: 'Natural Recovery',
 						id: 'druid_desert_recovery_01',
-						description: 'You can regain some expended spell slots during a short rest.',
+						description:
+							"You can regain some expended spell slots during a short rest. You can recover spell slots with a combined level equal to or less than 2. You can't use this feature again until you finish a long rest.",
 						source: 'druid.circle_of_the_land_desert',
 						effects: [{ target: 'features', action: 'add', value: 'Natural Recovery' }]
 					}
@@ -187,7 +193,8 @@ const druidCirclePrompt: FeaturePrompt = {
 					{
 						name: 'Natural Recovery',
 						id: 'druid_forest_recovery_01',
-						description: 'You can regain some expended spell slots during a short rest.',
+						description:
+							"You can regain some expended spell slots during a short rest. You can recover spell slots with a combined level equal to or less than 2. You can't use this feature again until you finish a long rest.",
 						source: 'druid.circle_of_the_land_forest',
 						effects: [{ target: 'features', action: 'add', value: 'Natural Recovery' }]
 					}
@@ -216,7 +223,8 @@ const druidCirclePrompt: FeaturePrompt = {
 					{
 						name: 'Natural Recovery',
 						id: 'druid_grassland_recovery_01',
-						description: 'You can regain some expended spell slots during a short rest.',
+						description:
+							"You can regain some expended spell slots during a short rest. You can recover spell slots with a combined level equal to or less than 2. You can't use this feature again until you finish a long rest.",
 						source: 'druid.circle_of_the_land_grassland',
 						effects: [{ target: 'features', action: 'add', value: 'Natural Recovery' }]
 					}
@@ -245,7 +253,8 @@ const druidCirclePrompt: FeaturePrompt = {
 					{
 						name: 'Natural Recovery',
 						id: 'druid_mountain_recovery_01',
-						description: 'You can regain some expended spell slots during a short rest.',
+						description:
+							"You can regain some expended spell slots during a short rest. You can recover spell slots with a combined level equal to or less than 2. You can't use this feature again until you finish a long rest.",
 						source: 'druid.circle_of_the_land_mountain',
 						effects: [{ target: 'features', action: 'add', value: 'Natural Recovery' }]
 					}
@@ -274,7 +283,8 @@ const druidCirclePrompt: FeaturePrompt = {
 					{
 						name: 'Natural Recovery',
 						id: 'druid_swamp_recovery_01',
-						description: 'You can regain some expended spell slots during a short rest.',
+						description:
+							"You can regain some expended spell slots during a short rest. You can recover spell slots with a combined level equal to or less than 2. You can't use this feature again until you finish a long rest.",
 						source: 'druid.circle_of_the_land_swamp',
 						effects: [{ target: 'features', action: 'add', value: 'Natural Recovery' }]
 					}
@@ -303,7 +313,8 @@ const druidCirclePrompt: FeaturePrompt = {
 					{
 						name: 'Natural Recovery',
 						id: 'druid_underdark_recovery_01',
-						description: 'You can regain some expended spell slots during a short rest.',
+						description:
+							"You can regain some expended spell slots during a short rest. You can recover spell slots with a combined level equal to or less than 2. You can't use this feature again until you finish a long rest.",
 						source: 'druid.circle_of_the_land_underdark',
 						effects: [{ target: 'features', action: 'add', value: 'Natural Recovery' }]
 					}
@@ -317,7 +328,7 @@ const druidCirclePrompt: FeaturePrompt = {
 						name: 'Combat Wild Shape',
 						id: 'druid_moon_combat_shape_01',
 						description: `
-							You can use Wild Shape as a bonus action and transform into stronger creatures.
+							You gain the ability to use Wild Shape as a bonus action, rather than as an action. Additionally, while you are transformed by Wild Shape, you can use a bonus action to expend one spell slot to regain 1d8 hit points per level of the spell slot expended.
 						`,
 						source: 'druid.circle_of_the_moon',
 						effects: [{ target: 'features', action: 'add', value: 'Combat Wild Shape' }]
@@ -326,7 +337,7 @@ const druidCirclePrompt: FeaturePrompt = {
 						name: 'Circle Forms',
 						id: 'druid_moon_circle_forms_01',
 						description: `
-							You can transform into beasts with a higher challenge rating than normal.
+							The rites of your circle grant you the ability to transform into more dangerous animal forms. You can use your Wild Shape to transform into a beast with a challenge rating as high as 1.
 						`,
 						source: 'druid.circle_of_the_moon',
 						effects: [{ target: 'features', action: 'add', value: 'Circle Forms' }]
@@ -368,7 +379,10 @@ export const druid: ClassData = {
 		'Spears'
 	],
 	startingEquipment: {
-		fixed: ['Leather armor', "Explorer's pack"],
+		fixed: [
+			'Leather armor',
+			"Explorer's pack (includes: backpack, bedroll, mess kit, tinderbox, 10 torches, 10 days of rations, waterskin, 50 feet of hempen rope)"
+		],
 		choices: [
 			{
 				name: 'Primary Equipment',

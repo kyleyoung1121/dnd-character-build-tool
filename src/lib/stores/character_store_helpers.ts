@@ -130,15 +130,26 @@ export function revertChanges(char: Character, scopeId: string): Character {
 	if (_mods) {
 		for (const key of Object.keys(_mods)) {
 			const typedKey = key as keyof Character;
-			// restore exact previous value if we captured it
-			if (_modsPrev && Object.prototype.hasOwnProperty.call(_modsPrev, typedKey)) {
-				(char[typedKey] as any) = _modsPrev[typedKey] as any;
-			} else {
-				// fallback: subtract delta (should rarely be needed)
+			// For ability scores (strength, dexterity, etc.), always subtract delta
+			// because they can be modified outside of provenance (via abilities page)
+			const abilityScores = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
+			if (abilityScores.includes(key)) {
+				// Always use delta subtraction for ability scores
 				const delta = Number(_mods[key]) || 0;
 				const current = char[typedKey] as any;
 				const base = typeof current === 'number' ? current : 0;
 				(char[typedKey] as any) = base - delta;
+			} else {
+				// For other numeric fields, restore exact previous value if we captured it
+				if (_modsPrev && Object.prototype.hasOwnProperty.call(_modsPrev, typedKey)) {
+					(char[typedKey] as any) = _modsPrev[typedKey] as any;
+				} else {
+					// fallback: subtract delta
+					const delta = Number(_mods[key]) || 0;
+					const current = char[typedKey] as any;
+					const base = typeof current === 'number' ? current : 0;
+					(char[typedKey] as any) = base - delta;
+				}
 			}
 		}
 	}

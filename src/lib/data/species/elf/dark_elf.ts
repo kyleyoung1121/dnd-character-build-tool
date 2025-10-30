@@ -25,7 +25,7 @@ const abilityScoreChoicePrompt: FeaturePrompt = {
 };
 
 export const darkElf: SpeciesData = {
-	name: 'Dark Elf (Drow)',
+	name: 'Dark Elf',
 	image: base + '/species_icons/dark_elf.jpg',
 	description: `
 		Drows are a subterranean subrace of elves with darkvision and innate magical abilities. 
@@ -79,7 +79,7 @@ export const darkElf: SpeciesData = {
 			name: 'Drow Magic',
 			id: 'dark_elf_drow_magic',
 			description: `
-				You know the Dancing Lights cantrip. At 3rd level, you can cast Faerie Fire once per long rest, and at 5th level, you can cast Darkness once per long rest. 
+				You know the Dancing Lights cantrip. You can cast Faerie Fire once per long rest. 
 				Charisma is your spellcasting ability for these spells.
 			`,
 			source: 'dark_elf',

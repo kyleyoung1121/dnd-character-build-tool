@@ -23,6 +23,7 @@ export interface SpellAccess {
 	chooseCantripCount?: number; // how many cantrips to choose
 	chooseSpellCount?: number; // how many leveled spells to choose
 	maxSpellLevel?: number; // maximum spell level that can be chosen (for limited casters like EK/AT)
+	restrictToSchools?: string[]; // restrict chooseable spells to specific schools (e.g., ['Enchantment', 'Illusion'] for Arcane Trickster)
 }
 
 export const cantrips: Spell[] = [
@@ -1918,9 +1919,9 @@ export const spellAccess: SpellAccess[] = [
 	{
 		source: 'race',
 		sourceName: 'Dark Elf',
-		spells: ['Faerie Fire'],
+		spells: ['Faerie Fire'], // Darkness is only available at 5th level, not 3rd
 		cantrips: ['Dancing Lights'],
-		chooseable: false // Drow Magic racial feature
+		chooseable: false // Drow Magic racial feature - auto-granted spells
 	},
 
 	// Full caster classes
@@ -1972,7 +1973,7 @@ export const spellAccess: SpellAccess[] = [
 		chooseable: true,
 		chooseFrom: ['Druid'],
 		chooseCantripCount: 2, // 2 cantrips known at level 3
-		chooseSpellCount: 6 // Typical prepared spells for level 3 (WIS mod 3 + level 3)
+		chooseSpellCount: 6 // Placeholder - dynamically calculated as WIS modifier + level (3) in getSpellAccessForCharacter
 	},
 	{
 		source: 'class',
@@ -1982,7 +1983,7 @@ export const spellAccess: SpellAccess[] = [
 		chooseable: true,
 		chooseFrom: ['Warlock'],
 		chooseCantripCount: 2, // 2 cantrips known at level 3
-		chooseSpellCount: 2 // 2 spells known at level 3
+		chooseSpellCount: 4 // 4 spells known at level 3
 	},
 
 	// Half-caster classes
@@ -2009,27 +2010,86 @@ export const spellAccess: SpellAccess[] = [
 	},
 
 	// Subclass-based spell access for non-casters
+	// Eldritch Knight - Tab 1: Cantrips (2 chooseable)
 	{
 		source: 'subclass',
-		sourceName: 'Eldritch Knight',
+		sourceName: 'Eldritch Knight - Cantrips',
 		spells: [],
 		cantrips: [],
 		chooseable: true,
 		chooseFrom: ['Wizard'],
-		chooseCantripCount: 2, // 2 cantrips known at level 3
-		chooseSpellCount: 3, // 3 spells known at level 3
-		maxSpellLevel: 1 // Limited to cantrips and 1st level spells
+		chooseCantripCount: 2, // 2 wizard cantrips
+		chooseSpellCount: 0,
+		maxSpellLevel: 0 // Only cantrips for this entry
+	},
+	// Eldritch Knight - Tab 2: 1st Level Abjuration/Evocation (2 restricted spells)
+	{
+		source: 'subclass',
+		sourceName: 'Eldritch Knight - 1st Level (Abjuration/Evocation)',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Wizard'],
+		chooseCantripCount: 0,
+		chooseSpellCount: 2, // 2 wizard spells from Abjuration or Evocation schools
+		maxSpellLevel: 1,
+		restrictToSchools: ['Abjuration', 'Evocation'] // School restriction
+	},
+	// Eldritch Knight - Tab 3: 1st Level Any School (1 unrestricted spell)
+	{
+		source: 'subclass',
+		sourceName: 'Eldritch Knight - 1st Level (Any School)',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Wizard'],
+		chooseCantripCount: 0,
+		chooseSpellCount: 1, // 1 wizard spell from any school
+		maxSpellLevel: 1
+	},
+	// Arcane Trickster - Tab 1: Cantrips (Mage Hand auto-granted + 2 chooseable)
+	{
+		source: 'subclass',
+		sourceName: 'Arcane Trickster - Cantrips',
+		spells: [],
+		cantrips: ['Mage Hand'],
+		chooseable: false // Mage Hand is automatically granted
 	},
 	{
 		source: 'subclass',
-		sourceName: 'Arcane Trickster',
+		sourceName: 'Arcane Trickster - Cantrips',
 		spells: [],
 		cantrips: [],
 		chooseable: true,
 		chooseFrom: ['Wizard'],
-		chooseCantripCount: 3, // 3 cantrips known at level 3
-		chooseSpellCount: 3, // 3 spells known at level 3, must be illusion/enchantment
-		maxSpellLevel: 1 // Limited to cantrips and 1st level spells
+		chooseCantripCount: 2, // 2 additional wizard cantrips
+		chooseSpellCount: 0,
+		maxSpellLevel: 0 // Only cantrips for this entry
+	},
+	// Arcane Trickster - Tab 2: 1st Level Enchantment/Illusion (2 restricted spells)
+	{
+		source: 'subclass',
+		sourceName: 'Arcane Trickster - 1st Level (Enchantment/Illusion)',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Wizard'],
+		chooseCantripCount: 0,
+		chooseSpellCount: 2, // 2 wizard spells from Enchantment or Illusion schools
+		maxSpellLevel: 1,
+		restrictToSchools: ['Enchantment', 'Illusion'] // School restriction
+	},
+	// Arcane Trickster - Tab 3: 1st Level Any School (1 unrestricted spell as a bonus)
+	{
+		source: 'subclass',
+		sourceName: 'Arcane Trickster - 1st Level (Any School)',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Wizard'],
+		chooseCantripCount: 0,
+		chooseSpellCount: 1, // 1 wizard spell from any school
+		maxSpellLevel: 1
 	},
 	{
 		source: 'subclass',
@@ -2056,8 +2116,53 @@ export const spellAccess: SpellAccess[] = [
 	},
 	{
 		source: 'subclass',
+		sourceName: 'Light Domain',
+		spells: ['Burning Hands', 'Faerie Fire', 'Flaming Sphere', 'Scorching Ray'], // 1st and 2nd level domain spells
+		cantrips: [],
+		chooseable: false // Domain spells are always prepared
+	},
+	{
+		source: 'subclass',
+		sourceName: 'Trickery Domain',
+		spells: ['Charm Person', 'Disguise Self', 'Mirror Image', 'Pass without Trace'], // 1st and 2nd level domain spells
+		cantrips: [],
+		chooseable: false // Domain spells are always prepared
+	},
+	{
+		source: 'subclass',
+		sourceName: 'Knowledge Domain',
+		spells: ['Command', 'Identify', 'Augury', 'Suggestion'], // 1st and 2nd level domain spells
+		cantrips: [],
+		chooseable: false // Domain spells are always prepared
+	},
+	{
+		source: 'subclass',
+		sourceName: 'Nature Domain',
+		spells: ['Animal Friendship', 'Speak with Animals', 'Barkskin', 'Spike Growth'], // 1st and 2nd level domain spells
+		cantrips: [],
+		chooseable: false // Domain spells are always prepared
+	},
+	{
+		source: 'subclass',
+		sourceName: 'Nature Domain - Druid Cantrip',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Druid'],
+		chooseCantripCount: 1, // Bonus druid cantrip from Acolyte of Nature
+		maxSpellLevel: 0 // Only cantrips allowed
+	},
+	{
+		source: 'subclass',
+		sourceName: 'Tempest Domain',
+		spells: ['Fog Cloud', 'Thunderwave', 'Gust of Wind', 'Shatter'], // 1st and 2nd level domain spells
+		cantrips: [],
+		chooseable: false // Domain spells are always prepared
+	},
+	{
+		source: 'subclass',
 		sourceName: 'War Domain',
-		spells: ['Divine Favor', 'Shield', 'Magic Weapon', 'Spiritual Weapon'], // 1st and 2nd level domain spells
+		spells: ['Divine Favor', 'Shield of Faith', 'Magic Weapon', 'Spiritual Weapon'], // 1st and 2nd level domain spells
 		cantrips: [],
 		chooseable: false // Domain spells are always prepared
 	},
@@ -2228,39 +2333,97 @@ export const spellAccess: SpellAccess[] = [
 	},
 
 	// Warlock Patron Expanded Spell Lists
+	// These add specific spells as options to the warlock spell list, not auto-granted
+	// Note: We DON'T use chooseFrom because that would duplicate the entire warlock spell list
+	// Instead, we just list the new spells that the patron adds as options
 	{
 		source: 'subclass',
 		sourceName: 'The Fiend',
-		spells: ['Burning Hands', 'Command'], // 1st level fiend expanded spells
+		spells: ['Burning Hands', 'Command', 'Blindness/Deafness', 'Scorching Ray'], // Fiend expanded spells
 		cantrips: [],
-		chooseable: false // Expanded spell list, always known
+		chooseable: true, // These are options, not auto-granted
+		chooseCantripCount: 0,
+		chooseSpellCount: 0 // Doesn't grant extra picks, just expands the spell pool
 	},
 	{
 		source: 'subclass',
 		sourceName: 'The Great Old One',
-		spells: ['Dissonant Whispers', "Tasha's Hideous Laughter"], // 1st level GOO expanded spells
+		spells: ['Dissonant Whispers', "Tasha's Hideous Laughter", 'Detect Thoughts', 'Phantasmal Force'], // GOO expanded spells
 		cantrips: [],
-		chooseable: false // Expanded spell list, always known
+		chooseable: true, // These are options, not auto-granted
+		chooseCantripCount: 0,
+		chooseSpellCount: 0 // Doesn't grant extra picks, just expands the spell pool
 	},
 	{
 		source: 'subclass',
 		sourceName: 'The Archfey',
-		spells: ['Faerie Fire', 'Sleep'], // 1st level archfey expanded spells
+		spells: ['Faerie Fire', 'Sleep', 'Calm Emotions', 'Phantasmal Force'], // Archfey expanded spells
 		cantrips: [],
-		chooseable: false // Expanded spell list, always known
+		chooseable: true, // These are options, not auto-granted
+		chooseCantripCount: 0,
+		chooseSpellCount: 0 // Doesn't grant extra picks, just expands the spell pool
 	},
 
+	// Warlock Pact of the Chain - Find Familiar
+	{
+		source: 'feature',
+		sourceName: 'Pact of the Chain',
+		spells: ['Find Familiar'],
+		cantrips: [],
+		chooseable: false // Automatically granted by Pact of the Chain
+	},
 	// Warlock Invocations that grant spells
 	{
 		source: 'feature',
-		sourceName: 'Warlock Invocation',
-		spells: ['Detect Magic', 'Disguise Self', 'Mage Armor'], // Examples: Eldritch Sight, Mask of Many Faces, Armor of Shadows
+		sourceName: 'Armor of Shadows',
+		spells: ['Mage Armor'],
 		cantrips: [],
-		chooseable: true, // Player chooses which invocations to take
-		chooseSpellCount: 2 // Approximate number of spell-granting invocations available at level 3
+		chooseable: false // Automatically granted by invocation choice
+	},
+	{
+		source: 'feature',
+		sourceName: 'Beast Speech',
+		spells: ['Speak with Animals'],
+		cantrips: [],
+		chooseable: false // Automatically granted by invocation choice
+	},
+	{
+		source: 'feature',
+		sourceName: 'Eldritch Sight',
+		spells: ['Detect Magic'],
+		cantrips: [],
+		chooseable: false // Automatically granted by invocation choice
+	},
+	{
+		source: 'feature',
+		sourceName: 'Fiendish Vigor',
+		spells: ['False Life'],
+		cantrips: [],
+		chooseable: false // Automatically granted by invocation choice
+	},
+	{
+		source: 'feature',
+		sourceName: 'Mask of Many Faces',
+		spells: ['Disguise Self'],
+		cantrips: [],
+		chooseable: false // Automatically granted by invocation choice
+	},
+	{
+		source: 'feature',
+		sourceName: 'Misty Visions',
+		spells: ['Silent Image'],
+		cantrips: [],
+		chooseable: false // Automatically granted by invocation choice
+	},
+	{
+		source: 'feature',
+		sourceName: 'Thief of Five Fates',
+		spells: ['Bane'],
+		cantrips: [],
+		chooseable: false // Automatically granted by invocation choice
 	},
 
-	// Warlock Pact Boon spells
+	// Warlock Pact of the Tome - Book of Shadows cantrips
 	{
 		source: 'feature',
 		sourceName: 'Pact of the Tome',
@@ -2270,6 +2433,17 @@ export const spellAccess: SpellAccess[] = [
 		chooseFrom: ['Bard', 'Cleric', 'Druid', 'Sorcerer', 'Warlock', 'Wizard'], // Any class cantrips
 		chooseCantripCount: 3, // Book of Shadows grants 3 cantrips from any class
 		chooseSpellCount: 0
+	},
+	// Warlock Invocation: Book of Ancient Secrets (requires Pact of the Tome)
+	{
+		source: 'feature',
+		sourceName: 'Book of Ancient Secrets',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Bard', 'Cleric', 'Druid', 'Sorcerer', 'Warlock', 'Wizard'], // Any class ritual spells
+		chooseCantripCount: 0,
+		chooseSpellCount: 2 // Choose 2 ritual spells
 	},
 
 	// Wizard School Features
@@ -2303,10 +2477,12 @@ function getAbilityModifier(abilityScore: number): number {
 export function getSpellAccessForCharacter(character: any): SpellAccess[] {
 	const access: SpellAccess[] = [];
 
-	// Check race-based access
+	// Check race-based access (both race and subrace)
 	if (character.race) {
 		const raceAccess = spellAccess.filter(
-			(sa) => sa.source === 'race' && sa.sourceName === character.race
+			(sa) =>
+				sa.source === 'race' &&
+				(sa.sourceName === character.race || sa.sourceName === character.subrace)
 		);
 		access.push(...raceAccess);
 	}
@@ -2317,13 +2493,42 @@ export function getSpellAccessForCharacter(character: any): SpellAccess[] {
 			(sa) => sa.source === 'class' && sa.sourceName === character.class
 		);
 
-		// Special handling for Paladin - dynamic prepared spell count
+		// Special handling for dynamic prepared spell counts
 		const processedClassAccess = classAccess.map((access) => {
 			if (access.sourceName === 'Paladin') {
 				// Calculate dynamic spell count: CHA modifier + 1 (minimum 1)
-				const charismaScore = character.charisma || 10; // Default to 10 if not set
+				// If charisma is very low (1-7), it's likely just racial bonuses without a base score selected
+				// In that case, assume +0 modifier (score of 10) for spell limits
+				const rawCharisma = character.charisma || 10;
+				const charismaScore = rawCharisma < 8 ? 10 : rawCharisma;
 				const charismaModifier = getAbilityModifier(charismaScore);
 				const preparedSpellCount = Math.max(1, charismaModifier + 1);
+
+				return {
+					...access,
+					chooseSpellCount: preparedSpellCount
+				};
+			} else if (access.sourceName === 'Cleric') {
+				// Calculate dynamic spell count: WIS modifier + 3 (minimum 1)
+				// If wisdom is very low (1-7), it's likely just racial bonuses without a base score selected
+				// In that case, assume +0 modifier (score of 10) for spell limits
+				const rawWisdom = character.wisdom || 10;
+				const wisdomScore = rawWisdom < 8 ? 10 : rawWisdom;
+				const wisdomModifier = getAbilityModifier(wisdomScore);
+				const preparedSpellCount = Math.max(1, wisdomModifier + 3);
+
+				return {
+					...access,
+					chooseSpellCount: preparedSpellCount
+				};
+			} else if (access.sourceName === 'Druid') {
+				// Calculate dynamic spell count: WIS modifier + 3 (minimum 1)
+				// If wisdom is very low (1-7), it's likely just racial bonuses without a base score selected
+				// In that case, assume +0 modifier (score of 10) for spell limits
+				const rawWisdom = character.wisdom || 10;
+				const wisdomScore = rawWisdom < 8 ? 10 : rawWisdom;
+				const wisdomModifier = getAbilityModifier(wisdomScore);
+				const preparedSpellCount = Math.max(1, wisdomModifier + 3);
 
 				return {
 					...access,
@@ -2339,9 +2544,20 @@ export function getSpellAccessForCharacter(character: any): SpellAccess[] {
 	// Check subclass-based access
 	if (character.subclass) {
 		const subclassAccess = spellAccess.filter(
-			(sa) => sa.source === 'subclass' && sa.sourceName === character.subclass
+			(sa) =>
+				sa.source === 'subclass' &&
+				(sa.sourceName === character.subclass ||
+					sa.sourceName.startsWith(character.subclass + ' - '))
 		);
 		access.push(...subclassAccess);
+	}
+
+	// Check feature-based access (for pact boons, invocations, etc.)
+	if (character.features && Array.isArray(character.features)) {
+		const featureAccess = spellAccess.filter(
+			(sa) => sa.source === 'feature' && character.features.includes(sa.sourceName)
+		);
+		access.push(...featureAccess);
 	}
 
 	return access;

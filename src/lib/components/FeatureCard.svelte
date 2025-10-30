@@ -46,10 +46,10 @@
 		}
 	}
 
-	// Get available options for a specific dropdown index
-	function getAvailableOptions(index: number): (string | ComplexOption)[] {
+	// Get available options for a specific dropdown index - reactive to character store changes
+	$: getAvailableOptions = (index: number): (string | ComplexOption)[] => {
 		return getGloballyAvailableOptions(feature, index, featureSelections, characterStore);
-	}
+	};
 
 	// Handle select change
 	function handleSelectChange(event: Event, index: number) {

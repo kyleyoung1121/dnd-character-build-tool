@@ -1,4 +1,8 @@
-import type { FeaturePrompt, ComplexOption } from '$lib/data/types/Features';
+import type {
+	FeaturePrompt,
+	ComplexOption,
+	DynamicOptionsGenerator
+} from '$lib/data/types/Features';
 import type { Character } from '$lib/stores/character_store';
 import { get } from 'svelte/store';
 
@@ -49,7 +53,7 @@ export function getNestedPrompts(
 ): FeaturePrompt[] {
 	if (!feature.featureOptions) return [];
 	const nested: FeaturePrompt[] = [];
-	for (const option of feature.featureOptions.options) {
+	for (const option of feature.featureOptions.options || []) {
 		const optionName = typeof option === 'string' ? option : option.name;
 		if (
 			selectedOptions.includes(optionName) &&
@@ -75,7 +79,16 @@ export function getGloballyAvailableOptions(
 	featureSelections: Record<string, (string | null)[]>,
 	characterStore: any
 ): (string | ComplexOption)[] {
-	const options = feature.featureOptions?.options || [];
+	let options = feature.featureOptions?.options || [];
+
+	// Handle dynamic options generation
+	if (feature.featureOptions?.dynamicOptionsGenerator) {
+		options = generateDynamicOptions(
+			feature.featureOptions.dynamicOptionsGenerator,
+			characterStore,
+			featureSelections
+		);
+	}
 	const chosenHere = featureSelections[feature.name] || [];
 	const currentValue = chosenHere[index] ?? null;
 
@@ -83,10 +96,22 @@ export function getGloballyAvailableOptions(
 	const state = get(characterStore) as Character;
 	const taken = new Set<string>();
 
+	// Special case: For expertise features, don't mark skills as "taken"
+	// because expertise specifically requires choosing from already-taken skills
+	const isExpertiseFeature = feature.name.toLowerCase().includes('expertise');
+
 	// Include store-backed sets that commonly correspond to dropdown options
-	if (Array.isArray(state.skills)) for (const s of state.skills) taken.add(s);
+	// But skip skills for expertise features since they should be available
+	if (Array.isArray(state.skills) && !isExpertiseFeature) {
+		for (const s of state.skills) taken.add(s);
+	}
 	if (Array.isArray(state.languages)) for (const l of state.languages) taken.add(l);
 	if (Array.isArray(state.proficiencies)) for (const p of state.proficiencies) taken.add(p);
+
+	// For expertise features, we still want to track already-chosen expertise to prevent duplicates
+	if (isExpertiseFeature && Array.isArray(state.expertise)) {
+		for (const e of state.expertise) taken.add(e);
+	}
 
 	// Include every selection already made in the UI (across all features & nested)
 	for (const [featName, picks] of Object.entries(featureSelections)) {
@@ -98,7 +123,7 @@ export function getGloballyAvailableOptions(
 		}
 	}
 
-	return options.filter((opt) => {
+	const finalFiltered = options.filter((opt) => {
 		const name = typeof opt === 'string' ? opt : opt.name;
 
 		// Rule 1: cannot duplicate within the same feature (other indices)
@@ -107,11 +132,39 @@ export function getGloballyAvailableOptions(
 		// Rule 2: allow the current index's already-chosen value
 		if (currentValue === name) return true;
 
-		// Rule 3: otherwise, must not be taken anywhere else
+		// Rule 3: For expertise features, ignore taken status for skills
+		// (since expertise requires choosing from already-taken skills)
+		if (isExpertiseFeature) {
+			// For expertise, only block if this specific item is already chosen as expertise
+			if (Array.isArray(state.expertise) && state.expertise.includes(name)) {
+				return false;
+			}
+			return true; // Allow all other options for expertise
+		}
+
+		// Rule 3 (normal): otherwise, must not be taken anywhere else
 		if (taken.has(name)) return false;
 
 		return true;
 	});
+
+	// Store debug info for filtering
+	if (typeof window !== 'undefined' && (window as any).dynamicOptionsDebug) {
+		(window as any).dynamicOptionsDebug.filtering = {
+			featureName: feature.name,
+			index,
+			isExpertiseFeature,
+			rawOptions: options,
+			chosenHere,
+			currentValue,
+			taken: Array.from(taken),
+			expertiseAlreadyChosen: isExpertiseFeature ? state.expertise || [] : [],
+			finalFiltered,
+			timestamp: new Date().toISOString()
+		};
+	}
+
+	return finalFiltered;
 }
 
 /**
@@ -136,7 +189,7 @@ export function clearNestedFeatureSelections(
 
 		// Recursively clear any deeper nested selections
 		if (nestedFeature.featureOptions) {
-			for (const option of nestedFeature.featureOptions.options) {
+			for (const option of nestedFeature.featureOptions.options || []) {
 				if (typeof option !== 'string' && option.nestedPrompts) {
 					for (const deeperNested of option.nestedPrompts) {
 						clearRecursively(deeperNested);
@@ -146,7 +199,7 @@ export function clearNestedFeatureSelections(
 		}
 	}
 
-	for (const option of feature.featureOptions.options) {
+	for (const option of feature.featureOptions.options || []) {
 		if (typeof option !== 'string' && option.nestedPrompts) {
 			for (const nested of option.nestedPrompts) {
 				clearRecursively(nested);
@@ -155,6 +208,121 @@ export function clearNestedFeatureSelections(
 	}
 
 	return mutated ? newSelections : selections;
+}
+
+/**
+ * Generate dynamic options based on character state
+ */
+export function generateDynamicOptions(
+	generator: DynamicOptionsGenerator,
+	characterStore: any,
+	featureSelections?: Record<string, (string | null)[]>
+): (string | ComplexOption)[] {
+	const state = get(characterStore) as Character;
+
+	// Store debug info for export tab
+	if (typeof window !== 'undefined' && (window as any).dynamicOptionsDebug) {
+		(window as any).dynamicOptionsDebug.lastCall = {
+			generatorType: generator.type,
+			additionalOptions: generator.additionalOptions,
+			characterStoreState: state,
+			skillsArray: state?.skills,
+			featureSelections,
+			timestamp: new Date().toISOString()
+		};
+	} else if (typeof window !== 'undefined') {
+		(window as any).dynamicOptionsDebug = {
+			lastCall: {
+				generatorType: generator.type,
+				additionalOptions: generator.additionalOptions,
+				characterStoreState: state,
+				skillsArray: state?.skills,
+				featureSelections,
+				timestamp: new Date().toISOString()
+			}
+		};
+	}
+
+	// Define common D&D skills once to avoid duplication
+	const commonSkills = [
+		'Acrobatics',
+		'Animal Handling',
+		'Arcana',
+		'Athletics',
+		'Deception',
+		'History',
+		'Insight',
+		'Intimidation',
+		'Investigation',
+		'Medicine',
+		'Nature',
+		'Perception',
+		'Performance',
+		'Persuasion',
+		'Religion',
+		'Sleight of Hand',
+		'Stealth',
+		'Survival'
+	];
+
+	switch (generator.type) {
+		case 'proficient-skills-plus-tools': {
+			const options: string[] = [];
+
+			// Add all skills the character is proficient in from the store
+			if (Array.isArray(state.skills)) {
+				options.push(...state.skills);
+			}
+
+			// Also check proficiencies - Half-Elf skills are stored there
+			if (Array.isArray(state.proficiencies)) {
+				// Only add skill proficiencies, not other types of proficiencies
+				for (const prof of state.proficiencies) {
+					if (commonSkills.includes(prof)) {
+						options.push(prof);
+					}
+				}
+			}
+
+			// Also add skills from current page selections (not yet saved to store)
+			if (featureSelections) {
+				for (const [featureName, selections] of Object.entries(featureSelections)) {
+					// Look for skill-related features - be more specific
+					const isSkillFeature =
+						featureName.toLowerCase().includes('skill') ||
+						featureName.toLowerCase().includes('proficiencies') ||
+						featureName === 'Skill Proficiencies' ||
+						featureName.includes('Skills');
+
+					if (isSkillFeature) {
+						for (const selection of selections) {
+							if (selection && typeof selection === 'string') {
+								// Only add if it's a recognized skill
+								if (commonSkills.includes(selection)) {
+									options.push(selection);
+								}
+							}
+						}
+					}
+				}
+			}
+
+			// Add the additional options (e.g., "Thieves' Tools" for rogues)
+			options.push(...generator.additionalOptions);
+
+			// Remove duplicates
+			const finalOptions = [...new Set(options)];
+
+			// Store final result in debug info
+			if (typeof window !== 'undefined' && (window as any).dynamicOptionsDebug) {
+				(window as any).dynamicOptionsDebug.lastCall.finalOptions = finalOptions;
+			}
+
+			return finalOptions;
+		}
+		default:
+			return [];
+	}
 }
 
 /**

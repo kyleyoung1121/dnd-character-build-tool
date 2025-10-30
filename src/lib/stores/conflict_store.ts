@@ -12,7 +12,18 @@ type ConflictDetectionResult = {
  * Reactive store that automatically detects conflicts when character changes
  */
 export const conflicts = derived(character_store, ($character) => {
-	return detectConflicts();
+	console.log('[Conflict Store] Character changed, detecting conflicts...');
+	console.log('[Conflict Store] Character:', {
+		class: $character?.class,
+		race: $character?.race,
+		subrace: $character?.subrace,
+		charisma: $character?.charisma,
+		spells: $character?.spells,
+		spellsLength: $character?.spells?.length
+	});
+	const result = detectConflicts();
+	console.log('[Conflict Store] Detection result:', result);
+	return result;
 });
 
 /**
@@ -26,7 +37,12 @@ export const visitedTabs = writable<Set<string>>(new Set());
  * Only shows warnings for tabs that have been visited (configured)
  */
 export const activeConflicts = derived([conflicts, visitedTabs], ([conflictResult, visited]) => {
+	console.log('[Active Conflicts] Deriving active conflicts...');
+	console.log('[Active Conflicts] Input conflicts:', conflictResult);
+	console.log('[Active Conflicts] Visited tabs:', Array.from(visited));
+	
 	if (!conflictResult.hasConflicts) {
+		console.log('[Active Conflicts] No conflicts detected');
 		return {
 			hasConflicts: false,
 			conflicts: [],
@@ -36,19 +52,40 @@ export const activeConflicts = derived([conflicts, visitedTabs], ([conflictResul
 
 	// Filter conflicts to only show warnings for tabs that have been visited
 	// This prevents showing warnings for unconfigured tabs
+	// EXCEPTION: Spell limit violations always show (urgent and actionable)
 	const filteredConflicts = conflictResult.conflicts.filter((conflict) => {
-		return conflict.affectedTabs?.some((tab) => visited.has(tab)) ?? false;
+		// Always include spell limit violations regardless of visited tabs
+		if (conflict.type === 'spell_limit') {
+			return true;
+		}
+		
+		const hasVisitedTab = conflict.affectedTabs?.some((tab) => visited.has(tab)) ?? false;
+		return hasVisitedTab;
 	});
 
+	// Get all tabs from filtered conflicts
+	// For spell limit violations, include the tabs even if not visited (urgent/actionable)
 	const tabsNeedingAttention = [
 		...new Set(filteredConflicts.flatMap((c) => c.affectedTabs || []))
-	].filter((tab) => visited.has(tab));
+	].filter((tab) => {
+		// Always include tabs from spell limit violations
+		const hasSpellLimitConflict = filteredConflicts.some(
+			(c) => c.type === 'spell_limit' && c.affectedTabs?.includes(tab)
+		);
+		if (hasSpellLimitConflict) {
+			return true;
+		}
+		// Otherwise only include if tab has been visited
+		return visited.has(tab);
+	});
 
-	return {
+	const result = {
 		hasConflicts: filteredConflicts.length > 0,
 		conflicts: filteredConflicts,
 		tabsNeedingAttention
 	};
+	console.log('[Active Conflicts] Final result:', result);
+	return result;
 });
 
 /**

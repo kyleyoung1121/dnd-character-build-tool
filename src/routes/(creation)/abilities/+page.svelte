@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { character_store } from '$lib/stores/character_store';
 	import { get } from 'svelte/store';
-	import { getSpellAccessForCharacter } from '$lib/data/spells';
+	import { getSpellAccessForCharacter, getSpellsByLevel } from '$lib/data/spells';
 
 	const standardArray = [15, 14, 13, 12, 10, 8];
 	const stats = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
@@ -224,13 +224,29 @@
 		charisma: null
 	};
 
-	// Initialize selected scores from current character state
+	// Track if initial load has completed to prevent re-initialization
+	let hasInitialized = false;
+
+	// Initialize selected scores from current character state (only on first load)
 	$: {
-		for (const stat of stats) {
-			const statValue = (currentCharacter as any)[stat];
-			if (statValue && selectedScores[stat] === null) {
-				// Subtract bonuses to get the base score
-				selectedScores[stat] = statValue - (bonuses[stat] || 0);
+		if (!hasInitialized) {
+			let hasAnyScore = false;
+			for (const stat of stats) {
+				const statValue = (currentCharacter as any)[stat];
+				if (statValue && selectedScores[stat] === null) {
+					// Subtract bonuses to get the base score
+					const baseScore = statValue - (bonuses[stat] || 0);
+					// Only set if the base score is valid (from standard array)
+					// If baseScore <= 0, it means only bonuses exist with no real selection
+					if (baseScore > 0) {
+						selectedScores[stat] = baseScore;
+						hasAnyScore = true;
+					}
+				}
+			}
+			// Mark as initialized after attempting to load scores
+			if (hasAnyScore || Object.values(bonuses).some(b => b !== 0)) {
+				hasInitialized = true;
 			}
 		}
 	}
@@ -273,7 +289,8 @@
 	}
 
 	// Used scores for dropdown filtering
-	$: usedScores = Object.values(selectedScores).filter((s) => s !== null);
+	// Filter out null and 0 (0 indicates only bonuses exist, not a real selection)
+	$: usedScores = Object.values(selectedScores).filter((s) => s !== null && s > 0);
 
 	// Apply ability scores to character store
 	$: {
@@ -281,12 +298,18 @@
 		let hasChanges = false;
 
 		for (const stat of stats) {
-			if (selectedScores[stat] !== null) {
+			if (selectedScores[stat] !== null && selectedScores[stat] > 0) {
+				// User has selected a score - update the character store
 				const totalScore = selectedScores[stat] + (bonuses[stat] || 0);
 				if ((currentCharacter as any)[stat] !== totalScore) {
 					updates[stat] = totalScore;
 					hasChanges = true;
 				}
+			} else if (hasInitialized && (currentCharacter as any)[stat] !== undefined) {
+				// User has cleared a score - remove it from character store
+				// Only do this after initialization to avoid clearing during initial load
+				updates[stat] = undefined;
+				hasChanges = true;
 			}
 		}
 
@@ -297,8 +320,23 @@
 
 	// Monitor Charisma changes for Paladin spell limit validation
 	$: {
-		if (currentCharacter.class === 'Paladin' && selectedScores.charisma !== null) {
+		if (
+			currentCharacter.class === 'Paladin' &&
+			selectedScores.charisma !== null &&
+			selectedScores.charisma > 0
+		) {
 			validatePaladinSpellLimit();
+		}
+	}
+
+	// Monitor Wisdom changes for Cleric spell limit validation
+	$: {
+		if (
+			currentCharacter.class === 'Cleric' &&
+			selectedScores.wisdom !== null &&
+			selectedScores.wisdom > 0
+		) {
+			validateClericSpellLimit();
 		}
 	}
 
@@ -338,7 +376,71 @@
 			.filter((access) => access.source === 'subclass' && access.sourceName?.includes('Oath'))
 			.flatMap((access) => access.spells || []);
 
-		const preparedSpells = currentCharacter.spells.filter((spell) => !oathSpells.includes(spell));
+		// Get list of all cantrip names to exclude them from the count
+		const allCantrips = getSpellsByLevel(0);
+		const cantripNames = new Set(allCantrips.map((spell) => spell.name));
+
+		// Filter to only count leveled spells (exclude cantrips and oath spells)
+		// NOTE: currentCharacter.spells may contain strings OR objects with a 'name' property
+		const preparedSpells = currentCharacter.spells.filter((spell) => {
+			// Extract spell name (handle both string and object formats)
+			const spellName = typeof spell === 'string' ? spell : spell.name;
+			return !oathSpells.includes(spellName) && !cantripNames.has(spellName);
+		});
+
+		// If current prepared spells exceed new limit, show warning
+		if (preparedSpells.length > newSpellLimit) {
+			const excessCount = preparedSpells.length - newSpellLimit;
+			spellLimitWarningInfo = {
+				currentCount: preparedSpells.length,
+				newLimit: newSpellLimit,
+				excessCount: excessCount
+			};
+			showSpellLimitWarning = true;
+		} else {
+			// Hide warning if spell count is now within limits
+			showSpellLimitWarning = false;
+		}
+	}
+
+	function validateClericSpellLimit() {
+		// Only validate if character has spells selected
+		if (!currentCharacter.spells || currentCharacter.spells.length === 0) {
+			return;
+		}
+
+		// Calculate new Wisdom-based spell limit
+		const totalWisdom = (selectedScores.wisdom || 10) + (bonuses.wisdom || 0);
+		const wisdomModifier = getModifier(totalWisdom);
+		const newSpellLimit = Math.max(1, wisdomModifier + 3);
+
+		// Get current cleric spell access to determine chooseable spells
+		const tempCharacter = { ...currentCharacter, wisdom: totalWisdom };
+		const spellAccess = getSpellAccessForCharacter(tempCharacter);
+		const clericAccess = spellAccess.find(
+			(access) => access.source === 'class' && access.sourceName === 'Cleric'
+		);
+
+		if (!clericAccess || !clericAccess.chooseable) {
+			return;
+		}
+
+		// Count current prepared spells (excluding domain spells which are always prepared)
+		const domainSpells = spellAccess
+			.filter((access) => access.source === 'subclass' && access.sourceName?.includes('Domain'))
+			.flatMap((access) => access.spells || []);
+
+		// Get list of all cantrip names to exclude them from the count
+		const allCantrips = getSpellsByLevel(0);
+		const cantripNames = new Set(allCantrips.map((spell) => spell.name));
+
+		// Filter to only count leveled spells (exclude cantrips and domain spells)
+		// NOTE: currentCharacter.spells may contain strings OR objects with a 'name' property
+		const preparedSpells = currentCharacter.spells.filter((spell) => {
+			// Extract spell name (handle both string and object formats)
+			const spellName = typeof spell === 'string' ? spell : spell.name;
+			return !domainSpells.includes(spellName) && !cantripNames.has(spellName);
+		});
 
 		// If current prepared spells exceed new limit, show warning
 		if (preparedSpells.length > newSpellLimit) {
@@ -437,12 +539,14 @@
 
 				<!-- Total -->
 				<div class="text-center font-semibold text-gray-800">
-					{selectedScores[stat] !== null ? selectedScores[stat] + (bonuses[stat] ?? 0) : ''}
+					{selectedScores[stat] !== null && selectedScores[stat] > 0
+						? selectedScores[stat] + (bonuses[stat] ?? 0)
+						: ''}
 				</div>
 
 				<!-- Modifier -->
 				<div class="text-center font-mono font-bold text-indigo-600">
-					{selectedScores[stat] !== null
+					{selectedScores[stat] !== null && selectedScores[stat] > 0
 						? getModifierString(selectedScores[stat] + (bonuses[stat] ?? 0))
 						: ''}
 				</div>
@@ -541,7 +645,8 @@
 			<div class="warning-text">
 				<h3>Spell Limit Exceeded</h3>
 				<p>
-					Your Charisma modifier change has reduced your prepared spell limit. You currently have
+					Your {currentCharacter.class === 'Paladin' ? 'Charisma' : 'Wisdom'} modifier change has reduced
+					your prepared spell limit. You currently have
 					<strong>{spellLimitWarningInfo.currentCount} prepared spells</strong> but can only prepare
 					<strong>{spellLimitWarningInfo.newLimit}</strong>. Please visit the
 					<a href="/spells">Spells page</a>

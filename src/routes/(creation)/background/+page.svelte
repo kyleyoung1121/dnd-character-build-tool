@@ -65,7 +65,8 @@
 
 			const prefixes = [
 				`background:${selectedBackgroundData.name}`,
-				...allFeatureNames.map((f) => `feature:${f}`)
+				...allFeatureNames.map((f) => `feature:${f}`),
+				'background_equipment_' // Remove all background equipment when changing background
 			];
 
 			for (const key of provKeys) {

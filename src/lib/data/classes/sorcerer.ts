@@ -72,35 +72,115 @@ const metamagicPrompt: FeaturePrompt = {
 		options: [
 			{
 				name: 'Careful Spell',
-				optionDescription: `When you cast a spell that forces other creatures to make a saving throw, you can protect some of those creatures from the effect.`
+				optionDescription: 'Protect allies from your area spells.',
+				nestedPrompts: [
+					{
+						id: 'sorcerer_careful_spell_desc',
+						name: 'Careful Spell',
+						description:
+							'When you cast a spell that forces other creatures to make a saving throw, you can protect some of those creatures from the spell\'s full force. To do so, you spend 1 sorcery point and choose a number of those creatures up to your Charisma modifier (minimum of one creature). A chosen creature automatically succeeds on its saving throw against the spell.',
+						source: 'sorcerer.metamagic',
+						effects: []
+					}
+				]
 			},
 			{
 				name: 'Distant Spell',
-				optionDescription: `When you cast a spell with a range of 5 feet or greater, you can double the range.`
+				optionDescription: 'Increase the range of your spells.',
+				nestedPrompts: [
+					{
+						id: 'sorcerer_distant_spell_desc',
+						name: 'Distant Spell',
+						description:
+							'When you cast a spell that has a range of 5 feet or greater, you can spend 1 sorcery point to double the range of the spell. When you cast a spell that has a range of touch, you can spend 1 sorcery point to make the range of the spell 30 feet.',
+						source: 'sorcerer.metamagic',
+						effects: []
+					}
+				]
 			},
 			{
 				name: 'Empowered Spell',
-				optionDescription: `When you roll damage for a spell, you can reroll a number of damage dice up to your Charisma modifier.`
+				optionDescription: 'Reroll damage dice for better results.',
+				nestedPrompts: [
+					{
+						id: 'sorcerer_empowered_spell_desc',
+						name: 'Empowered Spell',
+						description:
+							'When you roll damage for a spell, you can spend 1 sorcery point to reroll a number of the damage dice up to your Charisma modifier (minimum of one). You must use the new rolls. You can use Empowered Spell even if you have already used a different Metamagic option during the casting of the spell.',
+						source: 'sorcerer.metamagic',
+						effects: []
+					}
+				]
 			},
 			{
 				name: 'Extended Spell',
-				optionDescription: `When you cast a spell with a duration of 1 minute or longer, you can double the duration.`
+				optionDescription: 'Double the duration of your spells.',
+				nestedPrompts: [
+					{
+						id: 'sorcerer_extended_spell_desc',
+						name: 'Extended Spell',
+						description:
+							'When you cast a spell that has a duration of 1 minute or longer, you can spend 1 sorcery point to double its duration, to a maximum duration of 24 hours.',
+						source: 'sorcerer.metamagic',
+						effects: []
+					}
+				]
 			},
 			{
 				name: 'Heightened Spell',
-				optionDescription: `You can give one target of a spell disadvantage on its first saving throw made against the spell.`
+				optionDescription: 'Make spells harder to resist.',
+				nestedPrompts: [
+					{
+						id: 'sorcerer_heightened_spell_desc',
+						name: 'Heightened Spell',
+						description:
+							'When you cast a spell that forces a creature to make a saving throw to resist its effects, you can spend 3 sorcery points to give one target of the spell disadvantage on its first saving throw made against the spell.',
+						source: 'sorcerer.metamagic',
+						effects: []
+					}
+				]
 			},
 			{
 				name: 'Quickened Spell',
-				optionDescription: `You can cast a spell that has a casting time of 1 action as a bonus action instead.`
+				optionDescription: 'Cast spells as a bonus action.',
+				nestedPrompts: [
+					{
+						id: 'sorcerer_quickened_spell_desc',
+						name: 'Quickened Spell',
+						description:
+							'When you cast a spell that has a casting time of 1 action, you can spend 2 sorcery points to change the casting time to 1 bonus action for this casting.',
+						source: 'sorcerer.metamagic',
+						effects: []
+					}
+				]
 			},
 			{
 				name: 'Subtle Spell',
-				optionDescription: `You can cast a spell without any somatic or verbal components.`
+				optionDescription: 'Cast spells without components.',
+				nestedPrompts: [
+					{
+						id: 'sorcerer_subtle_spell_desc',
+						name: 'Subtle Spell',
+						description:
+							'When you cast a spell, you can spend 1 sorcery point to cast it without any somatic or verbal components.',
+						source: 'sorcerer.metamagic',
+						effects: []
+					}
+				]
 			},
 			{
 				name: 'Twinned Spell',
-				optionDescription: `When you cast a spell that targets only one creature and doesn’t have a range of self, you can target a second creature.`
+				optionDescription: 'Target two creatures with one spell.',
+				nestedPrompts: [
+					{
+						id: 'sorcerer_twinned_spell_desc',
+						name: 'Twinned Spell',
+						description:
+							'When you cast a spell that targets only one creature and doesn\'t have a range of self, you can spend a number of sorcery points equal to the spell\'s level to target a second creature in range with the same spell (1 sorcery point if the spell is a cantrip). To be eligible, a spell must be incapable of targeting more than one creature at the spell\'s current level.',
+						source: 'sorcerer.metamagic',
+						effects: []
+					}
+				]
 			}
 		],
 		numPicks: 2
@@ -124,7 +204,7 @@ const sorcerousOriginPrompt: FeaturePrompt = {
 		options: [
 			{
 				name: 'Draconic Bloodline',
-				optionDescription: `You have draconic ancestry that grants you additional resilience and elemental affinity.`,
+				optionDescription: `You have draconic ancestry that grants you additional resilience.`,
 				nestedPrompts: [
 					{
 						id: 'sorcerer_draconic_resilience_01',
@@ -139,20 +219,6 @@ const sorcerousOriginPrompt: FeaturePrompt = {
 								value: 'Draconic Resilience'
 							}
 						]
-					},
-					{
-						id: 'sorcerer_elemental_affinity_01',
-						name: 'Elemental Affinity',
-						description: `When you cast a spell that deals damage of the type associated with your draconic ancestry, 
-						you can add your Charisma modifier to one damage roll of that spell.`,
-						source: 'sorcerer.draconic_bloodline',
-						effects: [
-							{
-								target: 'features',
-								action: 'add',
-								value: 'Elemental Affinity'
-							}
-						]
 					}
 				]
 			},
@@ -163,8 +229,7 @@ const sorcerousOriginPrompt: FeaturePrompt = {
 					{
 						id: 'sorcerer_wild_magic_surge_01',
 						name: 'Wild Magic Surge',
-						description: `Beginning at 1st level, your spellcasting can unleash surges of wild magic.
-						Your DM might ask you to roll on the Wild Magic Surge table after you cast a sorcerer spell.`,
+						description: `After you cast a sorcerer spell of 1st level or higher, roll a d20. On a 1, roll on the Wild Magic Surge table to create a magical effect. The Wild Magic Surge table contains a variety of random magical effects that can occur. If that effect is a spell, it is too wild to be affected by your metamagic, and if it normally requires concentration, it doesn't require concentration in this case.`,
 						source: 'sorcerer.wild_magic',
 						effects: [
 							{
@@ -178,7 +243,7 @@ const sorcerousOriginPrompt: FeaturePrompt = {
 						id: 'sorcerer_tides_of_chaos_01',
 						name: 'Tides of Chaos',
 						description: `You can gain advantage on one attack roll, ability check, or saving throw. 
-						Once you use this feature, you must finish a long rest before you can use it again.`,
+						Once you use this feature, you must finish a long rest before you can use it again. Any time before you regain the use of this feature, the DM can have you roll on the Wild Magic Surge table immediately after you cast a sorcerer spell of 1st level or higher. You then regain the use of this feature.`,
 						source: 'sorcerer.wild_magic',
 						effects: [
 							{
@@ -238,7 +303,7 @@ export const sorcerer: ClassData = {
 								description: 'Choose a simple weapon',
 								type: 'weapon-list',
 								category: 'simple',
-								options: simpleWeapons.map((w) => w.name),
+								options: simpleWeapons,
 								count: 1
 							}
 						]
@@ -255,7 +320,16 @@ export const sorcerer: ClassData = {
 					},
 					{
 						label: 'Arcane focus',
-						items: ['Arcane focus']
+						items: [],
+						subChoices: [
+							{
+								name: 'Arcane Focus Type',
+								description: 'Choose your arcane focus',
+								type: 'simple-list',
+								options: ['Crystal', 'Orb', 'Rod', 'Staff', 'Wand'],
+								count: 1
+							}
+						]
 					}
 				]
 			} as EquipmentChoice,

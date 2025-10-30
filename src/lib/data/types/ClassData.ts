@@ -15,6 +15,7 @@ export interface EquipmentOption {
 	label: string; // What the user sees: "Martial weapon + Shield"
 	items?: string[]; // Direct items if no sub-choices needed
 	subChoices?: EquipmentSubChoice[]; // Sub-choices needed to resolve
+	requires?: string[]; // Required proficiencies (e.g., ['Heavy Armor'], ['Martial Weapons'])
 }
 
 // Enhanced equipment choice supporting multi-step selection

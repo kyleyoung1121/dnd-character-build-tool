@@ -25,6 +25,7 @@ export type Character = {
 	proficiencies: string[];
 	languages: string[];
 	skills: string[];
+	expertise: string[];
 	features: string[];
 	inventory: string[];
 	attacks: Attack[];
@@ -62,6 +63,7 @@ export const character_store = writable<Character>({
 	proficiencies: [],
 	languages: [],
 	skills: [],
+	expertise: [],
 	features: [],
 	inventory: [],
 	attacks: [],
@@ -107,7 +109,12 @@ export function hasSpellAccess(character: Character): boolean {
 		if (
 			character.race === 'Tiefling' ||
 			(character.race === 'Elf' && character.subrace === 'High Elf') ||
-			(character.race === 'Gnome' && character.subrace === 'Forest Gnome')
+			(character.race === 'Elf' && character.subrace === 'Dark Elf') ||
+			(character.race === 'Gnome' && character.subrace === 'Forest Gnome') ||
+			// Legacy fallback for old format
+			character.race === 'High Elf' ||
+			character.race === 'Dark Elf' ||
+			character.race === 'Forest Gnome'
 		) {
 			return true;
 		}
@@ -139,7 +146,77 @@ export function hasSpellAccess(character: Character): boolean {
 		return (
 			['Bard', 'Cleric', 'Druid', 'Sorcerer', 'Warlock', 'Wizard', 'Paladin', 'Ranger'].includes(
 				character.class
-			) || character.race === 'Tiefling'
+			) ||
+			character.race === 'Tiefling' ||
+			(character.race === 'Elf' &&
+				(character.subrace === 'High Elf' || character.subrace === 'Dark Elf')) ||
+			(character.race === 'Gnome' && character.subrace === 'Forest Gnome') ||
+			// Legacy fallback
+			character.race === 'High Elf' ||
+			character.race === 'Dark Elf' ||
+			character.race === 'Forest Gnome'
 		);
 	}
+}
+
+/**
+ * Determines if the character has access to beasts or familiars
+ * Used for conditional display of the Beasts/Familiars tab
+ */
+export function hasBeastAccess(character: Character): boolean {
+	// Druids always have access (for Wild Shape beast forms)
+	if (character.class === 'Druid') {
+		return true;
+	}
+
+	// Beast Master Rangers get a beast companion
+	if (character.class === 'Ranger' && character.subclass === 'Beast Master') {
+		return true;
+	}
+
+	// Pact of Chain Warlocks get Find Familiar
+	if (
+		character.class === 'Warlock' &&
+		character.features &&
+		character.features.includes('Pact of the Chain')
+	) {
+		return true;
+	}
+
+	// Wizards can learn Find Familiar - only show tab if they've selected it
+	if (
+		character.class === 'Wizard' &&
+		character.spells &&
+		character.spells.includes('Find Familiar')
+	) {
+		return true;
+	}
+
+	return false;
+}
+
+/**
+ * Returns the appropriate tab name based on character's beast/familiar access type
+ */
+export function getBeastTabName(character: Character): string {
+	// Wizards and Pact of Chain Warlocks use "Familiars"
+	if (
+		character.class === 'Wizard' ||
+		(character.class === 'Warlock' &&
+			character.features &&
+			character.features.includes('Pact of the Chain'))
+	) {
+		return 'Familiars';
+	}
+
+	// Druids and Beast Master Rangers use "Beasts"
+	if (
+		character.class === 'Druid' ||
+		(character.class === 'Ranger' && character.subclass === 'Beast Master')
+	) {
+		return 'Beasts';
+	}
+
+	// Default fallback
+	return 'Beasts';
 }

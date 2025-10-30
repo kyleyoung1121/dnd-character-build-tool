@@ -13,7 +13,8 @@
 			case 'warning':
 				return '⚠️';
 			case 'info':
-				return 'ℹ️';
+				// Use warning icon for info notifications to match yellow theme
+				return '⚠️';
 			case 'success':
 				return '✅';
 			default:
@@ -28,7 +29,8 @@
 			case 'warning':
 				return 'border-yellow-500 bg-yellow-50 text-yellow-900';
 			case 'info':
-				return 'border-blue-500 bg-blue-50 text-blue-900';
+				// Use yellow background for info notifications (matches ConflictWarning style for informational messages)
+				return 'border-yellow-500 bg-yellow-50 text-yellow-900';
 			case 'success':
 				return 'border-green-500 bg-green-50 text-green-900';
 			default:
@@ -65,13 +67,17 @@
 	.toast-container {
 		position: fixed;
 		top: 80px; /* Below the navigation */
-		right: 20px;
+		left: 50%;
+		transform: translateX(-50%);
 		z-index: 9999;
 		display: flex;
 		flex-direction: column;
 		gap: 12px;
-		max-width: 400px;
+		width: 100%;
+		max-width: 50vw; /* Match ConflictWarning width */
 		pointer-events: none; /* Allow clicks through container */
+		padding: 0 1rem;
+		box-sizing: border-box;
 	}
 
 	.toast {

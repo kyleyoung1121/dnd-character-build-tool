@@ -171,7 +171,7 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 		name: 'Rage',
 		id: 'barbarian_rage',
 		description:
-			'In battle, you fight with primal ferocity. You can enter a rage as a bonus action...',
+			"In battle, you fight with primal ferocity. On your turn, you can enter a rage as a bonus action.<br><br>While raging, you gain the following benefits if you aren't wearing heavy armor:<br><ul><li>• You have advantage on Strength checks and Strength saving throws.</li><li>• When you make a melee weapon attack using Strength, you gain a bonus to the damage roll that increases as you gain levels as a barbarian, as shown in the Rage Damage column of the Barbarian table.</li><li>• You have resistance to bludgeoning, piercing, and slashing damage.</li></ul>If you are able to cast spells, you can't cast them or concentrate on them while raging.<br><br>Your rage lasts for 1 minute. It ends early if you are knocked unconscious or if your turn ends and you haven't attacked a hostile creature since your last turn or taken damage since then. You can also end your rage on your turn as a bonus action.<br><br>Once you have raged the number of times shown for your barbarian level in the Rages column of the Barbarian table, you must finish a long rest before you can rage again.",
 		source: 'barbarian',
 		effects: [
 			{
@@ -197,7 +197,8 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 	{
 		name: 'Reckless Attack',
 		id: 'barbarian_reckless_attack',
-		description: 'You can throw aside all concern for defense to attack with fierce desperation.',
+		description:
+			'Starting at 2nd level, you can throw aside all concern for defense to attack with fierce desperation.<br><br>When you make your first attack on your turn, you can decide to attack recklessly. Doing so gives you advantage on melee weapon attack rolls using Strength during this turn, but attack rolls against you have advantage until your next turn.',
 		source: 'barbarian',
 		effects: [
 			{
@@ -210,7 +211,8 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 	{
 		name: 'Danger Sense',
 		id: 'barbarian_danger_sense',
-		description: 'You have advantage on Dexterity saving throws against effects you can see.',
+		description:
+			"At 2nd level, you gain an uncanny sense of when things nearby aren't as they should be, giving you an edge when you dodge away from danger.<br><br>You have advantage on Dexterity saving throws against effects that you can see, such as traps and spells. To gain this benefit, you can't be blinded, deafened, or incapacitated.",
 		source: 'barbarian',
 		effects: [
 			{

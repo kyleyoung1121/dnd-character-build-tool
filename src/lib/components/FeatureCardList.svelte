@@ -55,10 +55,9 @@
 
 		const scopeId = `feature:${feature.name}:${index}`;
 
-		// Apply the new choice effects (applyChoice handles reverting previous effects automatically)
-		applyFeatureEffects(feature, normalizedChoice, scopeId, index);
-
 		// Handle reverting any static nested effects that were tied to the previous choice
+		// IMPORTANT: Do this BEFORE applying new effects to avoid smart removal incorrectly
+		// removing items that were just added by the new choice
 		if (prev) {
 			const prevNested = getNestedPrompts(feature, [prev]) || [];
 			for (const nested of prevNested) {
@@ -68,6 +67,9 @@
 				applyChoice(prevNestedScopeId, {});
 			}
 		}
+
+		// Apply the new choice effects (applyChoice handles reverting previous effects automatically)
+		applyFeatureEffects(feature, normalizedChoice, scopeId, index);
 
 		// Force conflict detection to trigger immediately for reactive UI updates
 		// The derived store should handle this automatically, but this ensures immediate updates

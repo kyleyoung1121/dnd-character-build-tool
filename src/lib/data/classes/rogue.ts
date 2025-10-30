@@ -38,13 +38,45 @@ const proficienciesPrompt: FeaturePrompt = {
 	]
 };
 
+const expertisePrompt: FeaturePrompt = {
+	id: 'rogue_expertise_01',
+	name: 'Expertise',
+	description: `
+		At 1st level, choose two of your skill proficiencies, or one of your skill proficiencies and your proficiency with thieves' tools. 
+		Your proficiency bonus is doubled for any ability check you make that uses either of the chosen proficiencies. <br><br>
+		<strong>Important:</strong> You can only choose expertise in skills you have already selected as proficiencies above, plus Thieves' Tools (which all rogues are proficient with).
+	`,
+	featureOptions: {
+		placeholderText: 'Select expertise options',
+		dynamicOptionsGenerator: {
+			type: 'proficient-skills-plus-tools',
+			additionalOptions: ["Thieves' Tools"]
+		},
+		numPicks: 2
+	},
+	source: 'rogue',
+	effects: [
+		{
+			target: 'expertise',
+			action: 'add',
+			value: '{userChoice}'
+		},
+		{
+			target: 'features',
+			action: 'add',
+			value: 'Expertise: {userChoice}'
+		}
+	]
+};
+
 const sneakAttackPrompt: FeaturePrompt = {
 	id: 'rogue_sneak_attack_01',
 	name: 'Sneak Attack',
 	description: `
 		Beginning at 1st level, you know how to strike subtly and exploit a foe’s distraction. 
 		Once per turn, you can deal an extra 2d6 damage to one creature you hit with an attack if you have advantage on the attack roll. 
-		The attack must use a finesse or a ranged weapon.
+		The attack must use a finesse or a ranged weapon. 
+		You don't need advantage on the attack roll if another enemy of the target is within 5 feet of it, that enemy isn't incapacitated, and you don't have disadvantage on the attack roll.
 	`,
 	source: 'rogue',
 	effects: [
@@ -69,6 +101,25 @@ const cunningActionPrompt: FeaturePrompt = {
 			target: 'features',
 			action: 'add',
 			value: 'Cunning Action'
+		}
+	]
+};
+
+const thievesCantPrompt: FeaturePrompt = {
+	id: 'rogue_thieves_cant_01',
+	name: "Thieves' Cant",
+	description: `
+		During your rogue training you learned thieves' cant, a secret mix of dialect, jargon, and code that allows you to hide messages in seemingly normal conversation. 
+		Only another creature that knows thieves' cant understands such messages. 
+		It takes four times longer to convey such a message than it does to speak the same idea plainly. 
+		In addition, you understand a set of secret signs and symbols used to convey short, simple messages, such as whether an area is dangerous or the territory of a thieves' guild, whether loot is nearby, or whether the people in an area are easy marks or will provide a safe house for thieves on the run.
+	`,
+	source: 'rogue',
+	effects: [
+		{
+			target: 'features',
+			action: 'add',
+			value: "Thieves' Cant"
 		}
 	]
 };
@@ -118,6 +169,19 @@ const rogueArchetypePrompt: FeaturePrompt = {
 				optionDescription: `You are an expert at infiltration, disguise, and dealing deadly strikes.`,
 				nestedPrompts: [
 					{
+						id: 'rogue_assassin_bonus_proficiencies_01',
+						name: 'Bonus Proficiencies',
+						description: `When you choose this archetype at 3rd level, you gain proficiency with the disguise kit and the poisoner's kit.`,
+						source: 'rogue.assassin',
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: "Bonus Proficiencies (Disguise Kit, Poisoner's Kit)"
+							}
+						]
+					},
+					{
 						id: 'rogue_assassin_assassinate_01',
 						name: 'Assassinate',
 						description: `Starting at 3rd level, you have advantage on attack rolls against any creature that hasn’t taken a turn in the combat yet. 
@@ -140,7 +204,15 @@ const rogueArchetypePrompt: FeaturePrompt = {
 					{
 						id: 'rogue_arcane_trickster_spellcasting_01',
 						name: 'Spellcasting',
-						description: `You know three cantrips and three 1st-level spells from the wizard spell list, focusing on enchantment and illusion spells.`,
+						description: `When you reach 3rd level, you gain the ability to cast spells.<br><br>
+					<strong>Cantrips</strong><br>
+					You learn three cantrips: mage hand and two other cantrips of your choice from the wizard spell list.<br><br>
+					<strong>Spells Known of 1st-Level and Higher</strong><br>
+					You know three 1st-level wizard spells of your choice, two of which you must choose from the enchantment and illusion spells on the wizard spell list.<br><br>
+					<strong>Spellcasting Ability</strong><br>
+					Intelligence is your spellcasting ability for your wizard spells, since you learn your spells through dedicated study and memorization.<br><br>
+					<strong>Spell save DC</strong> = 8 + your proficiency bonus + your Intelligence modifier<br>
+					<strong>Spell attack modifier</strong> = your proficiency bonus + your Intelligence modifier`,
 						source: 'rogue.arcane_trickster',
 						effects: [
 							{
@@ -153,7 +225,11 @@ const rogueArchetypePrompt: FeaturePrompt = {
 					{
 						id: 'rogue_arcane_trickster_mage_hand_01',
 						name: 'Mage Hand Legerdemain',
-						description: `When you cast Mage Hand, the spectral hand is invisible, and you can use it to pick locks and pockets, and perform other tasks.`,
+						description: `When you cast Mage Hand, the spectral hand is invisible, and you can perform the following additional tasks with it: <br>
+						• You can stow one object the hand is holding in a container worn or carried by another creature <br>
+						• You can retrieve an object in a container worn or carried by another creature <br>
+						• You can use thieves' tools to pick locks and disarm traps at range <br>
+						You can perform one of these tasks without being noticed by a creature if you succeed on a Dexterity (Sleight of Hand) check contested by the creature's Wisdom (Perception) check.`,
 						source: 'rogue.arcane_trickster',
 						effects: [
 							{
@@ -178,7 +254,12 @@ const rogueArchetypePrompt: FeaturePrompt = {
 	]
 };
 
-const classFeaturesPrompt: FeaturePrompt[] = [sneakAttackPrompt, cunningActionPrompt];
+const classFeaturesPrompt: FeaturePrompt[] = [
+	expertisePrompt,
+	sneakAttackPrompt,
+	cunningActionPrompt,
+	thievesCantPrompt
+];
 
 export const rogue: ClassData = {
 	name: 'Rogue',

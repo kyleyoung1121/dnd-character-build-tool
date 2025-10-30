@@ -24,6 +24,7 @@
 	import { applyChoice, revertChanges } from '$lib/stores/character_store_helpers';
 	import { get } from 'svelte/store';
 	import { character_store } from '$lib/stores/character_store';
+	import { getSpellAccessForCharacter, getSpellsByLevel } from '$lib/data/spells';
 	import FeatureCardList from '$lib/components/FeatureCardList.svelte';
 	import ConflictWarning from '$lib/components/ConflictWarning.svelte';
 	import { isFeatureIncomplete, effectNeedsChoice } from '$lib/components/feature-card-utils';
@@ -105,6 +106,10 @@
 		selectionVersion = (selectionVersion + 1) % 1_000_000;
 	}
 
+	// Spell limit warning state management
+	let showSpellLimitWarning = false;
+	let spellLimitWarningInfo = { currentCount: 0, newLimit: 0, excessCount: 0, abilityName: '' };
+
 	// Current feature list for the selected race
 	$: mergedFeatures = selectedSpeciesData ? [...(selectedSpeciesData.speciesFeatures || [])] : [];
 
@@ -159,39 +164,171 @@
 		applyChoice(`feature:${feature.name}:static`, update, modify);
 	}
 
-	function removeSelectedSpecies() {
-		if (selectedSpeciesData) {
-			const state = get(character_store);
-			const provKeys = Object.keys(state._provenance || {});
+	/**
+	 * Calculate ability modifier from ability score
+	 */
+	function getModifier(score: number): number {
+		return Math.floor((score - 10) / 2);
+	}
 
-			// Recursively collect all features & nested prompts
-			function collectFeatureNames(features: FeaturePrompt[]): string[] {
-				const names: string[] = [];
-				for (const feat of features) {
-					names.push(feat.name);
-					if (feat.featureOptions) {
-						for (const opt of feat.featureOptions.options) {
-							if (typeof opt !== 'string' && opt.nestedPrompts) {
-								names.push(...collectFeatureNames(opt.nestedPrompts));
+	/**
+	 * Validate spell limits when species is about to be removed
+	 * This checks if removing the species ability bonuses would cause spell limit violations
+	 */
+	function validateSpellLimitBeforeRemoval(): boolean {
+		const currentCharacter = get(character_store);
+
+		// Only validate if character has spells selected
+		if (!currentCharacter.spells || currentCharacter.spells.length === 0) {
+			return true; // No spells, no problem
+		}
+
+		// Only check for Cleric (WIS) and Paladin (CHA)
+		if (currentCharacter.class !== 'Cleric' && currentCharacter.class !== 'Paladin') {
+			return true; // Not a class with ability-based spell limits
+		}
+
+		if (!selectedSpeciesData) {
+			return true; // No species selected
+		}
+
+		// Calculate what ability scores would be WITHOUT the species bonuses
+		// We need to check what ability bonuses this species provides
+		const tempCharacter = { ...currentCharacter };
+		const abilityModifications: Record<string, number> = {};
+
+		// Collect all ability modifications from this species by checking provenance
+		// We only collect from provenance _mods to get the actual applied bonuses
+		const prov = currentCharacter._provenance || {};
+		const allFeatures = selectedSpeciesData.speciesFeatures || [];
+		
+		for (const feature of allFeatures) {
+			// Look for provenance entries for this feature
+			for (const [key, value] of Object.entries(prov)) {
+				if (key.startsWith(`feature:${feature.name}`)) {
+					const storedMods = (value as any)?._mods || {};
+					for (const [modKey, modValue] of Object.entries(storedMods)) {
+						if (!abilityModifications[modKey]) {
+							abilityModifications[modKey] = 0;
+						}
+						abilityModifications[modKey] += modValue as number;
+					}
+				}
+			}
+		}
+
+		// Calculate what ability scores would be after removing species
+		const abilities = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
+		for (const ability of abilities) {
+			const currentScore = (currentCharacter as any)[ability] || 10;
+			const bonus = abilityModifications[ability] || 0;
+			(tempCharacter as any)[ability] = currentScore - bonus;
+		}
+
+		// Now check spell limits with the new ability scores
+		let abilityName = '';
+		let newModifier = 0;
+		let newSpellLimit = 0;
+
+		if (currentCharacter.class === 'Cleric') {
+			abilityName = 'Wisdom';
+			const newWisdom = tempCharacter.wisdom || 10;
+			newModifier = getModifier(newWisdom);
+			newSpellLimit = Math.max(1, newModifier + 3);
+		} else if (currentCharacter.class === 'Paladin') {
+			abilityName = 'Charisma';
+			const newCharisma = tempCharacter.charisma || 10;
+			newModifier = getModifier(newCharisma);
+			newSpellLimit = Math.max(1, newModifier + 1);
+		}
+
+		// Get current prepared spell count (excluding always-prepared spells)
+		const spellAccess = getSpellAccessForCharacter(currentCharacter);
+		const alwaysPreparedSpells = spellAccess
+			.filter(
+				(access) =>
+					access.chooseable === false ||
+					(access.source === 'subclass' &&
+						(access.sourceName?.includes('Domain') || access.sourceName?.includes('Oath')))
+			)
+			.flatMap((access) => access.spells || []);
+
+		// Get list of all cantrip names to exclude them from the count
+		const allCantrips = getSpellsByLevel(0);
+		const cantripNames = new Set(allCantrips.map((spell) => spell.name));
+
+		// Filter to only count leveled spells (exclude cantrips and always-prepared spells)
+		// NOTE: currentCharacter.spells may contain strings OR objects with a 'name' property
+		const preparedSpells = currentCharacter.spells.filter((spell) => {
+			// Extract spell name (handle both string and object formats)
+			const spellName = typeof spell === 'string' ? spell : spell.name;
+			return !alwaysPreparedSpells.includes(spellName) && !cantripNames.has(spellName);
+		});
+
+		// If current prepared spells exceed new limit, show warning
+		if (preparedSpells.length > newSpellLimit) {
+			const excessCount = preparedSpells.length - newSpellLimit;
+			spellLimitWarningInfo = {
+				currentCount: preparedSpells.length,
+				newLimit: newSpellLimit,
+				excessCount: excessCount,
+				abilityName: abilityName
+			};
+			showSpellLimitWarning = true;
+			return false; // Validation failed
+		} else {
+			// Hide warning if spell count is within limits
+			showSpellLimitWarning = false;
+			return true; // Validation passed
+		}
+	}
+
+	function dismissSpellLimitWarning() {
+		showSpellLimitWarning = false;
+	}
+
+	function removeSelectedSpecies() {
+		// First, validate spell limits
+		validateSpellLimitBeforeRemoval();
+
+		if (selectedSpeciesData) {
+			// Use character_store.update() to ensure the store is properly updated
+			character_store.update((state) => {
+				const provKeys = Object.keys(state._provenance || {});
+
+				// Recursively collect all features & nested prompts
+				function collectFeatureNames(features: FeaturePrompt[]): string[] {
+					const names: string[] = [];
+					for (const feat of features) {
+						names.push(feat.name);
+						if (feat.featureOptions) {
+							for (const opt of feat.featureOptions.options) {
+								if (typeof opt !== 'string' && opt.nestedPrompts) {
+									names.push(...collectFeatureNames(opt.nestedPrompts));
+								}
 							}
 						}
 					}
+					return names;
 				}
-				return names;
-			}
 
-			const allFeatureNames = collectFeatureNames(selectedSpeciesData.speciesFeatures || []);
+				const allFeatureNames = collectFeatureNames(selectedSpeciesData.speciesFeatures || []);
 
-			const prefixes = [
-				`race:${selectedSpeciesData.name}`,
-				...allFeatureNames.map((f) => `feature:${f}`)
-			];
+				const prefixes = [
+					`race:${selectedSpeciesData.name}`,
+					...allFeatureNames.map((f) => `feature:${f}`)
+				];
 
-			for (const key of provKeys) {
-				if (prefixes.some((prefix) => key.startsWith(prefix))) {
-					revertChanges(state, key);
+				// Revert all changes related to this species
+				for (const key of provKeys) {
+					if (prefixes.some((prefix) => key.startsWith(prefix))) {
+						// revertChanges mutates state in place and returns it
+						state = revertChanges(state, key);
+					}
 				}
-			}
+
+				return state; // Return the modified state to update the store
+			});
 		}
 
 		selectedSpeciesData = null;
@@ -208,9 +345,27 @@
 			featureSelections = {};
 			expandedFeatures = new Set();
 
-			applyChoice(`race:${selectedSpeciesData.name}`, {
-				race: selectedSpeciesData.name
-			});
+			// Determine if this is a subrace by checking if it's part of a species group
+			let parentRace: string | null = null;
+			for (const speciesItem of species) {
+				if ('subraces' in speciesItem && speciesItem.subraces.includes(selectedSpeciesData)) {
+					parentRace = speciesItem.name;
+					break;
+				}
+			}
+
+			if (parentRace) {
+				// This is a subrace - set both race and subrace
+				applyChoice(`race:${selectedSpeciesData.name}`, {
+					race: parentRace,
+					subrace: selectedSpeciesData.name
+				});
+			} else {
+				// This is a main race - just set race
+				applyChoice(`race:${selectedSpeciesData.name}`, {
+					race: selectedSpeciesData.name
+				});
+			}
 
 			for (const feature of selectedSpeciesData.speciesFeatures || []) {
 				if (feature.featureOptions) {
@@ -268,17 +423,33 @@
 		const state = get(character_store);
 
 		if (state.race) {
-			// Find race or subrace
-			let found: SpeciesData | SpeciesGroup | undefined = species.find(
-				(r) => r.name === state.race
-			);
-			if (!found) {
+			// New format: look for subrace first if it exists
+			let found: SpeciesData | SpeciesGroup | undefined;
+
+			if (state.subrace) {
+				// Look for the subrace in species groups
 				for (const speciesItem of species) {
 					if ('subraces' in speciesItem) {
-						const sub = speciesItem.subraces.find((sr) => sr.name === state.race);
+						const sub = speciesItem.subraces.find((sr) => sr.name === state.subrace);
 						if (sub) {
 							found = sub;
 							break;
+						}
+					}
+				}
+			} else {
+				// Legacy format or species without subraces: look for exact race match
+				found = species.find((r) => r.name === state.race);
+
+				// If not found, maybe race is actually a subrace name (legacy)
+				if (!found) {
+					for (const speciesItem of species) {
+						if ('subraces' in speciesItem) {
+							const sub = speciesItem.subraces.find((sr) => sr.name === state.race);
+							if (sub) {
+								found = sub;
+								break;
+							}
 						}
 					}
 				}
@@ -654,6 +825,35 @@
 	{/if}
 </div>
 
+<!-- Spell Limit Warning Banner -->
+{#if showSpellLimitWarning}
+	<div class="spell-limit-warning-banner">
+		<div class="warning-content">
+			<div class="warning-icon">⚠️</div>
+			<div class="warning-text">
+				<h3>Spell Limit Exceeded</h3>
+				<p>
+					Removing this species will reduce your {spellLimitWarningInfo.abilityName} bonus, which decreases
+					your prepared spell limit. You currently have
+					<strong>{spellLimitWarningInfo.currentCount} prepared spells</strong> but would only be able to prepare
+					<strong>{spellLimitWarningInfo.newLimit}</strong>. Please visit the
+					<a href="{base}/spells">Spells page</a>
+					to remove
+					<strong
+						>{spellLimitWarningInfo.excessCount} spell{spellLimitWarningInfo.excessCount > 1
+							? 's'
+							: ''}</strong
+					>
+					before changing your species.
+				</p>
+			</div>
+			<button class="warning-dismiss" on:click={dismissSpellLimitWarning} title="Dismiss warning">
+				×
+			</button>
+		</div>
+	</div>
+{/if}
+
 <style>
 	.main-content {
 		padding: 2rem 1rem;
@@ -964,5 +1164,94 @@
 	}
 	.add-button:hover {
 		background-color: #1b4d20;
+	}
+
+	/* Spell Limit Warning Banner Styles */
+	.spell-limit-warning-banner {
+		position: fixed;
+		top: 70px; /* Below navbar */
+		left: 0;
+		right: 0;
+		z-index: 1000;
+		background: linear-gradient(135deg, #fef3c7, #fde68a); /* Warm yellow gradient */
+		border: 2px solid #f59e0b; /* Orange border */
+		border-radius: 8px;
+		margin: 0 16px;
+		box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+		animation: slideDown 0.3s ease-out;
+	}
+
+	.warning-content {
+		display: flex;
+		align-items: flex-start;
+		gap: 12px;
+		padding: 16px 20px;
+	}
+
+	.warning-icon {
+		font-size: 24px;
+		flex-shrink: 0;
+		margin-top: 2px;
+	}
+
+	.warning-text {
+		flex: 1;
+	}
+
+	.warning-text h3 {
+		margin: 0 0 8px 0;
+		color: #92400e; /* Darker amber */
+		font-size: 1.1rem;
+		font-weight: 600;
+	}
+
+	.warning-text p {
+		margin: 0;
+		color: #78350f; /* Dark amber */
+		font-size: 0.95rem;
+		line-height: 1.4;
+	}
+
+	.warning-text a {
+		color: #1d4ed8; /* Blue link */
+		text-decoration: underline;
+		font-weight: 500;
+	}
+
+	.warning-text a:hover {
+		color: #1e40af;
+	}
+
+	.warning-dismiss {
+		background: none;
+		border: none;
+		color: #92400e;
+		font-size: 24px;
+		font-weight: bold;
+		cursor: pointer;
+		padding: 0;
+		width: 24px;
+		height: 24px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 4px;
+		transition: background-color 0.2s;
+		flex-shrink: 0;
+	}
+
+	.warning-dismiss:hover {
+		background-color: rgba(146, 64, 14, 0.1);
+	}
+
+	@keyframes slideDown {
+		from {
+			transform: translateY(-100%);
+			opacity: 0;
+		}
+		to {
+			transform: translateY(0);
+			opacity: 1;
+		}
 	}
 </style>

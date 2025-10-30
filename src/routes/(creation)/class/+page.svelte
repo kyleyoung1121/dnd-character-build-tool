@@ -64,37 +64,189 @@
 
 	function removeSelectedClass() {
 		if (selectedClassData) {
+			console.log('🗑️ Attempting to remove class:', selectedClassData.name);
+
+			// Store debug info for export tab
+			if (typeof window !== 'undefined') {
+				(window as any).classRemovalDebug = {
+					attemptedClass: selectedClassData.name,
+					steps: ['Starting removal process'],
+					timestamp: new Date().toISOString(),
+					hasExpertiseFeature: selectedClassData.classFeatures?.some(
+						(f) =>
+							f.name.toLowerCase().includes('expertise') ||
+							f.featureOptions?.dynamicOptionsGenerator?.type === 'proficient-skills-plus-tools'
+					),
+					expertiseFeatures: selectedClassData.classFeatures
+						?.filter(
+							(f) =>
+								f.name.toLowerCase().includes('expertise') ||
+								f.featureOptions?.dynamicOptionsGenerator?.type === 'proficient-skills-plus-tools'
+						)
+						.map((f) => f.name)
+				};
+			}
+
 			const state = get(character_store);
+			console.log('🗑️ Current state:', state);
 			const provKeys = Object.keys(state._provenance || {});
+			console.log('🗑️ Provenance keys:', provKeys);
+
+			if (typeof window !== 'undefined' && (window as any).classRemovalDebug) {
+				(window as any).classRemovalDebug.steps.push(`Found ${provKeys.length} provenance keys`);
+				(window as any).classRemovalDebug.provKeys = provKeys;
+			}
 
 			// Recursively collect all features & nested prompts
 			function collectFeatureNames(features: FeaturePrompt[]): string[] {
-				const names: string[] = [];
-				for (const feat of features) {
-					names.push(feat.name);
-					if (feat.featureOptions) {
-						for (const opt of feat.featureOptions.options) {
-							if (typeof opt !== 'string' && opt.nestedPrompts) {
-								names.push(...collectFeatureNames(opt.nestedPrompts));
+				try {
+					if (typeof window !== 'undefined' && (window as any).classRemovalDebug) {
+						(window as any).classRemovalDebug.steps.push(`Starting collectFeatureNames with ${features.length} features`);
+					}
+					const names: string[] = [];
+					for (const feat of features) {
+						console.log('🗑️ Processing feature:', feat.name);
+						names.push(feat.name);
+						if (feat.featureOptions) {
+							console.log('🗑️ Feature has options, processing...');
+							
+							// Skip dynamic options during collection - they're not stored in provenance anyway
+							if (feat.featureOptions.dynamicOptionsGenerator) {
+								console.log('🗑️ Skipping dynamic options feature:', feat.name);
+								continue;
+							}
+							
+							const options = feat.featureOptions.options;
+							if (Array.isArray(options)) {
+								for (const opt of options) {
+									if (typeof opt !== 'string' && opt.nestedPrompts) {
+										console.log('🗑️ Processing nested prompts for option:', opt.name);
+										names.push(...collectFeatureNames(opt.nestedPrompts));
+									}
+								}
+							} else {
+								console.log('🗑️ Feature options is not an array:', typeof options);
 							}
 						}
 					}
+					if (typeof window !== 'undefined' && (window as any).classRemovalDebug) {
+						(window as any).classRemovalDebug.steps.push(`Collected ${names.length} feature names`);
+					}
+					return names;
+				} catch (error) {
+					console.error('❌ Error in collectFeatureNames:', error);
+					if (typeof window !== 'undefined' && (window as any).classRemovalDebug) {
+						(window as any).classRemovalDebug.steps.push(`ERROR in collectFeatureNames: ${error.message}`);
+						(window as any).classRemovalDebug.collectFeatureNamesError = error;
+					}
+					throw error;
 				}
-				return names;
 			}
 
-			const allFeatureNames = collectFeatureNames(selectedClassData.classFeatures || []);
+			let allFeatureNames: string[] = [];
+			let prefixes: string[] = [];
+			
+			try {
+				if (typeof window !== 'undefined' && (window as any).classRemovalDebug) {
+					(window as any).classRemovalDebug.steps.push('About to collect feature names');
+				}
+				
+				allFeatureNames = collectFeatureNames(selectedClassData.classFeatures || []);
+				console.log('🗑️ All feature names:', allFeatureNames);
 
-			const prefixes = [
-				`class:${selectedClassData.name}`,
-				...allFeatureNames.map((f) => `feature:${f}`)
-			];
+				if (typeof window !== 'undefined' && (window as any).classRemovalDebug) {
+					(window as any).classRemovalDebug.steps.push('Feature names collected, creating prefixes');
+				}
+
+				prefixes = [
+					`class:${selectedClassData.name}`,
+					...allFeatureNames.map((f) => `feature:${f}`),
+					'class_equipment_' // Remove all class equipment when changing class
+				];
+				console.log('🗑️ Prefixes to remove:', prefixes);
+			} catch (error) {
+				console.error('❌ Error during feature collection:', error);
+				if (typeof window !== 'undefined' && (window as any).classRemovalDebug) {
+					(window as any).classRemovalDebug.steps.push(`FATAL ERROR during feature collection: ${error.message}`);
+					(window as any).classRemovalDebug.fatalError = error;
+					(window as any).classRemovalDebug.completed = false;
+				}
+				return; // Exit early if feature collection fails
+			}
+
+			if (typeof window !== 'undefined' && (window as any).classRemovalDebug) {
+				(window as any).classRemovalDebug.steps.push(
+					`Collected ${allFeatureNames.length} feature names`
+				);
+				(window as any).classRemovalDebug.featureNames = allFeatureNames;
+				(window as any).classRemovalDebug.prefixes = prefixes;
+			}
+
+			const revertedKeys: string[] = [];
+			const revertErrors: Array<{ key: string; error: any }> = [];
+
+			if (typeof window !== 'undefined' && (window as any).classRemovalDebug) {
+				(window as any).classRemovalDebug.steps.push(`Starting provenance key processing loop with ${provKeys.length} keys`);
+			}
 
 			for (const key of provKeys) {
+				console.log('🗑️ Processing key:', key);
 				if (prefixes.some((prefix) => key.startsWith(prefix))) {
-					revertChanges(state, key);
+					console.log('🗑️ Reverting key:', key);
+					
+					if (typeof window !== 'undefined' && (window as any).classRemovalDebug) {
+						(window as any).classRemovalDebug.steps.push(`Processing key: ${key}`);
+					}
+
+					// Check if this is an expertise-related key
+					const isExpertiseKey = key.includes('Expertise') || key.includes('expertise');
+					if (isExpertiseKey) {
+						console.log('🔍 Expertise key detected:', key);
+					}
+
+					try {
+						// Get current provenance data for this key to understand what we're reverting
+						const provData = state._provenance?.[key];
+						console.log('📊 Provenance data for', key, ':', provData);
+
+						revertChanges(state, key);
+						console.log('✅ Successfully reverted:', key);
+						revertedKeys.push(key);
+					} catch (error) {
+						console.error('❌ Error reverting key:', key, error);
+						console.error('📊 Error details:', {
+							key,
+							error: error.message || error,
+							stack: error.stack,
+							provenanceData: state._provenance?.[key]
+						});
+						revertErrors.push({
+							key,
+							error: error.message || error,
+							errorObj: error,
+							provenanceData: state._provenance?.[key]
+						});
+					}
 				}
 			}
+
+			console.log('🗑️ Completed provenance key processing');
+			
+			if (typeof window !== 'undefined' && (window as any).classRemovalDebug) {
+				(window as any).classRemovalDebug.steps.push(
+					`Completed provenance processing - reverted ${revertedKeys.length} keys, ${revertErrors.length} errors`
+				);
+				(window as any).classRemovalDebug.revertedKeys = revertedKeys;
+				(window as any).classRemovalDebug.revertErrors = revertErrors;
+			}
+		}
+		
+		console.log('🗑️ About to start cleanup phase');
+
+		console.log('🗑️ Cleaning up UI state...');
+
+		if (typeof window !== 'undefined' && (window as any).classRemovalDebug) {
+			(window as any).classRemovalDebug.steps.push('Cleaning up UI state');
 		}
 
 		selectedClassData = null;
@@ -102,6 +254,13 @@
 		featureSelections = {};
 		expandedFeatures = new Set();
 		bumpVersion();
+
+		if (typeof window !== 'undefined' && (window as any).classRemovalDebug) {
+			(window as any).classRemovalDebug.steps.push('Class removal completed successfully');
+			(window as any).classRemovalDebug.completed = true;
+		}
+
+		console.log('🗑️ Class removal complete');
 	}
 
 	function confirmAddClass() {
@@ -178,7 +337,7 @@
 	}
 
 	// --- onMount for class feature restoration ---
-	onMount(() => {
+	onMount(async () => {
 		const state = get(character_store);
 
 		if (!state.class) return;
@@ -202,7 +361,7 @@
 		};
 
 		// Recursive function to restore a feature and its nested prompts
-		const restoreFeatureSelection = (feature: FeaturePrompt) => {
+		const restoreFeatureSelection = async (feature: FeaturePrompt) => {
 			const numPicks = feature.featureOptions?.numPicks || 1;
 
 			if (!featureSelections[feature.name]) {
@@ -211,7 +370,24 @@
 				ensureArrayLen(featureSelections[feature.name], numPicks);
 			}
 
-			const opts = feature.featureOptions?.options || [];
+			// For features with dynamic options (like Expertise), we need to generate the options
+			let opts = feature.featureOptions?.options || [];
+			if (feature.featureOptions?.dynamicOptionsGenerator) {
+				// Import and use the dynamic options generator
+				try {
+					const { generateDynamicOptions } = await import('$lib/components/feature-card-utils');
+					const dynamicOpts = generateDynamicOptions(
+						feature.featureOptions.dynamicOptionsGenerator,
+						character_store,
+						featureSelections
+					);
+					// Convert to string array for restoration logic
+					opts = dynamicOpts.map((opt) => (typeof opt === 'string' ? opt : opt.name));
+				} catch (error) {
+					console.warn('Failed to generate dynamic options for restoration:', error);
+				}
+			}
+
 			const optionMap = new Map(
 				opts.map((o) => [
 					toSnakeCase(typeof o === 'string' ? o : o.name),
@@ -221,12 +397,33 @@
 
 			const prov = state._provenance || {};
 
+			// Debug Bard College restoration
+			if (feature.name === 'Bard College') {
+				console.log('🎵 Bard College restoration debug:', {
+					featureName: feature.name,
+					numPicks,
+					currentFeatureSelections: featureSelections[feature.name],
+					optionMap: Array.from(optionMap.entries()),
+					provenanceKeys: Object.keys(prov).filter((k) => k.includes('Bard College'))
+				});
+			}
+
 			for (let idx = 0; idx < numPicks; idx++) {
 				// Skip if already restored
 				if (featureSelections[feature.name][idx]) continue;
 
 				const key = `feature:${feature.name}:${idx}`;
 				const stored: any = prov[key];
+
+				// Debug specific key for Bard College
+				if (feature.name === 'Bard College') {
+					console.log('🎵 Bard College key debug:', {
+						key,
+						idx,
+						stored,
+						provenanceExists: !!stored
+					});
+				}
 
 				let restored: string | null = null;
 
@@ -261,25 +458,81 @@
 				}
 
 				if (restored) {
+					if (feature.name === 'Bard College') {
+						console.log('🎵 Bard College value restored:', restored);
+					}
 					featureSelections[feature.name][idx] = restored;
+				} else if (feature.name === 'Bard College') {
+					console.log('🎵 Bard College value NOT restored for idx:', idx);
 				}
 			}
 
 			// Recurse into nested prompts if any
 			if (feature.featureOptions?.options) {
-				feature.featureOptions.options.forEach((o) => {
+				for (const o of feature.featureOptions.options) {
 					if (typeof o !== 'string' && o.nestedPrompts) {
 						const selectedVal = featureSelections[feature.name].find((v) => v === o.name);
+
+						// Debug nested prompt restoration
+						if (feature.name === 'Bard College') {
+							console.log('🎵 Bard College nested restoration debug:', {
+								featureName: feature.name,
+								optionName: o.name,
+								currentSelections: featureSelections[feature.name],
+								selectedVal,
+								hasNestedPrompts: !!o.nestedPrompts,
+								nestedPromptCount: o.nestedPrompts?.length || 0
+							});
+						}
+
 						if (selectedVal) {
-							o.nestedPrompts.forEach((nested) => restoreFeatureSelection(nested));
+							if (feature.name === 'Bard College') {
+								console.log('🎵 Processing Bard College nested prompts for:', selectedVal);
+							}
+							for (const nested of o.nestedPrompts) {
+								await restoreFeatureSelection(nested);
+							}
+						} else {
+							// Even if parent selection is not restored, check if nested prompts have provenance data
+							// This handles cases where the parent selection restoration failed but nested data exists
+							for (const nested of o.nestedPrompts) {
+								const nestedKey = `feature:${nested.name}:0`;
+								if (prov[nestedKey]) {
+									if (feature.name === 'Bard College') {
+										console.log(
+											'🎵 Found nested provenance data, attempting restoration for:',
+											nested.name
+										);
+									}
+									// Force parent selection to match this nested data existence
+									if (!featureSelections[feature.name].includes(o.name)) {
+										// Find first empty slot and set the parent selection
+										const emptyIdx = featureSelections[feature.name].findIndex((v) => v === null);
+										if (emptyIdx !== -1) {
+											if (feature.name === 'Bard College') {
+												console.log('🎵 Setting parent selection to:', o.name);
+											}
+											featureSelections[feature.name][emptyIdx] = o.name;
+										}
+									}
+									// Now restore the nested prompt
+									await restoreFeatureSelection(nested);
+								}
+							}
+
+							if (feature.name === 'Bard College') {
+								console.log('🎵 No selection found for Bard College option:', o.name);
+							}
 						}
 					}
-				});
+				}
 			}
 		};
 
 		// Restore all top-level features
-		found.classFeatures?.forEach((feature) => restoreFeatureSelection(feature));
+		for (const feature of found.classFeatures || []) {
+			await restoreFeatureSelection(feature);
+		}
 
 		// Trigger Svelte reactivity
 		featureSelections = { ...featureSelections };

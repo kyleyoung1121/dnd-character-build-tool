@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Conflict Detection Test</title>
+</head>
+<body>
+    <h1>Conflict Detection Test</h1>
+    <p>Open browser console (F12) and check for debug logs when you:</p>
+    <ol>
+        <li>Navigate to Class tab</li>
+        <li>Select Bard class</li>
+        <li>Choose Perception as one of the skill proficiencies</li>
+        <li>Navigate to Species tab</li>
+        <li>Select High Elf (which grants Perception via Keen Senses)</li>
+    </ol>
+    
+    <h2>Expected Console Output:</h2>
+    <pre>
+[Visited Tabs] Marking tab as visited: class
+[Conflict Detection] Running detection...
+[Conflict Detection] Character: {...}
+[Conflict Detection] Provenance: {...}
+[Conflict Detection] Additions: { skill: { Perception: ['feature:Skill Proficiencies:0', 'feature:Keen Senses'] } }
+[Conflict Detection] Found conflict: skill "Perception" from sources: ['feature:Skill Proficiencies:0', 'feature:Keen Senses']
+[Conflict Detection] Final results: { hasConflicts: true, conflictCount: 1, ... }
+[Active Conflicts] tabsNeedingAttention: ['class', 'species']
+    </pre>
+
+    <h2>What to Check:</h2>
+    <ul>
+        <li>Are both tabs being marked as visited?</li>
+        <li>Is the provenance structure showing both features?</li>
+        <li>Is the conflict being detected?</li>
+        <li>Are the tabs appearing in tabsNeedingAttention?</li>
+    </ul>
+
+    <h2>For Spell Limit Test:</h2>
+    <ol>
+        <li>Create Cleric + Wood Elf character</li>
+        <li>Set WIS to 15 (becomes 16 with racial bonus)</li>
+        <li>Select 6 leveled spells on Spells tab</li>
+        <li>Try to remove Wood Elf species</li>
+    </ol>
+    
+    <p><strong>Expected:</strong> Spells tab should turn red, warning should appear</p>
+    
+    <p><a href="/">Back to Character Creator</a></p>
+</body>
+</html>

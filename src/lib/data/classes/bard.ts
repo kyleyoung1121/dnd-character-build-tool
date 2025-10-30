@@ -3,7 +3,7 @@ import type { ClassData, EquipmentChoice } from '$lib/data/types/ClassData';
 import type { FeaturePrompt } from '$lib/data/types/Features';
 import { simpleWeapons, musicalInstruments } from '../equipment/weapons';
 
-const proficienciesPrompt: FeaturePrompt = {
+const skillProficienciesPrompt: FeaturePrompt = {
 	name: 'Skill Proficiencies',
 	id: 'bard_skills_01',
 	description: `
@@ -46,14 +46,43 @@ const proficienciesPrompt: FeaturePrompt = {
 	]
 };
 
+const musicalInstrumentProficienciesPrompt: FeaturePrompt = {
+	name: 'Musical Instrument Proficiencies',
+	id: 'bard_instruments_01',
+	description: 'Choose three musical instruments of your choice.',
+	featureOptions: {
+		placeholderText: 'Select 3 musical instruments',
+		options: [
+			'Bagpipes',
+			'Drum',
+			'Dulcimer',
+			'Flute',
+			'Lute',
+			'Lyre',
+			'Horn',
+			'Pan flute',
+			'Shawm',
+			'Viol'
+		],
+		numPicks: 3
+	},
+	source: 'bard.instruments',
+	effects: [
+		{
+			target: 'proficiencies',
+			action: 'add',
+			value: '{userChoice}'
+		}
+	]
+};
+
 const bardicInspirationPrompt: FeaturePrompt = {
 	name: 'Bardic Inspiration',
 	id: 'bard_feature_01',
 	description: `
-		You can inspire others through stirring words or music. 
-		Use a bonus action to give one creature other than yourself within 60 feet an inspiration die (a d6). 
-		This die can be added to ability checks, attack rolls, or saving throws.
-		You can use this feature a number of times equal to your Charisma modifier (minimum of once), and regain all uses on a long rest.
+		You can inspire others through stirring words or music. To do so, you use a bonus action on your turn to choose one creature other than yourself within 60 feet of you who can hear you. That creature gains one Bardic Inspiration die, a d6.<br><br>
+		Once within the next 10 minutes, the creature can roll the die and add the number rolled to one ability check, attack roll, or saving throw it makes. The creature can wait until after it rolls the d20 before deciding to use the Bardic Inspiration die, but must decide before the DM says whether the roll succeeds or fails. Once the Bardic Inspiration die is rolled, it is lost. A creature can have only one Bardic Inspiration die at a time.<br><br>
+		You can use this feature a number of times equal to your Charisma modifier (a minimum of once). You regain any expended uses when you finish a long rest.
 	`,
 	source: 'bard',
 	effects: [
@@ -69,9 +98,7 @@ const spellcastingPrompt: FeaturePrompt = {
 	name: 'Spellcasting',
 	id: 'bard_feature_02',
 	description: `
-		You know two cantrips of your choice from the bard spell list. 
-		You know four 1st-level spells of your choice.
-		You can cast spells using Charisma as your spellcasting ability.
+		You have learned to untangle and reshape the fabric of reality in harmony with your wishes and music. Your spells are part of your vast repertoire, magic that you can tune to different situations. You know 2 cantrips and 6 leveled spells.
 	`,
 	source: 'bard',
 	effects: [
@@ -87,7 +114,7 @@ const jackOfAllTradesPrompt: FeaturePrompt = {
 	name: 'Jack of All Trades',
 	id: 'bard_feature_03',
 	description: `
-		Starting at 2nd level, you can add half your proficiency bonus, rounded down, to any ability check you make that doesn't already include your proficiency bonus.
+		You can add half your proficiency bonus, rounded down, to any ability check you make that doesn't already include your proficiency bonus.
 	`,
 	source: 'bard',
 	effects: [
@@ -103,8 +130,7 @@ const songOfRestPrompt: FeaturePrompt = {
 	name: 'Song of Rest',
 	id: 'bard_feature_04',
 	description: `
-		Beginning at 2nd level, you can use soothing music or oration to help revitalize your wounded allies during a short rest. 
-		If you or any friendly creatures who can hear your performance regain hit points by spending Hit Dice at the end of the short rest, each of those creatures regains an extra 1d6 hit points.
+		You can use soothing music or oration to help revitalize your wounded allies during a short rest. If you or any friendly creatures who can hear your performance regain hit points by spending Hit Dice at the end of the short rest, each of those creatures regains an extra 1d6 hit points.
 	`,
 	source: 'bard',
 	effects: [
@@ -116,12 +142,37 @@ const songOfRestPrompt: FeaturePrompt = {
 	]
 };
 
+const expertisePrompt: FeaturePrompt = {
+	name: 'Expertise',
+	id: 'bard_feature_05',
+	description: `
+		Choose two of your skill proficiencies. Your proficiency bonus is doubled for any ability check you make that uses either of the chosen proficiencies.
+	`,
+	featureOptions: {
+		placeholderText: 'Select 2 skills for expertise',
+		dynamicOptionsGenerator: {
+			type: 'proficient-skills-plus-tools',
+			additionalOptions: [] // No additional options for Bard (unlike Rogue which gets Thieves' Tools)
+		},
+		numPicks: 2
+	},
+	source: 'bard.expertise',
+	effects: [
+		{
+			target: 'expertise',
+			action: 'add',
+			value: '{userChoice}'
+		}
+	]
+};
+
 const bardCollegePrompt: FeaturePrompt = {
 	name: 'Bard College',
 	id: 'bard_subclass_01',
-	description: 'Choose a Bard College at 3rd level.',
+	description: 'Choose a Bard College.',
 	featureOptions: {
 		placeholderText: '-Choose a College-',
+		numPicks: 1,
 		options: [
 			{
 				name: 'College of Lore',
@@ -229,7 +280,8 @@ const classFeaturesPrompt = [
 	bardicInspirationPrompt,
 	spellcastingPrompt,
 	jackOfAllTradesPrompt,
-	songOfRestPrompt
+	songOfRestPrompt,
+	expertisePrompt
 ];
 
 export const bard: ClassData = {
@@ -313,5 +365,10 @@ export const bard: ClassData = {
 			} as EquipmentChoice
 		]
 	},
-	classFeatures: [proficienciesPrompt, ...classFeaturesPrompt, bardCollegePrompt]
+	classFeatures: [
+		skillProficienciesPrompt,
+		musicalInstrumentProficienciesPrompt,
+		...classFeaturesPrompt,
+		bardCollegePrompt
+	]
 };

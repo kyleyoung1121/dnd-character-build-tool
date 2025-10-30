@@ -32,6 +32,7 @@ const divineSensePrompt: FeaturePrompt = {
 	name: 'Divine Sense',
 	description: `
 		As an action, you can open your awareness to detect good and evil until the start of your next turn. 
+		You know the location of any celestial, fiend, or undead within 60 feet of you that is not behind total cover. You know the type (celestial, fiend, or undead) of any being whose presence you sense, but not its identity.
 		You can use this feature a number of times equal to 1 + your Charisma modifier per long rest.
 	`,
 	source: 'paladin',
@@ -51,6 +52,8 @@ const layOnHandsPrompt: FeaturePrompt = {
 		You have a pool of healing power that replenishes when you take a long rest. 
 		With that pool, you can restore a total of 15 hit points.
 		As an action, you can touch a creature to restore any number of hit points remaining in the pool.
+		Alternatively, you can expend 5 hit points from your pool of healing to cure the target of one disease or neutralize one poison affecting it. You can cure multiple diseases and neutralize multiple poisons with a single use of Lay on Hands, expending hit points separately for each one.
+		This feature has no effect on undead and constructs.
 	`,
 	source: 'paladin',
 	effects: [
@@ -142,7 +145,7 @@ const spellcastingPrompt: FeaturePrompt = {
 	name: 'Spellcasting',
 	description: `
 		You can cast prepared paladin spells using Charisma as your spellcasting ability. 
-		At level 3, you gain access to 1st-level paladin spells.
+		At level 3, you have access to 1st-level paladin spells.
 	`,
 	source: 'paladin',
 	effects: [
@@ -186,7 +189,7 @@ const sacredOathPrompt: FeaturePrompt = {
 						id: 'paladin_oath_devotion_01',
 						name: 'Oath Spells',
 						description:
-							"You gain oath-specific spells that are always prepared and don't count against your prepared spells limit.",
+							"You gain oath-specific spells that are always prepared and don't count against your prepared spells limit. At 3rd level, you gain Protection from Evil and Good and Sanctuary.",
 						source: 'paladin.oath_devotion',
 						effects: [
 							{
@@ -234,7 +237,7 @@ const sacredOathPrompt: FeaturePrompt = {
 						id: 'paladin_oath_ancients_01',
 						name: 'Oath Spells',
 						description:
-							"You gain oath-specific spells that are always prepared and don't count against your prepared spells limit.",
+							"You gain oath-specific spells that are always prepared and don't count against your prepared spells limit. At 3rd level, you gain Ensnaring Strike and Speak with Animals.",
 						source: 'paladin.oath_ancients',
 						effects: [
 							{
@@ -282,7 +285,7 @@ const sacredOathPrompt: FeaturePrompt = {
 						id: 'paladin_oath_vengeance_01',
 						name: 'Oath Spells',
 						description:
-							"You gain oath-specific spells that are always prepared and don't count against your prepared spells limit.",
+							"You gain oath-specific spells that are always prepared and don't count against your prepared spells limit. At 3rd level, you gain Bane and Hunter's Mark.",
 						source: 'paladin.oath_vengeance',
 						effects: [
 							{
@@ -368,7 +371,7 @@ export const paladin: ClassData = {
 								description: 'Choose a martial weapon',
 								type: 'weapon-list',
 								category: 'martial',
-								options: martialWeapons.map((w) => w.name),
+								options: martialWeapons,
 								count: 1
 							}
 						]
@@ -382,7 +385,7 @@ export const paladin: ClassData = {
 								description: 'Choose your first martial weapon',
 								type: 'weapon-list',
 								category: 'martial',
-								options: martialWeapons.map((w) => w.name),
+								options: martialWeapons,
 								count: 1
 							},
 							{
@@ -390,7 +393,7 @@ export const paladin: ClassData = {
 								description: 'Choose your second martial weapon',
 								type: 'weapon-list',
 								category: 'martial',
-								options: martialWeapons.map((w) => w.name),
+								options: martialWeapons,
 								count: 1
 							}
 						]
@@ -414,7 +417,7 @@ export const paladin: ClassData = {
 								description: 'Choose a simple melee weapon',
 								type: 'weapon-list',
 								category: 'simple-melee',
-								options: simpleWeapons.filter((w) => w.type === 'melee').map((w) => w.name),
+								options: simpleWeapons.filter((w) => !['Light crossbow', 'Shortbow', 'Sling'].includes(w)),
 								count: 1
 							}
 						]

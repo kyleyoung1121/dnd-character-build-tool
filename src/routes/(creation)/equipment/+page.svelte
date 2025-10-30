@@ -203,6 +203,35 @@
 		return subChoiceSelections;
 	}
 
+	// Parse equipment pack to extract name and description
+	function parseEquipmentPack(item: string): { name: string; description: string } | null {
+		if (item.includes('(includes:')) {
+			const match = item.match(/^(.+?)\s*\(includes:\s*(.+)\)$/);
+			if (match) {
+				return {
+					name: match[1].trim(),
+					description: match[2].trim()
+				};
+			}
+		}
+		return null;
+	}
+
+	// Check if character meets proficiency requirements for an equipment option
+	function meetsRequirements(option: EquipmentOption): boolean {
+		if (!option.requires || option.requires.length === 0) {
+			return true; // No requirements
+		}
+
+		const char = get(character_store);
+		if (!char.proficiencies) {
+			return false;
+		}
+
+		// Check if character has all required proficiencies
+		return option.requires.every((req) => char.proficiencies.includes(req));
+	}
+
 	// Type guard functions
 	function isEquipmentChoice(
 		choice: EquipmentChoice | SimpleEquipmentChoice
@@ -403,9 +432,17 @@
 
 					<div class="equipment-list">
 						{#each currentClass.startingEquipment.fixed as item}
-							<div class="equipment-item class-equipment">
-								<span class="item-name">{item}</span>
-							</div>
+							{@const packInfo = parseEquipmentPack(item)}
+							{#if packInfo}
+								<div class="equipment-item-pack class-equipment">
+									<div class="pack-name">{packInfo.name}</div>
+									<div class="pack-description">{packInfo.description}</div>
+								</div>
+							{:else}
+								<div class="equipment-item class-equipment">
+									<span class="item-name">{item}</span>
+								</div>
+							{/if}
 						{/each}
 					</div>
 				</div>
@@ -423,12 +460,29 @@
 							<!-- Main Option Selection -->
 							<div class="main-options">
 								{#each choice.options as option, optionIndex}
+									{@const hasRequirements = meetsRequirements(option)}
 									<button
 										class="choice-option"
 										class:selected={equipmentChoices[choiceIndex]?.selectedOption === optionIndex}
-										on:click={() => handleMainOptionSelection(choiceIndex, optionIndex)}
+										class:disabled={!hasRequirements}
+										disabled={!hasRequirements}
+										on:click={() => hasRequirements && handleMainOptionSelection(choiceIndex, optionIndex)}
 									>
-										{option.label}
+										<div class="option-content">
+											<div class="option-label">{option.label}</div>
+											{#if !hasRequirements}
+												<div class="requirement-warning">Requires: {option.requires?.join(', ')}</div>
+											{/if}
+											{#if option.items && option.items.length > 0 && option.items.some((item) => item.includes('(includes:'))}
+												<div class="option-description">
+													{#each option.items as item}
+														{#if item.includes('(includes:')}
+															<div class="item-detail">{item}</div>
+														{/if}
+													{/each}
+												</div>
+											{/if}
+										</div>
 									</button>
 								{/each}
 							</div>
@@ -745,6 +799,35 @@
 		border-left-color: #10b981;
 	}
 
+	.equipment-item-pack {
+		padding: 0.75rem;
+		background: #f9fafb;
+		border-radius: 6px;
+		border-left: 4px solid #d1d5db;
+		margin-bottom: 0.5rem;
+	}
+
+	.equipment-item-pack.class-equipment {
+		border-left-color: #3b82f6;
+	}
+
+	.equipment-item-pack.background {
+		border-left-color: #10b981;
+	}
+
+	.pack-name {
+		font-weight: 600;
+		font-size: 1rem;
+		color: #1f2937;
+		margin-bottom: 0.25rem;
+	}
+
+	.pack-description {
+		font-size: 0.875rem;
+		color: #6b7280;
+		line-height: 1.5;
+	}
+
 	.item-name {
 		font-weight: 500;
 		color: #1f2937;
@@ -799,6 +882,49 @@
 		border-color: #3b82f6;
 		background: #eff6ff;
 		box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+	}
+
+	.choice-option.disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+		background: #f3f4f6;
+	}
+
+	.choice-option.disabled:hover {
+		border-color: #e5e7eb;
+		box-shadow: none;
+	}
+
+	.option-content {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		width: 100%;
+	}
+
+	.option-label {
+		font-weight: 600;
+		font-size: 1rem;
+		color: #1f2937;
+	}
+
+	.option-description {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+
+	.item-detail {
+		font-size: 0.875rem;
+		color: #6b7280;
+		line-height: 1.5;
+	}
+
+	.requirement-warning {
+		font-size: 0.75rem;
+		color: #dc2626;
+		margin-top: 0.25rem;
+		font-weight: 500;
 	}
 
 	.subchoices-container {

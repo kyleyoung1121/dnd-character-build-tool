@@ -17,8 +17,14 @@ export type FeatureAction = 'add' | 'remove' | 'set' | 'modify';
 
 export type SelectOptions = {
 	placeholderText: string;
-	options: (string | ComplexOption)[];
+	options?: (string | ComplexOption)[];
+	dynamicOptionsGenerator?: DynamicOptionsGenerator;
 	numPicks: number;
+};
+
+export type DynamicOptionsGenerator = {
+	type: 'proficient-skills-plus-tools';
+	additionalOptions: string[];
 };
 
 export type ComplexOption = {

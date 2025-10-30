@@ -2,9 +2,27 @@
 	import { base } from '$app/paths';
 	import { page } from '$app/stores';
 	import { activeConflicts, markTabAsVisited } from '$lib/stores/conflict_store';
-	import { character_store, hasSpellAccess } from '$lib/stores/character_store';
+	import {
+		character_store,
+		hasSpellAccess,
+		hasBeastAccess,
+		getBeastTabName
+	} from '$lib/stores/character_store';
 	import NotificationToast from '$lib/components/NotificationToast.svelte';
 	import { onMount } from 'svelte';
+	import { initializeSpellCleanup } from '$lib/stores/spell_cleanup';
+	import { initializeEquipmentCleanup } from '$lib/stores/equipment_cleanup';
+	import { debugConflicts } from '$lib/debug/conflict_debug';
+
+	// Initialize spell cleanup service when app loads
+	// This ensures spells are cleaned up when class/race/subclass changes,
+	// even if the user never visits the spells page again
+	initializeSpellCleanup();
+
+	// Initialize equipment cleanup service when app loads
+	// This ensures equipment selections are cleared when proficiencies are lost,
+	// preventing invalid equipment selections
+	initializeEquipmentCleanup();
 
 	const baseNavItems = [
 		{ name: 'Class', href: base + '/class', id: 'class' },
@@ -15,14 +33,32 @@
 		{ name: 'Export', href: base + '/export', id: 'export' }
 	];
 
-	// Add spells tab conditionally based on character's spell access
-	$: navItems = hasSpellAccess($character_store)
-		? [
-				...baseNavItems.slice(0, 5), // Class through Equipment
-				{ name: 'Spells', href: base + '/spells', id: 'spells' },
-				baseNavItems[5] // Export
-			]
-		: baseNavItems;
+	// Declare navItems variable
+	let navItems = baseNavItems;
+
+	// Build navigation items dynamically based on character's abilities
+	$: {
+		const items = [...baseNavItems.slice(0, 5)]; // Class through Equipment
+
+		// Add Beasts/Familiars tab if character has access
+		if (hasBeastAccess($character_store)) {
+			items.push({
+				name: getBeastTabName($character_store),
+				href: base + '/beasts',
+				id: 'beasts'
+			});
+		}
+
+		// Add Spells tab if character has spell access
+		if (hasSpellAccess($character_store)) {
+			items.push({ name: 'Spells', href: base + '/spells', id: 'spells' });
+		}
+
+		// Always add Export at the end
+		items.push(baseNavItems[5]); // Export
+
+		navItems = items;
+	}
 
 	// Mark current tab as visited when navigating
 	$: if ($page.route?.id) {

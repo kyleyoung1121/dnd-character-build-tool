@@ -49,9 +49,19 @@
 
 				// This access allows choosing from specific class lists
 				access.chooseFrom.forEach((className) => {
-					const classSpells = levelSpells.filter((spell) => spell.classes.includes(className));
+					let classSpells = levelSpells.filter((spell) => spell.classes.includes(className));
+					
+					// Apply school restriction if present
+					if (access.restrictToSchools && access.restrictToSchools.length > 0) {
+						classSpells = classSpells.filter((spell) => 
+							access.restrictToSchools!.includes(spell.school)
+						);
+					}
+					
 					classSpells.forEach((spell) => {
-						if (!availableSpells.find((s) => s.name === spell.name)) {
+						// Check for duplicates by both name and sourceName to allow same spell in different tabs
+						// (e.g., Charm Person in both "Enchantment/Illusion" and "Any School" Arcane Trickster tabs)
+						if (!availableSpells.find((s) => s.name === spell.name && s.sourceName === access.sourceName)) {
 							availableSpells.push({
 								...spell,
 								source: access.source,
@@ -70,21 +80,30 @@
 					if (spell) {
 						const existingSpell = availableSpells.find((s) => s.name === spell.name);
 
+						// Special handling for warlock patron expanded spell lists
+						// Instead of creating separate tabs, merge them into the class spell list
+						const isWarlockPatron = access.source === 'subclass' && 
+							(access.sourceName === 'The Archfey' || 
+							 access.sourceName === 'The Fiend' || 
+							 access.sourceName === 'The Great Old One');
+
 						if (!existingSpell) {
 							// Add new spell
+							// If it's a warlock patron spell, add it as a class spell to avoid creating separate tabs
 							availableSpells.push({
 								...spell,
-								source: access.source,
-								sourceName: access.sourceName,
+								source: isWarlockPatron ? 'class' : access.source,
+								sourceName: isWarlockPatron ? 'Warlock' : access.sourceName,
 								chooseable: access.chooseable !== false
 							});
 						} else if (
 							access.source === 'subclass' &&
 							(access.sourceName.includes('Oath') ||
-								access.sourceName.includes('Circle of the Land')) &&
+								access.sourceName.includes('Circle of the Land') ||
+								access.sourceName.includes('Domain')) &&
 							existingSpell.source === 'class'
 						) {
-							// Replace class source with subclass source for oath/circle spells to show proper tags
+							// Replace class source with subclass source for oath/circle/domain spells to show proper tags
 							existingSpell.source = access.source;
 							existingSpell.sourceName = access.sourceName;
 							existingSpell.chooseable = access.chooseable !== false;
@@ -100,21 +119,29 @@
 					if (spell) {
 						const existingSpell = availableSpells.find((s) => s.name === spell.name);
 
+						// Special handling for warlock patron expanded spell lists
+						const isWarlockPatron = access.source === 'subclass' && 
+							(access.sourceName === 'The Archfey' || 
+							 access.sourceName === 'The Fiend' || 
+							 access.sourceName === 'The Great Old One');
+
 						if (!existingSpell) {
 							// Add new spell
+							// If it's a warlock patron spell, add it as a class spell to avoid creating separate tabs
 							availableSpells.push({
 								...spell,
-								source: access.source,
-								sourceName: access.sourceName,
+								source: isWarlockPatron ? 'class' : access.source,
+								sourceName: isWarlockPatron ? 'Warlock' : access.sourceName,
 								chooseable: access.chooseable !== false
 							});
 						} else if (
 							access.source === 'subclass' &&
 							(access.sourceName.includes('Oath') ||
-								access.sourceName.includes('Circle of the Land')) &&
+								access.sourceName.includes('Circle of the Land') ||
+								access.sourceName.includes('Domain')) &&
 							existingSpell.source === 'class'
 						) {
-							// Replace class source with subclass source for oath/circle spells to show proper tags
+							// Replace class source with subclass source for oath/circle/domain spells to show proper tags
 							existingSpell.source = access.source;
 							existingSpell.sourceName = access.sourceName;
 							existingSpell.chooseable = access.chooseable !== false;
@@ -122,6 +149,41 @@
 					}
 				});
 			}
+		});
+
+		// Sort spells so that patron expanded spells appear first for warlocks
+		availableSpells.sort((a, b) => {
+			// Check if these are warlock spells
+			const aIsWarlock = a.classes.includes('Warlock');
+			const bIsWarlock = b.classes.includes('Warlock');
+			
+			if (aIsWarlock && bIsWarlock) {
+				// Both are warlock spells - check if they're from patron expanded lists
+				// Patron spells are marked with sourceName 'Warlock' but came from patron lists
+				// We can identify them by checking if they're NOT in the base warlock spell list
+				// Actually, we need a different approach - let's check the original spell's classes
+				// If a spell is in the warlock list but originally from patron, it won't have been
+				// in the base warlock class list. But we've already processed that...
+				// Better approach: patron spells will have specific spell names we know
+				const patronSpells = [
+					// The Archfey
+					'Faerie Fire', 'Sleep', 'Calm Emotions', 'Phantasmal Force',
+					// The Fiend  
+					'Burning Hands', 'Command', 'Blindness/Deafness', 'Scorching Ray',
+					// The Great Old One
+					'Dissonant Whispers', "Tasha's Hideous Laughter", 'Detect Thoughts'
+					// Note: Phantasmal Force appears in both Archfey and GOO
+				];
+				
+				const aIsPatron = patronSpells.includes(a.name);
+				const bIsPatron = patronSpells.includes(b.name);
+				
+				if (aIsPatron && !bIsPatron) return -1; // Patron spells first
+				if (!aIsPatron && bIsPatron) return 1;  // Base warlock spells after
+			}
+			
+			// Otherwise maintain alphabetical order
+			return a.name.localeCompare(b.name);
 		});
 
 		return availableSpells;
@@ -140,9 +202,13 @@
 
 		spellAccess.forEach((access) => {
 			if (access.chooseable !== false) {
-				// Only count class and subclass access toward limits, not race/feat bonuses
+				// Only count class and subclass access toward limits, not race/feat bonuses or feature sources
+				// Exclude subclass entries with extended names (like "Nature Domain - Druid Cantrip")
+				// as they are handled in separate tabs
+				// Exclude feature sources (like Pact of the Tome) as they have their own separate tabs and limits
 				const countsTowardLimits =
-					access.source === 'class' || access.source === 'subclass' || access.source === 'feature';
+					access.source === 'class' ||
+					(access.source === 'subclass' && !access.sourceName.includes(' - '));
 
 				// Handle new format with separate cantrip and spell counts
 				if (access.chooseCantripCount !== undefined || access.chooseSpellCount !== undefined) {
@@ -224,7 +290,15 @@
 	}
 
 	// State for selected spells, expanded spell cards, and filters
-	let selectedSpells = new Set();
+	// Store selections with full metadata to enable cleanup when sources change
+	type SpellSelection = {
+		tabSource: string; // The tab ID where it was selected (e.g., 'cantrips', 'level1', 'Arcane Trickster - Cantrips')
+		charClass: string; // The class at time of selection
+		charSubclass: string; // The subclass at time of selection
+		charRace: string; // The race at time of selection
+		charSubrace: string; // The subrace at time of selection
+	};
+	let selectedSpells = new Map<string, SpellSelection>(); // spellName -> selection metadata
 	let expandedSpells = new Set();
 	let activeTab = ''; // Current active tab ID
 
@@ -236,10 +310,28 @@
 			return; // Can't select more spells
 		}
 
+		// Get the source name for tracking
+		const sourceId = activeTab;
+		const sourceName = sourceId.startsWith('subclass-')
+			? sourceId.replace('subclass-', '')
+			: sourceId.startsWith('race-')
+				? sourceId.replace('race-', '')
+				: sourceId.startsWith('feature-')
+					? sourceId.replace('feature-', '')
+					: sourceId;
+
 		if (selectedSpells.has(spellName)) {
 			selectedSpells.delete(spellName);
 		} else {
-			selectedSpells.add(spellName);
+			// Store comprehensive metadata about the selection
+			const char = $character_store;
+			selectedSpells.set(spellName, {
+				tabSource: sourceName,
+				charClass: char.class || '',
+				charSubclass: char.subclass || '',
+				charRace: char.race || '',
+				charSubrace: char.subrace || ''
+			});
 		}
 		selectedSpells = selectedSpells; // Trigger reactivity
 
@@ -261,7 +353,10 @@
 	function persistSpellSelections() {
 		const scopeId = 'spell_selections';
 		const spellSelections = {
-			spells: Array.from(selectedSpells) as string[]
+			spells: Array.from(selectedSpells.entries()).map(([name, metadata]) => ({
+				name,
+				...metadata
+			}))
 		};
 
 		applyChoice(scopeId, spellSelections);
@@ -280,7 +375,42 @@
 			const actualData = (provenanceData as any)._set || provenanceData;
 
 			if (actualData.spells && Array.isArray(actualData.spells)) {
-				selectedSpells = new Set(actualData.spells);
+				// Handle multiple formats for backward compatibility
+				selectedSpells = new Map();
+				actualData.spells.forEach((item: any) => {
+					if (typeof item === 'string') {
+						// Legacy format: just spell name
+						// Create minimal metadata (will be cleaned up on next character change)
+						selectedSpells.set(item, {
+							tabSource: '',
+							charClass: char.class || '',
+							charSubclass: char.subclass || '',
+							charRace: char.race || '',
+							charSubrace: char.subrace || ''
+						});
+					} else if (item && item.name) {
+						// Check if this is the old {name, source} format or new format with full metadata
+						if (item.tabSource !== undefined) {
+							// New format with full metadata
+							selectedSpells.set(item.name, {
+								tabSource: item.tabSource || '',
+								charClass: item.charClass || '',
+								charSubclass: item.charSubclass || '',
+								charRace: item.charRace || '',
+								charSubrace: item.charSubrace || ''
+							});
+						} else {
+							// Old format: {name, source} where source is just the tab name
+							selectedSpells.set(item.name, {
+								tabSource: item.source || '',
+								charClass: char.class || '',
+								charSubclass: char.subclass || '',
+								charRace: char.race || '',
+								charSubrace: char.subrace || ''
+							});
+						}
+					}
+				});
 			}
 		}
 	}
@@ -292,27 +422,53 @@
 		if (spellLevel === 0) {
 			// Cantrips are always separate
 			const availableCantrips = getAvailableSpells(0, character);
+			// Only count spells from sources that contribute to main limits
+			// Exclude feature sources as they have their own separate tabs
 			const selectedCount = availableCantrips.filter(
-				(spell) => spell.chooseable && selectedSpells.has(spell.name)
+				(spell) =>
+					spell.chooseable &&
+					selectedSpells.has(spell.name) &&
+					(spell.source === 'class' ||
+						(spell.source === 'subclass' && !spell.sourceName.includes(' - '))) &&
+					spell.source !== 'feature'
 			).length;
 			return selectedCount < limits.cantrips;
 		} else if (limits.isSharedLimits && (spellLevel === 1 || spellLevel === 2)) {
 			// For shared limits, count all leveled spells together
 			const availableLevel1 = getAvailableSpells(1, character);
 			const availableLevel2 = getAvailableSpells(2, character);
+			// Only count spells from sources that contribute to main limits
+			// Exclude feature sources as they have their own separate tabs
 			const selectedLevel1Count = availableLevel1.filter(
-				(spell) => spell.chooseable && selectedSpells.has(spell.name)
+				(spell) =>
+					spell.chooseable &&
+					selectedSpells.has(spell.name) &&
+					(spell.source === 'class' ||
+						(spell.source === 'subclass' && !spell.sourceName.includes(' - '))) &&
+					spell.source !== 'feature'
 			).length;
 			const selectedLevel2Count = availableLevel2.filter(
-				(spell) => spell.chooseable && selectedSpells.has(spell.name)
+				(spell) =>
+					spell.chooseable &&
+					selectedSpells.has(spell.name) &&
+					(spell.source === 'class' ||
+						(spell.source === 'subclass' && !spell.sourceName.includes(' - '))) &&
+					spell.source !== 'feature'
 			).length;
 			const totalSelectedLeveled = selectedLevel1Count + selectedLevel2Count;
 			return totalSelectedLeveled < limits.sharedLeveled;
 		} else {
 			// Separate limits per level
 			const availableSpells = getAvailableSpells(spellLevel, character);
+			// Only count spells from sources that contribute to main limits
+			// Exclude feature sources as they have their own separate tabs
 			const selectedCount = availableSpells.filter(
-				(spell) => spell.chooseable && selectedSpells.has(spell.name)
+				(spell) =>
+					spell.chooseable &&
+					selectedSpells.has(spell.name) &&
+					(spell.source === 'class' ||
+						(spell.source === 'subclass' && !spell.sourceName.includes(' - '))) &&
+					spell.source !== 'feature'
 			).length;
 
 			switch (spellLevel) {
@@ -477,7 +633,16 @@
 						)))
 		);
 
-		if (hasClassCantrips) {
+		// Check if this is a non-caster with only subclass spell access (like Arcane Trickster Rogue)
+		// In this case, don't show standard cantrips/level tabs since they use dedicated subclass tabs
+		const hasClassSpellAccess = spellAccess.some(
+			(access) => access.source === 'class' && access.chooseable
+		);
+		const onlySubclassSpellAccess = !hasClassSpellAccess && spellAccess.some(
+			(access) => access.source === 'subclass' && access.chooseable
+		);
+
+		if (hasClassCantrips && !onlySubclassSpellAccess) {
 			sources.push({
 				id: 'cantrips',
 				name: 'Cantrips',
@@ -487,7 +652,7 @@
 			});
 		}
 
-		if (hasClassLevel1) {
+		if (hasClassLevel1 && !onlySubclassSpellAccess) {
 			sources.push({
 				id: 'level1',
 				name: '1st Level',
@@ -520,21 +685,66 @@
 
 	// Get spells for a specific source tab
 	function getSpellsForSource(character: any, sourceId: string) {
+		// Helper function to add racial spells as crossed-out duplicates
+		function addRacialDuplicates(classSpells: any[], level: number) {
+			const racialSpells = getAvailableSpells(level, character).filter(
+				(spell) => spell.source === 'race' && !spell.chooseable
+			);
+
+			// Start with class spells and mark any that are racial duplicates
+			const markedClassSpells = classSpells.map((spell) => {
+				const isRacialDuplicate = racialSpells.some(
+					(racialSpell) => racialSpell.name === spell.name
+				);
+				return {
+					...spell,
+					isRacialDuplicate,
+					racialSource: isRacialDuplicate
+						? racialSpells.find((rs) => rs.name === spell.name)?.sourceName
+						: null
+				};
+			});
+
+			// Add any racial spells that aren't already in the class spell list
+			const additionalRacialSpells = racialSpells
+				.filter(
+					(racialSpell) => !classSpells.some((classSpell) => classSpell.name === racialSpell.name)
+				)
+				.map((racialSpell) => ({
+					...racialSpell,
+					isRacialDuplicate: true,
+					racialSource: racialSpell.sourceName,
+					// Keep the racial spell as chooseable: false since it's auto-granted
+					chooseable: false
+				}));
+
+			return [...markedClassSpells, ...additionalRacialSpells];
+		}
+
 		if (sourceId === 'cantrips') {
-			return getAvailableSpells(0, character).filter(
+			const classSpells = getAvailableSpells(0, character).filter(
 				(spell) =>
-					spell.source === 'class' || spell.source === 'subclass' || spell.source === 'feature'
+					(spell.source === 'class' ||
+					(spell.source === 'subclass' && !spell.sourceName.includes(' - '))) &&
+					spell.source !== 'feature' // Exclude feature sources from base cantrips tab
 			);
+			return addRacialDuplicates(classSpells, 0);
 		} else if (sourceId === 'level1') {
-			return getAvailableSpells(1, character).filter(
+			const classSpells = getAvailableSpells(1, character).filter(
 				(spell) =>
-					spell.source === 'class' || spell.source === 'subclass' || spell.source === 'feature'
+					(spell.source === 'class' ||
+					(spell.source === 'subclass' && !spell.sourceName.includes(' - '))) &&
+					spell.source !== 'feature' // Exclude feature sources from base level1 tab
 			);
+			return addRacialDuplicates(classSpells, 1);
 		} else if (sourceId === 'level2') {
-			return getAvailableSpells(2, character).filter(
+			const classSpells = getAvailableSpells(2, character).filter(
 				(spell) =>
-					spell.source === 'class' || spell.source === 'subclass' || spell.source === 'feature'
+					(spell.source === 'class' ||
+					(spell.source === 'subclass' && !spell.sourceName.includes(' - '))) &&
+					spell.source !== 'feature' // Exclude feature sources from base level2 tab
 			);
+			return addRacialDuplicates(classSpells, 2);
 		} else if (sourceId.startsWith('race-')) {
 			// Race-based source
 			const sourceName = sourceId.replace('race-', '');
@@ -589,27 +799,45 @@
 
 			// Get the spell access configuration for this subclass
 			const spellAccess = getSpellAccessForCharacter(character);
-			const access = spellAccess.find(
+			// Find ALL access entries for this subclass (there may be multiple)
+			const allAccess = spellAccess.filter(
 				(sa) => sa.source === 'subclass' && sa.sourceName === sourceName
 			);
 
-			if (!access) return [];
+			if (allAccess.length === 0) return [];
 
-			// For unified subclasses (like Eldritch Knight), return both cantrips and spells
-			// but mark them with section info for proper rendering
-			const cantrips = getAvailableSpells(0, character)
-				.filter((spell) => spell.source === 'subclass' && spell.sourceName === sourceName)
-				.map((spell) => ({ ...spell, spellSection: 'cantrips' }));
+			// Determine which spell levels this subclass tab should include
+			const totalCantripCount = allAccess.reduce((sum, access) => {
+				return sum + (access.chooseCantripCount ?? 0) + (access.cantrips?.length ?? 0);
+			}, 0);
+			const totalSpellCount = allAccess.reduce((sum, access) => {
+				return sum + (access.chooseSpellCount ?? 0) + (access.spells?.length ?? 0);
+			}, 0);
 
-			const level1 = getAvailableSpells(1, character)
-				.filter((spell) => spell.source === 'subclass' && spell.sourceName === sourceName)
-				.map((spell) => ({ ...spell, spellSection: 'level1' }));
+			const results: any[] = [];
 
-			const level2 = getAvailableSpells(2, character)
-				.filter((spell) => spell.source === 'subclass' && spell.sourceName === sourceName)
-				.map((spell) => ({ ...spell, spellSection: 'level2' }));
+			// Only include cantrips if this tab has cantrip access
+			if (totalCantripCount > 0) {
+				const cantrips = getAvailableSpells(0, character)
+					.filter((spell) => spell.source === 'subclass' && spell.sourceName === sourceName)
+					.map((spell) => ({ ...spell, spellSection: 'cantrips' }));
+				results.push(...cantrips);
+			}
 
-			return [...cantrips, ...level1, ...level2];
+			// Only include leveled spells if this tab has spell access
+			if (totalSpellCount > 0) {
+				const level1 = getAvailableSpells(1, character)
+					.filter((spell) => spell.source === 'subclass' && spell.sourceName === sourceName)
+					.map((spell) => ({ ...spell, spellSection: 'level1' }));
+
+				const level2 = getAvailableSpells(2, character)
+					.filter((spell) => spell.source === 'subclass' && spell.sourceName === sourceName)
+					.map((spell) => ({ ...spell, spellSection: 'level2' }));
+
+				results.push(...level1, ...level2);
+			}
+
+			return results;
 		} else if (sourceId.startsWith('feature-')) {
 			// Feature-based source (like Warlock invocations, Pact of the Tome, etc.)
 			const sourceName = sourceId.replace('feature-', '');
@@ -664,9 +892,12 @@
 			// If this source doesn't require choices (auto-granted), it's always complete
 			if (!access.chooseable) return true;
 
-			const selectedCount = chooseableSpells.filter((spell) =>
-				selectedSpells.has(spell.name)
-			).length;
+			// Only count spells that were selected FROM THIS tab
+			const selectedCount = chooseableSpells.filter((spell) => {
+				if (!selectedSpells.has(spell.name)) return false;
+				const selectedFrom = selectedSpells.get(spell.name)?.tabSource;
+				return selectedFrom === sourceName;
+			}).length;
 			const requiredCantrips = access.chooseCantripCount ?? 0;
 			const requiredSpells = access.chooseSpellCount ?? 0;
 			const totalRequired = requiredCantrips + requiredSpells;
@@ -678,19 +909,20 @@
 		if (sourceId.startsWith('subclass-')) {
 			const sourceName = sourceId.replace('subclass-', '');
 			const spellAccess = getSpellAccessForCharacter(character);
-			const access = spellAccess.find(
+			const allAccess = spellAccess.filter(
 				(sa) => sa.source === 'subclass' && sa.sourceName === sourceName
 			);
-			if (!access) return true;
+			const chooseableAccess = allAccess.filter((sa) => sa.chooseable);
+			if (chooseableAccess.length === 0) return true; // All auto-granted
 
-			// If this source doesn't require choices (auto-granted), it's always complete
-			if (!access.chooseable) return true;
-
-			const selectedCount = chooseableSpells.filter((spell) =>
-				selectedSpells.has(spell.name)
-			).length;
-			const requiredCantrips = access.chooseCantripCount ?? 0;
-			const requiredSpells = access.chooseSpellCount ?? 0;
+			// Only count spells that were selected FROM THIS tab
+			const selectedCount = chooseableSpells.filter((spell) => {
+				if (!selectedSpells.has(spell.name)) return false;
+				const selectedFrom = selectedSpells.get(spell.name)?.tabSource;
+				return selectedFrom === sourceName;
+			}).length;
+			const requiredCantrips = chooseableAccess.reduce((sum, access) => sum + (access.chooseCantripCount ?? 0), 0);
+			const requiredSpells = chooseableAccess.reduce((sum, access) => sum + (access.chooseSpellCount ?? 0), 0);
 			const totalRequired = requiredCantrips + requiredSpells;
 
 			return selectedCount >= totalRequired;
@@ -708,9 +940,12 @@
 			// If this source doesn't require choices (auto-granted), it's always complete
 			if (!access.chooseable) return true;
 
-			const selectedCount = chooseableSpells.filter((spell) =>
-				selectedSpells.has(spell.name)
-			).length;
+			// Only count spells that were selected FROM THIS tab
+			const selectedCount = chooseableSpells.filter((spell) => {
+				if (!selectedSpells.has(spell.name)) return false;
+				const selectedFrom = selectedSpells.get(spell.name)?.tabSource;
+				return selectedFrom === sourceName;
+			}).length;
 			const requiredCantrips = access.chooseCantripCount ?? 0;
 			const requiredSpells = access.chooseSpellCount ?? 0;
 			const totalRequired = requiredCantrips + requiredSpells;
@@ -720,26 +955,38 @@
 
 		// For level-based sources, check against spell limits
 		if (sourceId === 'cantrips') {
-			const selectedCount = chooseableSpells.filter((spell) =>
-				selectedSpells.has(spell.name)
-			).length;
+			// Only count spells that were selected FROM THIS tab (not from feature sources)
+			const selectedCount = chooseableSpells.filter((spell) => {
+				if (!selectedSpells.has(spell.name)) return false;
+				const selectedFrom = selectedSpells.get(spell.name)?.tabSource;
+				// Count if selected from 'cantrips' tab, or if no tabSource (legacy format)
+				return !selectedFrom || selectedFrom === 'cantrips';
+			}).length;
 			return selectedCount >= spellLimits.cantrips;
 		} else if (sourceId === 'level1') {
 			if (spellLimits.isSharedLimits) {
 				return selectedLeveledCount >= spellLimits.sharedLeveled;
 			} else {
-				const selectedCount = chooseableSpells.filter((spell) =>
-					selectedSpells.has(spell.name)
-				).length;
+				// Only count spells that were selected FROM THIS tab (not from feature sources)
+				const selectedCount = chooseableSpells.filter((spell) => {
+					if (!selectedSpells.has(spell.name)) return false;
+					const selectedFrom = selectedSpells.get(spell.name)?.tabSource;
+					// Count if selected from 'level1' tab, or if no tabSource (legacy format)
+					return !selectedFrom || selectedFrom === 'level1';
+				}).length;
 				return selectedCount >= spellLimits.level1;
 			}
 		} else if (sourceId === 'level2') {
 			if (spellLimits.isSharedLimits) {
 				return selectedLeveledCount >= spellLimits.sharedLeveled;
 			} else {
-				const selectedCount = chooseableSpells.filter((spell) =>
-					selectedSpells.has(spell.name)
-				).length;
+				// Only count spells that were selected FROM THIS tab (not from feature sources)
+				const selectedCount = chooseableSpells.filter((spell) => {
+					if (!selectedSpells.has(spell.name)) return false;
+					const selectedFrom = selectedSpells.get(spell.name)?.tabSource;
+					// Count if selected from 'level2' tab, or if no tabSource (legacy format)
+					return !selectedFrom || selectedFrom === 'level2';
+				}).length;
 				return selectedCount >= spellLimits.level2;
 			}
 		}
@@ -767,13 +1014,14 @@
 		} else if (sourceId.startsWith('subclass-')) {
 			const sourceName = sourceId.replace('subclass-', '');
 			const spellAccess = getSpellAccessForCharacter(character);
-			const access = spellAccess.find(
+			const allAccess = spellAccess.filter(
 				(sa) => sa.source === 'subclass' && sa.sourceName === sourceName
 			);
-			if (!access || !access.chooseable) return null;
+			const chooseableAccess = allAccess.filter((sa) => sa.chooseable);
+			if (chooseableAccess.length === 0) return null;
 
-			const requiredCantrips = access.chooseCantripCount || 0;
-			const requiredSpells = access.chooseSpellCount || 0;
+			const requiredCantrips = chooseableAccess.reduce((sum, access) => sum + (access.chooseCantripCount || 0), 0);
+			const requiredSpells = chooseableAccess.reduce((sum, access) => sum + (access.chooseSpellCount || 0), 0);
 			const totalRequired = requiredCantrips + requiredSpells;
 
 			return { selected: selectedCount, total: totalRequired };
@@ -789,7 +1037,15 @@
 			const requiredSpells = access.chooseSpellCount || 0;
 			const totalRequired = requiredCantrips + requiredSpells;
 
-			return { selected: selectedCount, total: totalRequired };
+			// Only count spells that were actually selected FROM THIS tab (not from base tabs)
+			const actualSelectedCount = chooseableSpells.filter((spell) => {
+				if (!selectedSpells.has(spell.name)) return false;
+				// Check if this spell was selected from the current tab
+				const selectedFrom = selectedSpells.get(spell.name)?.tabSource;
+				return selectedFrom === sourceName;
+			}).length;
+
+			return { selected: actualSelectedCount, total: totalRequired };
 		} else if (sourceId === 'cantrips') {
 			return { selected: selectedCantripCount, total: spellLimits.cantrips };
 		} else if (sourceId === 'level1') {
@@ -843,13 +1099,15 @@
 				: currentSourceId.startsWith('feature-')
 					? 'feature'
 					: 'class';
+		// For basic level tabs (cantrips, level1, level2), use the tab ID as the source name
+		// This matches what's stored in selectedSpells by toggleSpell
 		const currentSourceName = currentSourceId.startsWith('race-')
 			? currentSourceId.replace('race-', '')
 			: currentSourceId.startsWith('subclass-')
 				? currentSourceId.replace('subclass-', '')
 				: currentSourceId.startsWith('feature-')
 					? currentSourceId.replace('feature-', '')
-					: null;
+					: currentSourceId; // Use the full tab ID for basic level tabs
 
 		// Get all auto-granted spells from OTHER sources (not current source)
 		spellAccess.forEach((access) => {
@@ -880,15 +1138,37 @@
 		// Get all currently selected spells from other sources
 		for (let level = 0; level <= 2; level++) {
 			const availableSpells = getAvailableSpells(level, character);
+			// Group spells by name to check if ANY version matches current source
+			const spellsByName = new Map<string, any[]>();
 			availableSpells.forEach((spell) => {
-				if (selectedSpells.has(spell.name)) {
-					// Only add to unavailable if it's from a different source
-					const isDifferentSource =
-						spell.source !== currentSourceType ||
-						(currentSourceName && spell.sourceName !== currentSourceName);
+				if (!spellsByName.has(spell.name)) {
+					spellsByName.set(spell.name, []);
+				}
+				spellsByName.get(spell.name)!.push(spell);
+			});
 
-					if (isDifferentSource) {
-						unavailable.add(spell.name);
+			spellsByName.forEach((spellVersions, spellName) => {
+				if (selectedSpells.has(spellName)) {
+					// Check WHERE this spell was selected from
+					const selectedFromSource = selectedSpells.get(spellName)?.tabSource;
+
+					// If spell was selected from current tab, don't mark as unavailable
+					if (selectedFromSource === currentSourceName) {
+						return; // Skip - this spell belongs to current tab
+					}
+
+					// Check if ANY version of this spell matches the current source
+					const matchingVersions = spellVersions.filter((spell) => {
+						return (
+							spell.source === currentSourceType &&
+							(!currentSourceName || spell.sourceName === currentSourceName)
+						);
+					});
+
+					// If spell exists in current tab's spell list, mark it as unavailable
+					// (it was selected from a different tab but is available here too)
+					if (matchingVersions.length > 0) {
+						unavailable.add(spellName);
 					}
 				}
 			});
@@ -950,14 +1230,19 @@
 				if (hasSpell) {
 					// Oath spells show specific oath name with (auto)
 					if (access.source === 'subclass' && access.sourceName.includes('Oath')) {
-						return `${access.sourceName} (auto)`;
+						return 'Duplicate';
 					}
 					// Domain/Circle spells are "always prepared"
 					else if (
 						access.source === 'subclass' &&
 						(access.sourceName.includes('Domain') || access.sourceName.includes('Circle'))
 					) {
-						return 'Always Prepared';
+						// Check if it's a domain spell to show specific domain name
+						if (access.sourceName.includes('Domain')) {
+							return 'Duplicate';
+						}
+						// Other circle spells
+						return 'Duplicate';
 					}
 					// Other auto-granted spells are "already known"
 					return 'Already Known';
@@ -977,9 +1262,13 @@
 	$: spellLimits = getSpellLimits(character);
 
 	// Restore spell selections when character changes
+	// Note: Cleanup of invalid spells is now handled globally by the spell_cleanup service
+	// which runs independently of this component
 	$: {
 		if (character) {
 			restoreSpellSelectionsFromStore();
+			// IMPORTANT: After restoring, persist to character.spells so conflict detection can see them
+			persistSpellSelections();
 		}
 	}
 
@@ -997,30 +1286,53 @@
 		: [];
 
 	// Reactive variables for spell limits (ensures UI updates when selections change)
-	// Only count class/subclass spells toward limits, not race-based bonus spells or unified subclasses
+	// Only count class/subclass spells toward limits, not race-based bonus spells, extended subclass entries, or feature sources
+	// Feature sources have their own separate tabs and shouldn't count toward base class tabs
+	// Also exclude spells that were selected from feature tabs (like Pact of the Tome)
 	$: selectedCantripCount = availableCantrips.filter(
-		(s) =>
-			s.chooseable &&
-			selectedSpells.has(s.name) &&
-			(s.source === 'class' ||
-				(s.source === 'subclass' && !unifiedSubclassNames.includes(s.sourceName)) ||
-				s.source === 'feature')
+		(s) => {
+			if (!s.chooseable || !selectedSpells.has(s.name)) return false;
+			if (s.source === 'feature') return false;
+			if (!(s.source === 'class' || (s.source === 'subclass' && !s.sourceName.includes(' - ')))) return false;
+			
+			// Check if this spell was selected from a feature tab - if so, don't count it
+			const meta = selectedSpells.get(s.name);
+			if (meta && meta.tabSource && (meta.tabSource.includes('Pact of the') || meta.tabSource.startsWith('feature-'))) {
+				return false;
+			}
+			
+			return true;
+		}
 	).length;
 	$: selectedLevel1Count = availableLevel1.filter(
-		(s) =>
-			s.chooseable &&
-			selectedSpells.has(s.name) &&
-			(s.source === 'class' ||
-				(s.source === 'subclass' && !unifiedSubclassNames.includes(s.sourceName)) ||
-				s.source === 'feature')
+		(s) => {
+			if (!s.chooseable || !selectedSpells.has(s.name)) return false;
+			if (s.source === 'feature') return false;
+			if (!(s.source === 'class' || (s.source === 'subclass' && !s.sourceName.includes(' - ')))) return false;
+			
+			// Check if this spell was selected from a feature tab - if so, don't count it
+			const meta = selectedSpells.get(s.name);
+			if (meta && meta.tabSource && (meta.tabSource.includes('Pact of the') || meta.tabSource.startsWith('feature-'))) {
+				return false;
+			}
+			
+			return true;
+		}
 	).length;
 	$: selectedLevel2Count = availableLevel2.filter(
-		(s) =>
-			s.chooseable &&
-			selectedSpells.has(s.name) &&
-			(s.source === 'class' ||
-				(s.source === 'subclass' && !unifiedSubclassNames.includes(s.sourceName)) ||
-				s.source === 'feature')
+		(s) => {
+			if (!s.chooseable || !selectedSpells.has(s.name)) return false;
+			if (s.source === 'feature') return false;
+			if (!(s.source === 'class' || (s.source === 'subclass' && !s.sourceName.includes(' - ')))) return false;
+			
+			// Check if this spell was selected from a feature tab - if so, don't count it
+			const meta = selectedSpells.get(s.name);
+			if (meta && meta.tabSource && (meta.tabSource.includes('Pact of the') || meta.tabSource.startsWith('feature-'))) {
+				return false;
+			}
+			
+			return true;
+		}
 	).length;
 	$: selectedLeveledCount = selectedLevel1Count + selectedLevel2Count;
 
@@ -1034,7 +1346,7 @@
 		: selectedLevel2Count < spellLimits.level2;
 
 	// Reactive tab system
-	$: spellSources = character.class ? getSpellSources(character) : [];
+	$: spellSources = hasSpellAccess(character) ? getSpellSources(character) : [];
 	$: {
 		// Auto-select first available tab if none selected or current tab doesn't exist
 		if (spellSources.length > 0 && (!activeTab || !spellSources.find((s) => s.id === activeTab))) {
@@ -1052,6 +1364,8 @@
 
 		const spells = currentTabSpells;
 		const chooseableSpells = spells.filter((spell) => spell.chooseable);
+		// Only count spells that are actually in THIS tab's spell list
+		// This prevents spells from other tabs (like other Arcane Trickster tabs) from being counted
 		const selectedCount = chooseableSpells.filter((spell) => selectedSpells.has(spell.name)).length;
 
 		if (activeTab.startsWith('race-')) {
@@ -1068,13 +1382,30 @@
 		} else if (activeTab.startsWith('subclass-')) {
 			const sourceName = activeTab.replace('subclass-', '');
 			const spellAccess = getSpellAccessForCharacter(character);
-			const access = spellAccess.find(
+			// Find ALL access entries for this subclass (there may be multiple with different restrictions)
+			const allAccess = spellAccess.filter(
 				(sa) => sa.source === 'subclass' && sa.sourceName === sourceName
 			);
-			if (!access || !access.chooseable) return null;
+			const chooseableAccess = allAccess.filter((sa) => sa.chooseable);
+			if (chooseableAccess.length === 0) return null;
 
-			const requiredCantrips = access.chooseCantripCount ?? 0;
-			const requiredSpells = access.chooseSpellCount ?? 0;
+			// Count auto-granted spells for this tab (like Mage Hand for Arcane Trickster)
+			const autoGrantedSpells = spells.filter((spell) => !spell.chooseable).length;
+
+			// Aggregate cantrip and spell requirements from all entries
+			const requiredCantrips = chooseableAccess.reduce((sum, access) => sum + (access.chooseCantripCount ?? 0), 0);
+			const requiredSpells = chooseableAccess.reduce((sum, access) => sum + (access.chooseSpellCount ?? 0), 0);
+
+			// For tabs with school restrictions, only count spells that match the restriction
+			// This prevents double-counting between restricted and unrestricted tabs
+			// Only count spells that were actually selected FROM THIS TAB
+			// Check the stored source for each selected spell
+			const actualSelectedCount = chooseableSpells.filter((spell) => {
+				if (!selectedSpells.has(spell.name)) return false;
+				// Check if this spell was selected from the current tab
+				const selectedFrom = selectedSpells.get(spell.name)?.tabSource;
+				return selectedFrom === sourceName;
+			}).length;
 
 			// For unified subclasses with both cantrips and spells, show separate counts
 			if (requiredCantrips > 0 && requiredSpells > 0) {
@@ -1098,8 +1429,12 @@
 				};
 			} else {
 				// Simple case: only cantrips or only spells
+				// Include auto-granted spells in both selected and total counts
 				const totalRequired = requiredCantrips + requiredSpells;
-				return { selected: selectedCount, total: totalRequired };
+				return { 
+					selected: actualSelectedCount + autoGrantedSpells, 
+					total: totalRequired + autoGrantedSpells 
+				};
 			}
 		} else if (activeTab.startsWith('feature-')) {
 			const sourceName = activeTab.replace('feature-', '');
@@ -1113,7 +1448,15 @@
 			const requiredSpells = access.chooseSpellCount ?? 0;
 			const totalRequired = requiredCantrips + requiredSpells;
 
-			return { selected: selectedCount, total: totalRequired };
+			// Only count spells that were actually selected FROM THIS tab (not from base tabs)
+			const actualSelectedCount = chooseableSpells.filter((spell) => {
+				if (!selectedSpells.has(spell.name)) return false;
+				// Check if this spell was selected from the current tab
+				const selectedFrom = selectedSpells.get(spell.name)?.tabSource;
+				return selectedFrom === sourceName;
+			}).length;
+
+			return { selected: actualSelectedCount, total: totalRequired };
 		} else if (activeTab === 'cantrips') {
 			return { selected: selectedCantripCount, total: spellLimits.cantrips };
 		} else if (activeTab === 'level1') {
@@ -1249,27 +1592,58 @@
 										{#if !spell.chooseable}
 											<span class="auto-granted-indicator">✓</span>
 										{/if}
-										<span class="spell-name">{spell.name}</span>
-										{#if spell.source !== 'class'}
-											<span class="spell-tag {spell.source}">
-												{spell.sourceName}
-												{#if !spell.chooseable}(auto){/if}
+										<span class="spell-name" class:racial-duplicate={spell.isRacialDuplicate}
+											>{spell.name}</span
+										>
+										{#if spell.isRacialDuplicate && spell.racialSource}
+											<span class="spell-tag racial-tag">
+												{spell.racialSource.toUpperCase()} (AUTO)
 											</span>
+										{:else if spell.source !== 'class'}
+											<span class="spell-tag {spell.source}">
+												{spell.sourceName.toUpperCase()}
+												{#if !spell.chooseable}(AUTO){/if}
+											</span>
+										{/if}
+										<!-- Show PATRON tag for warlock expanded spell list spells -->
+										{#if spell.sourceName === 'Warlock'}
+											{@const patronSpells = [
+												'Faerie Fire', 'Sleep', 'Calm Emotions', 'Phantasmal Force',
+												'Burning Hands', 'Command', 'Blindness/Deafness', 'Scorching Ray',
+												'Dissonant Whispers', "Tasha's Hideous Laughter", 'Detect Thoughts'
+											]}
+											{#if patronSpells.includes(spell.name)}
+												<span class="spell-tag patron-tag">
+													PATRON
+												</span>
+											{/if}
 										{/if}
 									</div>
 									{#if spell.chooseable}
-										{#if isUnavailable}
+										{#if spell.isRacialDuplicate}
+											<button class="spell-button duplicate-button" disabled> Duplicate </button>
+										{:else if isUnavailable}
 											<span class="spell-status unavailable-status"
 												>{getUnavailableText(spell.name, character)}</span
 											>
 										{:else if selectedSpells.has(spell.name)}
-											<button
-												class="spell-button delete-button"
-												on:click|stopPropagation={() =>
-													toggleSpell(spell.name, spell.chooseable, spell)}
-											>
-												Delete
-											</button>
+											{@const isBaseTab = activeTab === 'cantrips' || activeTab === 'level1' || activeTab === 'level2'}
+											{@const isFeatureTab = activeTab.startsWith('feature-')}
+											{@const selectedMeta = selectedSpells.get(spell.name)}
+											{@const selectedFromFeature = selectedMeta && selectedMeta.tabSource && selectedMeta.tabSource.includes('Pact of the')}
+											{@const selectedFromBase = selectedMeta && selectedMeta.tabSource && (selectedMeta.tabSource === 'cantrips' || selectedMeta.tabSource === 'level1' || selectedMeta.tabSource === 'level2')}
+											{@const showAlreadyKnown = (isBaseTab && selectedFromFeature) || (isFeatureTab && selectedFromBase)}
+											{#if showAlreadyKnown}
+												<span class="spell-status unavailable-status">Already Known</span>
+											{:else}
+												<button
+													class="spell-button delete-button"
+													on:click|stopPropagation={() =>
+														toggleSpell(spell.name, spell.chooseable, spell)}
+												>
+													Delete
+												</button>
+											{/if}
 										{:else}
 											<button
 												class="spell-button learn-button"
@@ -1605,6 +1979,11 @@
 		font-size: 1.05rem;
 	}
 
+	.spell-name.racial-duplicate {
+		text-decoration: line-through;
+		color: #6b7280;
+	}
+
 	.spell-tag {
 		font-size: 0.7rem;
 		padding: 0.2rem 0.5rem;
@@ -1624,6 +2003,21 @@
 		color: #92400e;
 	}
 
+	.spell-tag.feature {
+		background: #e0e7ff;
+		color: #3730a3;
+	}
+
+	.spell-tag.patron-tag {
+		background: #fce7f3;
+		color: #9f1239;
+	}
+
+	.spell-tag.racial-tag {
+		background: #fde2e7;
+		color: #be185d;
+	}
+
 	.spell-description {
 		color: #4b5563;
 		font-size: 0.9rem;
@@ -1638,5 +2032,17 @@
 		font-style: italic;
 		padding-top: 0.5rem;
 		border-top: 1px solid #f3f4f6;
+	}
+
+	.duplicate-button {
+		background: #f3f4f6;
+		color: #6b7280;
+		border: 1px solid #d1d5db;
+		border-radius: 6px;
+		padding: 0.5rem 1rem;
+		font-size: 0.85rem;
+		font-weight: 500;
+		cursor: not-allowed;
+		opacity: 0.6;
 	}
 </style>

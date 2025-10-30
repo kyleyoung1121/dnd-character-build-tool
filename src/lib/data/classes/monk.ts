@@ -1,7 +1,7 @@
 import { base } from '$app/paths';
 import type { ClassData, EquipmentChoice } from '$lib/data/types/ClassData';
 import type { FeaturePrompt } from '$lib/data/types/Features';
-import { simpleWeapons } from '$lib/data/equipment/weapons';
+import { simpleWeapons } from '../equipment/weapons';
 
 const proficienciesPrompt: FeaturePrompt = {
 	id: 'monk_proficiencies_01',
@@ -31,9 +31,10 @@ const martialArtsPrompt: FeaturePrompt = {
 	id: 'monk_martial_arts_01',
 	name: 'Martial Arts',
 	description: `
-		At 1st level, your practice of martial arts gives you the ability to use Dexterity instead of Strength for the attack and damage rolls of your unarmed strikes and monk weapons.
-		You can roll a d4 in place of the normal damage of your unarmed strike or monk weapon. This die increases as you level.
-		When you use the Attack action with an unarmed strike or monk weapon on your turn, you can make one unarmed strike as a bonus action.
+		At 1st level, your practice of martial arts gives you mastery of combat styles that use unarmed strikes and monk weapons:<br>
+		• You can use Dexterity instead of Strength for the attack and damage rolls of your unarmed strikes and monk weapons.<br>
+		• You can roll a d4 in place of the normal damage of your unarmed strike or monk weapon. This die increases as you level.<br>
+		• When you use the Attack action with an unarmed strike or monk weapon on your turn, you can make one unarmed strike as a bonus action.
 	`,
 	source: 'monk',
 	effects: [
@@ -49,9 +50,7 @@ const kiPrompt: FeaturePrompt = {
 	id: 'monk_ki_01',
 	name: 'Ki',
 	description: `
-		Starting at 2nd level, you can use your ki to fuel special martial arts techniques.
-		You have a number of ki points equal to your monk level, which you can spend to use features like Flurry of Blows, Patient Defense, and Step of the Wind.
-		Ki points are regained after a short or long rest.
+		Starting at 2nd level, your training allows you to harness the mystic energy of ki. Your access to this energy is represented by a number of ki points. Your monk level determines the number of ki points you have. You can spend these points to fuel various ki features like Flurry of Blows, Patient Defense, and Step of the Wind. When you spend a ki point, it is unavailable until you finish a short or long rest, at the end of which you draw all of your expended ki points back into yourself. You must spend at least 30 minutes of the rest meditating to regain your ki points. Some of your ki features require your target to make a saving throw to resist the feature's effects. The saving throw DC is calculated as follows: Ki save DC = 8 + your proficiency bonus + your Wisdom modifier.
 	`,
 	source: 'monk',
 	effects: [
@@ -59,6 +58,37 @@ const kiPrompt: FeaturePrompt = {
 			target: 'features',
 			action: 'add',
 			value: 'Ki'
+		}
+	]
+};
+
+const kiFeaturesPrompt: FeaturePrompt = {
+	id: 'monk_ki_features_01',
+	name: 'Ki Features',
+	description: `
+		<strong>Flurry of Blows</strong><br>
+		Immediately after you take the Attack action on your turn, you can spend 1 ki point to make two unarmed strikes as a bonus action.<br><br>
+		<strong>Patient Defense</strong><br>
+		You can spend 1 ki point to take the Dodge action as a bonus action on your turn.<br><br>
+		<strong>Step of the Wind</strong><br>
+		You can spend 1 ki point to take the Disengage or Dash action as a bonus action on your turn, and your jump distance is doubled for the turn.
+	`,
+	source: 'monk',
+	effects: [
+		{
+			target: 'features',
+			action: 'add',
+			value: 'Flurry of Blows'
+		},
+		{
+			target: 'features',
+			action: 'add',
+			value: 'Patient Defense'
+		},
+		{
+			target: 'features',
+			action: 'add',
+			value: 'Step of the Wind'
 		}
 	]
 };
@@ -79,6 +109,22 @@ const unarmoredMovementPrompt: FeaturePrompt = {
 	]
 };
 
+const deflectMissilesPrompt: FeaturePrompt = {
+	id: 'monk_deflect_missiles_01',
+	name: 'Deflect Missiles',
+	description: `
+		Starting at 3rd level, you can use your reaction to deflect or catch the missile when you are hit by a ranged weapon attack. When you do so, the damage you take from the attack is reduced by 1d10 + your Dexterity modifier + your monk level. If you reduce the damage to 0, you can catch the missile if it is small enough for you to hold in one hand and you have at least one hand free. If you catch a missile in this way, you can spend 1 ki point to make a ranged attack with the weapon or piece of ammunition you just caught, as part of the same reaction. You make this attack with proficiency, regardless of your weapon proficiencies, and the missile counts as a monk weapon for the attack, which has a normal range of 20 feet and a long range of 60 feet.
+	`,
+	source: 'monk',
+	effects: [
+		{
+			target: 'features',
+			action: 'add',
+			value: 'Deflect Missiles'
+		}
+	]
+};
+
 const monasticTraditionPrompt: FeaturePrompt = {
 	id: 'monk_tradition_01',
 	name: 'Monastic Tradition',
@@ -94,10 +140,10 @@ const monasticTraditionPrompt: FeaturePrompt = {
 						id: 'monk_open_hand_technique_01',
 						name: 'Open Hand Technique',
 						description: `
-							When you hit a creature with one of the attacks granted by your Flurry of Blows, you can impose one of the following effects:
-							- It must succeed on a Dexterity saving throw or be knocked prone.
-							- It must make a Strength saving throw or be pushed 15 feet away.
-							- It can’t take reactions until the end of your next turn.
+							When you hit a creature with one of the attacks granted by your Flurry of Blows, you can impose one of the following effects:<br>
+							• It must succeed on a Dexterity saving throw or be knocked prone.<br>
+							• It must make a Strength saving throw or be pushed 15 feet away.<br>
+							• It can't take reactions until the end of your next turn.
 						`,
 						source: 'monk.open_hand',
 						effects: [
@@ -118,7 +164,7 @@ const monasticTraditionPrompt: FeaturePrompt = {
 						id: 'monk_shadow_arts_01',
 						name: 'Shadow Arts',
 						description: `
-							You can use your ki to cast certain spells like darkness, darkvision, pass without trace, and silence.
+							As an action, you can spend 2 ki points to cast darkness, darkvision, pass without trace, or silence, without providing material components. Additionally, you gain the minor illusion cantrip if you don't already know it.
 						`,
 						source: 'monk.shadow',
 						effects: [
@@ -136,15 +182,183 @@ const monasticTraditionPrompt: FeaturePrompt = {
 				optionDescription: `You harness the elemental forces to perform martial arts techniques.`,
 				nestedPrompts: [
 					{
-						id: 'monk_elements_disciple_01',
-						name: 'Disciple of the Elements',
-						description: `You can spend ki points to cast elemental disciplines.`,
+						id: 'monk_elemental_attunement_01',
+						name: 'Elemental Attunement',
+						description: `
+							You can use your action to briefly control elemental forces nearby, causing one of the following effects of your choice:<br>
+							• Create a harmless, instantaneous sensory effect related to air, earth, fire, or water, such as a shower of sparks, a puff of wind, a spray of light mist, or a gentle rumbling of stone.<br>
+							• Instantaneously light or snuff out a candle, a torch, or a small campfire.<br>
+							• Chill or warm up to 1 pound of nonliving material for up to 1 hour.<br>
+							• Cause earth, fire, water, or mist that can fit within a 1-foot cube to shape itself into a crude form you designate for 1 minute.
+						`,
 						source: 'monk.four_elements',
 						effects: [
 							{
 								target: 'features',
 								action: 'add',
-								value: 'Disciple of the Elements'
+								value: 'Elemental Attunement'
+							}
+						]
+					},
+					{
+						id: 'monk_elemental_disciplines_01',
+						name: 'Elemental Disciplines',
+						description: `
+							You know one elemental discipline of your choice. An elemental discipline requires you to spend ki points each time you use it.
+						`,
+						featureOptions: {
+							placeholderText: 'Choose an Elemental Discipline',
+							options: [
+								{
+									name: 'Fangs of the Fire Snake',
+									optionDescription:
+										'When you use the Attack action on your turn, you can spend 1 ki point to cause tendrils of flame to stretch out from your fists and feet. Your reach with your unarmed strikes increases by 10 feet for that action, as well as the rest of the turn. A hit with such an attack deals fire damage instead of bludgeoning damage, and if you spend 1 ki point when the attack hits, it also deals an extra 1d10 fire damage.',
+									nestedPrompts: [
+										{
+											id: 'monk_fangs_fire_snake_01',
+											name: 'Fangs of the Fire Snake',
+											description:
+												'When you use the Attack action on your turn, you can spend 1 ki point to cause tendrils of flame to stretch out from your fists and feet. Your reach with your unarmed strikes increases by 10 feet for that action, as well as the rest of the turn. A hit with such an attack deals fire damage instead of bludgeoning damage, and if you spend 1 ki point when the attack hits, it also deals an extra 1d10 fire damage.',
+											source: 'monk.four_elements.fangs_fire_snake',
+											effects: [
+												{
+													target: 'features',
+													action: 'add',
+													value: 'Fangs of the Fire Snake'
+												}
+											]
+										}
+									]
+								},
+								{
+									name: 'Fist of Four Thunders',
+									optionDescription: 'You can spend 2 ki points to cast thunderwave.',
+									nestedPrompts: [
+										{
+											id: 'monk_fist_four_thunders_01',
+											name: 'Fist of Four Thunders',
+											description: 'You can spend 2 ki points to cast thunderwave.',
+											source: 'monk.four_elements.fist_four_thunders',
+											effects: [
+												{
+													target: 'features',
+													action: 'add',
+													value: 'Fist of Four Thunders'
+												}
+											]
+										}
+									]
+								},
+								{
+									name: 'Fist of Unbroken Air',
+									optionDescription:
+										"You can create a blast of compressed air that strikes like a mighty fist. As an action, you can spend 2 ki points and choose a creature within 30 feet of you. That creature must make a Strength saving throw. On a failed save, the creature takes 3d10 bludgeoning damage, plus an extra 1d10 bludgeoning damage for each additional ki point you spend, and you can push the creature up to 20 feet away from you and knock it prone. On a successful save, the creature takes half as much damage, and you don't push it or knock it prone.",
+									nestedPrompts: [
+										{
+											id: 'monk_fist_unbroken_air_01',
+											name: 'Fist of Unbroken Air',
+											description:
+												"You can create a blast of compressed air that strikes like a mighty fist. As an action, you can spend 2 ki points and choose a creature within 30 feet of you. That creature must make a Strength saving throw. On a failed save, the creature takes 3d10 bludgeoning damage, plus an extra 1d10 bludgeoning damage for each additional ki point you spend, and you can push the creature up to 20 feet away from you and knock it prone. On a successful save, the creature takes half as much damage, and you don't push it or knock it prone.",
+											source: 'monk.four_elements.fist_unbroken_air',
+											effects: [
+												{
+													target: 'features',
+													action: 'add',
+													value: 'Fist of Unbroken Air'
+												}
+											]
+										}
+									]
+								},
+								{
+									name: 'Rush of Gale Spirits',
+									optionDescription: 'You can spend 2 ki points to cast gust of wind.',
+									nestedPrompts: [
+										{
+											id: 'monk_rush_gale_spirits_01',
+											name: 'Rush of Gale Spirits',
+											description: 'You can spend 2 ki points to cast gust of wind.',
+											source: 'monk.four_elements.rush_gale_spirits',
+											effects: [
+												{
+													target: 'features',
+													action: 'add',
+													value: 'Rush of Gale Spirits'
+												}
+											]
+										}
+									]
+								},
+								{
+									name: 'Shape the Flowing River',
+									optionDescription:
+										"As an action, you can spend 1 ki point to choose an area of ice or water no larger than 30 feet on a side within 120 feet of you. You can change water to ice within the area and vice versa, and you can reshape ice in the area in any manner you choose. You can raise or lower the ice's elevation, create or fill in a trench, erect or flatten a wall, or form a pillar. The extent of any such changes can't exceed half the area's largest dimension. For example, if you affect a 30-foot square, you can create a pillar up to 15 feet high, raise or lower the square's elevation by up to 15 feet, dig a trench up to 15 feet deep, and so on. You can't shape the ice to trap or injure a creature in the area.",
+									nestedPrompts: [
+										{
+											id: 'monk_shape_flowing_river_01',
+											name: 'Shape the Flowing River',
+											description:
+												"As an action, you can spend 1 ki point to choose an area of ice or water no larger than 30 feet on a side within 120 feet of you. You can change water to ice within the area and vice versa, and you can reshape ice in the area in any manner you choose. You can raise or lower the ice's elevation, create or fill in a trench, erect or flatten a wall, or form a pillar. The extent of any such changes can't exceed half the area's largest dimension. For example, if you affect a 30-foot square, you can create a pillar up to 15 feet high, raise or lower the square's elevation by up to 15 feet, dig a trench up to 15 feet deep, and so on. You can't shape the ice to trap or injure a creature in the area.",
+											source: 'monk.four_elements.shape_flowing_river',
+											effects: [
+												{
+													target: 'features',
+													action: 'add',
+													value: 'Shape the Flowing River'
+												}
+											]
+										}
+									]
+								},
+								{
+									name: 'Sweeping Cinder Strike',
+									optionDescription: 'You can spend 2 ki points to cast burning hands.',
+									nestedPrompts: [
+										{
+											id: 'monk_sweeping_cinder_strike_01',
+											name: 'Sweeping Cinder Strike',
+											description: 'You can spend 2 ki points to cast burning hands.',
+											source: 'monk.four_elements.sweeping_cinder_strike',
+											effects: [
+												{
+													target: 'features',
+													action: 'add',
+													value: 'Sweeping Cinder Strike'
+												}
+											]
+										}
+									]
+								},
+								{
+									name: 'Water Whip',
+									optionDescription:
+										"You can spend 2 ki points as an action to create a whip of water that shoves and pulls a creature to unbalance it. A creature that you can see that is within 30 feet of you must make a Dexterity saving throw. On a failed save, the creature takes 3d10 bludgeoning damage, plus an extra 1d10 bludgeoning damage for each additional ki point you spend, and you can either knock it prone or pull it up to 25 feet closer to you. On a successful save, the creature takes half as much damage, and you don't pull it or knock it prone.",
+									nestedPrompts: [
+										{
+											id: 'monk_water_whip_01',
+											name: 'Water Whip',
+											description:
+												"You can spend 2 ki points as an action to create a whip of water that shoves and pulls a creature to unbalance it. A creature that you can see that is within 30 feet of you must make a Dexterity saving throw. On a failed save, the creature takes 3d10 bludgeoning damage, plus an extra 1d10 bludgeoning damage for each additional ki point you spend, and you can either knock it prone or pull it up to 25 feet closer to you. On a successful save, the creature takes half as much damage, and you don't pull it or knock it prone.",
+											source: 'monk.four_elements.water_whip',
+											effects: [
+												{
+													target: 'features',
+													action: 'add',
+													value: 'Water Whip'
+												}
+											]
+										}
+									]
+								}
+							],
+							numPicks: 1
+						},
+						source: 'monk.four_elements',
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Elemental Disciplines'
 							}
 						]
 					}
@@ -163,7 +377,13 @@ const monasticTraditionPrompt: FeaturePrompt = {
 	]
 };
 
-const classFeaturesPrompt: FeaturePrompt[] = [martialArtsPrompt, kiPrompt, unarmoredMovementPrompt];
+const classFeaturesPrompt: FeaturePrompt[] = [
+	martialArtsPrompt,
+	kiPrompt,
+	kiFeaturesPrompt,
+	unarmoredMovementPrompt,
+	deflectMissilesPrompt
+];
 
 export const monk: ClassData = {
 	name: 'Monk',
@@ -194,7 +414,7 @@ export const monk: ClassData = {
 								description: 'Choose a simple melee weapon',
 								type: 'weapon-list',
 								category: 'simple-melee',
-								options: simpleWeapons.filter((w) => w.type === 'melee').map((w) => w.name),
+								options: simpleWeapons.filter((w) => !['Light crossbow', 'Shortbow', 'Sling'].includes(w)),
 								count: 1
 							}
 						]

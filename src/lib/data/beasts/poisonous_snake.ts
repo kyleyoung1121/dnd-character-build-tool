@@ -2,7 +2,7 @@ import type { Beast } from './types';
 
 export const poisonous_snake: Beast = {
 	name: "Poisonous Snake",
-	sources: ["Ranger (Beast Master)", "Warlock (Pact of the Chain)", "Wizard"],
+	sources: ["Ranger", "Warlock (Pact of the Chain)", "Wizard"],
 	type: "beast",
 	size: "Tiny",
 	speed: {

@@ -30,6 +30,7 @@ export type Character = {
 	inventory: string[];
 	attacks: Attack[];
 	spells?: string[];
+	beasts?: string[]; // Selected beast/familiar names for printing
 	hp: number | null;
 	ac: number | null;
 	speed: number | null;

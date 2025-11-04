@@ -2,7 +2,7 @@ import type { Beast } from './types';
 
 export const lizard: Beast = {
 	name: "Lizard",
-	sources: ["Warlock (Pact of the Chain)", "Wizard (Find Familiar)"],
+	sources: ["Druid", "Warlock (Pact of the Chain)", "Wizard (Find Familiar)"],
 	type: "beast",
 	size: "Tiny",
 	speed: {

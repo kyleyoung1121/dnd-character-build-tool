@@ -2,7 +2,7 @@ import type { Beast } from './types';
 
 export const mule: Beast = {
 	name: "Mule",
-	sources: ["Druid", "Ranger (Beast Master)"],
+	sources: ["Druid", "Ranger"],
 	type: "beast",
 	size: "Medium",
 	speed: {

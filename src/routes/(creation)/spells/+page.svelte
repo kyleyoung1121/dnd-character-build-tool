@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { get } from 'svelte/store';
 	import ConflictWarning from '$lib/components/ConflictWarning.svelte';
 	import { character_store, hasSpellAccess } from '$lib/stores/character_store';
 	import { applyChoice } from '$lib/stores/character_store_helpers';
@@ -352,14 +353,25 @@
 	// Persist spell selections to character store
 	function persistSpellSelections() {
 		const scopeId = 'spell_selections';
+		// Store detailed spell selections with metadata in provenance
 		const spellSelections = {
-			spells: Array.from(selectedSpells.entries()).map(([name, metadata]) => ({
-				name,
-				...metadata
-			}))
+			spells: Array.from(selectedSpells.keys()) // Just spell names for character.spells array
 		};
-
+		// Store full metadata separately for restoration
+		const spellMetadata = Array.from(selectedSpells.entries()).map(([name, metadata]) => ({
+			name,
+			...metadata
+		}));
+		
+		// Apply the spell names to character.spells
 		applyChoice(scopeId, spellSelections);
+		
+		// Also store metadata in provenance for restoration
+		// Update the provenance to include metadata
+		const char = get(character_store);
+		if (char._provenance && char._provenance[scopeId]) {
+			(char._provenance[scopeId] as any)._metadata = spellMetadata;
+		}
 	}
 
 	// Restore spell selections from character store
@@ -371,7 +383,27 @@
 		const provenanceData = char._provenance[scopeId];
 
 		if (provenanceData) {
-			// Access data from _set property (character store wraps our data)
+			// Try to get metadata first (new format)
+			const metadata = (provenanceData as any)._metadata;
+			
+			if (metadata && Array.isArray(metadata)) {
+				// New format: use stored metadata
+				selectedSpells = new Map();
+				metadata.forEach((item: any) => {
+					if (item && item.name) {
+						selectedSpells.set(item.name, {
+							tabSource: item.tabSource || '',
+							charClass: item.charClass || '',
+							charSubclass: item.charSubclass || '',
+							charRace: item.charRace || '',
+							charSubrace: item.charSubrace || ''
+						});
+					}
+				});
+				return;
+			}
+			
+			// Fallback to old format
 			const actualData = (provenanceData as any)._set || provenanceData;
 
 			if (actualData.spells && Array.isArray(actualData.spells)) {

@@ -30,7 +30,7 @@ export type Character = {
 	inventory: string[];
 	attacks: Attack[];
 	spells?: string[];
-	beasts?: string[]; // Selected beast/familiar names for printing
+	beasts?: string[];
 	hp: number | null;
 	ac: number | null;
 	speed: number | null;
@@ -69,6 +69,7 @@ export const character_store = writable<Character>({
 	inventory: [],
 	attacks: [],
 	spells: [],
+	beasts: [],
 	hp: null,
 	ac: null,
 	speed: null,

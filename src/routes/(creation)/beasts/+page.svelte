@@ -1,22 +1,23 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
 	import { character_store, getBeastTabName, hasBeastAccess } from '$lib/stores/character_store';
-	import { applyChoice } from '$lib/stores/character_store_helpers';
+	import { applyChoice, revertChanges } from '$lib/stores/character_store_helpers';
 	import { beasts } from '$lib/data/beasts/index';
 	import BeastCard from '$lib/components/BeastCard.svelte';
+	import type { Beast } from '$lib/data/beasts/types';
 
 	// Track selected beasts (max 3)
-	let selectedBeasts = [];
+	let selectedBeasts: Beast[] = [];
 	const MAX_SELECTIONS = 3;
 
 	// Sorting and filtering
 	let sortBy = 'cr'; // 'name' or 'cr' - default to CR
 	let sortDirection = 'desc'; // 'asc' or 'desc' - default to high-to-low
-	let selectedCRs = []; // Will be set based on available CRs
+	let selectedCRs: Number[] = []; // Will be set based on available CRs
 
 	// Convert CR decimal to fraction display
-	function crToDisplay(cr) {
+	function crToDisplay(cr: Number) {
 		if (cr === 0) return '0';
 		if (cr === 0.125) return '1/8';
 		if (cr === 0.25) return '1/4';
@@ -77,7 +78,7 @@
 	$: availableBeasts = beasts.filter(beast => {
 		if (!characterSources) return true;
 		const hasMatchingSource = characterSources.some(charSource => 
-			beast.sources.some(beastSource => beastSource.includes(charSource))
+			beast.sources.some(beastSource => beastSource === charSource)
 		);
 		return hasMatchingSource;
 	});
@@ -114,24 +115,42 @@
 			}
 		});
 
-	function handleBeastSelect(beast) {
+	function handleBeastSelect(beast: Beast) {
+		// Check if this beast is already in our selected beasts list
 		const index = selectedBeasts.findIndex(b => b.name === beast.name);
-		
+
 		if (index >= 0) {
 			// Deselect if already selected
 			selectedBeasts = selectedBeasts.filter(b => b.name !== beast.name);
+			let selectedBeastNames = selectedBeasts.map((beast) => beast.name)
+			
+			// Clear our provenance entry
+			const state = get(character_store);
+			const provKeys = Object.keys(state._provenance || {});
+			for (const key of provKeys) {
+				if (key === "beasts") {
+					revertChanges(state, key);
+				}
+			}
+			// Resubmit our knewest understanding of selected beasts (should now lack the deselected beast)
+			applyChoice(`beasts:`, {
+				beasts: selectedBeastNames
+			});
+
 		} else if (selectedBeasts.length < MAX_SELECTIONS) {
-			// Select if under max limit
+			// Add the beast if we are able to (under the selection limit)
 			selectedBeasts = [...selectedBeasts, beast];
+			let selectedBeastNames = selectedBeasts.map((beast) => beast.name)
+			
+			// Add selection to character store
+			applyChoice(`beasts:`, {
+				beasts: selectedBeastNames
+			});
 		}
 		// If at max capacity and trying to select a new beast, button will be disabled so this won't be called
 	}
 
-	function isBeastSelected(beast) {
-		return selectedBeasts.some(b => b.name === beast.name);
-	}
-
-	function toggleCR(cr) {
+	function toggleCR(cr: Number) {
 		if (selectedCRs.includes(cr)) {
 			selectedCRs = selectedCRs.filter(c => c !== cr);
 		} else {
@@ -146,6 +165,14 @@
 	function deselectAllCRs() {
 		selectedCRs = [];
 	}
+
+	// Check for existing background selection on mount and restore feature selections
+	onMount(() => {
+		const state = get(character_store);
+		let previous_beasts = state.beasts;
+		selectedBeasts = availableBeasts.filter((beast) => previous_beasts?.some((beastName) => beastName === beast.name))
+
+	});
 </script>
 
 <div class="page-container">
@@ -264,8 +291,8 @@
 					{#each filteredBeasts as beast (beast.name)}
 						<BeastCard 
 							{beast} 
-							isSelected={isBeastSelected(beast)}
-							isDisabled={!isBeastSelected(beast) && selectedBeasts.length >= MAX_SELECTIONS}
+							isSelected={selectedBeasts.some(b => b.name === beast.name)}
+							isDisabled={!selectedBeasts.some(b => b.name === beast.name) && selectedBeasts.length >= MAX_SELECTIONS}
 							onSelect={handleBeastSelect}
 						/>
 					{/each}

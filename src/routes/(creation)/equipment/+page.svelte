@@ -116,7 +116,7 @@
 		// Restore each equipment choice
 		currentClass.startingEquipment.choices.forEach((choice, choiceIndex) => {
 			const scopeId = `class_equipment_${choiceIndex}`;
-			const provenanceData = char._provenance![scopeId];
+			const  provenanceData = char._provenance![scopeId];
 
 			if (provenanceData) {
 				if (isEquipmentChoice(choice)) {
@@ -281,7 +281,11 @@
 		equipmentChoices = newEquipmentChoices;
 
 		// Store the selection state in provenance for persistence
-		const selectionState = {
+		const selectionState: {
+			selectedOption: unknown,
+			subChoiceSelections: unknown,
+			inventory: string[]
+		} = {
 			selectedOption: optionIndex,
 			subChoiceSelections: {},
 			inventory: []

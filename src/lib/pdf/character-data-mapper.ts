@@ -160,7 +160,7 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 	
 	// Format class and level
 	const classAndLevel = character.class 
-		? `${character.class} ${character.subclass ? `(${character.subclass}) ` : ''}Level 3`
+		? `${character.class} ${character.subclass ? `(${character.subclass}) ` : ''}`
 		: '';
 	
 	// Format species (with subrace if applicable)
@@ -210,34 +210,34 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 		
 		// Page 1 - Saving Throws
 		savingThrows: {
-			strength: formatModifier(getSavingThrowModifier(character, 'Strength', strMod)),
-			dexterity: formatModifier(getSavingThrowModifier(character, 'Dexterity', dexMod)),
-			constitution: formatModifier(getSavingThrowModifier(character, 'Constitution', conMod)),
-			intelligence: formatModifier(getSavingThrowModifier(character, 'Intelligence', intMod)),
-			wisdom: formatModifier(getSavingThrowModifier(character, 'Wisdom', wisMod)),
-			charisma: formatModifier(getSavingThrowModifier(character, 'Charisma', chaMod))
+			strength: `${formatModifier(getSavingThrowModifier(character, 'Strength', strMod))} Strength Save`,
+			dexterity: `${formatModifier(getSavingThrowModifier(character, 'Dexterity', dexMod))} Dexterity Save`,
+			constitution: `${formatModifier(getSavingThrowModifier(character, 'Constitution', conMod))} Constitution Save`,
+			intelligence: `${formatModifier(getSavingThrowModifier(character, 'Intelligence', intMod))} Intelligence Save`,
+			wisdom: `${formatModifier(getSavingThrowModifier(character, 'Wisdom', wisMod))} Wisdom Save`,
+			charisma: `${formatModifier(getSavingThrowModifier(character, 'Charisma', chaMod))} Charisma Save`
 		},
 		
 		// Page 1 - Skills
 		skills: {
-			acrobatics: formatModifier(getSkillModifier(character, dexMod, 'Acrobatics')),
-			animalHandling: formatModifier(getSkillModifier(character, wisMod, 'Animal Handling')),
-			arcana: formatModifier(getSkillModifier(character, intMod, 'Arcana')),
-			athletics: formatModifier(getSkillModifier(character, strMod, 'Athletics')),
-			deception: formatModifier(getSkillModifier(character, chaMod, 'Deception')),
-			history: formatModifier(getSkillModifier(character, intMod, 'History')),
-			insight: formatModifier(getSkillModifier(character, wisMod, 'Insight')),
-			intimidation: formatModifier(getSkillModifier(character, chaMod, 'Intimidation')),
-			investigation: formatModifier(getSkillModifier(character, intMod, 'Investigation')),
-			medicine: formatModifier(getSkillModifier(character, wisMod, 'Medicine')),
-			nature: formatModifier(getSkillModifier(character, intMod, 'Nature')),
-			perception: formatModifier(getSkillModifier(character, wisMod, 'Perception')),
-			performance: formatModifier(getSkillModifier(character, chaMod, 'Performance')),
-			persuasion: formatModifier(getSkillModifier(character, chaMod, 'Persuasion')),
-			religion: formatModifier(getSkillModifier(character, intMod, 'Religion')),
-			sleightOfHand: formatModifier(getSkillModifier(character, dexMod, 'Sleight of Hand')),
-			stealth: formatModifier(getSkillModifier(character, dexMod, 'Stealth')),
-			survival: formatModifier(getSkillModifier(character, wisMod, 'Survival'))
+			acrobatics: `${formatModifier(getSkillModifier(character, dexMod, 'Acrobatics'))} Acrobatics`,
+			animalHandling: `${formatModifier(getSkillModifier(character, wisMod, 'Animal Handling'))} Animal Handling`,
+			arcana: `${formatModifier(getSkillModifier(character, intMod, 'Arcana'))} Arcana`,
+			athletics: `${formatModifier(getSkillModifier(character, strMod, 'Athletics'))} Athletics`,
+			deception: `${formatModifier(getSkillModifier(character, chaMod, 'Deception'))} Deception`,
+			history: `${formatModifier(getSkillModifier(character, intMod, 'History'))} History`,
+			insight: `${formatModifier(getSkillModifier(character, wisMod, 'Insight'))} Insight`,
+			intimidation: `${formatModifier(getSkillModifier(character, chaMod, 'Intimidation'))} Intimidation`,
+			investigation: `${formatModifier(getSkillModifier(character, intMod, 'Investigation'))} Investigation`,
+			medicine: `${formatModifier(getSkillModifier(character, wisMod, 'Medicine'))} Medicine`,
+			nature: `${formatModifier(getSkillModifier(character, intMod, 'Nature'))} Nature`,
+			perception: `${formatModifier(getSkillModifier(character, wisMod, 'Perception'))} Perception`,
+			performance: `${formatModifier(getSkillModifier(character, chaMod, 'Performance'))} Performance`,
+			persuasion: `${formatModifier(getSkillModifier(character, chaMod, 'Persuasion'))} Persuasion`,
+			religion: `${formatModifier(getSkillModifier(character, intMod, 'Religion'))} Religion`,
+			sleightOfHand: `${formatModifier(getSkillModifier(character, dexMod, 'Sleight of Hand'))} Sleight of Hand`,
+			stealth: `${formatModifier(getSkillModifier(character, dexMod, 'Stealth'))} Stealth`,
+			survival: `${formatModifier(getSkillModifier(character, wisMod, 'Survival'))} Survival`
 		},
 		
 		passivePerception: String(10 + getSkillModifier(character, wisMod, 'Perception')),

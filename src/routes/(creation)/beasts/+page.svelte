@@ -166,13 +166,13 @@
 		const provenanceData = char._provenance[scopeId];
 
 		if (provenanceData) {
-			const actualData = (provenanceData as any)._set || provenanceData;
+			const actualData = provenanceData._set || provenanceData;
 			
 			if (actualData.beasts && Array.isArray(actualData.beasts)) {
 				// Restore beast selections from names
 				selectedBeasts = actualData.beasts
-					.map((name: string) => beasts.find(b => b.name === name))
-					.filter((b: any) => b !== undefined); // Filter out any beasts that no longer exist
+					.map((name) => beasts.find(b => b.name === name))
+					.filter((b) => b !== undefined); // Filter out any beasts that no longer exist
 			}
 		}
 	}

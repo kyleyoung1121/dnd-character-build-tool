@@ -1,993 +1,327 @@
 <script lang="ts">
 	import { character_store } from '$lib/stores/character_store';
 	import type { Character } from '$lib/stores/character_store';
+	import { mapCharacterToSheetData } from '$lib/pdf/character-data-mapper';
+	import { generateCharacterSheet, downloadCharacterSheet } from '$lib/pdf/pdf-generator';
 	import { onMount } from 'svelte';
 
-	let showDialog = false;
-	let pageStackRef: HTMLDivElement;
-	let html2pdf: any = null;
-
-	// Character data
 	let character: Character;
+	let pdfUrl: string | null = null;
+	let isGenerating = false;
+	let errorMessage = '';
+	let showExportDialog = false;
+
 	const unsubscribe = character_store.subscribe((value) => {
 		character = value;
+		if (typeof window !== 'undefined') {
+			generatePreview();
+		}
 	});
 
-	// Load html2pdf only in browser
-	onMount(async () => {
-		if (typeof window !== 'undefined') {
-			const mod = await import('html2pdf.js');
-			html2pdf = mod.default;
-		}
+	onMount(() => {
+		generatePreview();
 		return () => {
 			unsubscribe();
+			if (pdfUrl) {
+				URL.revokeObjectURL(pdfUrl);
+			}
 		};
 	});
 
-	function toggleDialog() {
-		showDialog = !showDialog;
-	}
-
-	async function downloadPDF() {
-		if (!html2pdf) {
-			console.error('html2pdf not yet loaded');
-			return;
+	async function generatePreview() {
+		if (!character) return;
+		
+		isGenerating = true;
+		errorMessage = '';
+		
+		try {
+			if (pdfUrl) {
+				URL.revokeObjectURL(pdfUrl);
+			}
+			
+			const sheetData = mapCharacterToSheetData(character);
+			pdfUrl = await generateCharacterSheet(sheetData);
+		} catch (error) {
+			console.error('Failed to generate PDF preview:', error);
+			errorMessage = error instanceof Error ? error.message : 'Failed to generate PDF preview';
+		} finally {
+			isGenerating = false;
 		}
-		showDialog = false;
-
-		const element = pageStackRef;
-		if (!element) return;
-
-		const opt = {
-			margin: 0.25,
-			filename: `${character.name || 'character'}_sheet.pdf`,
-			image: { type: 'jpeg', quality: 0.98 },
-			html2canvas: { scale: 2, useCORS: true },
-			jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-			pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-		};
-
-		await html2pdf().from(element).set(opt).save();
 	}
 
-	function handleDummy(action: string) {
-		alert(`${action} clicked`);
+	async function handleDownload() {
+		try {
+			const sheetData = mapCharacterToSheetData(character);
+			await downloadCharacterSheet(sheetData, `${character.name || 'character'}-sheet.pdf`);
+			showExportDialog = false;
+		} catch (error) {
+			console.error('Failed to download PDF:', error);
+			errorMessage = error instanceof Error ? error.message : 'Failed to download PDF';
+		}
 	}
 
-	// Helper function to calculate ability modifier
-	function getModifier(score: number | null): string {
-		if (score === null) return '+0';
-		const mod = Math.floor((score - 10) / 2);
-		return mod >= 0 ? `+${mod}` : `${mod}`;
+	function toggleExportDialog() {
+		showExportDialog = !showExportDialog;
+	}
+
+	function handlePrint() {
+		if (pdfUrl) {
+			const iframe = document.createElement('iframe');
+			iframe.style.display = 'none';
+			iframe.src = pdfUrl;
+			document.body.appendChild(iframe);
+			iframe.onload = () => {
+				iframe.contentWindow?.print();
+			};
+		}
 	}
 </script>
 
-<div class="export-container">
-	<!-- Printable region -->
-	<div bind:this={pageStackRef} class="page-stack">
-		<!-- PAGE 1 -->
-		<div class="sheet-page">
-			<!-- Header Section -->
-			<div class="sheet-header">
-				<div class="header-row">
-					<div class="field char-name">
-						<label>Character Name</label>
-						<div class="field-value"></div>
-					</div>
-				</div>
-				<div class="header-row three-col">
-					<div class="field">
-						<label>Class & Level</label>
-						<div class="field-value"></div>
-					</div>
-					<div class="field">
-						<label>Background</label>
-						<div class="field-value"></div>
-					</div>
-					<div class="field">
-						<label>Species</label>
-						<div class="field-value"></div>
-					</div>
-				</div>
-				<div class="header-row three-col">
-					<div class="field">
-						<label>Alignment</label>
-						<div class="field-value"></div>
-					</div>
-					<div class="field">
-						<label>Experience Points</label>
-						<div class="field-value"></div>
-					</div>
-					<div class="field">
-						<label>Proficiency Bonus</label>
-						<div class="field-value"></div>
-					</div>
-				</div>
+<div class="export-page">
+	<div class="content-wrapper">
+		{#if errorMessage}
+			<div class="error-message">
+				<h3>Error Generating Character Sheet</h3>
+				<p>{errorMessage}</p>
+				<button class="btn-retry" on:click={generatePreview}>
+					Try Again
+				</button>
+			</div>
+		{:else if isGenerating}
+			<div class="loading-state">
+				<div class="spinner"></div>
+				<p>Generating your character sheet...</p>
+			</div>
+		{:else if pdfUrl}
+			<div class="pdf-preview-container">
+				<iframe
+					src="{pdfUrl}#toolbar=0&navpanes=0&scrollbar=1"
+					class="pdf-viewer"
+					title="Character sheet"
+				></iframe>
 			</div>
 
-			<!-- Main Content: 3 columns -->
-			<div class="sheet-main">
-				<!-- LEFT COLUMN: Ability Scores -->
-				<div class="column left-column">
-					<div class="ability-scores-section">
-						<h3 class="section-title">Ability Scores</h3>
-						
-						{#each ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'] as ability}
-							<div class="ability-box">
-								<div class="ability-name">{ability}</div>
-								<div class="ability-modifier"></div>
-								<div class="ability-score"></div>
-							</div>
-						{/each}
-					</div>
-
-					<!-- Inspiration -->
-					<div class="inspiration-box">
-						<label>Inspiration</label>
-						<div class="checkbox"></div>
-					</div>
-
-					<!-- Proficiency Bonus (larger display) -->
-					<div class="proficiency-display">
-						<label>Proficiency Bonus</label>
-						<div class="prof-value"></div>
-					</div>
-
-					<!-- Saving Throws -->
-					<div class="saves-section">
-						<h3 class="section-title">Saving Throws</h3>
-						{#each ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'] as ability}
-							<div class="save-row">
-								<div class="checkbox"></div>
-								<div class="save-value"></div>
-								<label>{ability}</label>
-							</div>
-						{/each}
-					</div>
-
-					<!-- Skills -->
-					<div class="skills-section">
-						<h3 class="section-title">Skills</h3>
-						{#each [
-							{ name: 'Acrobatics', ability: 'Dex' },
-							{ name: 'Animal Handling', ability: 'Wis' },
-							{ name: 'Arcana', ability: 'Int' },
-							{ name: 'Athletics', ability: 'Str' },
-							{ name: 'Deception', ability: 'Cha' },
-							{ name: 'History', ability: 'Int' },
-							{ name: 'Insight', ability: 'Wis' },
-							{ name: 'Intimidation', ability: 'Cha' },
-							{ name: 'Investigation', ability: 'Int' },
-							{ name: 'Medicine', ability: 'Wis' },
-							{ name: 'Nature', ability: 'Int' },
-							{ name: 'Perception', ability: 'Wis' },
-							{ name: 'Performance', ability: 'Cha' },
-							{ name: 'Persuasion', ability: 'Cha' },
-							{ name: 'Religion', ability: 'Int' },
-							{ name: 'Sleight of Hand', ability: 'Dex' },
-							{ name: 'Stealth', ability: 'Dex' },
-							{ name: 'Survival', ability: 'Wis' }
-						] as skill}
-							<div class="skill-row">
-								<div class="checkbox"></div>
-								<div class="skill-value"></div>
-								<label>{skill.name} <span class="ability-abbr">({skill.ability})</span></label>
-							</div>
-						{/each}
-					</div>
-
-					<!-- Passive Perception -->
-					<div class="passive-perception">
-						<label>Passive Wisdom (Perception)</label>
-						<div class="passive-value"></div>
-					</div>
-				</div>
-
-				<!-- MIDDLE COLUMN: Combat Stats -->
-				<div class="column middle-column">
-					<!-- Combat Stats -->
-					<div class="combat-stats">
-						<div class="stat-box ac-box">
-							<div class="stat-value"></div>
-							<label>Armor Class</label>
-						</div>
-						<div class="stat-box initiative-box">
-							<div class="stat-value"></div>
-							<label>Initiative</label>
-						</div>
-						<div class="stat-box speed-box">
-							<div class="stat-value"></div>
-							<label>Speed</label>
-						</div>
-					</div>
-
-					<!-- HP Box -->
-					<div class="hp-section">
-						<div class="hp-max">
-							<label>Hit Point Maximum</label>
-							<div class="field-value"></div>
-						</div>
-						<div class="hp-current">
-							<label>Current Hit Points</label>
-							<div class="large-field"></div>
-						</div>
-						<div class="hp-temp">
-							<label>Temporary Hit Points</label>
-							<div class="field-value"></div>
-						</div>
-					</div>
-
-					<!-- Hit Dice & Death Saves -->
-					<div class="hit-dice-death">
-						<div class="hit-dice-box">
-							<label>Hit Dice</label>
-							<div class="field-value"></div>
-							<label class="sublabel">Total</label>
-						</div>
-						<div class="death-saves">
-							<h4>Death Saves</h4>
-							<div class="save-group">
-								<label>Successes</label>
-								<div class="bubbles">
-									<div class="bubble"></div>
-									<div class="bubble"></div>
-									<div class="bubble"></div>
-								</div>
-							</div>
-							<div class="save-group">
-								<label>Failures</label>
-								<div class="bubbles">
-									<div class="bubble"></div>
-									<div class="bubble"></div>
-									<div class="bubble"></div>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- Attacks & Spellcasting -->
-					<div class="attacks-section">
-						<h3 class="section-title">Attacks & Spellcasting</h3>
-						<div class="attacks-header">
-							<span class="col-name">Name</span>
-							<span class="col-bonus">Atk Bonus</span>
-							<span class="col-damage">Damage/Type</span>
-						</div>
-						<div class="attack-rows">
-							<div class="attack-row">
-								<div class="attack-name"></div>
-								<div class="attack-bonus"></div>
-								<div class="attack-damage"></div>
-							</div>
-							<div class="attack-row">
-								<div class="attack-name"></div>
-								<div class="attack-bonus"></div>
-								<div class="attack-damage"></div>
-							</div>
-							<div class="attack-row">
-								<div class="attack-name"></div>
-								<div class="attack-bonus"></div>
-								<div class="attack-damage"></div>
-							</div>
-							<div class="attack-row">
-								<div class="attack-name"></div>
-								<div class="attack-bonus"></div>
-								<div class="attack-damage"></div>
-							</div>
-							<div class="attack-row">
-								<div class="attack-name"></div>
-								<div class="attack-bonus"></div>
-								<div class="attack-damage"></div>
-							</div>
-						</div>
-					</div>
-
-					<!-- Equipment -->
-					<div class="equipment-section">
-						<h3 class="section-title">Equipment</h3>
-						<div class="equipment-list">
-							<div class="equipment-line"></div>
-							<div class="equipment-line"></div>
-							<div class="equipment-line"></div>
-							<div class="equipment-line"></div>
-							<div class="equipment-line"></div>
-							<div class="equipment-line"></div>
-							<div class="equipment-line"></div>
-							<div class="equipment-line"></div>
-						</div>
-					</div>
-				</div>
-
-				<!-- RIGHT COLUMN: Features & Traits -->
-				<div class="column right-column">
-					<!-- Proficiencies & Languages -->
-					<div class="proficiencies-section">
-						<h3 class="section-title">Other Proficiencies & Languages</h3>
-						<div class="text-area"></div>
-					</div>
-
-					<!-- Features & Traits -->
-					<div class="features-section">
-						<h3 class="section-title">Features & Traits</h3>
-						<div class="text-area large"></div>
-					</div>
-				</div>
+			<!-- Floating Action Button -->
+			<button class="fab" on:click={toggleExportDialog}>
+				Finish Export
+			</button>
+		{:else}
+			<div class="empty-state">
+				<p>No character data available</p>
 			</div>
-		</div>
-
-		<!-- PAGE 2 -->
-		<div class="sheet-page">
-			<div class="page2-header">
-				<div class="field char-name-p2">
-					<label>Character Name</label>
-					<div class="field-value"></div>
-				</div>
-			</div>
-
-			<!-- Character Appearance & Backstory -->
-			<div class="character-description">
-				<div class="desc-grid">
-					<div class="field">
-						<label>Age</label>
-						<div class="field-value"></div>
-					</div>
-					<div class="field">
-						<label>Height</label>
-						<div class="field-value"></div>
-					</div>
-					<div class="field">
-						<label>Weight</label>
-						<div class="field-value"></div>
-					</div>
-					<div class="field">
-						<label>Eyes</label>
-						<div class="field-value"></div>
-					</div>
-					<div class="field">
-						<label>Skin</label>
-						<div class="field-value"></div>
-					</div>
-					<div class="field">
-						<label>Hair</label>
-						<div class="field-value"></div>
-					</div>
-				</div>
-			</div>
-
-			<!-- Character Portrait/Sketch Area -->
-			<div class="character-portrait">
-				<label>Character Appearance</label>
-				<div class="portrait-box"></div>
-			</div>
-
-			<!-- Backstory & Traits -->
-			<div class="backstory-section">
-				<div class="backstory-field">
-					<label>Personality Traits</label>
-					<div class="text-area small"></div>
-				</div>
-				<div class="backstory-field">
-					<label>Ideals</label>
-					<div class="text-area small"></div>
-				</div>
-				<div class="backstory-field">
-					<label>Bonds</label>
-					<div class="text-area small"></div>
-				</div>
-				<div class="backstory-field">
-					<label>Flaws</label>
-					<div class="text-area small"></div>
-				</div>
-			</div>
-
-			<!-- Additional Features & Traits (continued from page 1) -->
-			<div class="additional-features">
-				<h3 class="section-title">Additional Features & Traits</h3>
-				<div class="text-area large"></div>
-			</div>
-
-			<!-- Treasure & Notes -->
-			<div class="treasure-section">
-				<h3 class="section-title">Treasure & Notes</h3>
-				<div class="text-area medium"></div>
-			</div>
-		</div>
+		{/if}
 	</div>
 
-	<!-- Floating download button -->
-	<button class="export-fab" on:click={toggleDialog}>Finish Export</button>
-
-	<!-- Modal -->
-	{#if showDialog}
-		<div class="dialog-backdrop" on:click={toggleDialog} role="button" tabindex="-1"></div>
+	<!-- Export Dialog -->
+	{#if showExportDialog}
+		<div class="dialog-backdrop" on:click={toggleExportDialog} role="button" tabindex="-1" 
+			on:keydown={(e) => e.key === 'Escape' && toggleExportDialog()}>
+		</div>
 		<div class="dialog" role="dialog">
-			<h2>Export Options</h2>
-			<button on:click={downloadPDF}>Download as PDF</button>
-			<button on:click={() => handleDummy('Send to E&D Team')}>Send to E&D Team</button>
-			<button on:click={() => handleDummy('Save Character')}>Save Character</button>
-			<button class="close-btn" on:click={toggleDialog}>Close</button>
+			<h2>Export Your Character</h2>
+			<p>Your character sheet is ready to export.</p>
+			
+			<div class="dialog-actions">
+				<button class="btn-primary" on:click={handleDownload}>
+					Download PDF
+				</button>
+				<button class="btn-secondary" on:click={handlePrint}>
+					Print
+				</button>
+			</div>
+			
+			<button class="btn-close" on:click={toggleExportDialog}>Close</button>
 		</div>
 	{/if}
 </div>
 
 <style>
-	.export-container {
-		margin-top: 4rem;
-		padding-bottom: 5rem;
-		display: flex;
-		justify-content: center;
-		background: #e5e7eb;
-	}
-
-	.page-stack {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		width: 100%;
-		padding: 2rem 0;
-	}
-
-	/* Page styling */
-	.sheet-page {
-		width: 8.5in;
-		min-height: 11in;
+	.export-page {
+		min-height: 100vh;
 		background: white;
-		color: #000;
-		border: 1px solid #999;
-		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-		padding: 0.5in;
-		margin-bottom: 2rem;
-		box-sizing: border-box;
-		font-family: 'Arial', sans-serif;
-		font-size: 9pt;
-		page-break-after: always;
+		padding: 6rem 2rem 2rem 2rem;
 	}
 
-	/* Header Section */
-	.sheet-header {
-		margin-bottom: 0.5rem;
-	}
-
-	.header-row {
-		display: flex;
-		gap: 0.5rem;
-		margin-bottom: 0.3rem;
-	}
-
-	.header-row.three-col {
-		display: grid;
-		grid-template-columns: 1fr 1fr 1fr;
-		gap: 0.5rem;
-	}
-
-	.field {
-		display: flex;
-		flex-direction: column;
-	}
-
-	.field label {
-		font-size: 7pt;
-		font-weight: bold;
-		text-transform: uppercase;
-		margin-bottom: 2px;
-		color: #555;
-	}
-
-	.field-value {
-		border-bottom: 1px solid #000;
-		min-height: 18px;
-		padding: 2px 4px;
-	}
-
-	.char-name {
-		flex: 1;
-	}
-
-	.char-name .field-value {
-		font-size: 12pt;
-		font-weight: bold;
-	}
-
-	/* Main Content - 3 column layout */
-	.sheet-main {
-		display: grid;
-		grid-template-columns: 1.8in 2.5in 3in;
-		gap: 0.2in;
-		margin-top: 0.2in;
-	}
-
-	.column {
-		display: flex;
-		flex-direction: column;
-		gap: 0.15in;
-	}
-
-	.section-title {
-		font-size: 9pt;
-		font-weight: bold;
-		text-transform: uppercase;
-		margin: 0 0 0.1in 0;
-		padding: 3px 6px;
-		background: #f3f4f6;
-		border: 1px solid #999;
+	.header {
+		max-width: 1000px;
+		margin: 0 auto 2rem auto;
 		text-align: center;
 	}
 
-	/* Ability Scores */
-	.ability-scores-section {
-		display: flex;
-		flex-direction: column;
-		gap: 0.08in;
+	.header p {
+		font-size: 1rem;
+		color: #666;
+		margin: 0;
 	}
 
-	.ability-box {
-		border: 1px solid #999;
-		text-align: center;
-		padding: 4px;
-		background: #f9f9f9;
+	.content-wrapper {
+		max-width: 1000px;
+		margin: 0 auto;
 	}
 
-	.ability-name {
-		font-size: 7pt;
-		font-weight: bold;
-		text-transform: uppercase;
-		color: #555;
-	}
-
-	.ability-modifier {
-		font-size: 16pt;
-		font-weight: bold;
-		min-height: 24px;
-		border-bottom: 1px solid #ccc;
-		margin: 2px 0;
-	}
-
-	.ability-score {
-		border: 1px solid #999;
-		width: 30px;
-		height: 30px;
-		margin: 4px auto 0;
-		border-radius: 50%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
+	/* Error State */
+	.error-message {
 		background: white;
-	}
-
-	/* Inspiration */
-	.inspiration-box {
-		border: 1px solid #999;
-		padding: 6px;
+		border: 2px solid #dc2626;
+		border-radius: 8px;
+		padding: 2rem;
 		text-align: center;
 	}
 
-	.inspiration-box label {
-		font-size: 7pt;
-		font-weight: bold;
-		text-transform: uppercase;
-		display: block;
-		margin-bottom: 4px;
+	.error-message h3 {
+		color: #dc2626;
+		font-size: 1.25rem;
+		margin: 0 0 0.5rem 0;
 	}
 
-	.checkbox {
-		width: 16px;
-		height: 16px;
-		border: 2px solid #000;
-		margin: 0 auto;
-		border-radius: 3px;
-	}
-
-	/* Proficiency Bonus */
-	.proficiency-display {
-		border: 1px solid #999;
-		padding: 6px;
-		text-align: center;
-	}
-
-	.proficiency-display label {
-		font-size: 7pt;
-		font-weight: bold;
-		text-transform: uppercase;
-		display: block;
-		margin-bottom: 4px;
-	}
-
-	.prof-value {
-		font-size: 14pt;
-		font-weight: bold;
-		min-height: 24px;
-		border: 1px solid #999;
-		border-radius: 50%;
-		width: 36px;
-		height: 36px;
-		margin: 0 auto;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	/* Saving Throws */
-	.saves-section {
-		border: 1px solid #999;
-		padding: 6px;
-	}
-
-	.save-row,
-	.skill-row {
-		display: flex;
-		align-items: center;
-		gap: 6px;
-		margin-bottom: 3px;
-		font-size: 8pt;
-	}
-
-	.save-row .checkbox,
-	.skill-row .checkbox {
-		width: 12px;
-		height: 12px;
-		flex-shrink: 0;
-	}
-
-	.save-value,
-	.skill-value {
-		border-bottom: 1px solid #999;
-		width: 32px;
-		min-height: 14px;
-		text-align: center;
-		flex-shrink: 0;
-	}
-
-	.save-row label,
-	.skill-row label {
-		font-size: 8pt;
-		flex: 1;
-	}
-
-	/* Skills */
-	.skills-section {
-		border: 1px solid #999;
-		padding: 6px;
-	}
-
-	.ability-abbr {
+	.error-message p {
 		color: #666;
-		font-size: 7pt;
+		margin: 0 0 1rem 0;
 	}
 
-	/* Passive Perception */
-	.passive-perception {
-		border: 1px solid #999;
-		padding: 6px;
-		text-align: center;
-	}
-
-	.passive-perception label {
-		font-size: 7pt;
-		font-weight: bold;
-		text-transform: uppercase;
-		display: block;
-		margin-bottom: 4px;
-	}
-
-	.passive-value {
-		border: 1px solid #999;
-		width: 36px;
-		height: 36px;
-		margin: 0 auto;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 12pt;
-		font-weight: bold;
-		border-radius: 4px;
-	}
-
-	/* Combat Stats */
-	.combat-stats {
-		display: flex;
-		justify-content: space-between;
-		gap: 0.1in;
-	}
-
-	.stat-box {
-		flex: 1;
-		border: 1px solid #999;
-		text-align: center;
-		padding: 8px 4px;
-		background: #f9f9f9;
-	}
-
-	.stat-value {
-		font-size: 18pt;
-		font-weight: bold;
-		min-height: 32px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		border-bottom: 1px solid #ccc;
-		margin-bottom: 4px;
-	}
-
-	.stat-box label {
-		font-size: 7pt;
-		font-weight: bold;
-		text-transform: uppercase;
-		color: #555;
-	}
-
-	/* HP Section */
-	.hp-section {
-		border: 1px solid #999;
-		padding: 8px;
-	}
-
-	.hp-max,
-	.hp-temp {
-		margin-bottom: 6px;
-	}
-
-	.hp-max label,
-	.hp-temp label {
-		font-size: 7pt;
-		font-weight: bold;
-		text-transform: uppercase;
-		display: block;
-		margin-bottom: 2px;
-		color: #555;
-	}
-
-	.large-field {
-		border: 1px solid #999;
-		min-height: 50px;
-		background: #fff;
-	}
-
-	/* Hit Dice & Death Saves */
-	.hit-dice-death {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 0.1in;
-	}
-
-	.hit-dice-box {
-		border: 1px solid #999;
-		padding: 8px;
-		text-align: center;
-	}
-
-	.hit-dice-box label {
-		font-size: 7pt;
-		font-weight: bold;
-		text-transform: uppercase;
-		display: block;
-		margin-bottom: 4px;
-	}
-
-	.hit-dice-box .field-value {
-		min-height: 24px;
-		margin-bottom: 4px;
-	}
-
-	.sublabel {
-		font-size: 6pt !important;
-		color: #666;
-	}
-
-	.death-saves {
-		border: 1px solid #999;
-		padding: 8px;
-	}
-
-	.death-saves h4 {
-		font-size: 8pt;
-		font-weight: bold;
-		text-transform: uppercase;
-		margin: 0 0 6px 0;
-		text-align: center;
-	}
-
-	.save-group {
-		margin-bottom: 4px;
-	}
-
-	.save-group label {
-		font-size: 7pt;
-		font-weight: bold;
-		display: block;
-		margin-bottom: 2px;
-	}
-
-	.bubbles {
-		display: flex;
-		gap: 6px;
-	}
-
-	.bubble {
-		width: 14px;
-		height: 14px;
-		border: 2px solid #000;
-		border-radius: 50%;
-	}
-
-	/* Attacks */
-	.attacks-section {
-		border: 1px solid #999;
-		padding: 8px;
-	}
-
-	.attacks-header {
-		display: grid;
-		grid-template-columns: 2fr 1fr 2fr;
-		gap: 4px;
-		font-size: 7pt;
-		font-weight: bold;
-		text-transform: uppercase;
-		padding-bottom: 4px;
-		border-bottom: 1px solid #999;
-		margin-bottom: 4px;
-	}
-
-	.attack-row {
-		display: grid;
-		grid-template-columns: 2fr 1fr 2fr;
-		gap: 4px;
-		margin-bottom: 3px;
-	}
-
-	.attack-name,
-	.attack-bonus,
-	.attack-damage {
-		border-bottom: 1px solid #999;
-		min-height: 14px;
-		font-size: 8pt;
-	}
-
-	/* Equipment */
-	.equipment-section {
-		border: 1px solid #999;
-		padding: 8px;
-	}
-
-	.equipment-list {
-		display: flex;
-		flex-direction: column;
-		gap: 4px;
-	}
-
-	.equipment-line {
-		border-bottom: 1px solid #999;
-		min-height: 14px;
-	}
-
-	/* Proficiencies & Languages */
-	.proficiencies-section {
-		border: 1px solid #999;
-		padding: 8px;
-	}
-
-	.text-area {
-		border: 1px solid #ccc;
-		min-height: 80px;
-		background: #fff;
-		padding: 4px;
-	}
-
-	.text-area.small {
-		min-height: 50px;
-	}
-
-	.text-area.medium {
-		min-height: 120px;
-	}
-
-	.text-area.large {
-		min-height: 200px;
-	}
-
-	/* Features & Traits */
-	.features-section {
-		border: 1px solid #999;
-		padding: 8px;
-		flex: 1;
-	}
-
-	/* PAGE 2 */
-	.page2-header {
-		margin-bottom: 0.3in;
-	}
-
-	.char-name-p2 {
-		width: 100%;
-	}
-
-	.character-description {
-		margin-bottom: 0.2in;
-	}
-
-	.desc-grid {
-		display: grid;
-		grid-template-columns: repeat(6, 1fr);
-		gap: 0.1in;
-	}
-
-	.character-portrait {
-		border: 1px solid #999;
-		padding: 8px;
-		margin-bottom: 0.2in;
-	}
-
-	.character-portrait label {
-		font-size: 8pt;
-		font-weight: bold;
-		text-transform: uppercase;
-		display: block;
-		margin-bottom: 6px;
-		text-align: center;
-	}
-
-	.portrait-box {
-		border: 1px solid #ccc;
-		min-height: 2in;
-		background: #fafafa;
-	}
-
-	.backstory-section {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 0.15in;
-		margin-bottom: 0.2in;
-	}
-
-	.backstory-field {
-		border: 1px solid #999;
-		padding: 8px;
-	}
-
-	.backstory-field label {
-		font-size: 8pt;
-		font-weight: bold;
-		text-transform: uppercase;
-		display: block;
-		margin-bottom: 4px;
-	}
-
-	.additional-features {
-		border: 1px solid #999;
-		padding: 8px;
-		margin-bottom: 0.2in;
-	}
-
-	.treasure-section {
-		border: 1px solid #999;
-		padding: 8px;
-	}
-
-	/* Floating Button */
-	.export-fab {
-		position: fixed;
-		bottom: 1.5rem;
-		right: 1.5rem;
-		background: #2563eb;
-		color: #fff;
-		font-weight: 600;
-		padding: 0.75rem 1.25rem;
-		border-radius: 9999px;
+	.btn-retry {
+		background: #dc2626;
+		color: white;
 		border: none;
+		border-radius: 6px;
+		padding: 0.75rem 1.5rem;
+		font-size: 1rem;
+		font-weight: 500;
 		cursor: pointer;
-		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 		transition: background 0.2s;
+	}
+
+	.btn-retry:hover {
+		background: #b91c1c;
+	}
+
+	/* Loading State */
+	.loading-state {
+		background: white;
+		border-radius: 8px;
+		padding: 3rem;
+		text-align: center;
+	}
+
+	.spinner {
+		width: 50px;
+		height: 50px;
+		border: 4px solid #e5e7eb;
+		border-top-color: #3b82f6;
+		border-radius: 50%;
+		animation: spin 1s linear infinite;
+		margin: 0 auto 1rem auto;
+	}
+
+	@keyframes spin {
+		to { transform: rotate(360deg); }
+	}
+
+	.loading-state p {
+		color: #666;
+		font-size: 1rem;
+		margin: 0;
+	}
+
+	/* PDF Preview */
+	.pdf-preview-container {
+		background: white;
+		border-radius: 8px;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		margin-bottom: 2rem;
+		overflow: hidden;
+		/* Use viewport height - works on any monitor */
+		height: 80vh;
+		min-height: 2070px;
+		max-width: 800px;
+	}
+
+	.pdf-viewer {
+		width: 100%;
+		height: 100%;
+		border: none;
+	}
+
+	/* Floating Action Button */
+	.fab {
+		position: fixed;
+		bottom: 2rem;
+		right: 2rem;
+		background: #3b82f6;
+		color: white;
+		border: none;
+		border-radius: 50px;
+		padding: 1rem 2rem;
+		font-size: 1rem;
+		font-weight: 600;
+		cursor: pointer;
+		box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+		transition: all 0.3s ease;
 		z-index: 100;
 	}
 
-	.export-fab:hover {
-		background: #1d4ed8;
+	.fab:hover {
+		background: #2563eb;
+		transform: translateY(-2px);
+		box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
 	}
 
-	/* Modal */
+	.fab:active {
+		transform: translateY(0);
+	}
+
+	.btn-primary,
+	.btn-secondary {
+		border: none;
+		border-radius: 6px;
+		padding: 0.875rem 2rem;
+		font-size: 1rem;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.btn-primary {
+		background: #3b82f6;
+		color: white;
+	}
+
+	.btn-primary:hover {
+		background: #2563eb;
+	}
+
+	.btn-secondary {
+		background: white;
+		color: #3b82f6;
+		border: 2px solid #3b82f6;
+	}
+
+	.btn-secondary:hover {
+		background: #eff6ff;
+	}
+
+	/* Empty State */
+	.empty-state {
+		background: white;
+		border-radius: 8px;
+		padding: 3rem;
+		text-align: center;
+	}
+
+	.empty-state p {
+		color: #666;
+		font-size: 1rem;
+		margin: 0;
+	}
+
+	/* Dialog */
 	.dialog-backdrop {
 		position: fixed;
-		inset: 0;
-		background: rgba(0, 0, 0, 0.4);
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(0, 0, 0, 0.5);
 		z-index: 200;
 	}
 
@@ -997,62 +331,71 @@
 		left: 50%;
 		transform: translate(-50%, -50%);
 		background: white;
+		border-radius: 8px;
 		padding: 2rem;
-		border-radius: 0.75rem;
-		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+		max-width: 400px;
+		width: 90%;
+		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
 		z-index: 201;
-		min-width: 300px;
 	}
 
 	.dialog h2 {
 		margin: 0 0 0.5rem 0;
-		font-size: 1.25rem;
-	}
-
-	.dialog button {
-		padding: 0.5rem 1rem;
+		font-size: 1.5rem;
 		font-weight: 600;
-		border: 1px solid #ccc;
+		color: #1a1a1a;
+	}
+
+	.dialog p {
+		margin: 0 0 1.5rem 0;
+		color: #666;
+	}
+
+	.dialog-actions {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		margin-bottom: 1rem;
+	}
+
+	.dialog .btn-primary,
+	.dialog .btn-secondary {
+		width: 100%;
+	}
+
+	.btn-close {
+		width: 100%;
+		background: #f5f5f5;
+		color: #666;
+		border: none;
 		border-radius: 6px;
+		padding: 0.75rem;
+		font-size: 0.9375rem;
+		font-weight: 500;
 		cursor: pointer;
-		background: white;
-		transition: all 0.2s;
+		transition: background 0.2s;
 	}
 
-	.dialog button:hover {
-		background: #f3f4f6;
+	.btn-close:hover {
+		background: #e5e7eb;
 	}
 
-	.close-btn {
-		background: #f3f4f6 !important;
-	}
-
-	.close-btn:hover {
-		background: #e5e7eb !important;
-	}
-
-	/* Print styles */
-	@media print {
-		.export-container {
-			margin: 0;
-			padding: 0;
-			background: white;
+	/* Responsive */
+	@media (max-width: 768px) {
+		.export-page {
+			padding: 5rem 1rem 1rem 1rem;
 		}
 
-		.export-fab,
-		.dialog,
-		.dialog-backdrop {
-			display: none !important;
+		.pdf-preview-container {
+			height: calc(100vh - 7rem);
+			min-height: 500px;
 		}
 
-		.sheet-page {
-			margin: 0;
-			border: none;
-			box-shadow: none;
-			page-break-after: always;
+		.fab {
+			bottom: 1rem;
+			right: 1rem;
+			padding: 0.875rem 1.5rem;
+			font-size: 0.9375rem;
 		}
 	}
 </style>

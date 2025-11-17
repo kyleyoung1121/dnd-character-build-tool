@@ -32,170 +32,148 @@ export interface TextAreaConfig extends FieldConfig {
 export const PAGE_1_FIELDS = {
 	// Header Section
 	characterName: {
-		x: 100,
-		y: 720,
+		x: 465,
+		y: 730,
 		fontSize: 14,
 		maxWidth: 400
 	} as FieldConfig,
 	
 	classAndLevel: {
-		x: 100,
-		y: 690,
+		x: 215,
+		y: 730,
 		fontSize: 10,
 		maxWidth: 150
 	} as FieldConfig,
 	
 	background: {
-		x: 260,
-		y: 690,
+		x: 340,
+		y: 730,
 		fontSize: 10,
 		maxWidth: 150
 	} as FieldConfig,
 	
 	species: {
-		x: 420,
-		y: 690,
+		x: 215,
+		y: 700,
 		fontSize: 10,
 		maxWidth: 150
 	} as FieldConfig,
 	
 	alignment: {
-		x: 100,
-		y: 665,
+		x: 340,
+		y: 700,
 		fontSize: 10,
 		maxWidth: 150
 	} as FieldConfig,
 	
-	experiencePoints: {
-		x: 260,
-		y: 665,
-		fontSize: 10,
-		maxWidth: 150
-	} as FieldConfig,
-	
-	proficiencyBonus: {
-		x: 420,
-		y: 665,
-		fontSize: 10,
-		maxWidth: 150,
-		align: 'center'
-	} as FieldConfig,
+
 	
 	// Ability Scores (left column)
 	abilityScores: {
 		strength: {
-			score: { x: 60, y: 600, fontSize: 12, align: 'center' } as FieldConfig,
-			modifier: { x: 60, y: 625, fontSize: 16, align: 'center' } as FieldConfig
+			score: { x: 40, y: 539, fontSize: 12, align: 'center' } as FieldConfig,
+			modifier: { x: 32, y: 555, fontSize: 25, align: 'center' } as FieldConfig
 		},
 		dexterity: {
-			score: { x: 60, y: 540, fontSize: 12, align: 'center' } as FieldConfig,
-			modifier: { x: 60, y: 565, fontSize: 16, align: 'center' } as FieldConfig
+			score: { x: 40, y: 467, fontSize: 12, align: 'center' } as FieldConfig,
+			modifier: { x: 32, y: 485, fontSize: 25, align: 'center' } as FieldConfig
 		},
 		constitution: {
-			score: { x: 60, y: 480, fontSize: 12, align: 'center' } as FieldConfig,
-			modifier: { x: 60, y: 505, fontSize: 16, align: 'center' } as FieldConfig
+			score: { x: 40, y: 395, fontSize: 12, align: 'center' } as FieldConfig,
+			modifier: { x: 32, y: 413, fontSize: 25, align: 'center' } as FieldConfig
 		},
 		intelligence: {
-			score: { x: 60, y: 420, fontSize: 12, align: 'center' } as FieldConfig,
-			modifier: { x: 60, y: 445, fontSize: 16, align: 'center' } as FieldConfig
+			score: { x: 40, y: 323, fontSize: 12, align: 'center' } as FieldConfig,
+			modifier: { x: 32, y: 341, fontSize: 25, align: 'center' } as FieldConfig
 		},
 		wisdom: {
-			score: { x: 60, y: 360, fontSize: 12, align: 'center' } as FieldConfig,
-			modifier: { x: 60, y: 385, fontSize: 16, align: 'center' } as FieldConfig
+			score: { x: 40, y: 251, fontSize: 12, align: 'center' } as FieldConfig,
+			modifier: { x: 32, y: 269, fontSize: 25, align: 'center' } as FieldConfig
 		},
 		charisma: {
-			score: { x: 60, y: 300, fontSize: 12, align: 'center' } as FieldConfig,
-			modifier: { x: 60, y: 325, fontSize: 16, align: 'center' } as FieldConfig
+			score: { x: 40, y: 179, fontSize: 12, align: 'center' } as FieldConfig,
+			modifier: { x: 32, y: 197, fontSize: 25, align: 'center' } as FieldConfig
 		}
 	},
 	
 	// Saving Throws (left column, below abilities)
+	// Note: User requested "left 3/16ths" but that would be off-page from x:70
+	// Keeping at reasonable position - may need adjustment after testing
 	savingThrows: {
-		strength: { x: 70, y: 250, fontSize: 9 } as FieldConfig,
-		dexterity: { x: 70, y: 235, fontSize: 9 } as FieldConfig,
-		constitution: { x: 70, y: 220, fontSize: 9 } as FieldConfig,
-		intelligence: { x: 70, y: 205, fontSize: 9 } as FieldConfig,
-		wisdom: { x: 70, y: 190, fontSize: 9 } as FieldConfig,
-		charisma: { x: 70, y: 175, fontSize: 9 } as FieldConfig
+		strength: { x: 100, y: 570, fontSize: 9 } as FieldConfig,
+		dexterity: { x: 100, y: 555, fontSize: 9 } as FieldConfig,
+		constitution: { x: 100, y: 540, fontSize: 9 } as FieldConfig,
+		intelligence: { x: 100, y: 525, fontSize: 9 } as FieldConfig,
+		wisdom: { x: 100, y: 510, fontSize: 9 } as FieldConfig,
+		charisma: { x: 100, y: 495, fontSize: 9 } as FieldConfig
 	},
 	
 	// Skills (left column)
 	skills: {
-		acrobatics: { x: 70, y: 145, fontSize: 8 } as FieldConfig,
-		animalHandling: { x: 70, y: 133, fontSize: 8 } as FieldConfig,
-		arcana: { x: 70, y: 121, fontSize: 8 } as FieldConfig,
-		athletics: { x: 70, y: 109, fontSize: 8 } as FieldConfig,
-		deception: { x: 70, y: 97, fontSize: 8 } as FieldConfig,
-		history: { x: 70, y: 85, fontSize: 8 } as FieldConfig,
-		insight: { x: 70, y: 73, fontSize: 8 } as FieldConfig,
-		intimidation: { x: 70, y: 61, fontSize: 8 } as FieldConfig,
-		investigation: { x: 70, y: 49, fontSize: 8 } as FieldConfig,
-		medicine: { x: 70, y: 37, fontSize: 8 } as FieldConfig,
-		nature: { x: 70, y: 25, fontSize: 8 } as FieldConfig,
-		perception: { x: 70, y: 13, fontSize: 8 } as FieldConfig,
-		performance: { x: 70, y: 1, fontSize: 8 } as FieldConfig,
-		persuasion: { x: 200, y: 145, fontSize: 8 } as FieldConfig,
-		religion: { x: 200, y: 133, fontSize: 8 } as FieldConfig,
-		sleightOfHand: { x: 200, y: 121, fontSize: 8 } as FieldConfig,
-		stealth: { x: 200, y: 109, fontSize: 8 } as FieldConfig,
-		survival: { x: 200, y: 97, fontSize: 8 } as FieldConfig
+		acrobatics: { x: 100, y: 450, fontSize: 9 } as FieldConfig,
+		animalHandling: { x: 100, y: 435, fontSize: 9 } as FieldConfig,
+		arcana: { x: 100, y: 420, fontSize: 9 } as FieldConfig,
+		athletics: { x: 100, y: 405, fontSize: 9 } as FieldConfig,
+		deception: { x: 100, y: 390, fontSize: 9 } as FieldConfig,
+		history: { x: 100, y: 375, fontSize: 9 } as FieldConfig,
+		insight: { x: 100, y: 360, fontSize: 9 } as FieldConfig,
+		intimidation: { x: 100, y: 345, fontSize: 9 } as FieldConfig,
+		investigation: { x: 100, y: 330, fontSize: 9 } as FieldConfig,
+		medicine: { x: 100, y: 315, fontSize: 9 } as FieldConfig,
+		nature: { x: 100, y: 300, fontSize: 9 } as FieldConfig,
+		perception: { x: 100, y: 285, fontSize: 9 } as FieldConfig,
+		performance: { x: 100, y: 270, fontSize: 9 } as FieldConfig,
+		persuasion: { x: 100, y: 255, fontSize: 9 } as FieldConfig,
+		religion: { x: 100, y: 240, fontSize: 9 } as FieldConfig,
+		sleightOfHand: { x: 100, y: 225, fontSize: 9 } as FieldConfig,
+		stealth: { x: 100, y: 210, fontSize: 9 } as FieldConfig,
+		survival: { x: 100, y: 195, fontSize: 9 } as FieldConfig
 	},
 	
-	passivePerception: {
-		x: 60,
-		y: 50,
-		fontSize: 12,
-		align: 'center'
-	} as FieldConfig,
 	
 	// Combat Stats (middle column)
 	armorClass: {
-		x: 300,
-		y: 625,
+		x: 227,
+		y: 635,
 		fontSize: 18,
 		align: 'center'
 	} as FieldConfig,
 	
 	initiative: {
-		x: 380,
-		y: 625,
+		x: 290,
+		y: 635,
 		fontSize: 18,
 		align: 'center'
 	} as FieldConfig,
 	
 	speed: {
-		x: 460,
-		y: 625,
+		x: 350,
+		y: 635,
 		fontSize: 18,
 		align: 'center'
 	} as FieldConfig,
 	
 	hitPointMaximum: {
-		x: 380,
-		y: 590,
+		x: 245,
+		y: 570,
 		fontSize: 12,
 		align: 'center'
 	} as FieldConfig,
 	
 	currentHitPoints: {
-		x: 380,
-		y: 550,
-		fontSize: 16,
+		x: 335,
+		y: 530,
+		fontSize: 18,
 		align: 'center'
 	} as FieldConfig,
 	
 	temporaryHitPoints: {
-		x: 380,
-		y: 510,
+		x: 245,
+		y: 520,
 		fontSize: 12,
 		align: 'center'
 	} as FieldConfig,
 	
-	hitDice: {
-		x: 300,
-		y: 470,
-		fontSize: 10
-	} as FieldConfig,
 	
 	// Attacks (middle column)
 	attacks: [
@@ -208,7 +186,7 @@ export const PAGE_1_FIELDS = {
 	
 	// Equipment (middle column)
 	equipment: {
-		x: 250,
+		x: 245,
 		y: 300,
 		width: 300,
 		height: 200,
@@ -218,8 +196,8 @@ export const PAGE_1_FIELDS = {
 	
 	// Proficiencies & Languages (right column)
 	proficienciesAndLanguages: {
-		x: 580,
-		y: 500,
+		x: 30,
+		y: -10,
 		width: 200,
 		height: 150,
 		fontSize: 8,
@@ -228,8 +206,8 @@ export const PAGE_1_FIELDS = {
 	
 	// Features & Traits (right column)
 	featuresAndTraits: {
-		x: 580,
-		y: 100,
+		x: 420,
+		y: 270,
 		width: 200,
 		height: 380,
 		fontSize: 8,

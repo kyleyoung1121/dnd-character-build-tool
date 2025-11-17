@@ -136,8 +136,9 @@ async function fillPage1(
 	drawText(page, data.background, PAGE_1_FIELDS.background, font);
 	drawText(page, data.species, PAGE_1_FIELDS.species, font);
 	drawText(page, data.alignment, PAGE_1_FIELDS.alignment, font);
-	drawText(page, data.experiencePoints, PAGE_1_FIELDS.experiencePoints, font);
-	drawText(page, data.proficiencyBonus, PAGE_1_FIELDS.proficiencyBonus, font);
+	// Removed: experiencePoints and proficiencyBonus
+	// drawText(page, data.experiencePoints, PAGE_1_FIELDS.experiencePoints, font);
+	// drawText(page, data.proficiencyBonus, PAGE_1_FIELDS.proficiencyBonus, font);
 	
 	// Ability Scores
 	const abilities = PAGE_1_FIELDS.abilityScores;
@@ -172,7 +173,8 @@ async function fillPage1(
 		}
 	});
 	
-	drawText(page, data.passivePerception, PAGE_1_FIELDS.passivePerception, font);
+	// Removed: passivePerception
+	// drawText(page, data.passivePerception, PAGE_1_FIELDS.passivePerception, font);
 	
 	// Combat Stats
 	drawText(page, data.armorClass, PAGE_1_FIELDS.armorClass, font);
@@ -181,7 +183,8 @@ async function fillPage1(
 	drawText(page, data.hitPointMaximum, PAGE_1_FIELDS.hitPointMaximum, font);
 	drawText(page, data.currentHitPoints, PAGE_1_FIELDS.currentHitPoints, font);
 	drawText(page, data.temporaryHitPoints, PAGE_1_FIELDS.temporaryHitPoints, font);
-	drawText(page, data.hitDice, PAGE_1_FIELDS.hitDice, font);
+	// Removed: hitDice
+	// drawText(page, data.hitDice, PAGE_1_FIELDS.hitDice, font);
 	
 	// Attacks
 	data.attacks.forEach((attack, index) => {

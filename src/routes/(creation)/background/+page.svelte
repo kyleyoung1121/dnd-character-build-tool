@@ -50,7 +50,7 @@
 				const names: string[] = [];
 				for (const feat of features) {
 					names.push(feat.name);
-					if (feat.featureOptions) {
+					if (feat.featureOptions && feat.featureOptions.options) {
 						for (const opt of feat.featureOptions.options) {
 							if (typeof opt !== 'string' && opt.nestedPrompts) {
 								names.push(...collectFeatureNames(opt.nestedPrompts));

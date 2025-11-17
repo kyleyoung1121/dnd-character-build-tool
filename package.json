@@ -32,6 +32,8 @@
 	},
 	"dependencies": {
 		"@sveltejs/kit": "^1.30.3",
+		"html2pdf.js": "^0.12.1",
+		"pdf-lib": "^1.17.1",
 		"vite": "^4.5.3"
 	}
 }

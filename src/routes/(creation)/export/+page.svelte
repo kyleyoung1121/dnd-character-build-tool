@@ -1,514 +1,1058 @@
 <script lang="ts">
 	import { character_store } from '$lib/stores/character_store';
 	import type { Character } from '$lib/stores/character_store';
-	import { detectConflicts } from '$lib/stores/conflict_detection';
+	import { onMount } from 'svelte';
 
-	import { debugProvenance } from '$lib/debug/provenance_debug';
-	import { spells, spellAccess, getSpellAccessForCharacter } from '$lib/data/spells';
+	let showDialog = false;
+	let pageStackRef: HTMLDivElement;
+	let html2pdf: any = null;
 
+	// Character data
 	let character: Character;
-
-	// Subscribe to store
 	const unsubscribe = character_store.subscribe((value) => {
 		character = value;
 	});
 
-	// Cleanup subscription on destroy
-	import { onDestroy } from 'svelte';
-	onDestroy(unsubscribe);
+	// Load html2pdf only in browser
+	onMount(async () => {
+		if (typeof window !== 'undefined') {
+			const mod = await import('html2pdf.js');
+			html2pdf = mod.default;
+		}
+		return () => {
+			unsubscribe();
+		};
+	});
 
-	function runDebug() {
-		console.log('=== MANUAL DEBUG START ===');
-
-		// Use the detailed provenance debug utility
-		const analysis = debugProvenance();
-
-		// Also run conflict detection
-		const conflicts = detectConflicts();
-		console.log('\n=== CONFLICT DETECTION ===');
-		console.log('Conflicts:', conflicts);
-
-		return analysis;
+	function toggleDialog() {
+		showDialog = !showDialog;
 	}
 
-	function analyzeDataIntegrity() {
-		console.log('=== DATA INTEGRITY ANALYSIS ===');
-
-		// Spell database analysis
-		const totalSpells = spells.length;
-		const spellsByLevel = spells.reduce(
-			(acc, spell) => {
-				acc[spell.level] = (acc[spell.level] || 0) + 1;
-				return acc;
-			},
-			{} as Record<number, number>
-		);
-
-		// Check for specific Drow spells (level 3 character only gets Dancing Lights and Faerie Fire)
-		const drowSpells = ['Dancing Lights', 'Faerie Fire'];
-		const drowSpellsFound = drowSpells.map((spellName) => {
-			const found = spells.find((s) => s.name === spellName);
-			return {
-				name: spellName,
-				found: !!found,
-				level: found?.level ?? 'N/A',
-				classes: found?.classes ?? []
-			};
-		});
-
-		// Spell access configuration analysis
-		const totalSpellAccess = spellAccess.length;
-		const accessBySource = spellAccess.reduce(
-			(acc, access) => {
-				acc[access.source] = (acc[access.source] || 0) + 1;
-				return acc;
-			},
-			{} as Record<string, number>
-		);
-
-		// Character spell access analysis
-		let characterSpellAccess = [];
-		if (character.race || character.subrace) {
-			characterSpellAccess = getSpellAccessForCharacter(character);
+	async function downloadPDF() {
+		if (!html2pdf) {
+			console.error('html2pdf not yet loaded');
+			return;
 		}
+		showDialog = false;
 
-		const integrity = {
-			spellDatabase: {
-				totalSpells,
-				spellsByLevel,
-				drowSpellsAnalysis: drowSpellsFound
-			},
-			spellAccessConfig: {
-				totalAccessEntries: totalSpellAccess,
-				accessBySource
-			},
-			currentCharacter: {
-				race: character.race,
-				subrace: character.subrace,
-				class: character.class,
-				spellAccessEntries: characterSpellAccess.length,
-				spellAccessDetails: characterSpellAccess.map((sa) => ({
-					source: sa.source,
-					sourceName: sa.sourceName,
-					spellCount: sa.spells?.length || 0,
-					cantripCount: sa.cantrips?.length || 0,
-					chooseable: sa.chooseable
-				}))
-			}
+		const element = pageStackRef;
+		if (!element) return;
+
+		const opt = {
+			margin: 0.25,
+			filename: `${character.name || 'character'}_sheet.pdf`,
+			image: { type: 'jpeg', quality: 0.98 },
+			html2canvas: { scale: 2, useCORS: true },
+			jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+			pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
 		};
 
-		console.log('Data Integrity Analysis:', integrity);
-		return integrity;
+		await html2pdf().from(element).set(opt).save();
 	}
 
-	// Reactive data integrity analysis
-	$: dataIntegrity = analyzeDataIntegrity();
-
-	// Equipment proficiency debug
-	function debugEquipmentProficiencies() {
-		console.log('=== EQUIPMENT PROFICIENCY DEBUG ===');
-		console.log('Current proficiencies:', character.proficiencies);
-		console.log('Class:', character.class);
-		console.log('Subclass:', character.subclass);
-		
-		// Check equipment selections
-		if (character._provenance) {
-			const equipmentScopes = Object.keys(character._provenance).filter(k => k.startsWith('class_equipment_'));
-			console.log('Equipment scopes:', equipmentScopes);
-			
-			equipmentScopes.forEach(scopeId => {
-				const data = character._provenance![scopeId];
-				const actualData = data._set || data;
-				console.log(`${scopeId}:`, {
-					selectedOption: actualData.selectedOption,
-					inventory: actualData.inventory,
-					subChoiceSelections: actualData.subChoiceSelections
-				});
-			});
-		}
+	function handleDummy(action: string) {
+		alert(`${action} clicked`);
 	}
 
-	$: equipmentDebugInfo = {
-		proficiencies: character.proficiencies || [],
-		class: character.class || 'None',
-		subclass: character.subclass || 'None',
-		equipmentSelections: character._provenance ? Object.keys(character._provenance)
-			.filter(k => k.startsWith('class_equipment_'))
-			.map(scopeId => {
-				const data = character._provenance![scopeId];
-				const actualData = data._set || data;
-				return {
-					scopeId,
-					selectedOption: actualData.selectedOption,
-					inventory: actualData.inventory || []
-				};
-			}) : []
-	};
+	// Helper function to calculate ability modifier
+	function getModifier(score: number | null): string {
+		if (score === null) return '+0';
+		const mod = Math.floor((score - 10) / 2);
+		return mod >= 0 ? `+${mod}` : `${mod}`;
+	}
 </script>
 
-<div class="main-content">
-	<h1>Debug & Export Page</h1>
-	<p>This page provides debugging information and data integrity checks.</p>
-
-	<div class="debug-buttons">
-		<button
-			on:click={runDebug}
-			style="background: blue; color: white; padding: 10px; margin: 10px;"
-		>
-			Debug Conflicts
-		</button>
-		<button
-			on:click={debugEquipmentProficiencies}
-			style="background: green; color: white; padding: 10px; margin: 10px;"
-		>
-			Debug Equipment Proficiencies
-		</button>
-	</div>
-
-	<div class="equipment-debug-section" style="margin: 20px; padding: 20px; background: #f0f0f0; border-radius: 8px;">
-		<h2>⚔️ Equipment Proficiency Debug</h2>
-		<div style="margin: 10px 0;">
-			<strong>Class:</strong> {equipmentDebugInfo.class}
-		</div>
-		<div style="margin: 10px 0;">
-			<strong>Subclass:</strong> {equipmentDebugInfo.subclass}
-		</div>
-		<div style="margin: 10px 0;">
-			<strong>Proficiencies:</strong> {JSON.stringify(equipmentDebugInfo.proficiencies)}
-		</div>
-		<div style="margin: 10px 0;">
-			<strong>Equipment Selections:</strong>
-			{#if equipmentDebugInfo.equipmentSelections.length > 0}
-				<ul>
-					{#each equipmentDebugInfo.equipmentSelections as selection}
-						<li>
-							<strong>{selection.scopeId}:</strong>
-							Option #{selection.selectedOption !== undefined ? selection.selectedOption : 'None'},
-							Inventory: {JSON.stringify(selection.inventory)}
-						</li>
-					{/each}
-				</ul>
-			{:else}
-				<em>No equipment selected</em>
-			{/if}
-		</div>
-	</div>
-
-	<div class="integrity-section">
-		<h2>📊 Data Integrity Report</h2>
-
-		<div class="integrity-grid">
-			<div class="integrity-card">
-				<h3>🪄 Spell Database</h3>
-				<p><strong>Total Spells:</strong> {dataIntegrity.spellDatabase.totalSpells}</p>
-				<p><strong>By Level:</strong></p>
-				<ul>
-					{#each Object.entries(dataIntegrity.spellDatabase.spellsByLevel) as [level, count]}
-						<li>Level {level}: {count} spells</li>
-					{/each}
-				</ul>
-			</div>
-
-			<div class="integrity-card">
-				<h3>🧙‍♀️ Drow Spells Check</h3>
-				{#each dataIntegrity.spellDatabase.drowSpellsAnalysis as drowSpell}
-					<div class="spell-check {drowSpell.found ? 'found' : 'missing'}">
-						<strong>{drowSpell.name}:</strong>
-						{#if drowSpell.found}
-							✅ Found (Level {drowSpell.level})
-							<br /><small>Classes: {drowSpell.classes.join(', ')}</small>
-						{:else}
-							❌ Missing
-						{/if}
+<div class="export-container">
+	<!-- Printable region -->
+	<div bind:this={pageStackRef} class="page-stack">
+		<!-- PAGE 1 -->
+		<div class="sheet-page">
+			<!-- Header Section -->
+			<div class="sheet-header">
+				<div class="header-row">
+					<div class="field char-name">
+						<label>Character Name</label>
+						<div class="field-value"></div>
 					</div>
-				{/each}
+				</div>
+				<div class="header-row three-col">
+					<div class="field">
+						<label>Class & Level</label>
+						<div class="field-value"></div>
+					</div>
+					<div class="field">
+						<label>Background</label>
+						<div class="field-value"></div>
+					</div>
+					<div class="field">
+						<label>Species</label>
+						<div class="field-value"></div>
+					</div>
+				</div>
+				<div class="header-row three-col">
+					<div class="field">
+						<label>Alignment</label>
+						<div class="field-value"></div>
+					</div>
+					<div class="field">
+						<label>Experience Points</label>
+						<div class="field-value"></div>
+					</div>
+					<div class="field">
+						<label>Proficiency Bonus</label>
+						<div class="field-value"></div>
+					</div>
+				</div>
 			</div>
 
-			<div class="integrity-card">
-				<h3>⚙️ Spell Access Config</h3>
-				<p>
-					<strong>Total Access Entries:</strong>
-					{dataIntegrity.spellAccessConfig.totalAccessEntries}
-				</p>
-				<p><strong>By Source:</strong></p>
-				<ul>
-					{#each Object.entries(dataIntegrity.spellAccessConfig.accessBySource) as [source, count]}
-						<li>{source}: {count} entries</li>
-					{/each}
-				</ul>
-			</div>
-
-			<div class="integrity-card">
-				<h3>👤 Current Character</h3>
-				<p><strong>Race:</strong> {character.race || 'None'}</p>
-				<p><strong>Subrace:</strong> {character.subrace || 'None'}</p>
-				<p><strong>Class:</strong> {character.class || 'None'}</p>
-				<p>
-					<strong>Spell Access Entries:</strong>
-					{dataIntegrity.currentCharacter.spellAccessEntries}
-				</p>
-				{#if dataIntegrity.currentCharacter.spellAccessDetails.length > 0}
-					<details>
-						<summary>Spell Access Details</summary>
-						{#each dataIntegrity.currentCharacter.spellAccessDetails as detail}
-							<div class="access-detail">
-								<strong>{detail.sourceName}</strong> ({detail.source})
-								<br />Spells: {detail.spellCount}, Cantrips: {detail.cantripCount}
-								<br />Chooseable: {detail.chooseable ? 'Yes' : 'No'}
+			<!-- Main Content: 3 columns -->
+			<div class="sheet-main">
+				<!-- LEFT COLUMN: Ability Scores -->
+				<div class="column left-column">
+					<div class="ability-scores-section">
+						<h3 class="section-title">Ability Scores</h3>
+						
+						{#each ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'] as ability}
+							<div class="ability-box">
+								<div class="ability-name">{ability}</div>
+								<div class="ability-modifier"></div>
+								<div class="ability-score"></div>
 							</div>
 						{/each}
-					</details>
-				{/if}
-			</div>
-		</div>
-	</div>
+					</div>
 
-	<div class="debug-section">
-		<h2>🔧 Dynamic Options Debug</h2>
-		<div class="debug-info">
-			<p><strong>Character Skills:</strong> {JSON.stringify(character.skills || [])}</p>
-			<p><strong>Character Expertise:</strong> {JSON.stringify(character.expertise || [])}</p>
-			<p><strong>Character Class:</strong> {character.class || 'None'}</p>
-			<p><strong>Character Features:</strong> {JSON.stringify(character.features || [])}</p>
-			{#if typeof window !== 'undefined' && window.dynamicOptionsDebug}
-				<hr />
-				<p><strong>Last Dynamic Options Call:</strong></p>
-				<p>
-					<strong>Generator Type:</strong>
-					{window.dynamicOptionsDebug.lastCall?.generatorType || 'None'}
-				</p>
-				<p>
-					<strong>Additional Options:</strong>
-					{JSON.stringify(window.dynamicOptionsDebug.lastCall?.additionalOptions || [])}
-				</p>
-				<p>
-					<strong>Skills from Store:</strong>
-					{JSON.stringify(window.dynamicOptionsDebug.lastCall?.skillsArray || [])}
-				</p>
-				<p>
-					<strong>Final Options Generated:</strong>
-					{JSON.stringify(window.dynamicOptionsDebug.lastCall?.finalOptions || [])}
-				</p>
-				<p>
-					<strong>Timestamp:</strong>
-					{window.dynamicOptionsDebug.lastCall?.timestamp || 'Never'}
-				</p>
-				{#if window.dynamicOptionsDebug.filtering}
-					<hr />
-					<p><strong>Filtering Debug:</strong></p>
-					<p>
-						<strong>Feature:</strong>
-						{window.dynamicOptionsDebug.filtering.featureName} (index {window.dynamicOptionsDebug
-							.filtering.index})
-					</p>
-					<p>
-						<strong>Is Expertise Feature:</strong>
-						{window.dynamicOptionsDebug.filtering.isExpertiseFeature ? 'Yes' : 'No'}
-					</p>
-					<p>
-						<strong>Raw Options:</strong>
-						{JSON.stringify(window.dynamicOptionsDebug.filtering.rawOptions || [])}
-					</p>
-					<p>
-						<strong>Already Chosen Here:</strong>
-						{JSON.stringify(window.dynamicOptionsDebug.filtering.chosenHere || [])}
-					</p>
-					<p>
-						<strong>Current Value:</strong>
-						{window.dynamicOptionsDebug.filtering.currentValue || 'null'}
-					</p>
-					<p>
-						<strong>Taken (blocked):</strong>
-						{JSON.stringify(window.dynamicOptionsDebug.filtering.taken || [])}
-					</p>
-					{#if window.dynamicOptionsDebug.filtering.isExpertiseFeature}
-						<p>
-							<strong>Expertise Already Chosen:</strong>
-							{JSON.stringify(window.dynamicOptionsDebug.filtering.expertiseAlreadyChosen || [])}
-						</p>
-					{/if}
-					<p>
-						<strong>Final Filtered Options:</strong>
-						{JSON.stringify(window.dynamicOptionsDebug.filtering.finalFiltered || [])}
-					</p>
-				{/if}
-			{:else}
-				<hr />
-				<p>
-					<em
-						>No dynamic options calls detected yet. Try clicking on a Rogue or Bard Expertise
-						dropdown.</em
-					>
-				</p>
-			{/if}
-		</div>
-	</div>
+					<!-- Inspiration -->
+					<div class="inspiration-box">
+						<label>Inspiration</label>
+						<div class="checkbox"></div>
+					</div>
 
-	{#if typeof window !== 'undefined' && window.classRemovalDebug}
-		<div class="debug-section">
-			<h2>🗑️ Class Removal Debug</h2>
-			<div class="debug-info">
-				<p><strong>Attempted Class:</strong> {window.classRemovalDebug.attemptedClass}</p>
-				<p><strong>Completed:</strong> {window.classRemovalDebug.completed ? 'Yes' : 'No'}</p>
-				<p><strong>Timestamp:</strong> {window.classRemovalDebug.timestamp}</p>
-				<p><strong>Steps:</strong></p>
-				<ul>
-					{#each window.classRemovalDebug.steps || [] as step}
-						<li>{step}</li>
-					{/each}
-				</ul>
-				{#if window.classRemovalDebug.revertErrors && window.classRemovalDebug.revertErrors.length > 0}
-					<p><strong>Errors:</strong></p>
-					<ul>
-						{#each window.classRemovalDebug.revertErrors as error}
-							<li style="color: red;">{error.key}: {error.error}</li>
+					<!-- Proficiency Bonus (larger display) -->
+					<div class="proficiency-display">
+						<label>Proficiency Bonus</label>
+						<div class="prof-value"></div>
+					</div>
+
+					<!-- Saving Throws -->
+					<div class="saves-section">
+						<h3 class="section-title">Saving Throws</h3>
+						{#each ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'] as ability}
+							<div class="save-row">
+								<div class="checkbox"></div>
+								<div class="save-value"></div>
+								<label>{ability}</label>
+							</div>
 						{/each}
-					</ul>
-				{/if}
+					</div>
+
+					<!-- Skills -->
+					<div class="skills-section">
+						<h3 class="section-title">Skills</h3>
+						{#each [
+							{ name: 'Acrobatics', ability: 'Dex' },
+							{ name: 'Animal Handling', ability: 'Wis' },
+							{ name: 'Arcana', ability: 'Int' },
+							{ name: 'Athletics', ability: 'Str' },
+							{ name: 'Deception', ability: 'Cha' },
+							{ name: 'History', ability: 'Int' },
+							{ name: 'Insight', ability: 'Wis' },
+							{ name: 'Intimidation', ability: 'Cha' },
+							{ name: 'Investigation', ability: 'Int' },
+							{ name: 'Medicine', ability: 'Wis' },
+							{ name: 'Nature', ability: 'Int' },
+							{ name: 'Perception', ability: 'Wis' },
+							{ name: 'Performance', ability: 'Cha' },
+							{ name: 'Persuasion', ability: 'Cha' },
+							{ name: 'Religion', ability: 'Int' },
+							{ name: 'Sleight of Hand', ability: 'Dex' },
+							{ name: 'Stealth', ability: 'Dex' },
+							{ name: 'Survival', ability: 'Wis' }
+						] as skill}
+							<div class="skill-row">
+								<div class="checkbox"></div>
+								<div class="skill-value"></div>
+								<label>{skill.name} <span class="ability-abbr">({skill.ability})</span></label>
+							</div>
+						{/each}
+					</div>
+
+					<!-- Passive Perception -->
+					<div class="passive-perception">
+						<label>Passive Wisdom (Perception)</label>
+						<div class="passive-value"></div>
+					</div>
+				</div>
+
+				<!-- MIDDLE COLUMN: Combat Stats -->
+				<div class="column middle-column">
+					<!-- Combat Stats -->
+					<div class="combat-stats">
+						<div class="stat-box ac-box">
+							<div class="stat-value"></div>
+							<label>Armor Class</label>
+						</div>
+						<div class="stat-box initiative-box">
+							<div class="stat-value"></div>
+							<label>Initiative</label>
+						</div>
+						<div class="stat-box speed-box">
+							<div class="stat-value"></div>
+							<label>Speed</label>
+						</div>
+					</div>
+
+					<!-- HP Box -->
+					<div class="hp-section">
+						<div class="hp-max">
+							<label>Hit Point Maximum</label>
+							<div class="field-value"></div>
+						</div>
+						<div class="hp-current">
+							<label>Current Hit Points</label>
+							<div class="large-field"></div>
+						</div>
+						<div class="hp-temp">
+							<label>Temporary Hit Points</label>
+							<div class="field-value"></div>
+						</div>
+					</div>
+
+					<!-- Hit Dice & Death Saves -->
+					<div class="hit-dice-death">
+						<div class="hit-dice-box">
+							<label>Hit Dice</label>
+							<div class="field-value"></div>
+							<label class="sublabel">Total</label>
+						</div>
+						<div class="death-saves">
+							<h4>Death Saves</h4>
+							<div class="save-group">
+								<label>Successes</label>
+								<div class="bubbles">
+									<div class="bubble"></div>
+									<div class="bubble"></div>
+									<div class="bubble"></div>
+								</div>
+							</div>
+							<div class="save-group">
+								<label>Failures</label>
+								<div class="bubbles">
+									<div class="bubble"></div>
+									<div class="bubble"></div>
+									<div class="bubble"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Attacks & Spellcasting -->
+					<div class="attacks-section">
+						<h3 class="section-title">Attacks & Spellcasting</h3>
+						<div class="attacks-header">
+							<span class="col-name">Name</span>
+							<span class="col-bonus">Atk Bonus</span>
+							<span class="col-damage">Damage/Type</span>
+						</div>
+						<div class="attack-rows">
+							<div class="attack-row">
+								<div class="attack-name"></div>
+								<div class="attack-bonus"></div>
+								<div class="attack-damage"></div>
+							</div>
+							<div class="attack-row">
+								<div class="attack-name"></div>
+								<div class="attack-bonus"></div>
+								<div class="attack-damage"></div>
+							</div>
+							<div class="attack-row">
+								<div class="attack-name"></div>
+								<div class="attack-bonus"></div>
+								<div class="attack-damage"></div>
+							</div>
+							<div class="attack-row">
+								<div class="attack-name"></div>
+								<div class="attack-bonus"></div>
+								<div class="attack-damage"></div>
+							</div>
+							<div class="attack-row">
+								<div class="attack-name"></div>
+								<div class="attack-bonus"></div>
+								<div class="attack-damage"></div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Equipment -->
+					<div class="equipment-section">
+						<h3 class="section-title">Equipment</h3>
+						<div class="equipment-list">
+							<div class="equipment-line"></div>
+							<div class="equipment-line"></div>
+							<div class="equipment-line"></div>
+							<div class="equipment-line"></div>
+							<div class="equipment-line"></div>
+							<div class="equipment-line"></div>
+							<div class="equipment-line"></div>
+							<div class="equipment-line"></div>
+						</div>
+					</div>
+				</div>
+
+				<!-- RIGHT COLUMN: Features & Traits -->
+				<div class="column right-column">
+					<!-- Proficiencies & Languages -->
+					<div class="proficiencies-section">
+						<h3 class="section-title">Other Proficiencies & Languages</h3>
+						<div class="text-area"></div>
+					</div>
+
+					<!-- Features & Traits -->
+					<div class="features-section">
+						<h3 class="section-title">Features & Traits</h3>
+						<div class="text-area large"></div>
+					</div>
+				</div>
 			</div>
+		</div>
+
+		<!-- PAGE 2 -->
+		<div class="sheet-page">
+			<div class="page2-header">
+				<div class="field char-name-p2">
+					<label>Character Name</label>
+					<div class="field-value"></div>
+				</div>
+			</div>
+
+			<!-- Character Appearance & Backstory -->
+			<div class="character-description">
+				<div class="desc-grid">
+					<div class="field">
+						<label>Age</label>
+						<div class="field-value"></div>
+					</div>
+					<div class="field">
+						<label>Height</label>
+						<div class="field-value"></div>
+					</div>
+					<div class="field">
+						<label>Weight</label>
+						<div class="field-value"></div>
+					</div>
+					<div class="field">
+						<label>Eyes</label>
+						<div class="field-value"></div>
+					</div>
+					<div class="field">
+						<label>Skin</label>
+						<div class="field-value"></div>
+					</div>
+					<div class="field">
+						<label>Hair</label>
+						<div class="field-value"></div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Character Portrait/Sketch Area -->
+			<div class="character-portrait">
+				<label>Character Appearance</label>
+				<div class="portrait-box"></div>
+			</div>
+
+			<!-- Backstory & Traits -->
+			<div class="backstory-section">
+				<div class="backstory-field">
+					<label>Personality Traits</label>
+					<div class="text-area small"></div>
+				</div>
+				<div class="backstory-field">
+					<label>Ideals</label>
+					<div class="text-area small"></div>
+				</div>
+				<div class="backstory-field">
+					<label>Bonds</label>
+					<div class="text-area small"></div>
+				</div>
+				<div class="backstory-field">
+					<label>Flaws</label>
+					<div class="text-area small"></div>
+				</div>
+			</div>
+
+			<!-- Additional Features & Traits (continued from page 1) -->
+			<div class="additional-features">
+				<h3 class="section-title">Additional Features & Traits</h3>
+				<div class="text-area large"></div>
+			</div>
+
+			<!-- Treasure & Notes -->
+			<div class="treasure-section">
+				<h3 class="section-title">Treasure & Notes</h3>
+				<div class="text-area medium"></div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Floating download button -->
+	<button class="export-fab" on:click={toggleDialog}>Finish Export</button>
+
+	<!-- Modal -->
+	{#if showDialog}
+		<div class="dialog-backdrop" on:click={toggleDialog} role="button" tabindex="-1"></div>
+		<div class="dialog" role="dialog">
+			<h2>Export Options</h2>
+			<button on:click={downloadPDF}>Download as PDF</button>
+			<button on:click={() => handleDummy('Send to E&D Team')}>Send to E&D Team</button>
+			<button on:click={() => handleDummy('Save Character')}>Save Character</button>
+			<button class="close-btn" on:click={toggleDialog}>Close</button>
 		</div>
 	{/if}
-
-	<details class="character-dump">
-		<summary>Raw Character Data</summary>
-		<pre>{JSON.stringify(character, null, 2)}</pre>
-	</details>
 </div>
 
 <style>
-	.main-content {
-		padding: 2rem 1rem;
-		padding-top: 80px;
-		max-width: 1200px;
-		margin: 0 auto;
-	}
-
-	.debug-buttons {
-		margin-bottom: 2rem;
+	.export-container {
+		margin-top: 4rem;
+		padding-bottom: 5rem;
 		display: flex;
-		flex-wrap: wrap;
-		gap: 1rem;
+		justify-content: center;
+		background: #e5e7eb;
 	}
 
-	.integrity-section {
+	.page-stack {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		width: 100%;
+		padding: 2rem 0;
+	}
+
+	/* Page styling */
+	.sheet-page {
+		width: 8.5in;
+		min-height: 11in;
+		background: white;
+		color: #000;
+		border: 1px solid #999;
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+		padding: 0.5in;
 		margin-bottom: 2rem;
+		box-sizing: border-box;
+		font-family: 'Arial', sans-serif;
+		font-size: 9pt;
+		page-break-after: always;
 	}
 
-	.integrity-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-		gap: 1.5rem;
-		margin-top: 1rem;
-	}
-
-	.integrity-card {
-		background: #f8fafc;
-		border: 1px solid #e2e8f0;
-		border-radius: 8px;
-		padding: 1.5rem;
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-	}
-
-	.integrity-card h3 {
-		margin: 0 0 1rem 0;
-		color: #1e293b;
-		font-size: 1.1rem;
-	}
-
-	.integrity-card ul {
-		margin: 0.5rem 0;
-		padding-left: 1.5rem;
-	}
-
-	.integrity-card li {
-		margin: 0.25rem 0;
-	}
-
-	.spell-check {
-		padding: 0.75rem;
-		margin: 0.5rem 0;
-		border-radius: 6px;
-		border-left: 4px solid;
-	}
-
-	.spell-check.found {
-		background: #f0fdf4;
-		border-color: #22c55e;
-		color: #166534;
-	}
-
-	.spell-check.missing {
-		background: #fef2f2;
-		border-color: #ef4444;
-		color: #dc2626;
-	}
-
-	.access-detail {
-		padding: 0.75rem;
-		margin: 0.5rem 0;
-		background: #ffffff;
-		border: 1px solid #e5e7eb;
-		border-radius: 4px;
-		font-size: 0.9rem;
-	}
-
-	.character-dump {
-		margin-top: 2rem;
-		border: 1px solid #d1d5db;
-		border-radius: 6px;
-		padding: 1rem;
-		background: #f9fafb;
-	}
-
-	.character-dump summary {
-		cursor: pointer;
-		font-weight: 600;
-		color: #374151;
-		margin-bottom: 1rem;
-	}
-
-	.character-dump pre {
-		background: #1f2937;
-		color: #f9fafb;
-		padding: 1rem;
-		border-radius: 4px;
-		overflow-x: auto;
-		font-size: 0.875rem;
-		line-height: 1.5;
-	}
-
-	details summary {
-		cursor: pointer;
-		user-select: none;
-	}
-
-	details[open] summary {
+	/* Header Section */
+	.sheet-header {
 		margin-bottom: 0.5rem;
 	}
 
-	.debug-section {
-		margin: 2rem 0;
-		padding: 1.5rem;
-		border: 2px solid #ff6b6b;
-		border-radius: 8px;
-		background: #fff5f5;
+	.header-row {
+		display: flex;
+		gap: 0.5rem;
+		margin-bottom: 0.3rem;
 	}
 
-	.debug-section h2 {
-		margin: 0 0 1rem 0;
-		color: #d63031;
+	.header-row.three-col {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
+		gap: 0.5rem;
 	}
 
-	.debug-info {
-		font-family: monospace;
-		background: #f8f8f8;
-		padding: 1rem;
+	.field {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.field label {
+		font-size: 7pt;
+		font-weight: bold;
+		text-transform: uppercase;
+		margin-bottom: 2px;
+		color: #555;
+	}
+
+	.field-value {
+		border-bottom: 1px solid #000;
+		min-height: 18px;
+		padding: 2px 4px;
+	}
+
+	.char-name {
+		flex: 1;
+	}
+
+	.char-name .field-value {
+		font-size: 12pt;
+		font-weight: bold;
+	}
+
+	/* Main Content - 3 column layout */
+	.sheet-main {
+		display: grid;
+		grid-template-columns: 1.8in 2.5in 3in;
+		gap: 0.2in;
+		margin-top: 0.2in;
+	}
+
+	.column {
+		display: flex;
+		flex-direction: column;
+		gap: 0.15in;
+	}
+
+	.section-title {
+		font-size: 9pt;
+		font-weight: bold;
+		text-transform: uppercase;
+		margin: 0 0 0.1in 0;
+		padding: 3px 6px;
+		background: #f3f4f6;
+		border: 1px solid #999;
+		text-align: center;
+	}
+
+	/* Ability Scores */
+	.ability-scores-section {
+		display: flex;
+		flex-direction: column;
+		gap: 0.08in;
+	}
+
+	.ability-box {
+		border: 1px solid #999;
+		text-align: center;
+		padding: 4px;
+		background: #f9f9f9;
+	}
+
+	.ability-name {
+		font-size: 7pt;
+		font-weight: bold;
+		text-transform: uppercase;
+		color: #555;
+	}
+
+	.ability-modifier {
+		font-size: 16pt;
+		font-weight: bold;
+		min-height: 24px;
+		border-bottom: 1px solid #ccc;
+		margin: 2px 0;
+	}
+
+	.ability-score {
+		border: 1px solid #999;
+		width: 30px;
+		height: 30px;
+		margin: 4px auto 0;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: white;
+	}
+
+	/* Inspiration */
+	.inspiration-box {
+		border: 1px solid #999;
+		padding: 6px;
+		text-align: center;
+	}
+
+	.inspiration-box label {
+		font-size: 7pt;
+		font-weight: bold;
+		text-transform: uppercase;
+		display: block;
+		margin-bottom: 4px;
+	}
+
+	.checkbox {
+		width: 16px;
+		height: 16px;
+		border: 2px solid #000;
+		margin: 0 auto;
+		border-radius: 3px;
+	}
+
+	/* Proficiency Bonus */
+	.proficiency-display {
+		border: 1px solid #999;
+		padding: 6px;
+		text-align: center;
+	}
+
+	.proficiency-display label {
+		font-size: 7pt;
+		font-weight: bold;
+		text-transform: uppercase;
+		display: block;
+		margin-bottom: 4px;
+	}
+
+	.prof-value {
+		font-size: 14pt;
+		font-weight: bold;
+		min-height: 24px;
+		border: 1px solid #999;
+		border-radius: 50%;
+		width: 36px;
+		height: 36px;
+		margin: 0 auto;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	/* Saving Throws */
+	.saves-section {
+		border: 1px solid #999;
+		padding: 6px;
+	}
+
+	.save-row,
+	.skill-row {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		margin-bottom: 3px;
+		font-size: 8pt;
+	}
+
+	.save-row .checkbox,
+	.skill-row .checkbox {
+		width: 12px;
+		height: 12px;
+		flex-shrink: 0;
+	}
+
+	.save-value,
+	.skill-value {
+		border-bottom: 1px solid #999;
+		width: 32px;
+		min-height: 14px;
+		text-align: center;
+		flex-shrink: 0;
+	}
+
+	.save-row label,
+	.skill-row label {
+		font-size: 8pt;
+		flex: 1;
+	}
+
+	/* Skills */
+	.skills-section {
+		border: 1px solid #999;
+		padding: 6px;
+	}
+
+	.ability-abbr {
+		color: #666;
+		font-size: 7pt;
+	}
+
+	/* Passive Perception */
+	.passive-perception {
+		border: 1px solid #999;
+		padding: 6px;
+		text-align: center;
+	}
+
+	.passive-perception label {
+		font-size: 7pt;
+		font-weight: bold;
+		text-transform: uppercase;
+		display: block;
+		margin-bottom: 4px;
+	}
+
+	.passive-value {
+		border: 1px solid #999;
+		width: 36px;
+		height: 36px;
+		margin: 0 auto;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 12pt;
+		font-weight: bold;
 		border-radius: 4px;
-		border: 1px solid #ddd;
 	}
 
-	.debug-info p {
-		margin: 0.5rem 0;
-		word-break: break-all;
+	/* Combat Stats */
+	.combat-stats {
+		display: flex;
+		justify-content: space-between;
+		gap: 0.1in;
+	}
+
+	.stat-box {
+		flex: 1;
+		border: 1px solid #999;
+		text-align: center;
+		padding: 8px 4px;
+		background: #f9f9f9;
+	}
+
+	.stat-value {
+		font-size: 18pt;
+		font-weight: bold;
+		min-height: 32px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-bottom: 1px solid #ccc;
+		margin-bottom: 4px;
+	}
+
+	.stat-box label {
+		font-size: 7pt;
+		font-weight: bold;
+		text-transform: uppercase;
+		color: #555;
+	}
+
+	/* HP Section */
+	.hp-section {
+		border: 1px solid #999;
+		padding: 8px;
+	}
+
+	.hp-max,
+	.hp-temp {
+		margin-bottom: 6px;
+	}
+
+	.hp-max label,
+	.hp-temp label {
+		font-size: 7pt;
+		font-weight: bold;
+		text-transform: uppercase;
+		display: block;
+		margin-bottom: 2px;
+		color: #555;
+	}
+
+	.large-field {
+		border: 1px solid #999;
+		min-height: 50px;
+		background: #fff;
+	}
+
+	/* Hit Dice & Death Saves */
+	.hit-dice-death {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.1in;
+	}
+
+	.hit-dice-box {
+		border: 1px solid #999;
+		padding: 8px;
+		text-align: center;
+	}
+
+	.hit-dice-box label {
+		font-size: 7pt;
+		font-weight: bold;
+		text-transform: uppercase;
+		display: block;
+		margin-bottom: 4px;
+	}
+
+	.hit-dice-box .field-value {
+		min-height: 24px;
+		margin-bottom: 4px;
+	}
+
+	.sublabel {
+		font-size: 6pt !important;
+		color: #666;
+	}
+
+	.death-saves {
+		border: 1px solid #999;
+		padding: 8px;
+	}
+
+	.death-saves h4 {
+		font-size: 8pt;
+		font-weight: bold;
+		text-transform: uppercase;
+		margin: 0 0 6px 0;
+		text-align: center;
+	}
+
+	.save-group {
+		margin-bottom: 4px;
+	}
+
+	.save-group label {
+		font-size: 7pt;
+		font-weight: bold;
+		display: block;
+		margin-bottom: 2px;
+	}
+
+	.bubbles {
+		display: flex;
+		gap: 6px;
+	}
+
+	.bubble {
+		width: 14px;
+		height: 14px;
+		border: 2px solid #000;
+		border-radius: 50%;
+	}
+
+	/* Attacks */
+	.attacks-section {
+		border: 1px solid #999;
+		padding: 8px;
+	}
+
+	.attacks-header {
+		display: grid;
+		grid-template-columns: 2fr 1fr 2fr;
+		gap: 4px;
+		font-size: 7pt;
+		font-weight: bold;
+		text-transform: uppercase;
+		padding-bottom: 4px;
+		border-bottom: 1px solid #999;
+		margin-bottom: 4px;
+	}
+
+	.attack-row {
+		display: grid;
+		grid-template-columns: 2fr 1fr 2fr;
+		gap: 4px;
+		margin-bottom: 3px;
+	}
+
+	.attack-name,
+	.attack-bonus,
+	.attack-damage {
+		border-bottom: 1px solid #999;
+		min-height: 14px;
+		font-size: 8pt;
+	}
+
+	/* Equipment */
+	.equipment-section {
+		border: 1px solid #999;
+		padding: 8px;
+	}
+
+	.equipment-list {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+
+	.equipment-line {
+		border-bottom: 1px solid #999;
+		min-height: 14px;
+	}
+
+	/* Proficiencies & Languages */
+	.proficiencies-section {
+		border: 1px solid #999;
+		padding: 8px;
+	}
+
+	.text-area {
+		border: 1px solid #ccc;
+		min-height: 80px;
+		background: #fff;
+		padding: 4px;
+	}
+
+	.text-area.small {
+		min-height: 50px;
+	}
+
+	.text-area.medium {
+		min-height: 120px;
+	}
+
+	.text-area.large {
+		min-height: 200px;
+	}
+
+	/* Features & Traits */
+	.features-section {
+		border: 1px solid #999;
+		padding: 8px;
+		flex: 1;
+	}
+
+	/* PAGE 2 */
+	.page2-header {
+		margin-bottom: 0.3in;
+	}
+
+	.char-name-p2 {
+		width: 100%;
+	}
+
+	.character-description {
+		margin-bottom: 0.2in;
+	}
+
+	.desc-grid {
+		display: grid;
+		grid-template-columns: repeat(6, 1fr);
+		gap: 0.1in;
+	}
+
+	.character-portrait {
+		border: 1px solid #999;
+		padding: 8px;
+		margin-bottom: 0.2in;
+	}
+
+	.character-portrait label {
+		font-size: 8pt;
+		font-weight: bold;
+		text-transform: uppercase;
+		display: block;
+		margin-bottom: 6px;
+		text-align: center;
+	}
+
+	.portrait-box {
+		border: 1px solid #ccc;
+		min-height: 2in;
+		background: #fafafa;
+	}
+
+	.backstory-section {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.15in;
+		margin-bottom: 0.2in;
+	}
+
+	.backstory-field {
+		border: 1px solid #999;
+		padding: 8px;
+	}
+
+	.backstory-field label {
+		font-size: 8pt;
+		font-weight: bold;
+		text-transform: uppercase;
+		display: block;
+		margin-bottom: 4px;
+	}
+
+	.additional-features {
+		border: 1px solid #999;
+		padding: 8px;
+		margin-bottom: 0.2in;
+	}
+
+	.treasure-section {
+		border: 1px solid #999;
+		padding: 8px;
+	}
+
+	/* Floating Button */
+	.export-fab {
+		position: fixed;
+		bottom: 1.5rem;
+		right: 1.5rem;
+		background: #2563eb;
+		color: #fff;
+		font-weight: 600;
+		padding: 0.75rem 1.25rem;
+		border-radius: 9999px;
+		border: none;
+		cursor: pointer;
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+		transition: background 0.2s;
+		z-index: 100;
+	}
+
+	.export-fab:hover {
+		background: #1d4ed8;
+	}
+
+	/* Modal */
+	.dialog-backdrop {
+		position: fixed;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.4);
+		z-index: 200;
+	}
+
+	.dialog {
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		background: white;
+		padding: 2rem;
+		border-radius: 0.75rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+		z-index: 201;
+		min-width: 300px;
+	}
+
+	.dialog h2 {
+		margin: 0 0 0.5rem 0;
+		font-size: 1.25rem;
+	}
+
+	.dialog button {
+		padding: 0.5rem 1rem;
+		font-weight: 600;
+		border: 1px solid #ccc;
+		border-radius: 6px;
+		cursor: pointer;
+		background: white;
+		transition: all 0.2s;
+	}
+
+	.dialog button:hover {
+		background: #f3f4f6;
+	}
+
+	.close-btn {
+		background: #f3f4f6 !important;
+	}
+
+	.close-btn:hover {
+		background: #e5e7eb !important;
+	}
+
+	/* Print styles */
+	@media print {
+		.export-container {
+			margin: 0;
+			padding: 0;
+			background: white;
+		}
+
+		.export-fab,
+		.dialog,
+		.dialog-backdrop {
+			display: none !important;
+		}
+
+		.sheet-page {
+			margin: 0;
+			border: none;
+			box-shadow: none;
+			page-break-after: always;
+		}
 	}
 </style>

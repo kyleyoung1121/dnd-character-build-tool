@@ -1,218 +1,401 @@
 <script lang="ts">
 	import { character_store } from '$lib/stores/character_store';
 	import type { Character } from '$lib/stores/character_store';
-	import CharacterSheet from '$lib/components/CharacterSheet.svelte';
+	import { mapCharacterToSheetData } from '$lib/pdf/character-data-mapper';
+	import { generateCharacterSheet, downloadCharacterSheet } from '$lib/pdf/pdf-generator';
 	import { onMount } from 'svelte';
 
-	let showDialog = false;
-	let pageStackRef: HTMLDivElement;
-	let html2pdf: any = null;
-
 	let character: Character;
+	let pdfUrl: string | null = null;
+	let isGenerating = false;
+	let errorMessage = '';
+	let showExportDialog = false;
+
 	const unsubscribe = character_store.subscribe((value) => {
 		character = value;
+		if (typeof window !== 'undefined') {
+			generatePreview();
+		}
 	});
 
 	onMount(() => {
-		if (typeof window !== 'undefined') {
-			import('html2pdf.js').then((mod) => {
-				html2pdf = mod.default;
-			});
-		}
-		return () => unsubscribe();
+		generatePreview();
+		return () => {
+			unsubscribe();
+			if (pdfUrl) {
+				URL.revokeObjectURL(pdfUrl);
+			}
+		};
 	});
 
-
-	function toggleDialog() {
-		showDialog = !showDialog;
-	}
-
-	async function downloadPDF() {
-		if (!html2pdf) {
-			console.error('html2pdf not yet loaded');
-			return;
+	async function generatePreview() {
+		if (!character) return;
+		
+		isGenerating = true;
+		errorMessage = '';
+		
+		try {
+			if (pdfUrl) {
+				URL.revokeObjectURL(pdfUrl);
+			}
+			
+			const sheetData = mapCharacterToSheetData(character);
+			pdfUrl = await generateCharacterSheet(sheetData);
+		} catch (error) {
+			console.error('Failed to generate PDF preview:', error);
+			errorMessage = error instanceof Error ? error.message : 'Failed to generate PDF preview';
+		} finally {
+			isGenerating = false;
 		}
-		showDialog = false;
-
-		const element = pageStackRef;
-		if (!element) return;
-
-		const opt = {
-			margin: 0.25,
-			filename: `${character.name || 'character'}_sheet.pdf`,
-			image: { type: 'jpeg', quality: 0.98 },
-			html2canvas: { scale: 2, useCORS: true },
-			jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-			pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-		};
-
-		await html2pdf().from(element).set(opt).save();
 	}
 
-	function handleDummy(action: string) {
-		alert(`${action} clicked`);
+	async function handleDownload() {
+		try {
+			const sheetData = mapCharacterToSheetData(character);
+			await downloadCharacterSheet(sheetData, `${character.name || 'character'}-sheet.pdf`);
+			showExportDialog = false;
+		} catch (error) {
+			console.error('Failed to download PDF:', error);
+			errorMessage = error instanceof Error ? error.message : 'Failed to download PDF';
+		}
 	}
 
-	// Helper function to calculate ability modifier
-	function getModifier(score: number | null): string {
-		if (score === null) return '+0';
-		const mod = Math.floor((score - 10) / 2);
-		return mod >= 0 ? `+${mod}` : `${mod}`;
+	function toggleExportDialog() {
+		showExportDialog = !showExportDialog;
+	}
+
+	function handlePrint() {
+		if (pdfUrl) {
+			const iframe = document.createElement('iframe');
+			iframe.style.display = 'none';
+			iframe.src = pdfUrl;
+			document.body.appendChild(iframe);
+			iframe.onload = () => {
+				iframe.contentWindow?.print();
+			};
+		}
 	}
 </script>
 
-<div class="export-container">
-	<!-- Printable region -->
-	<div bind:this={pageStackRef} class="page-stack">
-		<CharacterSheet {character} />
+<div class="export-page">
+	<div class="content-wrapper">
+		{#if errorMessage}
+			<div class="error-message">
+				<h3>Error Generating Character Sheet</h3>
+				<p>{errorMessage}</p>
+				<button class="btn-retry" on:click={generatePreview}>
+					Try Again
+				</button>
+			</div>
+		{:else if isGenerating}
+			<div class="loading-state">
+				<div class="spinner"></div>
+				<p>Generating your character sheet...</p>
+			</div>
+		{:else if pdfUrl}
+			<div class="pdf-preview-container">
+				<iframe
+					src="{pdfUrl}#toolbar=0&navpanes=0&scrollbar=1"
+					class="pdf-viewer"
+					title="Character sheet"
+				></iframe>
+			</div>
+
+			<!-- Floating Action Button -->
+			<button class="fab" on:click={toggleExportDialog}>
+				Finish Export
+			</button>
+		{:else}
+			<div class="empty-state">
+				<p>No character data available</p>
+			</div>
+		{/if}
 	</div>
 
-	<!-- Floating download button -->
-	<button class="export-fab" on:click={toggleDialog}>Finish Export</button>
-
-	<!-- Modal -->
-	{#if showDialog}
-		<div class="dialog-backdrop" on:click={toggleDialog} role="button" tabindex="-1"></div>
+	<!-- Export Dialog -->
+	{#if showExportDialog}
+		<div class="dialog-backdrop" on:click={toggleExportDialog} role="button" tabindex="-1" 
+			on:keydown={(e) => e.key === 'Escape' && toggleExportDialog()}>
+		</div>
 		<div class="dialog" role="dialog">
-			<h2>Export Options</h2>
-			<button on:click={downloadPDF}>Download as PDF</button>
-			<button on:click={() => handleDummy('Send to E&D Team')}>Send to E&D Team</button>
-			<button on:click={() => handleDummy('Save Character')}>Save Character</button>
-			<button class="close-btn" on:click={toggleDialog}>Close</button>
+			<h2>Export Your Character</h2>
+			<p>Your character sheet is ready to export.</p>
+			
+			<div class="dialog-actions">
+				<button class="btn-primary" on:click={handleDownload}>
+					Download PDF
+				</button>
+				<button class="btn-secondary" on:click={handlePrint}>
+					Print
+				</button>
+			</div>
+			
+			<button class="btn-close" on:click={toggleExportDialog}>Close</button>
 		</div>
 	{/if}
 </div>
 
 <style>
-	.export-container {
-		margin-top: 4rem;
-		padding-bottom: 5rem;
-		display: flex;
-		justify-content: center;
-		background: #e5e7eb;
+	.export-page {
+		min-height: 100vh;
+		background: white;
+		padding: 6rem 2rem 2rem 2rem;
 	}
 
-	.page-stack {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
+	.header {
+		max-width: 1000px;
+		margin: 0 auto 2rem auto;
+		text-align: center;
+	}
+
+	.header p {
+		font-size: 1rem;
+		color: #666;
+		margin: 0;
+	}
+
+	.content-wrapper {
+		max-width: 1000px;
+		margin: 0 auto;
+	}
+
+	/* Error State */
+	.error-message {
+		background: white;
+		border: 2px solid #dc2626;
+		border-radius: 8px;
+		padding: 2rem;
+		text-align: center;
+	}
+
+	.error-message h3 {
+		color: #dc2626;
+		font-size: 1.25rem;
+		margin: 0 0 0.5rem 0;
+	}
+
+	.error-message p {
+		color: #666;
+		margin: 0 0 1rem 0;
+	}
+
+	.btn-retry {
+		background: #dc2626;
+		color: white;
+		border: none;
+		border-radius: 6px;
+		padding: 0.75rem 1.5rem;
+		font-size: 1rem;
+		font-weight: 500;
+		cursor: pointer;
+		transition: background 0.2s;
+	}
+
+	.btn-retry:hover {
+		background: #b91c1c;
+	}
+
+	/* Loading State */
+	.loading-state {
+		background: white;
+		border-radius: 8px;
+		padding: 3rem;
+		text-align: center;
+	}
+
+	.spinner {
+		width: 50px;
+		height: 50px;
+		border: 4px solid #e5e7eb;
+		border-top-color: #3b82f6;
+		border-radius: 50%;
+		animation: spin 1s linear infinite;
+		margin: 0 auto 1rem auto;
+	}
+
+	@keyframes spin {
+		to { transform: rotate(360deg); }
+	}
+
+	.loading-state p {
+		color: #666;
+		font-size: 1rem;
+		margin: 0;
+	}
+
+	/* PDF Preview */
+	.pdf-preview-container {
+		background: white;
+		border-radius: 8px;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		margin-bottom: 2rem;
+		overflow: hidden;
+		/* Use viewport height - works on any monitor */
+		height: 80vh;
+		min-height: 2070px;
+		max-width: 800px;
+	}
+
+	.pdf-viewer {
 		width: 100%;
-		padding: 2rem 0;
+		height: 100%;
+		border: none;
 	}
 
-	/* Floating "Finish Export" button */
-	.export-fab {
+	/* Floating Action Button */
+	.fab {
 		position: fixed;
 		bottom: 2rem;
 		right: 2rem;
-		padding: 0.9rem 1.6rem;
-		border-radius: 2rem;
-		background-color: #2563eb; /* blue-600 */
+		background: #3b82f6;
 		color: white;
-		font-weight: bold;
 		border: none;
-		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+		border-radius: 50px;
+		padding: 1rem 2rem;
+		font-size: 1rem;
+		font-weight: 600;
 		cursor: pointer;
-		font-size: 0.9rem;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		transition: background-color 0.2s, transform 0.1s;
-		z-index: 1000;
+		box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+		transition: all 0.3s ease;
+		z-index: 100;
 	}
 
-	.export-fab:hover {
-		background-color: #1d4ed8; /* blue-700 */
+	.fab:hover {
+		background: #2563eb;
+		transform: translateY(-2px);
+		box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
 	}
 
-	.export-fab:active {
-		transform: scale(0.96);
+	.fab:active {
+		transform: translateY(0);
 	}
 
-	/* Modal backdrop */
+	.btn-primary,
+	.btn-secondary {
+		border: none;
+		border-radius: 6px;
+		padding: 0.875rem 2rem;
+		font-size: 1rem;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.btn-primary {
+		background: #3b82f6;
+		color: white;
+	}
+
+	.btn-primary:hover {
+		background: #2563eb;
+	}
+
+	.btn-secondary {
+		background: white;
+		color: #3b82f6;
+		border: 2px solid #3b82f6;
+	}
+
+	.btn-secondary:hover {
+		background: #eff6ff;
+	}
+
+	/* Empty State */
+	.empty-state {
+		background: white;
+		border-radius: 8px;
+		padding: 3rem;
+		text-align: center;
+	}
+
+	.empty-state p {
+		color: #666;
+		font-size: 1rem;
+		margin: 0;
+	}
+
+	/* Dialog */
 	.dialog-backdrop {
 		position: fixed;
 		top: 0;
 		left: 0;
-		width: 100%;
-		height: 100%;
-		background-color: rgba(0, 0, 0, 0.5);
-		backdrop-filter: blur(2px);
-		z-index: 1000;
+		right: 0;
+		bottom: 0;
+		background: rgba(0, 0, 0, 0.5);
+		z-index: 200;
 	}
 
-	/* Modal container */
 	.dialog {
 		position: fixed;
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
 		background: white;
+		border-radius: 8px;
 		padding: 2rem;
-		border-radius: 1rem;
-		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-		width: 90%;
 		max-width: 400px;
-		z-index: 1001;
-		text-align: center;
+		width: 90%;
+		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+		z-index: 201;
 	}
 
 	.dialog h2 {
-		margin-bottom: 1rem;
-		font-size: 1.25rem;
-		color: #111827;
-	}
-
-	.dialog button {
-		display: block;
-		width: 100%;
-		padding: 0.75rem;
-		margin-top: 0.5rem;
-		border: none;
-		border-radius: 0.5rem;
+		margin: 0 0 0.5rem 0;
+		font-size: 1.5rem;
 		font-weight: 600;
+		color: #1a1a1a;
+	}
+
+	.dialog p {
+		margin: 0 0 1.5rem 0;
+		color: #666;
+	}
+
+	.dialog-actions {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		margin-bottom: 1rem;
+	}
+
+	.dialog .btn-primary,
+	.dialog .btn-secondary {
+		width: 100%;
+	}
+
+	.btn-close {
+		width: 100%;
+		background: #f5f5f5;
+		color: #666;
+		border: none;
+		border-radius: 6px;
+		padding: 0.75rem;
+		font-size: 0.9375rem;
+		font-weight: 500;
 		cursor: pointer;
-		background-color: #2563eb;
-		color: white;
-		transition: background-color 0.2s;
+		transition: background 0.2s;
 	}
 
-	.dialog button:hover {
-		background-color: #1d4ed8;
+	.btn-close:hover {
+		background: #e5e7eb;
 	}
 
-	.close-btn {
-		background-color: #e5e7eb;
-		color: #111827;
-	}
-
-	.close-btn:hover {
-		background-color: #d1d5db;
-	}
-
-	/* Print adjustments */
-	@media print {
-		body {
-			margin: 0;
+	/* Responsive */
+	@media (max-width: 768px) {
+		.export-page {
+			padding: 5rem 1rem 1rem 1rem;
 		}
 
-		.export-container {
-			margin: 0;
-			padding: 0;
-			background: white;
+		.pdf-preview-container {
+			height: calc(100vh - 7rem);
+			min-height: 500px;
 		}
 
-		.export-fab,
-		.dialog,
-		.dialog-backdrop {
-			display: none !important;
-		}
-
-		.sheet-page {
-			box-shadow: none;
-			border: none;
-			margin: 0;
-			page-break-after: always;
+		.fab {
+			bottom: 1rem;
+			right: 1rem;
+			padding: 0.875rem 1.5rem;
+			font-size: 0.9375rem;
 		}
 	}
 </style>

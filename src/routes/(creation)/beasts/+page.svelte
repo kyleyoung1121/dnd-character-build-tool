@@ -166,12 +166,46 @@
 		selectedCRs = [];
 	}
 
-	// Check for existing background selection on mount and restore feature selections
-	onMount(() => {
-		const state = get(character_store);
-		let previous_beasts = state.beasts;
-		selectedBeasts = availableBeasts.filter((beast) => previous_beasts?.some((beastName) => beastName === beast.name))
+	// Persist beast selections to character store
+	function persistBeastSelections() {
+		const scopeId = 'beast_selections';
+		// Store beast names in character.beasts array
+		const beastSelections = {
+			beasts: selectedBeasts.map(b => b.name)
+		};
+		applyChoice(scopeId, beastSelections);
+	}
 
+	// Restore beast selections from character store
+	function restoreBeastSelectionsFromStore() {
+		const char = $character_store;
+		if (!char._provenance) return;
+
+		const scopeId = 'beast_selections';
+		const provenanceData = char._provenance[scopeId];
+
+		if (provenanceData) {
+			const actualData = provenanceData._set || provenanceData;
+			
+			if (actualData.beasts && Array.isArray(actualData.beasts)) {
+				// Restore beast selections from names
+				selectedBeasts = actualData.beasts
+					.map((name) => beasts.find(b => b.name === name))
+					.filter((b) => b !== undefined); // Filter out any beasts that no longer exist
+			}
+		}
+	}
+
+	// Persist whenever selectedBeasts changes
+	$: {
+		if (selectedBeasts) {
+			persistBeastSelections();
+		}
+	}
+
+	// Restore selections when component mounts
+	onMount(() => {
+		restoreBeastSelectionsFromStore();
 	});
 </script>
 

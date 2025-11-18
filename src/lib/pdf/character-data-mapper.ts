@@ -261,7 +261,7 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 		})),
 		
 		// Page 1 - Equipment & Features
-		equipment: (character.inventory || []).join(', '),
+		equipment: (character.inventory || []).join('\n'),
 		proficienciesAndLanguages: [
 			...(character.proficiencies || []).map(p => `• ${p}`),
 			'',

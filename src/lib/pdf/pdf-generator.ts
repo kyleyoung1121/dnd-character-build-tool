@@ -166,10 +166,11 @@ async function fillPage1(
 	
 	// Skills
 	const skillsConfig = PAGE_1_FIELDS.skills;
-	Object.keys(skillsConfig).forEach(skillKey => {
-		const skillValue = data.skills[skillKey];
+
+	(Object.keys(skillsConfig) as Array<keyof typeof skillsConfig>).forEach(key => {
+		const skillValue = data.skills[key];
 		if (skillValue) {
-			drawText(page, skillValue, skillsConfig[skillKey], font);
+			drawText(page, skillValue, skillsConfig[key], font);
 		}
 	});
 	
@@ -269,10 +270,11 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 		await fillPage1(page1, data, font);
 		await fillPage2(page2, data, font);
 		
-		// Save and return as data URL
 		const pdfBytes = await pdfDoc.save();
-		const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+		const byteArray = new Uint8Array(pdfBytes);
+		const blob = new Blob([byteArray], { type: 'application/pdf' });
 		return URL.createObjectURL(blob);
+
 	} catch (error) {
 		console.error('Error generating PDF:', error);
 		throw new Error(`Failed to generate character sheet: ${error instanceof Error ? error.message : 'Unknown error'}`);

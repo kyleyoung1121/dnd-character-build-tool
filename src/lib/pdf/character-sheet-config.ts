@@ -186,9 +186,9 @@ export const PAGE_1_FIELDS = {
 	
 	// Equipment (middle column)
 	equipment: {
-		x: 245,
-		y: 300,
-		width: 300,
+		x: 215,
+		y: 15,
+		width: 180,
 		height: 200,
 		fontSize: 9,
 		lineHeight: 12

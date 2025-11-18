@@ -6,6 +6,8 @@
  */
 
 import type { Character } from '$lib/stores/character_store';
+import { getWeaponData } from '$lib/data/equipment/weapon-data';
+import { formatFeaturesForPDF } from '$lib/data/features/feature-data';
 
 export interface CharacterSheetData {
 	// Page 1 - Header
@@ -268,7 +270,7 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 			'Languages:',
 			...(character.languages || []).map(l => `• ${l}`)
 		].join('\n'),
-		featuresAndTraits: (character.features || []).map(f => `• ${f}`).join('\n'),
+		featuresAndTraits: formatFeaturesForPDF(character.features || []),
 		
 		// Page 2 - Character Details (placeholders for now)
 		age: '',

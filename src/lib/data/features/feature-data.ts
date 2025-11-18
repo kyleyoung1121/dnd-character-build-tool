@@ -37,7 +37,11 @@ export const featureData: Record<string, FeatureData> = {
 	
 	'Rage': {
 		name: 'Rage',
-		description: "In battle, you fight with primal ferocity. On your turn, you can enter a rage as a bonus action.<br><br>While raging, you gain the following benefits if you aren't wearing heavy armor:<br>• You have advantage on Strength checks and Strength saving throws.<br>• When you make a melee weapon attack using Strength, you gain a +2 bonus to the damage roll.<br>• You have resistance to bludgeoning, piercing, and slashing damage.<br><br>Your rage lasts for 1 minute. It ends early if you are knocked unconscious or if your turn ends and you haven't attacked a hostile creature since your last turn or taken damage since then. You can also end your rage on your turn as a bonus action.<br><br>You can rage 2 times per day. You regain all expended uses when you finish a long rest.",
+		description: "As a bonus action on your turn, you can enter a barbaric rage lasting 1 minute, which grants you the following benefits:\n\
+• You make Strength checks and Strength saving throws with advantage\n\
+• You add +2 to the damage you inflict with Strength-based melee weapons\n\
+• You have resistance to bludgeoning, piercing and slashing damage\n\
+You can rage 3 times per long rest.",
 		source: 'class',
 		level: 1
 	},

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { get } from 'svelte/store';
+	import { onMount } from 'svelte';
 	import { character_store } from '$lib/stores/character_store';
 	import { applyChoice } from '$lib/stores/character_store_helpers';
 	import { base } from '$app/paths';
@@ -20,6 +21,9 @@
 
 	// Import background data
 	import { backgrounds } from '$lib/data/backgrounds';
+
+	// Import weapon utilities
+	import { extractWeaponsFromInventory, normalizeWeaponName } from '$lib/data/equipment/weapon-data';
 
 	import type {
 		ClassData,
@@ -70,6 +74,79 @@
 		if (currentClass) {
 			restoreEquipmentChoicesFromStore();
 		}
+	}
+	
+	// Apply fixed equipment on mount or when class changes
+	onMount(() => {
+		applyFixedEquipment();
+	});
+	
+	$: if (currentClass) {
+		applyFixedEquipment();
+	}
+	
+	$: if (currentBackground) {
+		applyFixedBackgroundEquipment();
+	}
+	
+	// Apply fixed class equipment to inventory and attacks
+	function applyFixedEquipment() {
+		if (!currentClass?.startingEquipment?.fixed) {
+			// If no fixed equipment, clean up any previously applied fixed equipment
+			const char = get(character_store);
+			const scopeId = 'class_fixed_equipment';
+			if (char._provenance?.[scopeId]) {
+				// Apply with empty arrays to clear
+				applyChoice(scopeId, {
+					inventory: [],
+					attacks: []
+				});
+			}
+			return;
+		}
+		
+		const fixedItems = currentClass.startingEquipment.fixed;
+		const scopeId = 'class_fixed_equipment';
+		
+		// Extract weapons from fixed equipment
+		const weaponNames = extractWeaponsFromInventory(fixedItems);
+		const normalizedWeapons = weaponNames.map(normalizeWeaponName);
+		
+		// applyChoice will automatically revert previous values if scope exists
+		applyChoice(scopeId, {
+			inventory: fixedItems,
+			attacks: normalizedWeapons
+		});
+	}
+	
+	// Apply fixed background equipment to inventory and attacks
+	function applyFixedBackgroundEquipment() {
+		if (!currentBackground?.startingEquipment?.fixed) {
+			// If no fixed equipment, clean up any previously applied fixed equipment
+			const char = get(character_store);
+			const scopeId = 'background_fixed_equipment';
+			if (char._provenance?.[scopeId]) {
+				// Apply with empty arrays to clear
+				applyChoice(scopeId, {
+					inventory: [],
+					attacks: []
+				});
+			}
+			return;
+		}
+		
+		const fixedItems = currentBackground.startingEquipment.fixed;
+		const scopeId = 'background_fixed_equipment';
+		
+		// Extract weapons from fixed equipment
+		const weaponNames = extractWeaponsFromInventory(fixedItems);
+		const normalizedWeapons = weaponNames.map(normalizeWeaponName);
+		
+		// applyChoice will automatically revert previous values if scope exists
+		applyChoice(scopeId, {
+			inventory: fixedItems,
+			attacks: normalizedWeapons
+		});
 	}
 
 	$: {
@@ -258,7 +335,15 @@
 		const selectedOption = choice.options[optionIndex];
 
 		const scopeId = `class_equipment_${choiceIndex}`;
-		applyChoice(scopeId, { inventory: selectedOption });
+		
+		// Extract weapons and add to attacks array
+		const weaponNames = extractWeaponsFromInventory(selectedOption);
+		const normalizedWeapons = weaponNames.map(normalizeWeaponName);
+		
+		applyChoice(scopeId, { 
+			inventory: selectedOption,
+			attacks: normalizedWeapons
+		});
 	}
 
 	// Handle main option selection for enhanced equipment choices
@@ -296,6 +381,16 @@
 		// If this option has direct items (no subchoices), apply immediately
 		if (selectedOption.items && !selectedOption.subChoices) {
 			selectionState.inventory = selectedOption.items;
+			
+			// Extract weapons and add to attacks array
+			const weaponNames = extractWeaponsFromInventory(selectedOption.items);
+			const normalizedWeapons = weaponNames.map(normalizeWeaponName);
+			
+			applyChoice(scopeId, {
+				...selectionState,
+				attacks: normalizedWeapons
+			});
+		} else {
 			applyChoice(scopeId, selectionState);
 		}
 		// If it has subchoices, wait for user to select those
@@ -362,10 +457,16 @@
 			}
 
 			selectionState.inventory = allItems;
+			
+			// Extract weapons and add to attacks array
+			const weaponNames = extractWeaponsFromInventory(allItems);
+			const normalizedWeapons = weaponNames.map(normalizeWeaponName);
+			
+			// Store in selection state
+			(selectionState as any).attacks = normalizedWeapons;
 		}
 
 		// Store the selection state in provenance
-
 		applyChoice(scopeId, selectionState);
 	}
 
@@ -380,7 +481,15 @@
 		const selectedOption = choice.options[optionIndex];
 
 		const scopeId = `background_equipment_${choiceIndex}`;
-		applyChoice(scopeId, { inventory: selectedOption });
+		
+		// Extract weapons and add to attacks array
+		const weaponNames = extractWeaponsFromInventory(selectedOption);
+		const normalizedWeapons = weaponNames.map(normalizeWeaponName);
+		
+		applyChoice(scopeId, { 
+			inventory: selectedOption,
+			attacks: normalizedWeapons
+		});
 	}
 
 	// Check if a subchoice needs resolution

@@ -1,7 +1,7 @@
 import { base } from '$app/paths';
 import type { ClassData, EquipmentChoice } from '$lib/data/types/ClassData';
 import type { FeaturePrompt } from '$lib/data/types/Features';
-import { martialMeleeWeapons, twoHandedWeapons } from '../equipment/weapons';
+import { martialMeleeWeapons, martialRangedWeapons, twoHandedWeapons } from '../equipment/weapons';
 
 const proficienciesPrompt: FeaturePrompt = {
 	name: 'Skill Proficiencies',
@@ -553,10 +553,15 @@ export const fighter: ClassData = {
 						subChoices: [
 							{
 								name: 'Martial Weapon',
-								description: 'Choose a one-handed martial weapon',
+								description: 'Choose a one-handed martial weapon (melee or ranged)',
 								type: 'weapon-list',
-								category: 'martial-melee',
-								options: martialMeleeWeapons.filter((w) => !twoHandedWeapons.includes(w)),
+								category: 'martial-one-handed',
+								options: [
+									...martialMeleeWeapons.filter((w) => !twoHandedWeapons.includes(w)),
+									'Blowgun', // One-handed martial ranged
+									'Hand crossbow', // One-handed martial ranged
+									'Net' // One-handed martial ranged (thrown)
+								],
 								count: 1
 							}
 						],
@@ -567,18 +572,18 @@ export const fighter: ClassData = {
 						subChoices: [
 							{
 								name: 'Primary Martial Weapon',
-								description: 'Choose your first martial weapon',
+								description: 'Choose your first martial weapon (melee or ranged)',
 								type: 'weapon-list',
-								category: 'martial-melee',
-								options: martialMeleeWeapons,
+								category: 'martial-all',
+								options: [...martialMeleeWeapons, ...martialRangedWeapons],
 								count: 1
 							},
 							{
 								name: 'Secondary Martial Weapon',
-								description: 'Choose your second martial weapon',
+								description: 'Choose your second martial weapon (melee or ranged)',
 								type: 'weapon-list',
-								category: 'martial-melee',
-								options: martialMeleeWeapons,
+								category: 'martial-all',
+								options: [...martialMeleeWeapons, ...martialRangedWeapons],
 								count: 1
 							}
 						]

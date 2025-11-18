@@ -149,6 +149,80 @@ function getSavingThrowModifier(
 }
 
 /**
+ * Calculate attack data from weapon names
+ * Looks up weapon properties and calculates attack bonus and damage
+ */
+function calculateAttacks(
+	character: Character,
+	strMod: number,
+	dexMod: number
+): Array<{ name: string; bonus: string; damage: string }> {
+	if (!character.attacks || character.attacks.length === 0) {
+		return [];
+	}
+	
+	const proficiencyBonus = getProficiencyBonus();
+	const attacks: Array<{ name: string; bonus: string; damage: string }> = [];
+	
+	// Assume proficiency with all weapons in attacks array
+	// Players can only select weapons they're proficient with through the equipment tab
+	
+	for (const weaponName of character.attacks.slice(0, 5)) {
+		const weaponData = getWeaponData(weaponName);
+		
+		if (!weaponData) {
+			// If weapon not found in database, still add proficiency bonus
+			attacks.push({
+				name: weaponName,
+				bonus: formatModifier(proficiencyBonus), // Still add prof bonus
+				damage: ''
+			});
+			continue;
+		}
+		
+		// Determine which ability modifier to use
+		let abilityMod: number;
+		if (weaponData.attackAbility === 'EITHER') {
+			// Finesse weapons - use higher of STR or DEX
+			abilityMod = Math.max(strMod, dexMod);
+		} else if (weaponData.attackAbility === 'DEX') {
+			abilityMod = dexMod;
+		} else {
+			// STR
+			abilityMod = strMod;
+		}
+		
+		// Calculate attack bonus: ability modifier + proficiency bonus
+		// Always add proficiency since player can only select weapons they're proficient with
+		const attackBonus = abilityMod + proficiencyBonus;
+		
+		// Format damage: dice + ability modifier + damage type
+		let damageWithModifier: string;
+		if (weaponData.damage === '0') {
+			// Special weapons like net - no damage
+			damageWithModifier = weaponData.damageType;
+		} else if (!weaponData.damage.includes('d')) {
+			// Flat damage weapons (like blowgun with damage "1")
+			// Evaluate the expression: base damage + ability modifier
+			const baseDamage = parseInt(weaponData.damage) || 0;
+			const totalDamage = baseDamage + abilityMod;
+			damageWithModifier = `${totalDamage} ${weaponData.damageType}`;
+		} else {
+			// Normal dice-based weapons
+			damageWithModifier = `${weaponData.damage}${abilityMod !== 0 ? formatModifier(abilityMod) : ''} ${weaponData.damageType}`;
+		}
+		
+		attacks.push({
+			name: weaponData.name,
+			bonus: formatModifier(attackBonus),
+			damage: damageWithModifier.trim()
+		});
+	}
+	
+	return attacks;
+}
+
+/**
  * Map character store data to PDF field data
  */
 export function mapCharacterToSheetData(character: Character): CharacterSheetData {
@@ -254,13 +328,7 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 		hitDice: '3d8', // Level 3 default, could be calculated based on class
 		
 		// Page 1 - Attacks
-		attacks: (character.attacks || []).slice(0, 5).map(attack => ({
-			name: attack.weapon || '',
-			bonus: formatModifier(attack.attack_type || 0),
-			damage: attack.damage_die 
-				? `${attack.damage_die} ${attack.damage_type || ''}`
-				: ''
-		})),
+		attacks: calculateAttacks(character, strMod, dexMod),
 		
 		// Page 1 - Equipment & Features
 		equipment: (character.inventory || []).join('\n'),

@@ -59,13 +59,51 @@ function drawText(
 }
 
 /**
- * Draw multi-line text in a text area
+ * Parse text with bold markers and return segments with font info
+ * <<BOLD:text>> becomes [{text: 'text', bold: true}]
+ */
+function parseTextWithBold(text: string): Array<{text: string; bold: boolean}> {
+	const segments: Array<{text: string; bold: boolean}> = [];
+	const regex = /<<BOLD:([^>]+)>>/g;
+	let lastIndex = 0;
+	let match;
+	
+	while ((match = regex.exec(text)) !== null) {
+		// Add text before the bold marker
+		if (match.index > lastIndex) {
+			segments.push({
+				text: text.substring(lastIndex, match.index),
+				bold: false
+			});
+		}
+		// Add the bold text
+		segments.push({
+			text: match[1],
+			bold: true
+		});
+		lastIndex = regex.lastIndex;
+	}
+	
+	// Add remaining text
+	if (lastIndex < text.length) {
+		segments.push({
+			text: text.substring(lastIndex),
+			bold: false
+		});
+	}
+	
+	return segments;
+}
+
+/**
+ * Draw multi-line text in a text area with support for bold text
  */
 function drawTextArea(
 	page: any,
 	text: string,
 	config: TextAreaConfig,
-	font: any
+	font: any,
+	boldFont: any
 ) {
 	const fontSize = config.fontSize || PDF_CONFIG.defaultFontSize;
 	const lineHeight = config.lineHeight || fontSize * 1.2;
@@ -75,50 +113,56 @@ function drawTextArea(
 		PDF_CONFIG.defaultColor.b
 	);
 	
-	// Split text into lines
-	const lines = text.split('\n');
+	// Convert <br> tags to newlines and split text into lines
+	const processedText = text.replace(/<br>/gi, '\n');
+	const lines = processedText.split('\n');
 	let currentY = config.y + config.height - lineHeight;
 	
 	for (const line of lines) {
 		if (currentY < config.y) break; // Stop if we run out of space
 		
-		// Word wrap if line is too long
-		const words = line.split(' ');
-		let currentLine = '';
+		// Parse line for bold markers
+		const segments = parseTextWithBold(line);
 		
-		for (const word of words) {
-			const testLine = currentLine ? `${currentLine} ${word}` : word;
-			const testWidth = font.widthOfTextAtSize(testLine, fontSize);
+		// Process each segment and wrap words
+		let currentX = config.x;
+		
+		for (const segment of segments) {
+			const segmentFont = segment.bold ? boldFont : font;
+			const words = segment.text.split(' ');
 			
-			if (testWidth > config.width && currentLine) {
-				// Draw current line and start new one
-				page.drawText(currentLine, {
-					x: config.x,
+			for (let i = 0; i < words.length; i++) {
+				const word = words[i];
+				const wordWidth = segmentFont.widthOfTextAtSize(word, fontSize);
+				const spaceWidth = segmentFont.widthOfTextAtSize(' ', fontSize);
+				
+				// Check if word fits on current line
+				if (currentX + wordWidth > config.x + config.width && currentX > config.x) {
+					// Move to next line
+					currentY -= lineHeight;
+					currentX = config.x;
+					if (currentY < config.y) return; // Out of space
+				}
+				
+				// Draw the word
+				page.drawText(word, {
+					x: currentX,
 					y: currentY,
 					size: fontSize,
-					font,
+					font: segmentFont,
 					color
 				});
-				currentLine = word;
-				currentY -= lineHeight;
 				
-				if (currentY < config.y) break;
-			} else {
-				currentLine = testLine;
+				// Move x position for next word
+				currentX += wordWidth;
+				if (i < words.length - 1) {
+					currentX += spaceWidth; // Add space between words
+				}
 			}
 		}
 		
-		// Draw remaining text
-		if (currentLine && currentY >= config.y) {
-			page.drawText(currentLine, {
-				x: config.x,
-				y: currentY,
-				size: fontSize,
-				font,
-				color
-			});
-			currentY -= lineHeight;
-		}
+		// Move to next line after processing all segments
+		currentY -= lineHeight;
 	}
 }
 
@@ -128,7 +172,8 @@ function drawTextArea(
 async function fillPage1(
 	page: any,
 	data: CharacterSheetData,
-	font: any
+	font: any,
+	boldFont: any
 ) {
 	// Header
 	drawText(page, data.characterName, PAGE_1_FIELDS.characterName, font);
@@ -198,9 +243,9 @@ async function fillPage1(
 	});
 	
 	// Equipment & Features
-	drawTextArea(page, data.equipment, PAGE_1_FIELDS.equipment, font);
-	drawTextArea(page, data.proficienciesAndLanguages, PAGE_1_FIELDS.proficienciesAndLanguages, font);
-	drawTextArea(page, data.featuresAndTraits, PAGE_1_FIELDS.featuresAndTraits, font);
+	drawTextArea(page, data.equipment, PAGE_1_FIELDS.equipment, font, boldFont);
+	drawTextArea(page, data.proficienciesAndLanguages, PAGE_1_FIELDS.proficienciesAndLanguages, font, boldFont);
+	drawTextArea(page, data.featuresAndTraits, PAGE_1_FIELDS.featuresAndTraits, font, boldFont);
 }
 
 /**
@@ -209,7 +254,8 @@ async function fillPage1(
 async function fillPage2(
 	page: any,
 	data: CharacterSheetData,
-	font: any
+	font: any,
+	boldFont: any
 ) {
 	// Character Name
 	drawText(page, data.characterName, PAGE_2_FIELDS.characterName, font);
@@ -224,24 +270,24 @@ async function fillPage2(
 	
 	// Backstory
 	if (data.personalityTraits) {
-		drawTextArea(page, data.personalityTraits, PAGE_2_FIELDS.personalityTraits, font);
+		drawTextArea(page, data.personalityTraits, PAGE_2_FIELDS.personalityTraits, font, boldFont);
 	}
 	if (data.ideals) {
-		drawTextArea(page, data.ideals, PAGE_2_FIELDS.ideals, font);
+		drawTextArea(page, data.ideals, PAGE_2_FIELDS.ideals, font, boldFont);
 	}
 	if (data.bonds) {
-		drawTextArea(page, data.bonds, PAGE_2_FIELDS.bonds, font);
+		drawTextArea(page, data.bonds, PAGE_2_FIELDS.bonds, font, boldFont);
 	}
 	if (data.flaws) {
-		drawTextArea(page, data.flaws, PAGE_2_FIELDS.flaws, font);
+		drawTextArea(page, data.flaws, PAGE_2_FIELDS.flaws, font, boldFont);
 	}
 	
 	// Additional Content
 	if (data.additionalFeatures) {
-		drawTextArea(page, data.additionalFeatures, PAGE_2_FIELDS.additionalFeatures, font);
+		drawTextArea(page, data.additionalFeatures, PAGE_2_FIELDS.additionalFeatures, font, boldFont);
 	}
 	if (data.treasureAndNotes) {
-		drawTextArea(page, data.treasureAndNotes, PAGE_2_FIELDS.treasureAndNotes, font);
+		drawTextArea(page, data.treasureAndNotes, PAGE_2_FIELDS.treasureAndNotes, font, boldFont);
 	}
 }
 
@@ -263,12 +309,13 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 		const page1 = pages[0];
 		const page2 = pages[1];
 		
-		// Embed font
+		// Embed fonts
 		const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+		const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 		
 		// Fill pages with data
-		await fillPage1(page1, data, font);
-		await fillPage2(page2, data, font);
+		await fillPage1(page1, data, font, boldFont);
+		await fillPage2(page2, data, font, boldFont);
 		
 		const pdfBytes = await pdfDoc.save();
 		const byteArray = new Uint8Array(pdfBytes);

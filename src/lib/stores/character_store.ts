@@ -1,11 +1,7 @@
 import { writable } from 'svelte/store';
 
-export type Attack = {
-	weapon: string;
-	attack_type: number;
-	damage_die: string;
-	damage_type: string;
-};
+// Attacks now store just weapon names - weapon data is looked up from weapon-data.ts
+export type Attack = string;
 
 export type Character = {
 	name: string;

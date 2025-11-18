@@ -248,7 +248,7 @@ export const barbarian: ClassData = {
 						items: ['Greataxe']
 					},
 					{
-						label: 'Other martial melee weapon',
+						label: 'Other martial weapon',
 						subChoices: [
 							{
 								name: 'Martial Melee Weapon',

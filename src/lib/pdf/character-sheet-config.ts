@@ -177,11 +177,14 @@ export const PAGE_1_FIELDS = {
 	
 	// Attacks (middle column)
 	attacks: [
-		{ name: { x: 250, y: 400, fontSize: 9 }, bonus: { x: 370, y: 400, fontSize: 9 }, damage: { x: 420, y: 400, fontSize: 9 } },
-		{ name: { x: 250, y: 385, fontSize: 9 }, bonus: { x: 370, y: 385, fontSize: 9 }, damage: { x: 420, y: 385, fontSize: 9 } },
-		{ name: { x: 250, y: 370, fontSize: 9 }, bonus: { x: 370, y: 370, fontSize: 9 }, damage: { x: 420, y: 370, fontSize: 9 } },
-		{ name: { x: 250, y: 355, fontSize: 9 }, bonus: { x: 370, y: 355, fontSize: 9 }, damage: { x: 420, y: 355, fontSize: 9 } },
-		{ name: { x: 250, y: 340, fontSize: 9 }, bonus: { x: 370, y: 340, fontSize: 9 }, damage: { x: 420, y: 340, fontSize: 9 } }
+		{ name: { x: 215, y: 445, fontSize: 9 }, bonus: { x: 275, y: 445, fontSize: 9 }, damage: { x: 300, y: 445, fontSize: 9 } },
+		{ name: { x: 215, y: 430, fontSize: 9 }, bonus: { x: 275, y: 430, fontSize: 9 }, damage: { x: 300, y: 430, fontSize: 9 } },
+		{ name: { x: 215, y: 415, fontSize: 9 }, bonus: { x: 275, y: 415, fontSize: 9 }, damage: { x: 300, y: 415, fontSize: 9 } },
+		{ name: { x: 215, y: 400, fontSize: 9 }, bonus: { x: 275, y: 400, fontSize: 9 }, damage: { x: 300, y: 400, fontSize: 9 } },
+		{ name: { x: 215, y: 385, fontSize: 9 }, bonus: { x: 275, y: 385, fontSize: 9 }, damage: { x: 300, y: 385, fontSize: 9 } },
+		{ name: { x: 215, y: 370, fontSize: 9 }, bonus: { x: 275, y: 370, fontSize: 9 }, damage: { x: 300, y: 370, fontSize: 9 } },
+		{ name: { x: 215, y: 355, fontSize: 9 }, bonus: { x: 275, y: 355, fontSize: 9 }, damage: { x: 300, y: 355, fontSize: 9 } },
+	
 	],
 	
 	// Equipment (middle column)
@@ -208,7 +211,7 @@ export const PAGE_1_FIELDS = {
 	featuresAndTraits: {
 		x: 420,
 		y: 270,
-		width: 200,
+		width: 145,
 		height: 380,
 		fontSize: 8,
 		lineHeight: 10

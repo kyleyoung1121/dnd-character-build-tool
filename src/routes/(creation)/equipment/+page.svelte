@@ -198,12 +198,15 @@
 			if (provenanceData) {
 				if (isEquipmentChoice(choice)) {
 					// Access data from _set property (character store wraps our data)
+					// This next line of code gives the following error.
+					// Property '_set' does not exist on type 'Partial<Character>'.ts(2339)
 					const actualData = provenanceData._set || provenanceData;
 
 					// Check if we have the new selection state format
 					if (actualData.selectedOption !== undefined) {
 						// Restore from stored selection state (new format)
 						newEquipmentChoices[choiceIndex] = {
+							// If I remove the option to try '._set', then the following lines of code enter error. saying selectedOption is not in actualData.
 							selectedOption: actualData.selectedOption,
 							subChoiceSelections: actualData.subChoiceSelections || {}
 						};

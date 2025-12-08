@@ -287,6 +287,8 @@ export function getProvenanceSummary(): Record<
 		if (!changes) continue;
 
 		summary[scopeId] = {
+			// As it stands, these lines produce typescript errors:
+			// Property 'skills' does not exist on type '{}'.ts(2339)
 			skills: Array.isArray(changes.skills) ? [...changes.skills] : [],
 			proficiencies: Array.isArray(changes.proficiencies) ? [...changes.proficiencies] : [],
 			languages: Array.isArray(changes.languages) ? [...changes.languages] : [],

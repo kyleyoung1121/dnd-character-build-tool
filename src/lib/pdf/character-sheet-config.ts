@@ -97,37 +97,37 @@ export const PAGE_1_FIELDS = {
 	},
 	
 	// Saving Throws (left column, below abilities)
-	// Note: User requested "left 3/16ths" but that would be off-page from x:70
-	// Keeping at reasonable position - may need adjustment after testing
+	// Shifted left to align with skills and make room for ability abbreviations
 	savingThrows: {
-		strength: { x: 100, y: 570, fontSize: 9 } as FieldConfig,
-		dexterity: { x: 100, y: 555, fontSize: 9 } as FieldConfig,
-		constitution: { x: 100, y: 540, fontSize: 9 } as FieldConfig,
-		intelligence: { x: 100, y: 525, fontSize: 9 } as FieldConfig,
-		wisdom: { x: 100, y: 510, fontSize: 9 } as FieldConfig,
-		charisma: { x: 100, y: 495, fontSize: 9 } as FieldConfig
+		strength: { x: 90, y: 570, fontSize: 9 } as FieldConfig,
+		dexterity: { x: 90, y: 555, fontSize: 9 } as FieldConfig,
+		constitution: { x: 90, y: 540, fontSize: 9 } as FieldConfig,
+		intelligence: { x: 90, y: 525, fontSize: 9 } as FieldConfig,
+		wisdom: { x: 90, y: 510, fontSize: 9 } as FieldConfig,
+		charisma: { x: 90, y: 495, fontSize: 9 } as FieldConfig
 	},
 	
 	// Skills (left column)
+	// Shifted left to make room for ability abbreviations on the right
 	skills: {
-		acrobatics: { x: 100, y: 450, fontSize: 9 } as FieldConfig,
-		animalHandling: { x: 100, y: 435, fontSize: 9 } as FieldConfig,
-		arcana: { x: 100, y: 420, fontSize: 9 } as FieldConfig,
-		athletics: { x: 100, y: 405, fontSize: 9 } as FieldConfig,
-		deception: { x: 100, y: 390, fontSize: 9 } as FieldConfig,
-		history: { x: 100, y: 375, fontSize: 9 } as FieldConfig,
-		insight: { x: 100, y: 360, fontSize: 9 } as FieldConfig,
-		intimidation: { x: 100, y: 345, fontSize: 9 } as FieldConfig,
-		investigation: { x: 100, y: 330, fontSize: 9 } as FieldConfig,
-		medicine: { x: 100, y: 315, fontSize: 9 } as FieldConfig,
-		nature: { x: 100, y: 300, fontSize: 9 } as FieldConfig,
-		perception: { x: 100, y: 285, fontSize: 9 } as FieldConfig,
-		performance: { x: 100, y: 270, fontSize: 9 } as FieldConfig,
-		persuasion: { x: 100, y: 255, fontSize: 9 } as FieldConfig,
-		religion: { x: 100, y: 240, fontSize: 9 } as FieldConfig,
-		sleightOfHand: { x: 100, y: 225, fontSize: 9 } as FieldConfig,
-		stealth: { x: 100, y: 210, fontSize: 9 } as FieldConfig,
-		survival: { x: 100, y: 195, fontSize: 9 } as FieldConfig
+		acrobatics: { x: 90, y: 450, fontSize: 9 } as FieldConfig,
+		animalHandling: { x: 90, y: 435, fontSize: 9 } as FieldConfig,
+		arcana: { x: 90, y: 420, fontSize: 9 } as FieldConfig,
+		athletics: { x: 90, y: 405, fontSize: 9 } as FieldConfig,
+		deception: { x: 90, y: 390, fontSize: 9 } as FieldConfig,
+		history: { x: 90, y: 375, fontSize: 9 } as FieldConfig,
+		insight: { x: 90, y: 360, fontSize: 9 } as FieldConfig,
+		intimidation: { x: 90, y: 345, fontSize: 9 } as FieldConfig,
+		investigation: { x: 90, y: 330, fontSize: 9 } as FieldConfig,
+		medicine: { x: 90, y: 315, fontSize: 9 } as FieldConfig,
+		nature: { x: 90, y: 300, fontSize: 9 } as FieldConfig,
+		perception: { x: 90, y: 285, fontSize: 9 } as FieldConfig,
+		performance: { x: 90, y: 270, fontSize: 9 } as FieldConfig,
+		persuasion: { x: 90, y: 255, fontSize: 9 } as FieldConfig,
+		religion: { x: 90, y: 240, fontSize: 9 } as FieldConfig,
+		sleightOfHand: { x: 90, y: 225, fontSize: 9 } as FieldConfig,
+		stealth: { x: 90, y: 210, fontSize: 9 } as FieldConfig,
+		survival: { x: 90, y: 195, fontSize: 9 } as FieldConfig
 	},
 	
 	
@@ -190,9 +190,9 @@ export const PAGE_1_FIELDS = {
 	// Equipment (middle column)
 	equipment: {
 		x: 215,
-		y: 15,
+		y: 70,
 		width: 180,
-		height: 200,
+		height: 150,
 		fontSize: 9,
 		lineHeight: 12
 	} as TextAreaConfig,
@@ -210,9 +210,9 @@ export const PAGE_1_FIELDS = {
 	// Features & Traits (right column)
 	featuresAndTraits: {
 		x: 420,
-		y: 270,
+		y: 75,
 		width: 145,
-		height: 380,
+		height: 575,
 		fontSize: 8,
 		lineHeight: 10
 	} as TextAreaConfig

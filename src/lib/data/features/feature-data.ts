@@ -1,13 +1,22 @@
 /**
- * D&D 5e Feature & Trait Data
- * Complete feature descriptions for PDF export
+ * D&D 5e Feature & Trait Data for PDF Export
  * 
- * ARCHITECTURE:
+ * NEW ARCHITECTURE (Dynamic Lookup):
  * - Features are stored by name in the character store as strings
- * - This file maps feature names to their full descriptions
- * - When generating PDF, we look up the description by feature name
- * - Multiple features can fit on page 1, overflow goes to page 2's additionalFeatures
+ * - During PDF generation, we look up the feature description from the original source files
+ *   (class files, race files, background files) using feature-lookup.ts
+ * - This maintains DRY principles - each feature description lives in only ONE place
+ * - No need to maintain a separate dictionary!
+ * 
+ * BENEFITS:
+ * - Single source of truth for feature descriptions
+ * - Automatically includes ALL features from all classes/races/backgrounds
+ * - No manual copying/pasting of descriptions
+ * - Easy to maintain and extend
  */
+
+import { lookupFeature, getFeatureDescription } from './feature-lookup';
+import type { Character } from '$lib/stores/character_store';
 
 export interface FeatureData {
 	name: string;
@@ -17,150 +26,65 @@ export interface FeatureData {
 }
 
 /**
- * Complete feature database
- * 
- * TO ADD MORE FEATURES:
- * 1. Find the feature name in your class/race data files (e.g., barbarian.ts)
- * 2. Copy the description from the D&D 5e SRD or Player's Handbook
- * 3. Add an entry here with the exact same name as in the class/race files
- * 4. Format: Keep line breaks as <br>, use bullet points with •
- * 5. Source should match where the feature comes from
- * 
- * CURRENT COVERAGE:
- * - Barbarian: Complete (all class features + subclass features)
- * - Other classes: TODO (to be added by user)
+ * DEPRECATED: Old hardcoded feature dictionary
+ * Kept for backwards compatibility but no longer needed
+ * The new system uses dynamic lookup from source files
  */
-export const featureData: Record<string, FeatureData> = {
-	// ==============================================
-	// BARBARIAN CLASS FEATURES
-	// ==============================================
-	
-	'Rage': {
-		name: 'Rage',
-		description: "As a bonus action on your turn, you can enter a barbaric rage lasting 1 minute, which grants you the following benefits:\n\
-• You make Strength checks and Strength saving throws with advantage\n\
-• You add +2 to the damage you inflict with Strength-based melee weapons\n\
-• You have resistance to bludgeoning, piercing and slashing damage\n\
-You can rage 3 times per long rest.",
-		source: 'class',
-		level: 1
-	},
-	
-	'Unarmored Defense': {
-		name: 'Unarmored Defense',
-		description: 'While you are not wearing any armor, your Armor Class equals 10 + your Dexterity modifier + your Constitution modifier. You can use a shield and still gain this benefit.',
-		source: 'class',
-		level: 1
-	},
-	
-	'Reckless Attack': {
-		name: 'Reckless Attack',
-		description: 'Starting at 2nd level, you can throw aside all concern for defense to attack with fierce desperation.<br><br>When you make your first attack on your turn, you can decide to attack recklessly. Doing so gives you advantage on melee weapon attack rolls using Strength during this turn, but attack rolls against you have advantage until your next turn.',
-		source: 'class',
-		level: 2
-	},
-	
-	'Danger Sense': {
-		name: 'Danger Sense',
-		description: "At 2nd level, you gain an uncanny sense of when things nearby aren't as they should be, giving you an edge when you dodge away from danger.<br><br>You have advantage on Dexterity saving throws against effects that you can see, such as traps and spells. To gain this benefit, you can't be blinded, deafened, or incapacitated.",
-		source: 'class',
-		level: 2
-	},
-	
-	// Primal Path: Berserker
-	'Frenzy': {
-		name: 'Frenzy',
-		description: 'Starting when you choose this path at 3rd level, you can go into a frenzy when you rage. If you do so, for the duration of your rage you can make a single melee weapon attack as a bonus action on each of your turns after this one. When your rage ends, you suffer one level of exhaustion.',
-		source: 'subclass',
-		level: 3
-	},
-	
-	// Primal Path: Totem Warrior
-	'Spirit Seeker': {
-		name: 'Spirit Seeker',
-		description: 'Yours is a path that seeks attunement with the natural world, giving you a kinship with beasts. At 3rd level when you adopt this path, you gain the ability to cast the beast sense and speak with animals spells, but only as rituals.',
-		source: 'subclass',
-		level: 3
-	},
-	
-	'Bear Totem Spirit': {
-		name: 'Bear Totem Spirit',
-		description: 'While raging, you have resistance to all damage except psychic damage. The spirit of the bear makes you tough enough to stand up to any punishment.',
-		source: 'subclass',
-		level: 3
-	},
-	
-	'Eagle Totem Spirit': {
-		name: 'Eagle Totem Spirit',
-		description: "While you're raging and aren't wearing heavy armor, other creatures have disadvantage on opportunity attack rolls against you, and you can use the Dash action as a bonus action on your turn. The spirit of the eagle makes you into a predator who can weave through the fray with ease.",
-		source: 'subclass',
-		level: 3
-	},
-	
-	'Wolf Totem Spirit': {
-		name: 'Wolf Totem Spirit',
-		description: "While you're raging, your friends have advantage on melee attack rolls against any creature within 5 feet of you that is hostile to you. The spirit of the wolf makes you a leader of hunters.",
-		source: 'subclass',
-		level: 3
-	},
-	
-	// ==============================================
-	// OTHER CLASSES (TO BE ADDED)
-	// ==============================================
-	// TODO: Fighter features
-	// TODO: Rogue features
-	// TODO: Wizard features
-	// TODO: Cleric features
-	// TODO: etc.
-	
-	// ==============================================
-	// RACIAL FEATURES (TO BE ADDED)
-	// ==============================================
-	// TODO: Darkvision
-	// TODO: Dwarven Resilience
-	// TODO: etc.
-	
-	// ==============================================
-	// BACKGROUND FEATURES (TO BE ADDED)
-	// ==============================================
-	// TODO: Background features
-};
+export const featureData: Record<string, FeatureData> = {};
 
 /**
- * Get feature data by name (case-insensitive)
+ * Get feature data by name using dynamic lookup
+ * This replaces the old hardcoded dictionary approach
+ * 
+ * @param featureName - Name of the feature to look up
+ * @param character - Optional character object to provide context (class, race, background)
+ * @returns FeatureData if found, null otherwise
  */
-export function getFeatureData(featureName: string): FeatureData | null {
-	// Try exact match first
-	if (featureData[featureName]) {
-		return featureData[featureName];
+export function getFeatureData(
+	featureName: string,
+	character?: Character
+): FeatureData | null {
+	// Use dynamic lookup from source files
+	const className = character?.class;
+	const raceName = character?.race || character?.subrace;
+	const backgroundName = character?.background;
+	
+	const feature = lookupFeature(featureName, className, raceName, backgroundName);
+	
+	if (!feature) {
+		return null;
 	}
 	
-	// Try case-insensitive match
-	const lowerName = featureName.toLowerCase();
-	const match = Object.keys(featureData).find(
-		key => key.toLowerCase() === lowerName
-	);
-	
-	return match ? featureData[match] : null;
+	// Convert FeaturePrompt to FeatureData format
+	return {
+		name: feature.name,
+		description: getFeatureDescription(featureName, className, raceName, backgroundName) || feature.description,
+		source: feature.source.includes('class') ? 'class' : 
+		        feature.source.includes('background') ? 'background' : 'race',
+		level: undefined // Not easily accessible from FeaturePrompt
+	};
 }
 
 /**
  * Check if a feature has data available
  */
-export function hasFeatureData(featureName: string): boolean {
-	return getFeatureData(featureName) !== null;
+export function hasFeatureData(featureName: string, character?: Character): boolean {
+	return getFeatureData(featureName, character) !== null;
 }
 
 /**
  * Format feature for PDF display
  * Returns formatted string with name and description
  * Uses special marker <<BOLD:text>> to indicate bold text
+ * 
+ * @param featureName - Name of the feature
+ * @param character - Character object to provide context for lookup
  */
-export function formatFeatureForPDF(featureName: string): string {
-	const featureData = getFeatureData(featureName);
+export function formatFeatureForPDF(featureName: string, character?: Character): string {
+	const featureData = getFeatureData(featureName, character);
 	
 	if (!featureData) {
-		// If feature not found in database, just show the name with bullet
+		// If feature not found, just show the name with bullet
 		return `• ${featureName}`;
 	}
 	
@@ -172,24 +96,30 @@ export function formatFeatureForPDF(featureName: string): string {
 /**
  * Format multiple features for PDF display
  * Separates each feature with double newline for spacing
+ * 
+ * @param featureNames - Array of feature names
+ * @param character - Character object to provide context for lookup
  */
-export function formatFeaturesForPDF(featureNames: string[]): string {
+export function formatFeaturesForPDF(featureNames: string[], character?: Character): string {
 	return featureNames
-		.map(name => formatFeatureForPDF(name))
+		.map(name => formatFeatureForPDF(name, character))
 		.join('\n\n'); // Double newline creates space between features
 }
 
 /**
- * Get list of features that have data available
- * Useful for testing/debugging
+ * DEPRECATED: Get list of features that have data available
+ * The new system uses dynamic lookup, so all features are automatically available
+ * Kept for backwards compatibility
  */
 export function getAvailableFeatures(): string[] {
-	return Object.keys(featureData);
+	return [];
 }
 
 /**
- * Get features by source (class, race, background, etc.)
+ * DEPRECATED: Get features by source (class, race, background, etc.)
+ * The new system uses dynamic lookup from source files
+ * Kept for backwards compatibility
  */
-export function getFeaturesBySource(source: FeatureData['source']): FeatureData[] {
-	return Object.values(featureData).filter(f => f.source === source);
+export function getFeaturesBySource(_source: FeatureData['source']): FeatureData[] {
+	return [];
 }

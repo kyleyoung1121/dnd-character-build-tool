@@ -771,7 +771,6 @@
 				</div>
 
 				<div class="popup-body">
-					<h2>{selectedSpecies.name}</h2>
 					<p class="description">{selectedSpecies.description}</p>
 
 					{#each selectedSpecies.speciesFeatures as feature}

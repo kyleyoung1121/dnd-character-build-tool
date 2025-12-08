@@ -294,7 +294,7 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 			charisma: `${formatModifier(getSavingThrowModifier(character, 'Charisma', chaMod))} Charisma Save`
 		},
 		
-		// Page 1 - Skills
+		// Page 1 - Skills (ability abbreviations drawn separately in gray)
 		skills: {
 			acrobatics: `${formatModifier(getSkillModifier(character, dexMod, 'Acrobatics'))} Acrobatics`,
 			animalHandling: `${formatModifier(getSkillModifier(character, wisMod, 'Animal Handling'))} Animal Handling`,
@@ -338,7 +338,7 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 			'Languages:',
 			...(character.languages || []).map(l => `• ${l}`)
 		].join('\n'),
-		featuresAndTraits: formatFeaturesForPDF(character.features || []),
+		featuresAndTraits: formatFeaturesForPDF(character.features || [], character),
 		
 		// Page 2 - Character Details (placeholders for now)
 		age: '',

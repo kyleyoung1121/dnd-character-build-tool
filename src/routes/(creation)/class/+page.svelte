@@ -493,7 +493,6 @@
 				</div>
 
 				<div class="popup-body">
-					<h2>{selectedClass.name}</h2>
 					<p class="description">{selectedClass.description}</p>
 					<p><strong>Primary Ability:</strong> {selectedClass.primaryAbility}</p>
 
@@ -692,7 +691,7 @@
 	.description {
 		font-size: 0.95rem;
 		color: #555;
-		margin-bottom: 1rem;
+		margin-bottom: 0.2rem;
 	}
 
 	.selected-class-card {
@@ -749,16 +748,27 @@
 		background-color: #fdd;
 	}
 
+	/* Feature card styling for popup content */
 	.feature-card {
-		border: 2px solid #ccc; /* default border slightly thicker for visibility */
+		border: 1px solid #ddd;
 		border-radius: 6px;
-		padding: 10px 12px;
-		margin: 10px 0;
-		background: #f9f9f9;
-		width: 100%;
-		max-width: 50vw;
-		box-sizing: border-box;
-		transition: border-color 0.2s ease; /* smooth transition when state changes */
+		padding: 12px;
+		margin-top: 12px;
+		background-color: #f9f9f9;
+	}
+
+	.feature-card h4 {
+		margin: 0 0 8px 0;
+		font-size: 1rem;
+		font-weight: bold;
+		color: #333;
+	}
+
+	.feature-card p {
+		margin: 0;
+		font-size: 0.9rem;
+		color: #555;
+		line-height: 1.4;
 	}
 
 	.popup-footer {

@@ -297,38 +297,9 @@
 				</div>
 
 				<div class="popup-body">
-					<h2>{selectedBackground.name}</h2>
 					<p class="description">{selectedBackground.description}</p>
 
-					<div class="background-details">
-						<div class="detail-section">
-							<h4>Skill Proficiencies</h4>
-							<p>{selectedBackground.skillProficiencies.join(', ')}</p>
-						</div>
-
-						{#if selectedBackground.languageCount}
-							<div class="detail-section">
-								<h4>Languages</h4>
-								<p>{selectedBackground.languageCount} of your choice</p>
-							</div>
-						{/if}
-
-						{#if selectedBackground.toolProficiencies && selectedBackground.toolProficiencies.length > 0}
-							<div class="detail-section">
-								<h4>Tool Proficiencies</h4>
-								<p>{selectedBackground.toolProficiencies.join(', ')}</p>
-							</div>
-						{/if}
-
-						<div class="detail-section">
-							<h4>Equipment</h4>
-							<ul>
-								{#each selectedBackground.equipment as item}
-									<li>{item}</li>
-								{/each}
-							</ul>
-						</div>
-					</div>
+					
 
 					{#each selectedBackground.backgroundFeatures as feature}
 						<div class="feature-card">
@@ -577,40 +548,41 @@
 		line-height: 1.4;
 	}
 
-	.popup-footer {
-		background: #f0f0f0;
+		.popup-footer {
 		padding: 12px 16px;
 		display: flex;
 		justify-content: flex-end;
-		gap: 12px;
+		gap: 10px;
 		border-top: 1px solid #ddd;
-	}
-
-	.cancel-button,
-	.add-button {
-		padding: 8px 16px;
-		border: none;
-		border-radius: 4px;
-		cursor: pointer;
-		font-weight: bold;
+		background: #f0f0f0;
 	}
 
 	.cancel-button {
-		background: #ccc;
-		color: #333;
+		background-color: #333;
+		color: white;
+		border: none;
+		padding: 0.6rem 1.2rem;
+		font-size: 1rem;
+		border-radius: 6px;
+		cursor: pointer;
+		transition: background-color 0.3s ease;
 	}
-
 	.cancel-button:hover {
-		background: #bbb;
+		background-color: #555;
 	}
 
 	.add-button {
-		background: #007bff;
+		background-color: #2e7d32;
 		color: white;
+		border: none;
+		padding: 0.6rem 1.2rem;
+		font-size: 1rem;
+		border-radius: 6px;
+		cursor: pointer;
+		transition: background-color 0.3s ease;
 	}
-
 	.add-button:hover {
-		background: #0056b3;
+		background-color: #1b4d20;
 	}
 
 	.selected-background-card {

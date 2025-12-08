@@ -59,6 +59,49 @@ function drawText(
 }
 
 /**
+ * Draw skill text with ability abbreviation in gray
+ * Example: "+5 Acrobatics" in black, then "(DEX)" in gray
+ */
+function drawSkillWithAbility(
+	page: any,
+	skillText: string,
+	abilityAbbr: string,
+	config: FieldConfig,
+	font: any
+) {
+	const fontSize = config.fontSize || PDF_CONFIG.defaultFontSize;
+	const blackColor = rgb(
+		PDF_CONFIG.defaultColor.r,
+		PDF_CONFIG.defaultColor.g,
+		PDF_CONFIG.defaultColor.b
+	);
+	const grayColor = rgb(0.5, 0.5, 0.5); // Medium gray
+	
+	// Draw main skill text in black
+	page.drawText(skillText, {
+		x: config.x,
+		y: config.y,
+		size: fontSize,
+		font,
+		color: blackColor
+	});
+	
+	// Calculate position for ability abbreviation
+	const skillWidth = font.widthOfTextAtSize(skillText, fontSize);
+	const spaceWidth = font.widthOfTextAtSize(' ', fontSize);
+	
+	// Draw ability abbreviation in gray, slightly smaller
+	const abilityFontSize = fontSize * 0.85; // 85% of normal size
+	page.drawText(`(${abilityAbbr})`, {
+		x: config.x + skillWidth + spaceWidth,
+		y: config.y,
+		size: abilityFontSize,
+		font,
+		color: grayColor
+	});
+}
+
+/**
  * Parse text with bold markers and return segments with font info
  * <<BOLD:text>> becomes [{text: 'text', bold: true}]
  */
@@ -209,13 +252,33 @@ async function fillPage1(
 	drawText(page, data.savingThrows.wisdom, saves.wisdom, font);
 	drawText(page, data.savingThrows.charisma, saves.charisma, font);
 	
-	// Skills
+	// Skills with ability abbreviations
 	const skillsConfig = PAGE_1_FIELDS.skills;
+	const skillAbilities: Record<string, string> = {
+		acrobatics: 'DEX',
+		animalHandling: 'WIS',
+		arcana: 'INT',
+		athletics: 'STR',
+		deception: 'CHA',
+		history: 'INT',
+		insight: 'WIS',
+		intimidation: 'CHA',
+		investigation: 'INT',
+		medicine: 'WIS',
+		nature: 'INT',
+		perception: 'WIS',
+		performance: 'CHA',
+		persuasion: 'CHA',
+		religion: 'INT',
+		sleightOfHand: 'DEX',
+		stealth: 'DEX',
+		survival: 'WIS'
+	};
 
 	(Object.keys(skillsConfig) as Array<keyof typeof skillsConfig>).forEach(key => {
 		const skillValue = data.skills[key];
 		if (skillValue) {
-			drawText(page, skillValue, skillsConfig[key], font);
+			drawSkillWithAbility(page, skillValue, skillAbilities[key], skillsConfig[key], font);
 		}
 	});
 	

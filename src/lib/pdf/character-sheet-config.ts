@@ -209,10 +209,10 @@ export const PAGE_1_FIELDS = {
 	
 	// Features & Traits (right column)
 	featuresAndTraits: {
-		x: 420,
-		y: 75,
-		width: 145,
-		height: 575,
+		x: 411,
+		y: 60,
+		width: 165,
+		height: 595,
 		fontSize: 8,
 		lineHeight: 10
 	} as TextAreaConfig

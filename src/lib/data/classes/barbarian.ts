@@ -42,8 +42,7 @@ const primalPathPrompt: FeaturePrompt = {
 					{
 						name: 'Frenzy',
 						id: 'barbarian_berserker_frenzy',
-						description:
-							'Starting when you choose this path at 3rd level, you can go into a frenzy when you rage. If you do so, for the duration of your rage you can make a single melee weapon attack as a bonus action on each of your turns after this one. When your rage ends, you suffer one level of exhaustion.',
+						description: "When you rage, you can enter a frenzy. For the rest of your rage, you can use a bonus action to make a melee weapon attack. When your rage ends, you suffer one level of exhaustion.",
 						source: 'barbarian.berserker',
 						effects: [
 							{
@@ -63,8 +62,7 @@ const primalPathPrompt: FeaturePrompt = {
 					{
 						name: 'Spirit Seeker',
 						id: 'barbarian_totem_spirit_seeker',
-						description:
-							'Yours is a path that seeks attunement with the natural world, giving you a kinship with beasts. You gain the ability to cast the beast sense and speak with animals spells, but only as rituals, as described in the Spellcasting section.',
+						description: "Your path attunes you to the natural world. You can cast <i>beast sense</i> and <i>speak with animals</i>, but only as rituals (add 10 minutes).",
 						source: 'barbarian.totem_warrior',
 						effects: [
 							{
@@ -170,8 +168,7 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 	{
 		name: 'Rage',
 		id: 'barbarian_rage',
-		description:
-			"In battle, you fight with primal ferocity. On your turn, you can enter a rage as a bonus action.<br><br>While raging, you gain the following benefits if you aren't wearing heavy armor:<br><ul><li>• You have advantage on Strength checks and Strength saving throws.</li><li>• When you make a melee weapon attack using Strength, you gain a bonus to the damage roll that increases as you gain levels as a barbarian, as shown in the Rage Damage column of the Barbarian table.</li><li>• You have resistance to bludgeoning, piercing, and slashing damage.</li></ul>If you are able to cast spells, you can't cast them or concentrate on them while raging.<br><br>Your rage lasts for 1 minute. It ends early if you are knocked unconscious or if your turn ends and you haven't attacked a hostile creature since your last turn or taken damage since then. You can also end your rage on your turn as a bonus action.<br><br>Once you have raged the number of times shown for your barbarian level in the Rages column of the Barbarian table, you must finish a long rest before you can rage again.",
+		description: "On your turn, you can rage as a bonus action. Rage lasts 1 minute and ends early if you fall unconscious or if your turn ends and you haven’t attacked or taken damage since your last turn.<br><br>While raging, you gain:<br><ul><li>• Advantage on Strength checks and Strength saving throws</li><li>• +2 bonus damage with Strength-based melee attacks</li><li>• Resistance to bludgeoning, piercing, and slashing damage</li></ul>You can’t cast or concentrate on spells while raging.<br><br>You can rage up to 3 times per long rest.",
 		source: 'barbarian',
 		effects: [
 			{
@@ -184,7 +181,7 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 	{
 		name: 'Unarmored Defense',
 		id: 'barbarian_unarmored_defense',
-		description: 'While not wearing armor, your AC equals 10 + Dex modifier + Con modifier.',
+		description: 'While not wearing armor, your AC is 10 + Dex + Con.',
 		source: 'barbarian',
 		effects: [
 			{
@@ -198,7 +195,7 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 		name: 'Reckless Attack',
 		id: 'barbarian_reckless_attack',
 		description:
-			'Starting at 2nd level, you can throw aside all concern for defense to attack with fierce desperation.<br><br>When you make your first attack on your turn, you can decide to attack recklessly. Doing so gives you advantage on melee weapon attack rolls using Strength during this turn, but attack rolls against you have advantage until your next turn.',
+			'When you attack, you can do so recklessly. This gives you advantage on melee weapon attack rolls using Strength during this turn, but attack rolls against you have advantage until your next turn.',
 		source: 'barbarian',
 		effects: [
 			{
@@ -212,7 +209,7 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 		name: 'Danger Sense',
 		id: 'barbarian_danger_sense',
 		description:
-			"At 2nd level, you gain an uncanny sense of when things nearby aren't as they should be, giving you an edge when you dodge away from danger.<br><br>You have advantage on Dexterity saving throws against effects that you can see, such as traps and spells. To gain this benefit, you can't be blinded, deafened, or incapacitated.",
+			"You have an uncanny sense of when things nearby aren't as they should be, helping you to dodge away from danger.<br><br>You have advantage on Dexterity saving throws against effects that you can see, such as traps and spells. To gain this benefit, you can't be blinded, deafened, or incapacitated.",
 		source: 'barbarian',
 		effects: [
 			{

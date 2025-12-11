@@ -329,8 +329,24 @@ export function generateDynamicOptions(
  * Utility: does an effect require a user choice in its target or value?
  */
 export function effectNeedsChoice(effect: any): boolean {
-	return (
-		(typeof effect.target === 'string' && effect.target.includes('{userChoice}')) ||
-		(typeof effect.value === 'string' && effect.value.includes('{userChoice}'))
-	);
+	// Check if target contains {userChoice}
+	if (typeof effect.target === 'string' && effect.target.includes('{userChoice}')) {
+		return true;
+	}
+	
+	// Check if value contains {userChoice} - handle both string and array forms
+	if (typeof effect.value === 'string' && effect.value.includes('{userChoice}')) {
+		return true;
+	}
+	
+	// Check arrays (e.g., value: ['{userChoice}'])
+	if (Array.isArray(effect.value)) {
+		for (const item of effect.value) {
+			if (typeof item === 'string' && item.includes('{userChoice}')) {
+				return true;
+			}
+		}
+	}
+	
+	return false;
 }

@@ -154,14 +154,24 @@
 		}
 	}
 
-	// Check for existing background selection on mount and restore feature selections
-	onMount(() => {
+		// Check for existing background selection on mount and restore feature selections
+	onMount(async () => {
 		const state = get(character_store);
-		if (!state.background) return;
+		if (!state.background) {
+			console.log('[BG DEBUG] No background selected, skipping restoration');
+			return;
+		}
+
+		console.log('[BG DEBUG] Starting background restoration for:', state.background);
 
 		// Find selected background
 		const found = backgrounds.find((bg) => bg.name === state.background);
-		if (!found) return;
+		if (!found) {
+			console.log('[BG DEBUG] Background not found in data:', state.background);
+			return;
+		}
+
+		console.log('[BG DEBUG] Found background data:', found.name, 'with', found.backgroundFeatures?.length || 0, 'features');
 
 		selectedBackgroundData = found;
 		featureSelections = {};
@@ -171,25 +181,47 @@
 		// Helper: convert stored snake_case value to display label
 		const tryRestoreFromValue = (val: string, optionMap: Map<string, string>) => {
 			const snakeVal = toSnakeCase(val);
+			console.log('[BG DEBUG] Trying to restore value:', val, '-> snake_case:', snakeVal);
 			for (const [key, label] of optionMap.entries()) {
-				if (snakeVal.includes(key)) return label;
+				if (snakeVal.includes(key)) {
+					console.log('[BG DEBUG] Match found!', snakeVal, 'matches', key, '-> label:', label);
+					return label;
+				}
 			}
+			console.log('[BG DEBUG] No match found for:', snakeVal);
 			return null;
 		};
 
-		// Recursive function to restore a feature and its nested prompts
-		const restoreFeatureSelection = (feature: FeaturePrompt) => {
-			const numPicks = feature.featureOptions?.numPicks || 1;
+		// Helper: Check if a nested feature has deeper provenance
+		const checkDeeperNestedProvenance = (feature: any, prov: any): boolean => {
+			if (!feature.featureOptions?.options) return false;
+			for (const opt of feature.featureOptions.options) {
+				if (typeof opt !== 'string' && opt.nestedPrompts) {
+					for (const nested of opt.nestedPrompts) {
+						const hasNestedProv = Object.keys(prov).some(k => 
+							k.startsWith(`feature:${nested.name}:`)
+						);
+						const hasDeeperProv = checkDeeperNestedProvenance(nested, prov);
+						if (hasNestedProv || hasDeeperProv) return true;
+					}
+				}
+			}
+			return false;
+		};
 
+		// Recursive function to restore nested features with parent context
+		const restoreNestedFeatureSelection = async (feature: FeaturePrompt, parentFeatureName: string, parentIndex: number) => {
+			console.log('[BG DEBUG] Restoring nested feature:', feature.name, 'with parent:', parentFeatureName, 'index:', parentIndex);
+
+			const numPicks = feature.featureOptions?.numPicks || 1;
+			
+			// Ensure the selection array exists
 			if (!featureSelections[feature.name]) {
 				featureSelections[feature.name] = Array(numPicks).fill(null);
-			} else {
-				ensureArrayLen(featureSelections[feature.name], numPicks);
 			}
-
-			const opts = feature.featureOptions?.options || [];
+			
 			const optionMap = new Map(
-				opts.map((o) => [
+				(feature.featureOptions?.options || []).map((o) => [
 					toSnakeCase(typeof o === 'string' ? o : o.name),
 					typeof o === 'string' ? o : o.name
 				])
@@ -199,10 +231,16 @@
 
 			for (let idx = 0; idx < numPicks; idx++) {
 				// Skip if already restored
-				if (featureSelections[feature.name][idx]) continue;
+				if (featureSelections[feature.name][idx]) {
+					console.log('[BG DEBUG] Nested feature', feature.name, 'index', idx, 'already restored');
+					continue;
+				}
 
-				const key = `feature:${feature.name}:${idx}`;
+				// Use the full nested path: parent_feature:parent_index:feature_name:index
+				const key = `feature:${parentFeatureName}:${parentIndex}:${feature.name}:${idx}`;
 				const stored: any = prov[key];
+
+				console.log('[BG DEBUG] Nested restore: Feature', feature.name, 'parent', parentFeatureName, 'idx', idx, 'key', key, 'stored:', stored);
 
 				let restored: string | null = null;
 
@@ -236,30 +274,253 @@
 					}
 				}
 
+				// If no direct provenance found, try to infer from deeper nested provenance
+				if (!restored && feature.featureOptions?.options) {
+					console.log('[BG DEBUG] Nested feature', feature.name, 'has no direct provenance, checking deeper nested options...');
+					for (const opt of feature.featureOptions.options) {
+						if (typeof opt !== 'string' && opt.nestedPrompts) {
+							console.log('[BG DEBUG] Checking nested option', opt.name, 'with', opt.nestedPrompts.length, 'nested prompts');
+							// Check if any deeper nested prompt of this option has provenance
+							for (const nested of opt.nestedPrompts) {
+								const hasNestedProv = Object.keys(prov).some(k => 
+									k.startsWith(`feature:${parentFeatureName}:${parentIndex}:${feature.name}:${idx}:${nested.name}:`)
+								);
+								const hasDeeperProv = checkDeeperNestedProvenance(nested, prov);
+								
+								console.log('[BG DEBUG] Nested Feature', feature.name, 'Option', opt.name, 'Deeper Nested', nested.name, 'hasNestedProv:', hasNestedProv, 'hasDeeperProv:', hasDeeperProv);
+								
+								if (hasNestedProv || hasDeeperProv) {
+									restored = opt.name;
+									console.log('[BG DEBUG] Inferred nested selection:', opt.name, 'for nested feature', feature.name);
+									break;
+								}
+							}
+							if (restored) break;
+						}
+					}
+				}
+
 				if (restored) {
 					featureSelections[feature.name][idx] = restored;
+					console.log('[BG DEBUG] Set nested featureSelections[\'', feature.name, '\'][', idx, '] =', restored);
+				}
+			}
+			
+			// Recurse into deeper nested prompts if any
+			if (feature.featureOptions?.options) {
+				for (const o of feature.featureOptions.options) {
+					if (typeof o !== 'string' && o.nestedPrompts) {
+						const selectedVal = featureSelections[feature.name].find((v) => v === o.name);
+						if (selectedVal) {
+							for (const nested of o.nestedPrompts) {
+								// Continue nesting with current feature as parent
+								await restoreNestedFeatureSelection(nested, feature.name, 0);
+							}
+						}
+					}
+				}
+			}
+		};
+
+		// Recursive function to restore a feature and its nested prompts
+		const restoreFeatureSelection = async (feature: FeaturePrompt) => {
+			console.log('[BG DEBUG] Processing feature:', feature.name, 'with options:', !!feature.featureOptions);
+
+			// Skip features without options - they don't need restoration
+			if (!feature.featureOptions) {
+				console.log('[BG DEBUG] Skipping feature', feature.name, 'no featureOptions');
+				return;
+			}
+
+			const numPicks = feature.featureOptions.numPicks || 1;
+			console.log('[BG DEBUG] Feature', feature.name, 'numPicks:', numPicks);
+
+			if (!featureSelections[feature.name]) {
+				featureSelections[feature.name] = Array(numPicks).fill(null);
+			} else {
+				ensureArrayLen(featureSelections[feature.name], numPicks);
+			}
+
+			const opts = feature.featureOptions.options || [];
+			const optionMap = new Map(
+				opts.map((o) => [
+					toSnakeCase(typeof o === 'string' ? o : o.name),
+					typeof o === 'string' ? o : o.name
+				])
+			);
+			console.log('[BG DEBUG] Feature', feature.name, 'has', opts.length, 'options:', opts.map(o => typeof o === 'string' ? o : o.name));
+
+			const prov = state._provenance || {};
+			console.log('[BG DEBUG] Provenance keys for', feature.name, ':', Object.keys(prov).filter(k => k.includes(feature.name)));
+
+			for (let idx = 0; idx < numPicks; idx++) {
+				// Skip if already restored
+				if (featureSelections[feature.name][idx]) {
+					console.log('[BG DEBUG] Feature', feature.name, 'index', idx, 'already restored');
+					continue;
+				}
+
+				const key = `feature:${feature.name}:${idx}`;
+				const stored: any = prov[key];
+
+				console.log('[BG DEBUG] Restore: Feature', feature.name, 'idx', idx, 'key', key, 'stored:', stored);
+
+				if (!stored) {
+					console.log('[BG DEBUG] No stored data for key:', key);
+					continue;
+				}
+
+				let restored: string | null = null;
+
+				// Try to restore from _set values
+				if (stored._set) {
+					console.log('[BG DEBUG] Found _set data for', feature.name, ':', stored._set);
+					
+					// First try matching against effect targets
+					for (const effect of feature.effects || []) {
+						const target = effect.target;
+						const arr = stored._set[target];
+						if (Array.isArray(arr)) {
+							for (const val of arr) {
+								const maybe = tryRestoreFromValue(val, optionMap);
+								if (maybe) {
+									restored = maybe;
+									break;
+								}
+							}
+						} else if (typeof arr === 'string') {
+							const maybe = tryRestoreFromValue(arr, optionMap);
+							if (maybe) restored = maybe;
+						}
+						if (restored) break;
+					}
+
+					// If not found via effects, try all _set keys directly
+					if (!restored) {
+						console.log('[BG DEBUG] Trying all _set keys directly for', feature.name);
+						for (const [setKey, setVal] of Object.entries(stored._set)) {
+							console.log('[BG DEBUG] Checking _set key:', setKey, 'value:', setVal);
+							if (Array.isArray(setVal)) {
+								for (const val of setVal) {
+									const maybe = tryRestoreFromValue(String(val), optionMap);
+									if (maybe) {
+										restored = maybe;
+										break;
+									}
+								}
+							} else if (typeof setVal === 'string') {
+								const maybe = tryRestoreFromValue(setVal, optionMap);
+								if (maybe) restored = maybe;
+							}
+							if (restored) break;
+						}
+					}
+				}
+
+				// Try to restore from _mods (for ability score bumps etc.)
+				if (!restored && stored._mods) {
+					console.log('[BG DEBUG] Trying _mods for', feature.name, ':', stored._mods);
+					for (const modKey of Object.keys(stored._mods)) {
+						const maybe = tryRestoreFromValue(modKey, optionMap);
+						if (maybe) {
+							restored = maybe;
+							break;
+						}
+					}
+				}
+
+				// If no direct provenance found, try to infer from nested provenance
+				// This handles features with empty effects
+				if (!restored && feature.featureOptions?.options) {
+					console.log('[BG DEBUG] Feature', feature.name, 'has no direct provenance, checking nested options...');
+					for (const opt of feature.featureOptions.options) {
+						if (typeof opt !== 'string' && opt.nestedPrompts) {
+							console.log('[BG DEBUG] Checking option', opt.name, 'with', opt.nestedPrompts.length, 'nested prompts');
+							// Check if any nested prompt of this option has provenance
+							for (const nested of opt.nestedPrompts) {
+								const hasNestedProv = Object.keys(prov).some(k => 
+									k.startsWith(`feature:${nested.name}:`)
+								);
+								const hasDeeperProv = checkDeeperNestedProvenance(nested, prov);
+								
+								console.log('[BG DEBUG] Feature', feature.name, 'Option', opt.name, 'Nested', nested.name, 'hasNestedProv:', hasNestedProv, 'hasDeeperProv:', hasDeeperProv);
+								
+								if (hasNestedProv || hasDeeperProv) {
+									restored = opt.name;
+									console.log('[BG DEBUG] Inferred selection:', opt.name, 'for feature', feature.name);
+									break;
+								}
+							}
+							if (restored) break;
+						}
+					}
+				}
+
+				if (restored) {
+					featureSelections[feature.name][idx] = restored;
+					console.log('[BG DEBUG] Set featureSelections[\'', feature.name, '\'][', idx, '] =', restored);
+				} else {
+					console.log('[BG DEBUG] Failed to restore any value for feature:', feature.name, 'index:', idx);
 				}
 			}
 
 			// Recurse into nested prompts if any
 			if (feature.featureOptions?.options) {
-				feature.featureOptions.options.forEach((o) => {
+				for (const o of feature.featureOptions.options) {
 					if (typeof o !== 'string' && o.nestedPrompts) {
 						const selectedVal = featureSelections[feature.name].find((v) => v === o.name);
 						if (selectedVal) {
-							o.nestedPrompts.forEach((nested) => restoreFeatureSelection(nested));
+							console.log('[BG DEBUG] Found selection for', o.name, 'restoring nested prompts');
+							for (const nested of o.nestedPrompts) {
+								// Pass parent context to nested restoration
+								await restoreNestedFeatureSelection(nested, feature.name, 0);
+							}
+						} else {
+							// Even if parent selection is not restored, check if nested prompts have provenance data
+							// This handles cases where the parent selection restoration failed but nested data exists
+							console.log('[BG DEBUG] Parent selection for', o.name, 'not found, checking for nested provenance');
+							for (const nested of o.nestedPrompts) {
+								// Check for provenance at any index for this nested feature
+								const hasNestedProvenance = Object.keys(prov).some(k => 
+									k.startsWith(`feature:${nested.name}:`)
+								);
+								
+								// Also recursively check if any deeper nested features have provenance
+								const hasDeeperNestedProvenance = checkDeeperNestedProvenance(nested, prov);
+								
+								if (hasNestedProvenance || hasDeeperNestedProvenance) {
+									console.log('[BG DEBUG] Found nested provenance for', nested.name, 'forcing parent selection');
+									// Force parent selection to match this nested data existence
+									if (!featureSelections[feature.name].includes(o.name)) {
+										// Find first empty slot and set the parent selection
+										const emptyIdx = featureSelections[feature.name].findIndex((v) => v === null);
+										if (emptyIdx !== -1) {
+											featureSelections[feature.name][emptyIdx] = o.name;
+											console.log('[BG DEBUG] Set parent selection', o.name, 'at index', emptyIdx);
+										}
+									}
+									// Now restore the nested prompt with parent context
+									await restoreNestedFeatureSelection(nested, feature.name, 0);
+								}
+							}
 						}
 					}
-				});
+				}
 			}
 		};
 
-		// Restore all top-level features
-		found.backgroundFeatures?.forEach((feature) => restoreFeatureSelection(feature));
+		// Restore all top-level features that have options
+		console.log('[BG DEBUG] Starting restoration of', found.backgroundFeatures?.length || 0, 'background features');
+		for (const feature of found.backgroundFeatures || []) {
+			await restoreFeatureSelection(feature);
+		}
+
+		console.log('[BG DEBUG] Final featureSelections:', featureSelections);
 
 		// Trigger Svelte reactivity
 		featureSelections = { ...featureSelections };
 		bumpVersion();
+		console.log('[BG DEBUG] Background restoration completed');
 	});
 </script>
 

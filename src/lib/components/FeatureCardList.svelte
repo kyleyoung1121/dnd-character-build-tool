@@ -113,7 +113,11 @@
 			if (!effectNeedsChoice(effect)) continue; // skip static effects here
 
 			// Replace {userChoice} anywhere in target or value with the chosen value.
-			const replaceUC = (s: any, isTarget = false) => {
+			const replaceUC = (s: any, isTarget = false): any => {
+				// Handle arrays - recursively replace in each element
+				if (Array.isArray(s)) {
+					return s.map(item => replaceUC(item, isTarget));
+				}
 				if (typeof s !== 'string') return s;
 				let replaced = s.replace(/\{userChoice\}/g, choice);
 				if (isTarget) {

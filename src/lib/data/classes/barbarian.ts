@@ -6,12 +6,27 @@ import { martialMeleeWeapons, simpleWeapons } from '../equipment/weapons';
 const proficienciesPrompt: FeaturePrompt = {
 	name: 'Skill Proficiencies',
 	id: 'barbarian_skills_01',
-	description: `
-		Armor: Light armor, medium armor, shields <br>
-		Weapons: Simple weapons, martial weapons <br>
-		Saving Throws: Strength, Constitution <br>
-		Skills: Choose two from Animal Handling, Athletics, Intimidation, Nature, Perception, and Survival
-	`,
+	description: {
+		blocks: [
+			{
+				type: 'text',
+				text: 'Armor: Light armor, medium armor, shields'
+			},
+			{
+				type: 'text',
+				text: 'Weapons: Simple weapons, martial weapons'
+			},
+			{
+				type: 'text',
+				text: 'Saving Throws: Strength, Constitution'
+			},
+			{
+				type: 'text',
+				text:
+					'Skills: Choose two from Animal Handling, Athletics, Intimidation, Nature, Perception, and Survival'
+			}
+		]
+	},
 	featureOptions: {
 		placeholderText: 'Select 2 skills',
 		options: ['Animal Handling', 'Athletics', 'Intimidation', 'Nature', 'Perception', 'Survival'],
@@ -30,7 +45,14 @@ const proficienciesPrompt: FeaturePrompt = {
 const primalPathPrompt: FeaturePrompt = {
 	name: 'Primal Path',
 	id: 'barbarian_primal_path',
-	description: 'Choose a path that shapes the nature of your rage.',
+	description: {
+		blocks: [
+			{
+				type: 'text',
+				text: 'Choose a path that shapes the nature of your rage.'
+			}
+		]
+	},
 	featureOptions: {
 		placeholderText: '-Choose an Option-',
 		options: [
@@ -42,7 +64,14 @@ const primalPathPrompt: FeaturePrompt = {
 					{
 						name: 'Frenzy',
 						id: 'barbarian_berserker_frenzy',
-						description: "When you rage, you can enter a frenzy. For the rest of your rage, you can use a bonus action to make a melee weapon attack. When your rage ends, you suffer one level of exhaustion.",
+						description: {
+							blocks: [
+								{
+									type: 'text',
+									text: "When you rage, you can enter a frenzy. For the rest of your rage, you can use a bonus action to make a melee weapon attack. When your rage ends, you suffer one level of exhaustion."
+								}
+							]
+						},
 						source: 'barbarian.berserker',
 						effects: [
 							{
@@ -62,7 +91,14 @@ const primalPathPrompt: FeaturePrompt = {
 					{
 						name: 'Spirit Seeker',
 						id: 'barbarian_totem_spirit_seeker',
-						description: "Your path attunes you to the natural world. You can cast <i>beast sense</i> and <i>speak with animals</i>, but only as rituals (add 10 minutes).",
+						description: {
+							blocks: [
+								{
+									type: 'text',
+									text: "Your path attunes you to the natural world. You can cast <i>beast sense</i> and <i>speak with animals</i>, but only as rituals (add 10 minutes)."
+								}
+							]
+						},
 						source: 'barbarian.totem_warrior',
 						effects: [
 							{
@@ -75,8 +111,14 @@ const primalPathPrompt: FeaturePrompt = {
 					{
 						name: 'Totem Spirit',
 						id: 'barbarian_totem_totem_spirit',
-						description:
-							'At 3rd level when you adopt this path, you choose a totem spirit and gain its feature. You must make or acquire a physical totem object - an amulet or similar adornment - that incorporates fur or feathers, claws, teeth, or bones of the totem animal.',
+						description: {
+							blocks: [
+								{
+									type: 'text',
+									text: 'At 3rd level when you adopt this path, you choose a totem spirit and gain its feature. You must make or acquire a physical totem object - an amulet or similar adornment - that incorporates fur or feathers, claws, teeth, or bones of the totem animal.'
+								}
+							]
+						},
 						source: 'barbarian.totem_warrior',
 						featureOptions: {
 							placeholderText: 'Choose your totem spirit...',
@@ -89,8 +131,14 @@ const primalPathPrompt: FeaturePrompt = {
 										{
 											name: 'Bear Totem Warrior',
 											id: 'barbarian_bear_totem_warrior',
-											description:
-												'The bear spirit grants you incredible resilience. While raging, you have resistance to all damage except psychic damage.',
+											description: {
+												blocks: [
+													{
+														type: 'text',
+														text: 'The bear spirit grants you incredible resilience. While raging, you have resistance to all damage except psychic damage.'
+													}
+												]
+											},
 											source: 'barbarian.totem_warrior.bear',
 											effects: [
 												{
@@ -110,8 +158,14 @@ const primalPathPrompt: FeaturePrompt = {
 										{
 											name: 'Eagle Totem Warrior',
 											id: 'barbarian_eagle_totem_warrior',
-											description:
-												'The eagle spirit grants you incredible mobility. While raging and not wearing heavy armor, other creatures have disadvantage on opportunity attacks against you, and you can use the Dash action as a bonus action.',
+											description: {
+												blocks: [
+													{
+														type: 'text',
+														text: 'The eagle spirit grants you incredible mobility. While raging and not wearing heavy armor, other creatures have disadvantage on opportunity attacks against you, and you can use the Dash action as a bonus action.'
+													}
+												]
+											},
 											source: 'barbarian.totem_warrior.eagle',
 											effects: [
 												{
@@ -131,8 +185,14 @@ const primalPathPrompt: FeaturePrompt = {
 										{
 											name: 'Wolf Totem Warrior',
 											id: 'barbarian_wolf_totem_warrior',
-											description:
-												'The wolf spirit grants you leadership in battle. While raging, your friends have advantage on melee attack rolls against any creature within 5 feet of you that is hostile to you.',
+											description: {
+												blocks: [
+													{
+														type: 'text',
+														text: 'The wolf spirit grants you leadership in battle. While raging, your friends have advantage on melee attack rolls against any creature within 5 feet of you that is hostile to you.'
+													}
+												]
+											},
 											source: 'barbarian.totem_warrior.wolf',
 											effects: [
 												{
@@ -168,7 +228,39 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 	{
 		name: 'Rage',
 		id: 'barbarian_rage',
-		description: "On your turn, you can rage as a bonus action. Rage lasts 1 minute and ends early if you fall unconscious or if your turn ends and you haven’t attacked or taken damage since your last turn.<br><br>While raging, you gain:<br><ul><li>• Advantage on Strength checks and Strength saving throws</li><li>• +2 bonus damage with Strength-based melee attacks</li><li>• Resistance to bludgeoning, piercing, and slashing damage</li></ul>You can’t cast or concentrate on spells while raging.<br><br>You can rage up to 3 times per long rest.",
+		description: {
+			blocks: [
+				{
+					type: 'text',
+					text:
+						'On your turn, you can rage as a bonus action. Rage lasts 1 minute and ends early if you fall unconscious or if your turn ends and you haven’t attacked or taken damage since your last turn.'
+				},
+				{
+					type: 'text',
+					text: 'While raging, you gain:'
+				},
+				{
+					type: 'text',
+					text: '• Advantage on Strength checks and Strength saving throws'
+				},
+				{
+					type: 'text',
+					text: '• +2 bonus damage with Strength-based melee attacks'
+				},
+				{
+					type: 'text',
+					text: '• Resistance to bludgeoning, piercing, and slashing damage'
+				},
+				{
+					type: 'text',
+					text: 'You can’t cast or concentrate on spells while raging.'
+				},
+				{
+					type: 'text',
+					text: 'You can rage up to 3 times per long rest.'
+				}
+			]
+		},
 		source: 'barbarian',
 		effects: [
 			{
@@ -181,7 +273,14 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 	{
 		name: 'Unarmored Defense',
 		id: 'barbarian_unarmored_defense',
-		description: 'While not wearing armor, your AC is 10 + Dex + Con.',
+		description: {
+			blocks: [
+				{
+					type: 'text',
+					text: 'While not wearing armor, your Armor Class equals 10 + your Dexterity modifier + your Constitution modifier.'
+				}
+			]
+		},
 		source: 'barbarian',
 		effects: [
 			{
@@ -194,8 +293,20 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 	{
 		name: 'Reckless Attack',
 		id: 'barbarian_reckless_attack',
-		description:
-			'When you attack, you can do so recklessly. This gives you advantage on melee weapon attack rolls using Strength during this turn, but attack rolls against you have advantage until your next turn.',
+		description: {
+			blocks: [
+				{
+					type: 'text',
+					text:
+						'When you make your first attack on your turn, you can decide to attack recklessly.'
+				},
+				{
+					type: 'text',
+					text:
+						'Doing so gives you advantage on melee weapon attack rolls using Strength during this turn, but attack rolls against you have advantage until your next turn.'
+				}
+			]
+		},
 		source: 'barbarian',
 		effects: [
 			{
@@ -208,8 +319,25 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 	{
 		name: 'Danger Sense',
 		id: 'barbarian_danger_sense',
-		description:
-			"You have an uncanny sense of when things nearby aren't as they should be, helping you to dodge away from danger.<br><br>You have advantage on Dexterity saving throws against effects that you can see, such as traps and spells. To gain this benefit, you can't be blinded, deafened, or incapacitated.",
+		description: {
+			blocks: [
+				{
+					type: 'text',
+					text:
+						'You have an uncanny sense of when things nearby aren’t as they should be, helping you to dodge away from danger.'
+				},
+				{
+					type: 'text',
+					text:
+						'You have advantage on Dexterity saving throws against effects that you can see, such as traps and spells.'
+				},
+				{
+					type: 'text',
+					text:
+						'To gain this benefit, you can’t be blinded, deafened, or incapacitated.'
+				}
+			]
+		},
 		source: 'barbarian',
 		effects: [
 			{
@@ -220,6 +348,7 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 		]
 	}
 ];
+
 
 export const barbarian: ClassData = {
 	name: 'Barbarian',

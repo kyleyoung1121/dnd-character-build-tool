@@ -23,7 +23,11 @@ export const soldier: BackgroundData = {
 		{
 			name: 'Skill Proficiencies',
 			id: 'soldier_skills',
-			description: 'You gain proficiency in Athletics and Intimidation.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency in Athletics and Intimidation.' },
+				]
+			},
 			source: 'background:Soldier',
 			effects: [
 				{
@@ -36,7 +40,11 @@ export const soldier: BackgroundData = {
 		{
 			name: 'Tool Proficiencies',
 			id: 'soldier_tools',
-			description: 'You gain proficiency with one type of gaming set and vehicles (land).',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency with one type of gaming set and vehicles (land).' },
+				]
+			},
 			source: 'background:Soldier',
 			featureOptions: {
 				placeholderText: 'Select 1 gaming set',
@@ -54,8 +62,11 @@ export const soldier: BackgroundData = {
 		{
 			name: 'Equipment',
 			id: 'soldier_equipment',
-			description:
-				'You start with insignia of rank, trophy from fallen enemy, deck of cards, common clothes, and 10 gp.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You start with insignia of rank, trophy from fallen enemy, deck of cards, common clothes, and 10 gp.' },
+				]
+			},
 			source: 'background:Soldier',
 			effects: [
 				{
@@ -74,8 +85,11 @@ export const soldier: BackgroundData = {
 		{
 			name: 'Military Rank',
 			id: 'soldier_feature',
-			description:
-				'You have a military rank that commands respect from other soldiers. You can invoke your rank to influence soldiers and requisition simple equipment.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You have a military rank that commands respect from other soldiers. You can invoke your rank to influence soldiers and requisition simple equipment.' },
+				]
+			},
 			source: 'background:Soldier',
 			effects: [
 				{

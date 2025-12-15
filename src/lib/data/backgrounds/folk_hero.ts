@@ -51,7 +51,11 @@ export const folkHero: BackgroundData = {
 		{
 			name: 'Skill Proficiencies',
 			id: 'folk_hero_skills',
-			description: 'You gain proficiency in Animal Handling and Survival.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency in Animal Handling and Survival.' },
+				]
+			},
 			source: 'background:Folk Hero',
 			effects: [
 				{
@@ -64,7 +68,11 @@ export const folkHero: BackgroundData = {
 		{
 			name: 'Tool Proficiencies',
 			id: 'folk_hero_tools',
-			description: "You gain proficiency with one type of artisan's tools and vehicles (land).",
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency with one type of artisan\'s tools and vehicles (land).' },
+				]
+			},
 			source: 'background:Folk Hero',
 			featureOptions: {
 				placeholderText: "Select 1 artisan's tools",
@@ -100,7 +108,11 @@ export const folkHero: BackgroundData = {
 		{
 			name: 'Equipment',
 			id: 'folk_hero_equipment',
-			description: "You start with artisan's tools, shovel, iron pot, common clothes, and 10 gp.",
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You start with artisan\'s tools, shovel, iron pot, common clothes, and 10 gp.' },
+				]
+			},
 			source: 'background:Folk Hero',
 			effects: [
 				{
@@ -113,8 +125,11 @@ export const folkHero: BackgroundData = {
 		{
 			name: 'Rustic Hospitality',
 			id: 'folk_hero_feature',
-			description:
-				"You fit in among common folk with ease and can find shelter among them. They will shield you from the law unless you've shown yourself to be dangerous.",
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You fit in among common folk with ease and can find shelter among them. They will shield you from the law unless you\'ve shown yourself to be dangerous.' },
+				]
+			},
 			source: 'background:Folk Hero',
 			effects: [
 				{

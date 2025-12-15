@@ -6,9 +6,11 @@ import type { FeaturePrompt } from '$lib/data/types/Features';
 const abilityScoreChoicePrompt: FeaturePrompt = {
 	name: 'Ability Score Increase',
 	id: 'rock_gnome_ability_score',
-	description: `
-		Your Constitution score increases by 1, and your Intelligence score increases by 2.
-	`,
+	description: {
+		blocks: [
+			{ type: 'text', text: 'Your Constitution score increases by 1, and your Intelligence score increases by 2.' },
+		]
+	},
 	source: 'rock_gnome',
 	effects: [
 		{
@@ -40,19 +42,22 @@ export const rockGnome: SpeciesData = {
 		{
 			name: 'Darkvision',
 			id: 'rock_gnome_darkvision',
-			description: `
-				Accustomed to life underground, you have superior vision in dark and dim conditions. 
-				You can see in dim light within 60 feet as if it were bright light, and in darkness as if it were dim light.
-			`,
+			description: {
+				blocks: [
+					{ type: 'text', text: 'Accustomed to life underground, you have superior vision in dark and dim conditions.  				You can see in dim light within 60 feet as if it were bright light, and in darkness as if it were dim light.' },
+				]
+			},
 			source: 'rock_gnome',
 			effects: [{ target: 'features', action: 'add', value: 'Darkvision' }]
 		},
 		{
 			name: 'Gnome Cunning',
 			id: 'rock_gnome_gnome_cunning',
-			description: `
-				You have advantage on all Intelligence, Wisdom, and Charisma saving throws against magic.
-			`,
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You have advantage on all Intelligence, Wisdom, and Charisma saving throws against magic.' },
+				]
+			},
 			source: 'rock_gnome',
 			effects: [{ target: 'features', action: 'add', value: 'Gnome Cunning' }]
 		}

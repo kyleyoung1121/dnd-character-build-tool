@@ -6,9 +6,11 @@ import type { FeaturePrompt } from '$lib/data/types/Features';
 const abilityScoreChoicePrompt: FeaturePrompt = {
 	name: 'Ability Score Increase',
 	id: 'human_ability_score',
-	description: `
-		Your Strength, Dexterity, Constitution, Intelligence, Wisdom, and Charisma scores each increase by 1.
-	`,
+	description: {
+		blocks: [
+			{ type: 'text', text: 'Your Strength, Dexterity, Constitution, Intelligence, Wisdom, and Charisma scores each increase by 1.' },
+		]
+	},
 	source: 'human',
 	effects: [
 		{ target: 'strength', action: 'modify', value: 1 },

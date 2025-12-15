@@ -25,7 +25,11 @@ export const acolyte: BackgroundData = {
 		{
 			name: 'Skill Proficiencies',
 			id: 'acolyte_skills',
-			description: 'You gain proficiency in Insight and Religion.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency in Insight and Religion.' },
+				]
+			},
 			source: 'background:Acolyte',
 			effects: [
 				{
@@ -38,7 +42,11 @@ export const acolyte: BackgroundData = {
 		{
 			name: 'Languages',
 			id: 'acolyte_languages',
-			description: 'You can speak, read, and write two languages of your choice.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You can speak, read, and write two languages of your choice.' },
+				]
+			},
 			source: 'background:Acolyte',
 			featureOptions: {
 				placeholderText: 'Select 2 languages',
@@ -73,8 +81,11 @@ export const acolyte: BackgroundData = {
 		{
 			name: 'Equipment',
 			id: 'acolyte_equipment',
-			description:
-				'You start with holy symbol, prayer book, incense, vestments, common clothes, and 15 gp.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You start with holy symbol, prayer book, incense, vestments, common clothes, and 15 gp.' },
+				]
+			},
 			source: 'background:Acolyte',
 			effects: [
 				{
@@ -94,8 +105,11 @@ export const acolyte: BackgroundData = {
 		{
 			name: 'Shelter of the Faithful',
 			id: 'acolyte_feature',
-			description:
-				'You command respect from worshipers of your faith and can expect free healing and care at temples. Those who share your religion will support you at a modest lifestyle.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You command respect from worshipers of your faith and can expect free healing and care at temples. Those who share your religion will support you at a modest lifestyle.' },
+				]
+			},
 			source: 'background:Acolyte',
 			effects: [
 				{

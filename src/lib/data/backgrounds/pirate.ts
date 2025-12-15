@@ -24,7 +24,11 @@ export const pirate: BackgroundData = {
 		{
 			name: 'Skill Proficiencies',
 			id: 'pirate_skills',
-			description: 'You gain proficiency in Athletics and Perception.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency in Athletics and Perception.' },
+				]
+			},
 			source: 'background:Pirate',
 			effects: [
 				{
@@ -37,7 +41,11 @@ export const pirate: BackgroundData = {
 		{
 			name: 'Tool Proficiencies',
 			id: 'pirate_tools',
-			description: "You gain proficiency with navigator's tools and vehicles (water).",
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency with navigator\'s tools and vehicles (water).' },
+				]
+			},
 			source: 'background:Pirate',
 			effects: [
 				{
@@ -50,8 +58,11 @@ export const pirate: BackgroundData = {
 		{
 			name: 'Equipment',
 			id: 'pirate_equipment',
-			description:
-				'You start with a belaying pin (club), silk rope, lucky charm, common clothes, and 10 gp.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You start with a belaying pin (club), silk rope, lucky charm, common clothes, and 10 gp.' },
+				]
+			},
 			source: 'background:Pirate',
 			effects: [
 				{
@@ -70,8 +81,11 @@ export const pirate: BackgroundData = {
 		{
 			name: 'Bad Reputation',
 			id: 'pirate_feature',
-			description:
-				"Your fearsome reputation allows you to get away with minor criminal offenses in civilized settlements, as most people won't report you to authorities.",
+			description: {
+				blocks: [
+					{ type: 'text', text: 'Your fearsome reputation allows you to get away with minor criminal offenses in civilized settlements, as most people won\'t report you to authorities.' },
+				]
+			},
 			source: 'background:Pirate',
 			effects: [
 				{

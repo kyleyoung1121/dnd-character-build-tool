@@ -6,9 +6,11 @@ import type { FeaturePrompt } from '$lib/data/types/Features';
 const abilityScoreChoicePrompt: FeaturePrompt = {
 	name: 'Ability Score Increase',
 	id: 'forest_gnome_ability_score',
-	description: `
-		Your Constitution score increases by 1, and your Intelligence score increases by 2.
-	`,
+	description: {
+		blocks: [
+			{ type: 'text', text: 'Your Constitution score increases by 1, and your Intelligence score increases by 2.' },
+		]
+	},
 	source: 'forest_gnome',
 	effects: [
 		{
@@ -40,37 +42,44 @@ export const forestGnome: SpeciesData = {
 		{
 			name: 'Darkvision',
 			id: 'forest_gnome_darkvision',
-			description: `
-				Accustomed to life underground and in forests, you have superior vision in dark and dim conditions. 
-				You can see in dim light within 60 feet as if it were bright light, and in darkness as if it were dim light.
-			`,
+			description: {
+				blocks: [
+					{ type: 'text', text: 'Accustomed to life underground and in forests, you have superior vision in dark and dim conditions.  				You can see in dim light within 60 feet as if it were bright light, and in darkness as if it were dim light.' },
+				]
+			},
 			source: 'forest_gnome',
 			effects: [{ target: 'features', action: 'add', value: 'Darkvision' }]
 		},
 		{
 			name: 'Gnome Cunning',
 			id: 'forest_gnome_gnome_cunning',
-			description: `
-				You have advantage on all Intelligence, Wisdom, and Charisma saving throws against magic.
-			`,
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You have advantage on all Intelligence, Wisdom, and Charisma saving throws against magic.' },
+				]
+			},
 			source: 'forest_gnome',
 			effects: [{ target: 'features', action: 'add', value: 'Gnome Cunning' }]
 		},
 		{
 			name: 'Natural Illusionist',
 			id: 'forest_gnome_natural_illusionist',
-			description: `
-				You know the Minor Illusion cantrip. Intelligence is your spellcasting ability for it.
-			`,
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You know the Minor Illusion cantrip. Intelligence is your spellcasting ability for it.' },
+				]
+			},
 			source: 'forest_gnome',
 			effects: [{ target: 'features', action: 'add', value: 'Natural Illusionist' }]
 		},
 		{
 			name: 'Speak with Small Beasts',
 			id: 'forest_gnome_speak_with_small_beasts',
-			description: `
-				Through sounds and gestures, you can communicate simple ideas with Small or smaller beasts.
-			`,
+			description: {
+				blocks: [
+					{ type: 'text', text: 'Through sounds and gestures, you can communicate simple ideas with Small or smaller beasts.' },
+				]
+			},
 			source: 'forest_gnome',
 			effects: [{ target: 'features', action: 'add', value: 'Speak with Small Beasts' }]
 		}

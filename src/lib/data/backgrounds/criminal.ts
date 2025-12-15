@@ -17,7 +17,11 @@ export const criminal: BackgroundData = {
 		{
 			name: 'Skill Proficiencies',
 			id: 'criminal_skills',
-			description: 'You gain proficiency in Deception and Stealth.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency in Deception and Stealth.' },
+				]
+			},
 			source: 'background:Criminal',
 			effects: [
 				{
@@ -30,7 +34,11 @@ export const criminal: BackgroundData = {
 		{
 			name: 'Tool Proficiencies',
 			id: 'criminal_tools',
-			description: "You gain proficiency with one type of gaming set and thieves' tools.",
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency with one type of gaming set and thieves\' tools.' },
+				]
+			},
 			source: 'background:Criminal',
 			featureOptions: {
 				placeholderText: 'Select 1 gaming set',
@@ -48,7 +56,11 @@ export const criminal: BackgroundData = {
 		{
 			name: 'Equipment',
 			id: 'criminal_equipment',
-			description: 'You start with a crowbar, dark common clothes with hood, and 15 gp.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You start with a crowbar, dark common clothes with hood, and 15 gp.' },
+				]
+			},
 			source: 'background:Criminal',
 			effects: [
 				{
@@ -61,8 +73,11 @@ export const criminal: BackgroundData = {
 		{
 			name: 'Criminal Contact',
 			id: 'criminal_feature',
-			description:
-				'You have a reliable contact within the criminal underworld who can deliver messages and provide information about criminal activities.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You have a reliable contact within the criminal underworld who can deliver messages and provide information about criminal activities.' },
+				]
+			},
 			source: 'background:Criminal',
 			effects: [
 				{

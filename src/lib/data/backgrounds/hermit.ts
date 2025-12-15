@@ -24,7 +24,11 @@ export const hermit: BackgroundData = {
 		{
 			name: 'Skill Proficiencies',
 			id: 'hermit_skills',
-			description: 'You gain proficiency in Medicine and Religion.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency in Medicine and Religion.' },
+				]
+			},
 			source: 'background:Hermit',
 			effects: [
 				{
@@ -37,7 +41,11 @@ export const hermit: BackgroundData = {
 		{
 			name: 'Tool Proficiencies',
 			id: 'hermit_tools',
-			description: 'You gain proficiency with herbalism kit.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency with herbalism kit.' },
+				]
+			},
 			source: 'background:Hermit',
 			effects: [
 				{
@@ -50,7 +58,11 @@ export const hermit: BackgroundData = {
 		{
 			name: 'Languages',
 			id: 'hermit_languages',
-			description: 'You can speak, read, and write one language of your choice.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You can speak, read, and write one language of your choice.' },
+				]
+			},
 			source: 'background:Hermit',
 			featureOptions: {
 				placeholderText: 'Select 1 language',
@@ -85,8 +97,11 @@ export const hermit: BackgroundData = {
 		{
 			name: 'Equipment',
 			id: 'hermit_equipment',
-			description:
-				'You start with herbalism kit, scroll case with notes, winter blanket, and 5 gp.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You start with herbalism kit, scroll case with notes, winter blanket, and 5 gp.' },
+				]
+			},
 			source: 'background:Hermit',
 			effects: [
 				{
@@ -104,8 +119,11 @@ export const hermit: BackgroundData = {
 		{
 			name: 'Discovery',
 			id: 'hermit_feature',
-			description:
-				'Your hermitage granted you access to a unique and powerful discovery about the cosmos, nature, history, or forgotten knowledge.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'Your hermitage granted you access to a unique and powerful discovery about the cosmos, nature, history, or forgotten knowledge.' },
+				]
+			},
 			source: 'background:Hermit',
 			effects: [
 				{

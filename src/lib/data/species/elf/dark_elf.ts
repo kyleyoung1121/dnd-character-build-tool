@@ -6,9 +6,11 @@ import type { FeaturePrompt } from '$lib/data/types/Features';
 const abilityScoreChoicePrompt: FeaturePrompt = {
 	name: 'Ability Score Increase',
 	id: 'dark_elf_ability_score',
-	description: `
-		Your Dexterity score increases by 2, and your Charisma score increases by 1.
-	`,
+	description: {
+		blocks: [
+			{ type: 'text', text: 'Your Dexterity score increases by 2, and your Charisma score increases by 1.' },
+		]
+	},
 	source: 'dark_elf',
 	effects: [
 		{
@@ -40,57 +42,66 @@ export const darkElf: SpeciesData = {
 		{
 			name: 'Darkvision',
 			id: 'dark_elf_darkvision',
-			description: `
-				Accustomed to life underground, you have superior vision in dark and dim conditions. 
-				You can see in dim light within 60 feet as if it were bright light, and in darkness as if it were dim light.
-			`,
+			description: {
+				blocks: [
+					{ type: 'text', text: 'Accustomed to life underground, you have superior vision in dark and dim conditions.  				You can see in dim light within 60 feet as if it were bright light, and in darkness as if it were dim light.' },
+				]
+			},
 			source: 'dark_elf',
 			effects: [{ target: 'features', action: 'add', value: 'Darkvision' }]
 		},
 		{
 			name: 'Keen Senses',
 			id: 'dark_elf_keen_senses',
-			description: `
-				You have proficiency in the Perception skill.
-			`,
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You have proficiency in the Perception skill.' },
+				]
+			},
 			source: 'dark_elf',
 			effects: [{ target: 'skills', action: 'add', value: 'Perception' }]
 		},
 		{
 			name: 'Fey Ancestry',
 			id: 'dark_elf_fey_ancestry',
-			description: `
-				You have advantage on saving throws against being charmed, and magic can't put you to sleep.
-			`,
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You have advantage on saving throws against being charmed, and magic can\'t put you to sleep.' },
+				]
+			},
 			source: 'dark_elf',
 			effects: [{ target: 'features', action: 'add', value: 'Fey Ancestry' }]
 		},
 		{
 			name: 'Trance',
 			id: 'dark_elf_trance',
-			description: `
-				Elves don't need to sleep. Instead, they meditate deeply, remaining semiconscious, for 4 hours a day.
-				After resting this way, you gain the same benefit as 8 hours of sleep.
-			`,
+			description: {
+				blocks: [
+					{ type: 'text', text: 'Elves don\'t need to sleep. Instead, they meditate deeply, remaining semiconscious, for 4 hours a day. 				After resting this way, you gain the same benefit as 8 hours of sleep.' },
+				]
+			},
 			source: 'dark_elf',
 			effects: [{ target: 'features', action: 'add', value: 'Trance' }]
 		},
 		{
 			name: 'Drow Magic',
 			id: 'dark_elf_drow_magic',
-			description: `
-				You know the Dancing Lights cantrip. You can cast Faerie Fire once per long rest. 
-				Charisma is your spellcasting ability for these spells.
-			`,
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You know the Dancing Lights cantrip. You can cast Faerie Fire once per long rest.  				Charisma is your spellcasting ability for these spells.' },
+				]
+			},
 			source: 'dark_elf',
 			effects: [{ target: 'features', action: 'add', value: 'Drow Magic' }]
 		},
 		{
 			name: 'Sunlight Sensitivity',
 			id: 'dark_elf_sunlight_sensitivity',
-			description: `
-				You have disadvantage on attack rolls and on Wisdom (Perception) checks that rely on sight when you, the target of your attack, or whatever you are trying to perceive is in direct sunlight.
-			`,
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You have disadvantage on attack rolls and on Wisdom (Perception) checks that rely on sight when you, the target of your attack, or whatever you are trying to perceive is in direct sunlight.' },
+				]
+			},
 			source: 'dark_elf',
 			effects: [{ target: 'features', action: 'add', value: 'Sunlight Sensitivity' }]
 		}

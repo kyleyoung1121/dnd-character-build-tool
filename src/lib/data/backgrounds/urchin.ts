@@ -25,7 +25,11 @@ export const urchin: BackgroundData = {
 		{
 			name: 'Skill Proficiencies',
 			id: 'urchin_skills',
-			description: 'You gain proficiency in Sleight of Hand and Stealth.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency in Sleight of Hand and Stealth.' },
+				]
+			},
 			source: 'background:Urchin',
 			effects: [
 				{
@@ -38,7 +42,11 @@ export const urchin: BackgroundData = {
 		{
 			name: 'Tool Proficiencies',
 			id: 'urchin_tools',
-			description: "You gain proficiency with disguise kit and thieves' tools.",
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency with disguise kit and thieves\' tools.' },
+				]
+			},
 			source: 'background:Urchin',
 			effects: [
 				{
@@ -51,8 +59,11 @@ export const urchin: BackgroundData = {
 		{
 			name: 'Equipment',
 			id: 'urchin_equipment',
-			description:
-				'You start with a small knife, city map, pet mouse, token from parents, common clothes, and 10 gp.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You start with a small knife, city map, pet mouse, token from parents, common clothes, and 10 gp.' },
+				]
+			},
 			source: 'background:Urchin',
 			effects: [
 				{
@@ -72,8 +83,11 @@ export const urchin: BackgroundData = {
 		{
 			name: 'City Secrets',
 			id: 'urchin_feature',
-			description:
-				'You know secret urban passages and can travel between city locations twice as fast as normal when not in combat.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You know secret urban passages and can travel between city locations twice as fast as normal when not in combat.' },
+				]
+			},
 			source: 'background:Urchin',
 			effects: [
 				{

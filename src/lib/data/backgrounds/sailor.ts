@@ -24,7 +24,11 @@ export const sailor: BackgroundData = {
 		{
 			name: 'Skill Proficiencies',
 			id: 'sailor_skills',
-			description: 'You gain proficiency in Athletics and Perception.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency in Athletics and Perception.' },
+				]
+			},
 			source: 'background:Sailor',
 			effects: [
 				{
@@ -37,7 +41,11 @@ export const sailor: BackgroundData = {
 		{
 			name: 'Tool Proficiencies',
 			id: 'sailor_tools',
-			description: "You gain proficiency with navigator's tools and vehicles (water).",
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency with navigator\'s tools and vehicles (water).' },
+				]
+			},
 			source: 'background:Sailor',
 			effects: [
 				{
@@ -50,8 +58,11 @@ export const sailor: BackgroundData = {
 		{
 			name: 'Equipment',
 			id: 'sailor_equipment',
-			description:
-				'You start with a belaying pin (club), silk rope, lucky charm, common clothes, and 10 gp.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You start with a belaying pin (club), silk rope, lucky charm, common clothes, and 10 gp.' },
+				]
+			},
 			source: 'background:Sailor',
 			effects: [
 				{
@@ -70,8 +81,11 @@ export const sailor: BackgroundData = {
 		{
 			name: "Ship's Passage",
 			id: 'sailor_feature',
-			description:
-				"You can secure free passage on sailing ships for yourself and companions, though you're expected to assist the crew during the voyage.",
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You can secure free passage on sailing ships for yourself and companions, though you\'re expected to assist the crew during the voyage.' },
+				]
+			},
 			source: 'background:Sailor',
 			effects: [
 				{

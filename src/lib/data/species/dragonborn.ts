@@ -6,9 +6,11 @@ import type { FeaturePrompt } from '$lib/data/types/Features';
 const abilityScoreChoicePrompt: FeaturePrompt = {
 	name: 'Ability Score Increase',
 	id: 'dragonborn_ability_score_choice',
-	description: `
-		Your Strength score increases by 2, and your Charisma score increases by 1.
-	`,
+	description: {
+		blocks: [
+			{ type: 'text', text: 'Your Strength score increases by 2, and your Charisma score increases by 1.' },
+		]
+	},
 	source: 'dragonborn',
 	effects: [
 		{
@@ -28,11 +30,11 @@ const abilityScoreChoicePrompt: FeaturePrompt = {
 const draconicElementPrompt: FeaturePrompt = {
 	name: 'Elemental Affinity',
 	id: 'dragonborn_elemental_affinity',
-	description: `
-		Your draconic heritage manifests as a connection to a destructive element.
-		Choose the damage type that both your breath weapon and your natural resistance
-		are associated with.
-	`,
+	description: {
+		blocks: [
+			{ type: 'text', text: 'Your draconic heritage manifests as a connection to a destructive element. 		Choose the damage type that both your breath weapon and your natural resistance 		are associated with.' },
+		]
+	},
 	featureOptions: {
 		placeholderText: '-Choose an Element-',
 		options: ['Acid', 'Cold', 'Fire', 'Lightning', 'Poison'],
@@ -52,9 +54,11 @@ const draconicElementPrompt: FeaturePrompt = {
 const draconicColorPrompt: FeaturePrompt = {
 	name: 'Draconic Color',
 	id: 'dragonborn_draconic_color',
-	description: `
-		Choose the hue of your scales. Traditionally, a dragonborn’s color hinted at their elemental breath, but here it can simply reflect your style or personality. 
-	`,
+	description: {
+		blocks: [
+			{ type: 'text', text: 'Choose the hue of your scales. Traditionally, a dragonborn’s color hinted at their elemental breath, but here it can simply reflect your style or personality.' },
+		]
+	},
 	featureOptions: {
 		placeholderText: '-Choose a Color-',
 		options: [
@@ -85,9 +89,11 @@ const draconicColorPrompt: FeaturePrompt = {
 const breathShapePrompt: FeaturePrompt = {
 	name: 'Breath Shape',
 	id: 'dragonborn_breath_shape',
-	description: `
-		Your breath weapon takes a particular form. Choose the shape of your exhalation.
-	`,
+	description: {
+		blocks: [
+			{ type: 'text', text: 'Your breath weapon takes a particular form. Choose the shape of your exhalation.' },
+		]
+	},
 	featureOptions: {
 		placeholderText: '-Choose a Shape-',
 		options: ['15 ft. Cone', '5 ft. by 30 ft. Line'],
@@ -107,11 +113,11 @@ const speciesFeatures: FeaturePrompt[] = [
 	{
 		name: 'Breath Weapon',
 		id: 'dragonborn_breath_weapon',
-		description: `
-			You can use your action to exhale destructive energy. 
-			The damage type is determined by your Elemental Affinity, and the area of effect
-			by your chosen Breath Shape.
-		`,
+		description: {
+			blocks: [
+				{ type: 'text', text: 'You can use your action to exhale destructive energy.  			The damage type is determined by your Elemental Affinity, and the area of effect 			by your chosen Breath Shape.' },
+			]
+		},
 		source: 'dragonborn',
 		effects: [
 			{
@@ -124,9 +130,11 @@ const speciesFeatures: FeaturePrompt[] = [
 	{
 		name: 'Damage Resistance',
 		id: 'dragonborn_damage_resistance',
-		description: `
-			You have resistance to the damage type associated with your Elemental Affinity.
-		`,
+		description: {
+			blocks: [
+				{ type: 'text', text: 'You have resistance to the damage type associated with your Elemental Affinity.' },
+			]
+		},
 		source: 'dragonborn',
 		effects: [
 			{

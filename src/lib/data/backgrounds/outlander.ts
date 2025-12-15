@@ -19,7 +19,11 @@ export const outlander: BackgroundData = {
 		{
 			name: 'Skill Proficiencies',
 			id: 'outlander_skills',
-			description: 'You gain proficiency in Athletics and Survival.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency in Athletics and Survival.' },
+				]
+			},
 			source: 'background:Outlander',
 			effects: [
 				{
@@ -32,7 +36,11 @@ export const outlander: BackgroundData = {
 		{
 			name: 'Tool Proficiencies',
 			id: 'outlander_tools',
-			description: 'You gain proficiency with one type of musical instrument.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency with one type of musical instrument.' },
+				]
+			},
 			source: 'background:Outlander',
 			featureOptions: {
 				placeholderText: 'Select 1 musical instrument',
@@ -61,7 +69,11 @@ export const outlander: BackgroundData = {
 		{
 			name: 'Languages',
 			id: 'outlander_languages',
-			description: 'You can speak, read, and write one language of your choice.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You can speak, read, and write one language of your choice.' },
+				]
+			},
 			source: 'background:Outlander',
 			featureOptions: {
 				placeholderText: 'Select 1 language',
@@ -96,7 +108,11 @@ export const outlander: BackgroundData = {
 		{
 			name: 'Equipment',
 			id: 'outlander_equipment',
-			description: "You start with a staff, hunting trap, traveler's clothes, and 10 gp.",
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You start with a staff, hunting trap, traveler\'s clothes, and 10 gp.' },
+				]
+			},
 			source: 'background:Outlander',
 			effects: [
 				{
@@ -109,8 +125,11 @@ export const outlander: BackgroundData = {
 		{
 			name: 'Wanderer',
 			id: 'outlander_feature',
-			description:
-				'You have excellent memory for geography and can find food and shelter for yourself and up to five others each day in the wilderness.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You have excellent memory for geography and can find food and shelter for yourself and up to five others each day in the wilderness.' },
+				]
+			},
 			source: 'background:Outlander',
 			effects: [
 				{

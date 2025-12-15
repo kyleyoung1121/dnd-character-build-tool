@@ -48,7 +48,11 @@ export const entertainer: BackgroundData = {
 		{
 			name: 'Skill Proficiencies',
 			id: 'entertainer_skills',
-			description: 'You gain proficiency in Acrobatics and Performance.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency in Acrobatics and Performance.' },
+				]
+			},
 			source: 'background:Entertainer',
 			effects: [
 				{
@@ -61,7 +65,11 @@ export const entertainer: BackgroundData = {
 		{
 			name: 'Tool Proficiencies',
 			id: 'entertainer_tools',
-			description: 'You gain proficiency with disguise kit and one type of musical instrument.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency with disguise kit and one type of musical instrument.' },
+				]
+			},
 			source: 'background:Entertainer',
 			featureOptions: {
 				placeholderText: 'Select 1 musical instrument',
@@ -90,7 +98,11 @@ export const entertainer: BackgroundData = {
 		{
 			name: 'Equipment',
 			id: 'entertainer_equipment',
-			description: 'You start with a musical instrument, favor of an admirer, costume, and 15 gp.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You start with a musical instrument, favor of an admirer, costume, and 15 gp.' },
+				]
+			},
 			source: 'background:Entertainer',
 			effects: [
 				{
@@ -107,8 +119,11 @@ export const entertainer: BackgroundData = {
 		{
 			name: 'By Popular Demand',
 			id: 'entertainer_feature',
-			description:
-				'You can always find a place to perform and receive free lodging and food. Your performances make you a local figure that strangers take a liking to.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You can always find a place to perform and receive free lodging and food. Your performances make you a local figure that strangers take a liking to.' },
+				]
+			},
 			source: 'background:Entertainer',
 			effects: [
 				{

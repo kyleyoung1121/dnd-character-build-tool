@@ -24,7 +24,11 @@ export const sage: BackgroundData = {
 		{
 			name: 'Skill Proficiencies',
 			id: 'sage_skills',
-			description: 'You gain proficiency in Arcana and History.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency in Arcana and History.' },
+				]
+			},
 			source: 'background:Sage',
 			effects: [
 				{
@@ -37,7 +41,11 @@ export const sage: BackgroundData = {
 		{
 			name: 'Languages',
 			id: 'sage_languages',
-			description: 'You can speak, read, and write two languages of your choice.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You can speak, read, and write two languages of your choice.' },
+				]
+			},
 			source: 'background:Sage',
 			featureOptions: {
 				placeholderText: 'Select 2 languages',
@@ -72,8 +80,11 @@ export const sage: BackgroundData = {
 		{
 			name: 'Equipment',
 			id: 'sage_equipment',
-			description:
-				'You start with ink, quill, small knife, letter from dead colleague, common clothes, and 10 gp.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You start with ink, quill, small knife, letter from dead colleague, common clothes, and 10 gp.' },
+				]
+			},
 			source: 'background:Sage',
 			effects: [
 				{
@@ -93,8 +104,11 @@ export const sage: BackgroundData = {
 		{
 			name: 'Researcher',
 			id: 'sage_feature',
-			description:
-				"When you don't know information, you often know where and from whom you can obtain it, usually from libraries, universities, or other learned persons.",
+			description: {
+				blocks: [
+					{ type: 'text', text: 'When you don\'t know information, you often know where and from whom you can obtain it, usually from libraries, universities, or other learned persons.' },
+				]
+			},
 			source: 'background:Sage',
 			effects: [
 				{

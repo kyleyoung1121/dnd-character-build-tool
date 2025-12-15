@@ -23,7 +23,11 @@ export const gladiator: BackgroundData = {
 		{
 			name: 'Skill Proficiencies',
 			id: 'gladiator_skills',
-			description: 'You gain proficiency in Acrobatics and Performance.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency in Acrobatics and Performance.' },
+				]
+			},
 			source: 'background:Gladiator',
 			effects: [
 				{
@@ -36,7 +40,11 @@ export const gladiator: BackgroundData = {
 		{
 			name: 'Tool Proficiencies',
 			id: 'gladiator_tools',
-			description: 'You gain proficiency with disguise kit and one type of unusual weapon.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency with disguise kit and one type of unusual weapon.' },
+				]
+			},
 			source: 'background:Gladiator',
 			featureOptions: {
 				placeholderText: 'Select 1 unusual weapon',
@@ -59,7 +67,11 @@ export const gladiator: BackgroundData = {
 		{
 			name: 'Equipment',
 			id: 'gladiator_equipment',
-			description: 'You start with an unusual weapon, favor of an admirer, costume, and 15 gp.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You start with an unusual weapon, favor of an admirer, costume, and 15 gp.' },
+				]
+			},
 			source: 'background:Gladiator',
 			effects: [
 				{
@@ -77,8 +89,11 @@ export const gladiator: BackgroundData = {
 		{
 			name: 'By Popular Demand',
 			id: 'gladiator_feature',
-			description:
-				'You can find performance venues in gladiatorial arenas and fighting pits, receiving lodging and food. Your combat performances make you a recognizable local figure.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You can find performance venues in gladiatorial arenas and fighting pits, receiving lodging and food. Your combat performances make you a recognizable local figure.' },
+				]
+			},
 			source: 'background:Gladiator',
 			effects: [
 				{

@@ -23,7 +23,11 @@ export const charlatan: BackgroundData = {
 		{
 			name: 'Skill Proficiencies',
 			id: 'charlatan_skills',
-			description: 'You gain proficiency in Deception and Sleight of Hand.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency in Deception and Sleight of Hand.' },
+				]
+			},
 			source: 'background:Charlatan',
 			effects: [
 				{
@@ -36,7 +40,11 @@ export const charlatan: BackgroundData = {
 		{
 			name: 'Tool Proficiencies',
 			id: 'charlatan_tools',
-			description: 'You gain proficiency with forgery kit and one type of gaming set.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency with forgery kit and one type of gaming set.' },
+				]
+			},
 			source: 'background:Charlatan',
 			featureOptions: {
 				placeholderText: 'Select 1 gaming set',
@@ -54,7 +62,11 @@ export const charlatan: BackgroundData = {
 		{
 			name: 'Equipment',
 			id: 'charlatan_equipment',
-			description: 'You start with forgery kit, gaming set, fine clothes, signet ring, and 15 gp.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You start with forgery kit, gaming set, fine clothes, signet ring, and 15 gp.' },
+				]
+			},
 			source: 'background:Charlatan',
 			effects: [
 				{
@@ -73,8 +85,11 @@ export const charlatan: BackgroundData = {
 		{
 			name: 'False Identity',
 			id: 'charlatan_feature',
-			description:
-				"You have created a second identity with documentation and disguises. You can also forge documents when you've seen examples.",
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You have created a second identity with documentation and disguises. You can also forge documents when you\'ve seen examples.' },
+				]
+			},
 			source: 'background:Charlatan',
 			effects: [
 				{

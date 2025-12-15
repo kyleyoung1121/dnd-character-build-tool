@@ -6,12 +6,14 @@ import { simpleWeapons } from '$lib/data/equipment/weapons';
 const proficienciesPrompt: FeaturePrompt = {
 	id: 'sorcerer_proficiencies_01',
 	name: 'Skill Proficiencies',
-	description: `
-		Armor: None <br>
-		Weapons: Daggers, darts, slings, quarterstaffs, light crossbows <br>
-		Saving Throws: Constitution, Charisma <br>
-		Skills: Choose two from Arcana, Deception, Insight, Intimidation, Persuasion, and Religion
-	`,
+	description: {
+		blocks: [
+			{ type: 'text', text: 'Armor: None' },
+			{ type: 'text', text: 'Weapons: Daggers, darts, slings, quarterstaffs, light crossbows' },
+			{ type: 'text', text: 'Saving Throws: Constitution, Charisma' },
+			{ type: 'text', text: 'Skills: Choose two from Arcana, Deception, Insight, Intimidation, Persuasion, and Religion' },
+		]
+	},
 	featureOptions: {
 		placeholderText: 'Select skills',
 		options: ['Arcana', 'Deception', 'Insight', 'Intimidation', 'Persuasion', 'Religion'],
@@ -30,11 +32,11 @@ const proficienciesPrompt: FeaturePrompt = {
 const spellcastingPrompt: FeaturePrompt = {
 	id: 'sorcerer_spellcasting_01',
 	name: 'Spellcasting',
-	description: `
-		You know four cantrips of your choice from the sorcerer spell list. 
-		You know two 1st-level spells of your choice.
-		You can cast spells using Charisma as your spellcasting ability.
-	`,
+	description: {
+		blocks: [
+			{ type: 'text', text: 'You know four cantrips of your choice from the sorcerer spell list.  		You know two 1st-level spells of your choice. 		You can cast spells using Charisma as your spellcasting ability.' },
+		]
+	},
 	source: 'sorcerer',
 	effects: [
 		{
@@ -48,11 +50,11 @@ const spellcastingPrompt: FeaturePrompt = {
 const sorceryPointsPrompt: FeaturePrompt = {
 	id: 'sorcerer_sorcery_points_01',
 	name: 'Sorcery Points',
-	description: `
-		Starting at 2nd level, you can use sorcery points to fuel your metamagic. 
-		You have a number of sorcery points equal to your sorcerer level (3).
-		You regain all expended sorcery points when you finish a long rest.
-	`,
+	description: {
+		blocks: [
+			{ type: 'text', text: 'Starting at 2nd level, you can use sorcery points to fuel your metamagic.  		You have a number of sorcery points equal to your sorcerer level (3). 		You regain all expended sorcery points when you finish a long rest.' },
+		]
+	},
 	source: 'sorcerer',
 	effects: [
 		{
@@ -66,7 +68,11 @@ const sorceryPointsPrompt: FeaturePrompt = {
 const metamagicPrompt: FeaturePrompt = {
 	id: 'sorcerer_metamagic_01',
 	name: 'Metamagic',
-	description: 'Choose two Metamagic options to customize your spells.',
+	description: {
+		blocks: [
+			{ type: 'text', text: 'Choose two Metamagic options to customize your spells.' },
+		]
+	},
 	featureOptions: {
 		placeholderText: '-Choose Metamagic-',
 		options: [
@@ -77,8 +83,11 @@ const metamagicPrompt: FeaturePrompt = {
 					{
 						id: 'sorcerer_careful_spell_desc',
 						name: 'Careful Spell',
-						description:
-							'When you cast a spell that forces other creatures to make a saving throw, you can protect some of those creatures from the spell\'s full force. To do so, you spend 1 sorcery point and choose a number of those creatures up to your Charisma modifier (minimum of one creature). A chosen creature automatically succeeds on its saving throw against the spell.',
+						description: {
+							blocks: [
+								{ type: 'text', text: 'When you cast a spell that forces other creatures to make a saving throw, you can protect some of those creatures from the spell\\' },
+							]
+						},
 						source: 'sorcerer.metamagic',
 						effects: []
 					}
@@ -91,8 +100,11 @@ const metamagicPrompt: FeaturePrompt = {
 					{
 						id: 'sorcerer_distant_spell_desc',
 						name: 'Distant Spell',
-						description:
-							'When you cast a spell that has a range of 5 feet or greater, you can spend 1 sorcery point to double the range of the spell. When you cast a spell that has a range of touch, you can spend 1 sorcery point to make the range of the spell 30 feet.',
+						description: {
+							blocks: [
+								{ type: 'text', text: 'When you cast a spell that has a range of 5 feet or greater, you can spend 1 sorcery point to double the range of the spell. When you cast a spell that has a range of touch, you can spend 1 sorcery point to make the range of the spell 30 feet.' },
+							]
+						},
 						source: 'sorcerer.metamagic',
 						effects: []
 					}
@@ -105,8 +117,11 @@ const metamagicPrompt: FeaturePrompt = {
 					{
 						id: 'sorcerer_empowered_spell_desc',
 						name: 'Empowered Spell',
-						description:
-							'When you roll damage for a spell, you can spend 1 sorcery point to reroll a number of the damage dice up to your Charisma modifier (minimum of one). You must use the new rolls. You can use Empowered Spell even if you have already used a different Metamagic option during the casting of the spell.',
+						description: {
+							blocks: [
+								{ type: 'text', text: 'When you roll damage for a spell, you can spend 1 sorcery point to reroll a number of the damage dice up to your Charisma modifier (minimum of one). You must use the new rolls. You can use Empowered Spell even if you have already used a different Metamagic option during the casting of the spell.' },
+							]
+						},
 						source: 'sorcerer.metamagic',
 						effects: []
 					}
@@ -119,8 +134,11 @@ const metamagicPrompt: FeaturePrompt = {
 					{
 						id: 'sorcerer_extended_spell_desc',
 						name: 'Extended Spell',
-						description:
-							'When you cast a spell that has a duration of 1 minute or longer, you can spend 1 sorcery point to double its duration, to a maximum duration of 24 hours.',
+						description: {
+							blocks: [
+								{ type: 'text', text: 'When you cast a spell that has a duration of 1 minute or longer, you can spend 1 sorcery point to double its duration, to a maximum duration of 24 hours.' },
+							]
+						},
 						source: 'sorcerer.metamagic',
 						effects: []
 					}
@@ -133,8 +151,11 @@ const metamagicPrompt: FeaturePrompt = {
 					{
 						id: 'sorcerer_heightened_spell_desc',
 						name: 'Heightened Spell',
-						description:
-							'When you cast a spell that forces a creature to make a saving throw to resist its effects, you can spend 3 sorcery points to give one target of the spell disadvantage on its first saving throw made against the spell.',
+						description: {
+							blocks: [
+								{ type: 'text', text: 'When you cast a spell that forces a creature to make a saving throw to resist its effects, you can spend 3 sorcery points to give one target of the spell disadvantage on its first saving throw made against the spell.' },
+							]
+						},
 						source: 'sorcerer.metamagic',
 						effects: []
 					}
@@ -147,8 +168,11 @@ const metamagicPrompt: FeaturePrompt = {
 					{
 						id: 'sorcerer_quickened_spell_desc',
 						name: 'Quickened Spell',
-						description:
-							'When you cast a spell that has a casting time of 1 action, you can spend 2 sorcery points to change the casting time to 1 bonus action for this casting.',
+						description: {
+							blocks: [
+								{ type: 'text', text: 'When you cast a spell that has a casting time of 1 action, you can spend 2 sorcery points to change the casting time to 1 bonus action for this casting.' },
+							]
+						},
 						source: 'sorcerer.metamagic',
 						effects: []
 					}
@@ -161,8 +185,11 @@ const metamagicPrompt: FeaturePrompt = {
 					{
 						id: 'sorcerer_subtle_spell_desc',
 						name: 'Subtle Spell',
-						description:
-							'When you cast a spell, you can spend 1 sorcery point to cast it without any somatic or verbal components.',
+						description: {
+							blocks: [
+								{ type: 'text', text: 'When you cast a spell, you can spend 1 sorcery point to cast it without any somatic or verbal components.' },
+							]
+						},
 						source: 'sorcerer.metamagic',
 						effects: []
 					}
@@ -175,8 +202,11 @@ const metamagicPrompt: FeaturePrompt = {
 					{
 						id: 'sorcerer_twinned_spell_desc',
 						name: 'Twinned Spell',
-						description:
-							'When you cast a spell that targets only one creature and doesn\'t have a range of self, you can spend a number of sorcery points equal to the spell\'s level to target a second creature in range with the same spell (1 sorcery point if the spell is a cantrip). To be eligible, a spell must be incapable of targeting more than one creature at the spell\'s current level.',
+						description: {
+							blocks: [
+								{ type: 'text', text: 'When you cast a spell that targets only one creature and doesn\\' },
+							]
+						},
 						source: 'sorcerer.metamagic',
 						effects: []
 					}
@@ -198,7 +228,11 @@ const metamagicPrompt: FeaturePrompt = {
 const sorcerousOriginPrompt: FeaturePrompt = {
 	id: 'sorcerer_origin_01',
 	name: 'Sorcerous Origin',
-	description: 'Choose your Sorcerous Origin at 1st level.',
+	description: {
+		blocks: [
+			{ type: 'text', text: 'Choose your Sorcerous Origin at 1st level.' },
+		]
+	},
 	featureOptions: {
 		placeholderText: '-Choose an Origin-',
 		options: [
@@ -209,8 +243,11 @@ const sorcerousOriginPrompt: FeaturePrompt = {
 					{
 						id: 'sorcerer_draconic_resilience_01',
 						name: 'Draconic Resilience',
-						description: `Your hit point maximum increases by 1 per sorcerer level. 
-						Your AC equals 13 + your Dexterity modifier when not wearing armor.`,
+						description: {
+							blocks: [
+								{ type: 'text', text: 'Your AC equals 13 + your Dexterity modifier when not wearing armor.' },
+							]
+						},
 						source: 'sorcerer.draconic_bloodline',
 						effects: [
 							{
@@ -229,7 +266,11 @@ const sorcerousOriginPrompt: FeaturePrompt = {
 					{
 						id: 'sorcerer_wild_magic_surge_01',
 						name: 'Wild Magic Surge',
-						description: `After you cast a sorcerer spell of 1st level or higher, roll a d20. On a 1, roll on the Wild Magic Surge table to create a magical effect. The Wild Magic Surge table contains a variety of random magical effects that can occur. If that effect is a spell, it is too wild to be affected by your metamagic, and if it normally requires concentration, it doesn't require concentration in this case.`,
+						description: {
+							blocks: [
+								{ type: 'text', text: 'After you cast a sorcerer spell of 1st level or higher, roll a d20. On a 1, roll on the Wild Magic Surge table to create a magical effect. The Wild Magic Surge table contains a variety of random magical effects that can occur. If that effect is a spell, it is too wild to be affected by your metamagic, and if it normally requires concentration, it doesn\'t require concentration in this case.' },
+							]
+						},
 						source: 'sorcerer.wild_magic',
 						effects: [
 							{
@@ -242,8 +283,11 @@ const sorcerousOriginPrompt: FeaturePrompt = {
 					{
 						id: 'sorcerer_tides_of_chaos_01',
 						name: 'Tides of Chaos',
-						description: `You can gain advantage on one attack roll, ability check, or saving throw. 
-						Once you use this feature, you must finish a long rest before you can use it again. Any time before you regain the use of this feature, the DM can have you roll on the Wild Magic Surge table immediately after you cast a sorcerer spell of 1st level or higher. You then regain the use of this feature.`,
+						description: {
+							blocks: [
+								{ type: 'text', text: 'Once you use this feature, you must finish a long rest before you can use it again. Any time before you regain the use of this feature, the DM can have you roll on the Wild Magic Surge table immediately after you cast a sorcerer spell of 1st level or higher. You then regain the use of this feature.' },
+							]
+						},
 						source: 'sorcerer.wild_magic',
 						effects: [
 							{

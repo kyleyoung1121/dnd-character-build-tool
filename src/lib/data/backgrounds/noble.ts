@@ -18,7 +18,11 @@ export const noble: BackgroundData = {
 		{
 			name: 'Skill Proficiencies',
 			id: 'noble_skills',
-			description: 'You gain proficiency in History and Persuasion.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency in History and Persuasion.' },
+				]
+			},
 			source: 'background:Noble',
 			effects: [
 				{
@@ -31,7 +35,11 @@ export const noble: BackgroundData = {
 		{
 			name: 'Tool Proficiencies',
 			id: 'noble_tools',
-			description: 'You gain proficiency with one type of gaming set.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency with one type of gaming set.' },
+				]
+			},
 			source: 'background:Noble',
 			featureOptions: {
 				placeholderText: 'Select 1 gaming set',
@@ -49,7 +57,11 @@ export const noble: BackgroundData = {
 		{
 			name: 'Languages',
 			id: 'noble_languages',
-			description: 'You can speak, read, and write one language of your choice.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You can speak, read, and write one language of your choice.' },
+				]
+			},
 			source: 'background:Noble',
 			featureOptions: {
 				placeholderText: 'Select 1 language',
@@ -84,7 +96,11 @@ export const noble: BackgroundData = {
 		{
 			name: 'Equipment',
 			id: 'noble_equipment',
-			description: 'You start with fine clothes, signet ring, scroll of pedigree, and 25 gp.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You start with fine clothes, signet ring, scroll of pedigree, and 25 gp.' },
+				]
+			},
 			source: 'background:Noble',
 			effects: [
 				{
@@ -97,8 +113,11 @@ export const noble: BackgroundData = {
 		{
 			name: 'Position of Privilege',
 			id: 'noble_feature',
-			description:
-				'People are inclined to think the best of you. You are welcome in high society and the common folk make every effort to accommodate you.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'People are inclined to think the best of you. You are welcome in high society and the common folk make every effort to accommodate you.' },
+				]
+			},
 			source: 'background:Noble',
 			effects: [
 				{

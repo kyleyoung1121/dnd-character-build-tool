@@ -6,9 +6,11 @@ import type { FeaturePrompt } from '$lib/data/types/Features';
 const abilityScoreChoicePrompt: FeaturePrompt = {
 	name: 'Ability Score Increase',
 	id: 'half_orc_ability_score',
-	description: `
-		Your Strength score increases by 2, and your Constitution score increases by 1.
-	`,
+	description: {
+		blocks: [
+			{ type: 'text', text: 'Your Strength score increases by 2, and your Constitution score increases by 1.' },
+		]
+	},
 	source: 'half_orc',
 	effects: [
 		{
@@ -41,31 +43,33 @@ export const halfOrc: SpeciesData = {
 		{
 			name: 'Darkvision',
 			id: 'half_orc_darkvision',
-			description: `
-				Thanks to your orc heritage, you have superior vision in dark and dim conditions.
-				You can see in dim light within 60 feet of you as if it were bright light, 
-				and in darkness as if it were dim light.
-			`,
+			description: {
+				blocks: [
+					{ type: 'text', text: 'Thanks to your orc heritage, you have superior vision in dark and dim conditions. 				You can see in dim light within 60 feet of you as if it were bright light,  				and in darkness as if it were dim light.' },
+				]
+			},
 			source: 'half_orc',
 			effects: [{ target: 'features', action: 'add', value: 'Darkvision' }]
 		},
 		{
 			name: 'Relentless Endurance',
 			id: 'half_orc_relentless_endurance',
-			description: `
-				When you are reduced to 0 hit points but not killed outright, you can drop to 1 hit point instead. 
-				You can use this feature once per long rest.
-			`,
+			description: {
+				blocks: [
+					{ type: 'text', text: 'When you are reduced to 0 hit points but not killed outright, you can drop to 1 hit point instead.  				You can use this feature once per long rest.' },
+				]
+			},
 			source: 'half_orc',
 			effects: [{ target: 'features', action: 'add', value: 'Relentless Endurance' }]
 		},
 		{
 			name: 'Savage Attacks',
 			id: 'half_orc_savage_attacks',
-			description: `
-				When you score a critical hit with a melee weapon attack, you can roll one of the weapon’s damage dice 
-				one additional time and add it to the extra damage of the critical hit.
-			`,
+			description: {
+				blocks: [
+					{ type: 'text', text: 'When you score a critical hit with a melee weapon attack, you can roll one of the weapon’s damage dice  				one additional time and add it to the extra damage of the critical hit.' },
+				]
+			},
 			source: 'half_orc',
 			effects: [{ target: 'features', action: 'add', value: 'Savage Attacks' }]
 		}

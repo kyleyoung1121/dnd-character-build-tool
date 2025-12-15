@@ -19,7 +19,11 @@ export const knight: BackgroundData = {
 		{
 			name: 'Skill Proficiencies',
 			id: 'knight_skills',
-			description: 'You gain proficiency in History and Persuasion.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency in History and Persuasion.' },
+				]
+			},
 			source: 'background:Knight',
 			effects: [
 				{
@@ -32,7 +36,11 @@ export const knight: BackgroundData = {
 		{
 			name: 'Tool Proficiencies',
 			id: 'knight_tools',
-			description: 'You gain proficiency with one type of gaming set.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency with one type of gaming set.' },
+				]
+			},
 			source: 'background:Knight',
 			featureOptions: {
 				placeholderText: 'Select 1 gaming set',
@@ -50,7 +58,11 @@ export const knight: BackgroundData = {
 		{
 			name: 'Languages',
 			id: 'knight_languages',
-			description: 'You can speak, read, and write one language of your choice.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You can speak, read, and write one language of your choice.' },
+				]
+			},
 			source: 'background:Knight',
 			featureOptions: {
 				placeholderText: 'Select 1 language',
@@ -85,7 +97,11 @@ export const knight: BackgroundData = {
 		{
 			name: 'Equipment',
 			id: 'knight_equipment',
-			description: 'You start with a signet ring, scroll of pedigree, fine clothes, and 25 gp.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You start with a signet ring, scroll of pedigree, fine clothes, and 25 gp.' },
+				]
+			},
 			source: 'background:Knight',
 			effects: [
 				{
@@ -98,8 +114,11 @@ export const knight: BackgroundData = {
 		{
 			name: 'Retainers',
 			id: 'knight_feature',
-			description:
-				'You have three retainers: a noble squire training for knighthood, and two others such as a groom and servant who perform mundane tasks.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You have three retainers: a noble squire training for knighthood, and two others such as a groom and servant who perform mundane tasks.' },
+				]
+			},
 			source: 'background:Knight',
 			effects: [
 				{

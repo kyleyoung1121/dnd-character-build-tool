@@ -56,7 +56,11 @@ export const guildArtisan: BackgroundData = {
 		{
 			name: 'Skill Proficiencies',
 			id: 'guild_artisan_skills',
-			description: 'You gain proficiency in Insight and Persuasion.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency in Insight and Persuasion.' },
+				]
+			},
 			source: 'background:Guild Artisan',
 			effects: [
 				{
@@ -69,7 +73,11 @@ export const guildArtisan: BackgroundData = {
 		{
 			name: 'Tool Proficiencies',
 			id: 'guild_artisan_tools',
-			description: "You gain proficiency with one type of artisan's tools.",
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You gain proficiency with one type of artisan\'s tools.' },
+				]
+			},
 			source: 'background:Guild Artisan',
 			featureOptions: {
 				placeholderText: "Select 1 artisan's tools",
@@ -105,7 +113,11 @@ export const guildArtisan: BackgroundData = {
 		{
 			name: 'Languages',
 			id: 'guild_artisan_languages',
-			description: 'You can speak, read, and write one language of your choice.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You can speak, read, and write one language of your choice.' },
+				]
+			},
 			source: 'background:Guild Artisan',
 			featureOptions: {
 				placeholderText: 'Select 1 language',
@@ -140,8 +152,11 @@ export const guildArtisan: BackgroundData = {
 		{
 			name: 'Equipment',
 			id: 'guild_artisan_equipment',
-			description:
-				"You start with artisan's tools, letter of introduction from your guild, traveler's clothes, and 15 gp.",
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You start with artisan\'s tools, letter of introduction from your guild, traveler\'s clothes, and 15 gp.' },
+				]
+			},
 			source: 'background:Guild Artisan',
 			effects: [
 				{
@@ -158,8 +173,11 @@ export const guildArtisan: BackgroundData = {
 		{
 			name: 'Guild Membership',
 			id: 'guild_artisan_feature',
-			description:
-				'Your guild membership provides lodging, food, and funeral arrangements. Guildhalls offer meeting places for potential patrons and allies.',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'Your guild membership provides lodging, food, and funeral arrangements. Guildhalls offer meeting places for potential patrons and allies.' },
+				]
+			},
 			source: 'background:Guild Artisan',
 			effects: [
 				{

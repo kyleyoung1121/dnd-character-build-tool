@@ -25,6 +25,38 @@ export interface FeatureData {
 	level?: number; // At what level this feature is gained (for class features)
 }
 
+import type {
+	FeatureDescription,
+	DescriptionBlock
+} from '$lib/data/types/Features';
+
+function serializeFeatureDescription(
+	description: FeatureDescription
+): string {
+	return description.blocks
+		.map((block) => {
+			switch (block.type) {
+				case 'text':
+					return block.text;
+
+				case 'computed-inline':
+					// PDFs should be readable but deterministic.
+					// We do NOT try to compute here.
+					return block.text;
+
+				case 'computed-replacement':
+					// PDF export happens after character creation,
+					// but to be safe, use fallback text.
+					return block.fallbackText;
+
+				default:
+					return '';
+			}
+		})
+		.join('\n\n');
+}
+
+
 /**
  * DEPRECATED: Old hardcoded feature dictionary
  * Kept for backwards compatibility but no longer needed
@@ -44,26 +76,42 @@ export function getFeatureData(
 	featureName: string,
 	character?: Character
 ): FeatureData | null {
-	// Use dynamic lookup from source files
 	const className = character?.class;
 	const raceName = character?.race || character?.subrace;
 	const backgroundName = character?.background;
-	
-	const feature = lookupFeature(featureName, className, raceName, backgroundName);
-	
+
+	const feature = lookupFeature(
+		featureName,
+		className,
+		raceName,
+		backgroundName
+	);
+
 	if (!feature) {
 		return null;
 	}
-	
-	// Convert FeaturePrompt to FeatureData format
+
+	let descriptionText: string;
+
+	if (typeof feature.description === 'string') {
+		// Legacy safety (should not happen anymore, but harmless)
+		descriptionText = feature.description;
+	} else {
+		descriptionText = serializeFeatureDescription(feature.description);
+	}
+
 	return {
 		name: feature.name,
-		description: getFeatureDescription(featureName, className, raceName, backgroundName) || feature.description,
-		source: feature.source.includes('class') ? 'class' : 
-		        feature.source.includes('background') ? 'background' : 'race',
-		level: undefined // Not easily accessible from FeaturePrompt
+		description: descriptionText,
+		source: feature.source.includes('class')
+			? 'class'
+			: feature.source.includes('background')
+			? 'background'
+			: 'race',
+		level: undefined
 	};
 }
+
 
 /**
  * Check if a feature has data available

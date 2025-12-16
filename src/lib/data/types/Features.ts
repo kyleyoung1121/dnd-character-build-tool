@@ -5,7 +5,7 @@
 export interface FeaturePrompt {
 	name: string;
 	id: string;
-	description: FeatureDescription; // UPDATED
+	description: FeatureDescription;
 	featureOptions?: SelectOptions;
 	source: string; // class, subclass, race, background, etc.
 	effects?: FeatureEffect[];

@@ -4,6 +4,8 @@
 	import FeatureCardList from '$lib/components/FeatureCardList.svelte';
 	import ConflictWarning from '$lib/components/ConflictWarning.svelte';
 	import { isFeatureIncomplete } from '$lib/components/feature-card-utils';
+	import FeatureDescription from '$lib/components/FeatureDescription.svelte';
+	
 	import { barbarian } from '$lib/data/classes/barbarian';
 	import { bard } from '$lib/data/classes/bard';
 	import { cleric } from '$lib/data/classes/cleric';
@@ -669,20 +671,26 @@
 				</div>
 
 				<div class="popup-body">
+					<!-- Class description remains a string -->
 					<p class="description">{selectedClass.description}</p>
+
 					<p><strong>Primary Ability:</strong> {selectedClass.primaryAbility}</p>
 
 					{#each selectedClass.classFeatures as feature}
 						<div class="feature-card">
 							<h4>{feature.name}</h4>
-							<p>{@html feature.description}</p>
+							<FeatureDescription description={feature.description} />
 						</div>
 					{/each}
 				</div>
 
 				<div class="popup-footer">
-					<button class="cancel-button" on:click={() => (selectedClass = null)}>Cancel</button>
-					<button class="add-button" on:click={confirmAddClass}>Add Class</button>
+					<button class="cancel-button" on:click={() => (selectedClass = null)}>
+						Cancel
+					</button>
+					<button class="add-button" on:click={confirmAddClass}>
+						Add Class
+					</button>
 				</div>
 			</div>
 		</div>
@@ -699,7 +707,9 @@
 				/>
 				<div class="selected-class-text">
 					<h2>{selectedClassData.name}</h2>
-					<p class="max-hp">Average Health: {calculateMaxHP(selectedClassData.hitDie)}</p>
+					<p class="max-hp">
+						Average Health: {calculateMaxHP(selectedClassData.hitDie)}
+					</p>
 				</div>
 				<button
 					class="remove-class-button"
@@ -710,7 +720,7 @@
 				</button>
 			</div>
 
-			<!-- Use shared feature card components -->
+			<!-- Feature cards -->
 			<FeatureCardList
 				features={mergedFeatures}
 				bind:featureSelections
@@ -721,6 +731,7 @@
 			/>
 		</div>
 	{/if}
+
 </div>
 
 <style>

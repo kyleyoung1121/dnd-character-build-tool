@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { FeaturePrompt, ComplexOption } from '$lib/data/types/Features';
+	import FeatureDescription from '$lib/components/FeatureDescription.svelte';
 	import {
 		isFeatureIncomplete,
 		getNestedPrompts,
@@ -94,7 +95,7 @@
 	</button>
 
 	{#if isExpanded}
-		<p>{@html feature.description}</p>
+	<FeatureDescription description={feature.description} />
 
 		{#if feature.featureOptions}
 			{#each Array(feature.featureOptions.numPicks) as _, idx}

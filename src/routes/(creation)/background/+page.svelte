@@ -4,6 +4,7 @@
 	import FeatureCardList from '$lib/components/FeatureCardList.svelte';
 	import ConflictWarning from '$lib/components/ConflictWarning.svelte';
 	import { isFeatureIncomplete } from '$lib/components/feature-card-utils';
+	import FeatureDescription from '$lib/components/FeatureDescription.svelte';
 
 	// Import all backgrounds
 	import { backgrounds } from '$lib/data/backgrounds/index';
@@ -560,12 +561,10 @@
 				<div class="popup-body">
 					<p class="description">{selectedBackground.description}</p>
 
-					
-
 					{#each selectedBackground.backgroundFeatures as feature}
 						<div class="feature-card">
 							<h4>{feature.name}</h4>
-							<p>{@html feature.description}</p>
+							<FeatureDescription description={feature.description} />
 						</div>
 					{/each}
 				</div>

@@ -20,6 +20,8 @@
 
 	import type { SpeciesData } from '$lib/data/types/SpeciesData';
 	import type { FeaturePrompt } from '$lib/data/types/Features';
+	import { isFeatureIncomplete, effectNeedsChoice } from '$lib/components/feature-card-utils';
+	import FeatureDescription from '$lib/components/FeatureDescription.svelte';
 
 	import { applyChoice, revertChanges } from '$lib/stores/character_store_helpers';
 	import { get } from 'svelte/store';
@@ -27,7 +29,6 @@
 	import { getSpellAccessForCharacter, getSpellsByLevel } from '$lib/data/spells';
 	import FeatureCardList from '$lib/components/FeatureCardList.svelte';
 	import ConflictWarning from '$lib/components/ConflictWarning.svelte';
-	import { isFeatureIncomplete, effectNeedsChoice } from '$lib/components/feature-card-utils';
 
 	// --- NEW: species group type ---
 	interface SpeciesGroup {
@@ -776,7 +777,7 @@
 					{#each selectedSpecies.speciesFeatures as feature}
 						<div class="feature-card">
 							<h4>{feature.name}</h4>
-							<p>{@html feature.description}</p>
+							<FeatureDescription description={feature.description} />
 						</div>
 					{/each}
 				</div>

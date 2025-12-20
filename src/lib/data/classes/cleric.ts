@@ -51,8 +51,21 @@ const spellcastingPrompt: FeaturePrompt = {
 				text: 'You can prepare and cast spells using Wisdom as your spellcasting ability.'
 			},
 			{
-				type: 'text',
-				text: 'You know three cantrips and have prepared a number of spells equal to your Wisdom modifier + cleric level.'
+				type: 'computed-replacement',
+
+				whenAvailable: [
+					{
+						source: 'derived',
+						formula: 'Math.max(1, WIS_MOD + LEVEL)'
+					}
+				],
+
+				fallbackText:
+					'You know three cantrips and have prepared a number of spells equal to your Wisdom modifier + cleric level.',
+					
+
+				replacementTemplate:
+					'You know three cantrips and have {value} spells prepared.'
 			}
 		]
 	},

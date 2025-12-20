@@ -110,9 +110,9 @@
         if (formula.includes('WIS_MOD') && WIS_MOD === null) return null;
         if (formula.includes('CHA_MOD') && CHA_MOD === null) return null;
 
-        // --- Proficiency ---
-        // Fixed assumption: level 3 characters
+        // Known Constants
         const PROF = 2;
+        const LEVEL = 3;
 
         try {
             // Controlled evaluation: formulas come from your data files only
@@ -120,11 +120,13 @@
                 'STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA',
                 'STR_MOD', 'DEX_MOD', 'CON_MOD', 'INT_MOD', 'WIS_MOD', 'CHA_MOD',
                 'PROF',
+                'LEVEL',
                 `return ${formula};`
             )(
                 STR, DEX, CON, INT, WIS, CHA,
                 STR_MOD, DEX_MOD, CON_MOD, INT_MOD, WIS_MOD, CHA_MOD,
-                PROF
+                PROF,
+                LEVEL
             );
         } catch (e) {
             console.error('[complex_desc] Formula eval failed:', formula, e);
@@ -133,11 +135,19 @@
     }
 
 	function allValuesAvailable(values: ComputedValue[]): number | null {
-		const resolved = values.map(resolveComputedValue);
-		if (resolved.some((v) => v === null)) return null;
-		// For now assume single-value replacement
-		return resolved[0];
-	}
+        const resolved = values.map(resolveComputedValue);
+
+        if (
+            resolved.some(
+                (v) => v === null || Number.isNaN(v)
+            )
+        ) {
+            return null;
+        }
+
+        return resolved[0];
+    }
+
 </script>
 
 {#each description.blocks as block}

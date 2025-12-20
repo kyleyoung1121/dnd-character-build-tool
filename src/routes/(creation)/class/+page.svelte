@@ -291,6 +291,11 @@
 			const prov = state._provenance || {};
 			const namesToTry: string[] = [];
 	
+			// NEW FORMAT: feature:ParentName:FeatureName:index (for nested features with parent context)
+			if (parentFeatureName && typeof idx === 'number') {
+				namesToTry.push(`feature:${parentFeatureName}:${featureName}:${idx}`);
+			}
+	
 			// canonical per-requested scheme: feature:Class:Parent:Feature
 			if (selectedClassData) {
 				if (parentFeatureName) {
@@ -373,11 +378,24 @@
 				const stored = provLookup?.entry;
 				const provKey = provLookup?.key;
 	
-				console.log(`${DBG} Nested restore probe: feature='${feature.name}', idx=${idx}, provKey='${provKey}', stored=`, stored);
+				console.log(`${DBG} Nested restore probe: feature='${feature.name}', idx=${idx}, provKey='${provKey}'`);
+			console.log(`${DBG} Stored provenance object:`, JSON.stringify(stored, null, 2));
+			console.log(`${DBG} Feature effects:`, feature.effects);
 	
 				// try to restore from direct provenance entry
 				let restored: string | null = null;
-				if (stored?._set) {
+				
+				// FIRST: Check for __userChoice marker (for features with no effects)
+				if (stored?._set?.['__userChoice']) {
+					const choiceValue = stored._set['__userChoice'];
+					const maybe = tryRestoreFromValue(choiceValue, optionMap);
+					if (maybe) {
+						restored = maybe;
+						console.log(`${DBG} Restored from __userChoice marker: feature='${feature.name}', idx=${idx}, value='${choiceValue}', mapped='${maybe}'`);
+					}
+				}
+				
+				if (!restored && stored?._set) {
 					for (const effect of feature.effects || []) {
 						const target = effect.target;
 						const arr = stored._set?.[target];
@@ -521,7 +539,17 @@
 	
 				let restored: string | null = null;
 	
-				if (stored?._set) {
+				// FIRST: Check for __userChoice marker (for features with no effects)
+				if (stored?._set?.['__userChoice']) {
+					const choiceValue = stored._set['__userChoice'];
+					const maybe = tryRestoreFromValue(choiceValue, optionMap);
+					if (maybe) {
+						restored = maybe;
+						console.log(`${DBG} Restored from __userChoice marker: feature='${feature.name}', idx=${idx}, value='${choiceValue}', mapped='${maybe}'`);
+					}
+				}
+
+				if (!restored && stored?._set) {
 					for (const effect of feature.effects || []) {
 						const target = effect.target;
 						const arr = stored._set?.[target];

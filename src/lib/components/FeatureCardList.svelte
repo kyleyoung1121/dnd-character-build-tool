@@ -25,7 +25,7 @@
 	export let onBumpVersion: () => void;
 
 	// Handle feature option selection
-	function handleSelectOption(feature: FeaturePrompt, index: number, selectedOption: string) {
+	function handleSelectOption(feature: FeaturePrompt, index: number, selectedOption: string, parentFeatureName?: string | null) {
 		if (!selectedOption) return;
 
 		const normalizedChoice = selectedOption;
@@ -53,7 +53,14 @@
 		// Clear any nested selections under the previous branch
 		featureSelections = clearNestedFeatureSelections(feature, featureSelections);
 
-		const scopeId = `feature:${feature.name}:${index}`;
+		// Construct scopeId with parent context for nested features
+		// Format: feature:ParentName:FeatureName:index for nested, or feature:FeatureName:index for top-level
+		const scopeId = parentFeatureName 
+			? `feature:${parentFeatureName}:${feature.name}:${index}`
+			: `feature:${feature.name}:${index}`;
+		
+		// DEBUG: Log scopeId generation
+		console.log(`[SCOPEID DEBUG] Saving selection: feature='${feature.name}', parent='${parentFeatureName || 'none'}', scopeId='${scopeId}'`);
 
 		// Handle reverting any static nested effects that were tied to the previous choice
 		// IMPORTANT: Do this BEFORE applying new effects to avoid smart removal incorrectly
@@ -62,14 +69,16 @@
 			const prevNested = getNestedPrompts(feature, [prev]) || [];
 			for (const nested of prevNested) {
 				if (nested.featureOptions) continue; // only static nested
-				const prevNestedScopeId = `feature:${feature.name}:${index}:${nested.name}`;
+				const prevNestedScopeId = parentFeatureName
+					? `feature:${parentFeatureName}:${feature.name}:${index}:${nested.name}`
+					: `feature:${feature.name}:${index}:${nested.name}`;
 				// Use applyChoice with empty changes to trigger revert of this nested scope
 				applyChoice(prevNestedScopeId, {});
 			}
 		}
 
 		// Apply the new choice effects (applyChoice handles reverting previous effects automatically)
-		applyFeatureEffects(feature, normalizedChoice, scopeId, index);
+		applyFeatureEffects(feature, normalizedChoice, scopeId, index, parentFeatureName);
 
 		// Force conflict detection to trigger immediately for reactive UI updates
 		// The derived store should handle this automatically, but this ensures immediate updates
@@ -102,7 +111,8 @@
 		feature: FeaturePrompt,
 		choice: string,
 		scopeId: string,
-		index: number
+		index: number,
+		parentFeatureName?: string | null
 	) {
 		// Prepare containers for ONLY the effects that depend on this choice
 		const update: Record<string, any> = {};
@@ -149,6 +159,12 @@
 				}
 			}
 		}
+		
+		// IMPORTANT: For features with no effects (e.g., Totem Spirit), store a marker so we can restore the choice
+		// We use a special key '__userChoice' to preserve the selected option name
+		if (Object.keys(update).length === 0 && Object.keys(modify).length === 0) {
+			update['__userChoice' as any] = choice;
+		}
 
 		// Apply the choice-dependent effects for this top-level selection
 		// Check if this is a subclass change that might affect spell limits
@@ -167,7 +183,9 @@
 			// Skip nested prompts that have their own options; those will be handled by user interaction later
 			if (nested.featureOptions) continue;
 
-			const nestedScopeId = `feature:${feature.name}:${index}:${nested.name}`;
+			const nestedScopeId = parentFeatureName
+				? `feature:${parentFeatureName}:${feature.name}:${index}:${nested.name}`
+				: `feature:${feature.name}:${index}:${nested.name}`;
 			// applyChoice handles reverting automatically, no need for manual revert
 
 			const nestedUpdate: Record<string, any> = {};

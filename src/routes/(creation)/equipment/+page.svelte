@@ -154,6 +154,11 @@
 		currentBackground = backgroundName
 			? backgrounds.find((bg) => bg.name === backgroundName) || null
 			: null;
+		
+		// Restore background equipment choices when background changes
+		if (currentBackground) {
+			restoreBackgroundEquipmentChoicesFromStore();
+		}
 	}
 
 	// Reactive statements for subchoice resolution
@@ -240,6 +245,55 @@
 			equipmentChoices = { ...equipmentChoices, ...newEquipmentChoices };
 		} else {
 		}
+	}
+
+	// Restore background equipment choices from character store
+	function restoreBackgroundEquipmentChoicesFromStore() {
+		if (!currentBackground?.startingEquipment?.choices) return;
+
+		// Look for existing background equipment choices in the character store's provenance
+		const char = get(character_store);
+		if (!char._provenance) return;
+
+		const newBackgroundEquipmentChoices: Record<string, number> = {};
+
+		// Restore each background equipment choice
+		currentBackground.startingEquipment.choices.forEach((choice, choiceIndex) => {
+			const scopeId = `background_equipment_${choiceIndex}`;
+			const provenanceData = char._provenance![scopeId];
+
+			if (provenanceData) {
+				// Access data from _set property (character store wraps our data)
+				const actualData = provenanceData._set || provenanceData;
+
+				// Background equipment choices are simple arrays, so look for inventory
+				if (actualData.inventory) {
+					const inventory = actualData.inventory as string[];
+
+					// Find which option matches the current inventory
+					for (let optionIndex = 0; optionIndex < choice.options.length; optionIndex++) {
+						const option = choice.options[optionIndex];
+
+						// Check if inventory matches this option (simple array comparison)
+						if (arraysEqual(inventory, option)) {
+							newBackgroundEquipmentChoices[choiceIndex] = optionIndex;
+							break;
+						}
+					}
+				}
+			}
+		});
+
+		// Only update if we found any choices to restore
+		if (Object.keys(newBackgroundEquipmentChoices).length > 0) {
+			backgroundEquipmentChoices = { ...backgroundEquipmentChoices, ...newBackgroundEquipmentChoices };
+		}
+	}
+
+	// Helper function to check if two arrays are equal
+	function arraysEqual(arr1: string[], arr2: string[]): boolean {
+		if (arr1.length !== arr2.length) return false;
+		return arr1.every((item, index) => item === arr2[index]);
 	}
 
 	// Check if an option could produce the given inventory

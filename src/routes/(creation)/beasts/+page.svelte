@@ -9,7 +9,7 @@
 
 	// Track selected beasts (max 3)
 	let selectedBeasts: Beast[] = [];
-	const MAX_SELECTIONS = 3;
+	$: MAX_SELECTIONS = isBeastMaster ? 1 : 3;
 
 	// Sorting and filtering
 	let sortBy = 'cr'; // 'name' or 'cr' - default to CR
@@ -226,7 +226,7 @@
 				{#if isBeastMaster}
 					<h2>Ranger's Companion</h2>
 					<p>You gain one loyal beast companion (CR 1/4 or lower, Medium or smaller) that fights alongside you.</p>
-					<p class="selection-note">Select up to {MAX_SELECTIONS} stat blocks to print with your character. You can choose which companion to bring each session.</p>
+					<p class="selection-note">Select one stat block to print with your character.</p>
 				{/if}
 				
 				{#if isWizard}

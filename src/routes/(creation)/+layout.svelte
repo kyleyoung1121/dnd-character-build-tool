@@ -33,12 +33,44 @@
 		{ name: 'Export', href: base + '/export', id: 'export' }
 	];
 
+	// Quiz tabs (hidden by default, revealed when visiting)
+	const quizTabs = [
+		{ name: 'Class Quiz', href: base + '/class-quiz', id: 'class-quiz' },
+		{ name: 'Species Quiz', href: base + '/species-quiz', id: 'species-quiz' }
+	];
+
 	// Declare navItems variable
 	let navItems = baseNavItems;
 
 	// Build navigation items dynamically based on character's abilities
 	$: {
-		const items = [...baseNavItems.slice(0, 5)]; // Class through Equipment
+		const items = [];
+
+		// Check if we're on quiz pages
+		const currentPath = $page.url.pathname;
+		const isOnClassQuiz = currentPath.includes('/class-quiz');
+		const isOnSpeciesQuiz = currentPath.includes('/species-quiz');
+
+		// Add Class tab
+		items.push(baseNavItems[0]); // Class
+		
+		// Add Class Quiz tab if on class quiz page
+		if (isOnClassQuiz) {
+			items.push(quizTabs[0]); // Class Quiz
+		}
+
+		// Add Species tab
+		items.push(baseNavItems[1]); // Species
+		
+		// Add Species Quiz tab if on species quiz page
+		if (isOnSpeciesQuiz) {
+			items.push(quizTabs[1]); // Species Quiz
+		}
+
+		// Add remaining base tabs (Abilities, Background, Equipment)
+		items.push(baseNavItems[2]); // Abilities
+		items.push(baseNavItems[3]); // Background
+		items.push(baseNavItems[4]); // Equipment
 
 		// Add Beasts/Familiars tab if character has access
 		if (hasBeastAccess($character_store)) {
@@ -83,7 +115,11 @@
 	<ul>
 		{#each navItems as item}
 			<li>
-				<a href={item.href} class:has-conflict={hasConflict(item.id)}>
+				<a 
+					href={item.href} 
+					class:has-conflict={hasConflict(item.id)}
+					aria-current={$page.url.pathname === item.href ? 'page' : undefined}
+				>
 					{item.name}
 					{#if hasConflict(item.id)}
 						<span class="conflict-indicator" title="This tab has conflicts that need attention"
@@ -137,6 +173,12 @@
 	nav a:hover {
 		background-color: #3b82f6; /* bright blue on hover */
 		color: white;
+	}
+
+	/* Highlight current page */
+	nav a[aria-current='page'] {
+		background-color: #2563eb; /* darker blue for current page */
+		box-shadow: 0 0 8px rgba(37, 99, 235, 0.6);
 	}
 
 	/* Conflict indicator styles */

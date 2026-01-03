@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { base } from '$app/paths';
 	import { onMount } from 'svelte';
+	import { writable } from 'svelte/store';
 	import FeatureCardList from '$lib/components/FeatureCardList.svelte';
 	import ConflictWarning from '$lib/components/ConflictWarning.svelte';
 	import { isFeatureIncomplete } from '$lib/components/feature-card-utils';
@@ -15,6 +16,25 @@
 	import { get } from 'svelte/store';
 	import { character_store } from '$lib/stores/character_store';
 
+	// Class-to-backgrounds mapping for simple view
+	const classBackgroundsMap: Record<string, string[]> = {
+		'Barbarian': ['Pirate', 'Outlander', 'Soldier'],
+		'Bard': ['Charlatan', 'Entertainer', 'Guild Artisan'],
+		'Cleric': ['Acolyte', 'Hermit', 'Noble', 'Sage'],
+		'Druid': ['Hermit', 'Outlander', 'Pirate'],
+		'Fighter': ['Entertainer', 'Folk Hero', 'Soldier'],
+		'Monk': ['Criminal', 'Urchin', 'Sage'],
+		'Paladin': ['Acolyte', 'Noble', 'Soldier'],
+		'Ranger': ['Folk Hero', 'Hermit', 'Outlander'],
+		'Rogue': ['Charlatan', 'Criminal', 'Pirate', 'Urchin'],
+		'Sorcerer': ['Noble', 'Sage', 'Guild Artisan'],
+		'Warlock': ['Criminal', 'Entertainer', 'Sage'],
+		'Wizard': ['Hermit', 'Sage', 'Noble']
+	};
+
+	// Track whether to show simple or complex view
+	const showSimpleView = writable(true);
+
 	let selectedBackground: BackgroundData | null = null;
 	let selectedBackgroundData: BackgroundData | null = null;
 
@@ -25,6 +45,14 @@
 
 	// Used to force Svelte to re-create <select> nodes so option lists refresh instantly
 	let selectionVersion = 0;
+
+	// Compute the backgrounds to display based on the view mode and selected class
+	$: displayedBackgrounds = $showSimpleView && $character_store.class
+		? backgrounds.filter(bg => {
+				const classRecommendations = classBackgroundsMap[$character_store.class] || [];
+				return classRecommendations.includes(bg.name);
+			})
+		: backgrounds;
 
 	function bumpVersion() {
 		selectionVersion = (selectionVersion + 1) % 1_000_000;
@@ -536,17 +564,51 @@
 	</p>
 
 	{#if !selectedBackgroundData}
-		<div class="background-cards">
-			{#each backgrounds as backgroundInfo}
-				<button class="background-card" on:click={() => (selectedBackground = backgroundInfo)}>
-					<div class="card-left">
-						<img src={backgroundInfo.image} alt={`${backgroundInfo.name} icon`} />
-						<span>{backgroundInfo.name}</span>
-					</div>
-					<img class="card-arrow" src="{base}/basic_icons/blue_next.png" alt="next arrow" />
+		<!-- Toggle button between simple and complex views -->
+		{#if $character_store.class}
+			<div class="view-toggle">
+				<button 
+					class="toggle-button" 
+					on:click={() => showSimpleView.set(!$showSimpleView)}
+				>
+					{$showSimpleView ? 'See all options' : 'See recommended options'}
 				</button>
-			{/each}
-		</div>
+			</div>
+		{/if}
+
+		{#if $showSimpleView && $character_store.class}
+			<!-- Simple view with descriptions expanded -->
+			<div class="simple-background-cards">
+				{#each displayedBackgrounds as backgroundInfo}
+					<div class="simple-background-card">
+						<div class="simple-card-header">
+							<img src={backgroundInfo.image} alt={`${backgroundInfo.name} icon`} class="simple-card-icon" />
+							<h3>{backgroundInfo.name}</h3>
+						</div>
+						<p class="simple-card-description">{backgroundInfo.description}</p>
+						<button 
+							class="select-background-button" 
+							on:click={() => (selectedBackground = backgroundInfo)}
+						>
+							Select {backgroundInfo.name}
+						</button>
+					</div>
+				{/each}
+			</div>
+		{:else}
+			<!-- Complex view with all options (original grid) -->
+			<div class="background-cards">
+				{#each displayedBackgrounds as backgroundInfo}
+					<button class="background-card" on:click={() => (selectedBackground = backgroundInfo)}>
+						<div class="card-left">
+							<img src={backgroundInfo.image} alt={`${backgroundInfo.name} icon`} />
+							<span>{backgroundInfo.name}</span>
+						</div>
+						<img class="card-arrow" src="{base}/basic_icons/blue_next.png" alt="next arrow" />
+					</button>
+				{/each}
+			</div>
+		{/if}
 	{/if}
 
 	{#if selectedBackground}
@@ -899,5 +961,116 @@
 
 	.remove-background-button:hover {
 		background-color: #fdd;
+	}
+
+	/* View toggle button */
+	.view-toggle {
+		max-width: 50vw;
+		margin: 1.5rem auto 1rem auto;
+		text-align: center;
+	}
+
+	.toggle-button {
+		background-color: #2563eb;
+		color: white;
+		border: none;
+		padding: 0.75rem 1.5rem;
+		font-size: 1rem;
+		font-weight: 600;
+		border-radius: 6px;
+		cursor: pointer;
+		transition: background-color 0.3s ease;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	}
+
+	.toggle-button:hover {
+		background-color: #1d4ed8;
+	}
+
+	/* Simple view styles */
+	.simple-background-cards {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+		margin-top: 2rem;
+		padding: 0 2rem;
+		max-width: 900px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.simple-background-card {
+		background-color: #f8f8f8;
+		border: 2px solid #ccc;
+		border-radius: 0.5rem;
+		padding: 1.5rem;
+		transition: border-color 0.2s ease, box-shadow 0.2s ease;
+	}
+
+	.simple-background-card:hover {
+		border-color: #2563eb;
+		box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+	}
+
+	.simple-card-header {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		margin-bottom: 1rem;
+	}
+
+	.simple-card-icon {
+		width: 50px;
+		height: 50px;
+		object-fit: contain;
+	}
+
+	.simple-card-header h3 {
+		margin: 0;
+		font-size: 1.5rem;
+		color: #333;
+		font-weight: bold;
+	}
+
+	.simple-card-description {
+		margin: 0 0 1rem 0;
+		font-size: 1rem;
+		color: #555;
+		line-height: 1.6;
+	}
+
+	.select-background-button {
+		background-color: #2e7d32;
+		color: white;
+		border: none;
+		padding: 0.75rem 1.5rem;
+		font-size: 1rem;
+		font-weight: 600;
+		border-radius: 6px;
+		cursor: pointer;
+		transition: background-color 0.3s ease;
+		width: 100%;
+	}
+
+	.select-background-button:hover {
+		background-color: #1b5e20;
+	}
+
+	@media (max-width: 768px) {
+		.simple-background-cards {
+			padding: 0 1rem;
+		}
+
+		.simple-background-card {
+			padding: 1rem;
+		}
+
+		.simple-card-header h3 {
+			font-size: 1.25rem;
+		}
+
+		.simple-card-description {
+			font-size: 0.95rem;
+		}
 	}
 </style>

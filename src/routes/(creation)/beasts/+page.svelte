@@ -9,7 +9,7 @@
 
 	// Track selected beasts (max 3)
 	let selectedBeasts: Beast[] = [];
-	$: MAX_SELECTIONS = isBeastMaster ? 1 : 3;
+	const MAX_SELECTIONS = 3;
 
 	// Sorting and filtering
 	let sortBy = 'cr'; // 'name' or 'cr' - default to CR
@@ -69,9 +69,15 @@
 	// Available CR options based on character
 	$: availableCRs = [0, 0.125, 0.25, 0.5, 1].filter(cr => cr <= maxCR);
 
-	// Auto-select all available CRs when they change
+	// Auto-select only the highest available CR by default
 	$: {
-		selectedCRs = [...availableCRs];
+		if (availableCRs.length > 0) {
+			// Get the maximum CR (last element since array is sorted ascending)
+			const maxAvailableCR = availableCRs[availableCRs.length - 1];
+			selectedCRs = [maxAvailableCR];
+		} else {
+			selectedCRs = [];
+		}
 	}
 
 	// Calculate total beasts available for this character source (before CR filtering)
@@ -226,7 +232,7 @@
 				{#if isBeastMaster}
 					<h2>Ranger's Companion</h2>
 					<p>You gain one loyal beast companion (CR 1/4 or lower, Medium or smaller) that fights alongside you.</p>
-					<p class="selection-note">Select one stat block to print with your character.</p>
+					<p class="selection-note">Select up to {MAX_SELECTIONS} stat blocks to print with your character. You can choose which companion to bring each session.</p>
 				{/if}
 				
 				{#if isWizard}

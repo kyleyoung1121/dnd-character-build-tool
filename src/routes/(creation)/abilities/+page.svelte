@@ -6,20 +6,21 @@
 	const standardArray = [15, 14, 13, 12, 10, 8];
 	const stats = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
 
-	// Simplified class ability score recommendations
+	// Class ability score recommendations (full ranking based on 2024 PHB)
+	// Each class lists all 6 abilities in order of importance
 	const classRecommendations: Record<string, { abilities: string[] }> = {
-		Barbarian: { abilities: ['strength', 'constitution', 'dexterity'] },
-		Bard: { abilities: ['charisma', 'dexterity', 'constitution'] },
-		Cleric: { abilities: ['wisdom', 'constitution', 'strength'] },
-		Druid: { abilities: ['wisdom', 'constitution', 'dexterity'] },
-		Fighter: { abilities: ['strength', 'dexterity', 'constitution'] },
-		Monk: { abilities: ['dexterity', 'wisdom', 'constitution'] },
-		Paladin: { abilities: ['strength', 'charisma', 'constitution'] },
-		Ranger: { abilities: ['dexterity', 'wisdom', 'constitution'] },
-		Rogue: { abilities: ['dexterity', 'constitution', 'wisdom'] },
-		Sorcerer: { abilities: ['charisma', 'constitution', 'dexterity'] },
-		Warlock: { abilities: ['charisma', 'constitution', 'dexterity'] },
-		Wizard: { abilities: ['intelligence', 'constitution', 'dexterity'] }
+		Barbarian: { abilities: ['strength', 'constitution', 'dexterity', 'wisdom', 'charisma', 'intelligence'] },
+		Bard: { abilities: ['charisma', 'dexterity', 'constitution', 'wisdom', 'intelligence', 'strength'] },
+		Cleric: { abilities: ['wisdom', 'constitution', 'strength', 'charisma', 'dexterity', 'intelligence'] },
+		Druid: { abilities: ['wisdom', 'constitution', 'intelligence', 'dexterity', 'strength', 'charisma'] },
+		Fighter: { abilities: ['strength', 'constitution', 'dexterity', 'wisdom', 'intelligence', 'charisma'] },
+		Monk: { abilities: ['dexterity', 'wisdom', 'constitution', 'strength', 'intelligence', 'charisma'] },
+		Paladin: { abilities: ['strength', 'charisma', 'constitution', 'wisdom', 'dexterity', 'intelligence'] },
+		Ranger: { abilities: ['dexterity', 'wisdom', 'constitution', 'strength', 'intelligence', 'charisma'] },
+		Rogue: { abilities: ['dexterity', 'intelligence', 'constitution', 'charisma', 'wisdom', 'strength'] },
+		Sorcerer: { abilities: ['charisma', 'constitution', 'dexterity', 'wisdom', 'intelligence', 'strength'] },
+		Warlock: { abilities: ['charisma', 'constitution', 'dexterity', 'intelligence', 'wisdom', 'strength'] },
+		Wizard: { abilities: ['intelligence', 'constitution', 'dexterity', 'wisdom', 'charisma', 'strength'] }
 	};
 
 	// Ability score information for popups
@@ -209,8 +210,9 @@
 		className: string,
 		subclass?: string
 	): { abilities: string[] } | null {
+		// Special case: Arcane Trickster Rogue prioritizes Intelligence over Charisma
 		if (className === 'Rogue' && subclass === 'Arcane Trickster') {
-			return { abilities: ['dexterity', 'constitution', 'intelligence'] };
+			return { abilities: ['dexterity', 'intelligence', 'constitution', 'wisdom', 'charisma', 'strength'] };
 		}
 		return classRecommendations[className] || null;
 	}
@@ -226,6 +228,9 @@
 
 	// Track if initial load has completed to prevent re-initialization
 	let hasInitialized = false;
+
+	// Track if we've auto-filled based on class
+	let hasAutoFilled = false;
 
 	// Initialize selected scores from current character state (only on first load)
 	$: {
@@ -245,10 +250,46 @@
 				}
 			}
 			// Mark as initialized after attempting to load scores
-			if (hasAnyScore || Object.values(bonuses).some(b => b !== 0)) {
+			if (hasAnyScore) {
+				hasInitialized = true;
+				hasAutoFilled = true; // If we loaded scores, consider it auto-filled
+			} else if (Object.values(bonuses).some(b => b !== 0)) {
+				// Has bonuses but no scores - mark as initialized but NOT auto-filled
+				// This allows auto-fill to run when class is selected
+				hasInitialized = true;
+			} else {
+				// No scores and no bonuses - fresh character, mark as initialized
+				// so auto-fill can run when class is selected
 				hasInitialized = true;
 			}
 		}
+	}
+
+	// Auto-fill ability scores based on class recommendation (only once)
+	$: {
+		if (hasInitialized && !hasAutoFilled && selectedClass && classRecommendation) {
+			// Check if all scores are empty
+			const allEmpty = stats.every(stat => selectedScores[stat] === null || selectedScores[stat] === 0);
+			
+			if (allEmpty) {
+				// Auto-fill based on class recommendations
+				const recommendations = classRecommendation.abilities;
+				const sortedArray = [...standardArray].sort((a, b) => b - a); // Sort descending: [15, 14, 13, 12, 10, 8]
+				
+				// Assign scores in order of class recommendations
+				// recommendations array now contains all 6 abilities in priority order
+				for (let i = 0; i < recommendations.length && i < sortedArray.length; i++) {
+					selectedScores[recommendations[i]] = sortedArray[i];
+				}
+				
+				hasAutoFilled = true;
+			}
+		}
+	}
+
+	// Function to clear a specific ability score
+	function clearScore(stat: string) {
+		selectedScores[stat] = null;
 	}
 
 	// Enhanced bonus tracking with source information
@@ -473,7 +514,7 @@
 				<div class="priority-group">
 					<span class="priority-label">Most Important:</span>
 					<div class="ability-list">
-						{#each classRecommendation.abilities as ability}
+						{#each classRecommendation.abilities.slice(0, 3) as ability}
 							<span class="ability-tag capitalize">{ability}</span>
 						{/each}
 					</div>
@@ -513,18 +554,30 @@
 					{stat} ℹ️
 				</button>
 
-				<!-- Dropdown -->
-				<select
-					bind:value={selectedScores[stat]}
-					class="w-full rounded border px-2 py-1 focus:ring-2 focus:ring-indigo-200 focus:outline-none"
-				>
-					<option value={null}>--</option>
-					{#each standardArray as num}
-						{#if !usedScores.includes(num) || selectedScores[stat] === num}
-							<option value={num}>{num}</option>
-						{/if}
-					{/each}
-				</select>
+				<!-- Score Selection with Clear Button -->
+				<div class="score-input-group">
+					<select
+						bind:value={selectedScores[stat]}
+						class="w-full rounded border px-2 py-1 focus:ring-2 focus:ring-indigo-200 focus:outline-none"
+					>
+						<option value={null}>--</option>
+						{#each standardArray as num}
+							{#if !usedScores.includes(num) || selectedScores[stat] === num}
+								<option value={num}>{num}</option>
+							{/if}
+						{/each}
+					</select>
+					{#if selectedScores[stat] !== null && selectedScores[stat] > 0}
+						<button
+							class="clear-score-btn"
+							on:click={() => clearScore(stat)}
+							title="Clear score"
+							aria-label="Clear {stat} score"
+						>
+							✕
+						</button>
+					{/if}
+				</div>
 
 				<!-- Bonus -->
 				<div class="text-center font-semibold text-gray-700">
@@ -695,6 +748,39 @@
 		padding: 0.4rem 0.6rem;
 		font-weight: 500;
 		text-align: center;
+	}
+
+	/* Score input group with clear button */
+	.score-input-group {
+		position: relative;
+		display: flex;
+		align-items: center;
+		gap: 0.25rem;
+	}
+
+	.clear-score-btn {
+		background: #ef4444;
+		color: white;
+		border: none;
+		border-radius: 4px;
+		width: 24px;
+		height: 24px;
+		font-size: 14px;
+		font-weight: bold;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: background-color 0.2s;
+		flex-shrink: 0;
+	}
+
+	.clear-score-btn:hover {
+		background: #dc2626;
+	}
+
+	.clear-score-btn:active {
+		background: #b91c1c;
 	}
 
 	/* Class Recommendation Card Styles */

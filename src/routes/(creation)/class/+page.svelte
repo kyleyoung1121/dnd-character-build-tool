@@ -687,6 +687,12 @@
 				</button>
 			{/each}
 		</div>
+		
+		<div class="quiz-link-container">
+			<a href="{base}/class-quiz" class="quiz-link">
+				Not sure? Take the Class quiz!
+			</a>
+		</div>
 	{/if}
 
 	{#if selectedClass}
@@ -1021,5 +1027,21 @@
 	}
 	.add-button:hover {
 		background-color: #1b4d20;
+	}
+
+	.quiz-link-container {
+		margin-top: 2rem;
+		text-align: center;
+	}
+
+	.quiz-link {
+		color: #2563eb;
+		font-size: 1.1rem;
+		text-decoration: underline;
+		transition: color 0.2s ease;
+	}
+
+	.quiz-link:hover {
+		color: #1d4ed8;
 	}
 </style>

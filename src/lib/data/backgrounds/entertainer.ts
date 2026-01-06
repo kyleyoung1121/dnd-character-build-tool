@@ -12,13 +12,13 @@ export const entertainer: BackgroundData = {
 	toolProficiencies: ['Disguise kit', 'One type of musical instrument'],
 	equipment: [
 		'Musical instrument (one of your choice)',
-		'Favor of an admirer (love letter, lock of hair, or trinket)',
+		'Favor of an admirer (letter, trinket, etc)',
 		'Costume',
 		'Belt pouch with 15 gp'
 	],
 	startingEquipment: {
 		fixed: [
-			'Favor of an admirer (love letter, lock of hair, or trinket)',
+			'Favor of an admirer (letter, trinket, etc)',
 			'Costume',
 			'Belt pouch with 15 gp'
 		],
@@ -109,7 +109,7 @@ export const entertainer: BackgroundData = {
 					target: 'inventory',
 					action: 'add',
 					value: [
-						'Favor of an admirer (love letter, lock of hair, or trinket)',
+						'Favor of an admirer (letter, trinket, etc)',
 						'Costume',
 						'Belt pouch with 15 gp'
 					]

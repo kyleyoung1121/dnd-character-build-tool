@@ -12,7 +12,7 @@ export const gladiator: BackgroundData = {
 	toolProficiencies: ['Disguise kit', 'One type of unusual weapon'],
 	equipment: [
 		'Unusual weapon (trident, net, or similar)',
-		'Favor of an admirer (love letter, lock of hair, or trinket)',
+		'Favor of an admirer (letter, trinket, etc)',
 		'Costume',
 		'Belt pouch with 15 gp'
 	],
@@ -79,7 +79,7 @@ export const gladiator: BackgroundData = {
 					action: 'add',
 					value: [
 						'Unusual weapon (trident, net, or similar)',
-						'Favor of an admirer (love letter, lock of hair, or trinket)',
+						'Favor of an admirer (letter, trinket, etc)',
 						'Costume',
 						'Belt pouch with 15 gp'
 					]

@@ -7,14 +7,18 @@
 	import BeastCard from '$lib/components/BeastCard.svelte';
 	import type { Beast } from '$lib/data/beasts/types';
 
-	// Track selected beasts (max 3)
+	// Track selected beasts (max 3 for most, max 1 for Beast Master)
 	let selectedBeasts: Beast[] = [];
-	const MAX_SELECTIONS = 3;
+	
+	// Determine max selections based on character
+	$: maxSelections = isBeastMaster ? 1 : 3;
+	$: MAX_SELECTIONS = maxSelections; // Keep constant name for template compatibility
 
 	// Sorting and filtering
 	let sortBy = 'cr'; // 'name' or 'cr' - default to CR
 	let sortDirection = 'desc'; // 'asc' or 'desc' - default to high-to-low
 	let selectedCRs: Number[] = []; // Will be set based on available CRs
+	let filtersExpanded = false; // Collapsible filter section starts closed
 
 	// Convert CR decimal to fraction display
 	function crToDisplay(cr: Number) {
@@ -66,15 +70,36 @@
 		return 1; // Default
 	})();
 
-	// Available CR options based on character
-	$: availableCRs = [0, 0.125, 0.25, 0.5, 1].filter(cr => cr <= maxCR);
+	// Available CR options based on character - only show CRs that have beasts
+	$: availableCRs = (() => {
+		const allPossibleCRs = [0, 0.125, 0.25, 0.5, 1].filter(cr => cr <= maxCR);
+		// Filter to only CRs that have at least one beast for this character source
+		return allPossibleCRs.filter(cr => {
+			return beasts.some(beast => {
+				if (beast.challenge_rating !== cr) return false;
+				if (!characterSources) return true;
+				return characterSources.some(charSource => 
+					beast.sources.some(beastSource => beastSource.includes(charSource))
+				);
+			});
+		});
+	})();
 
-	// Auto-select only the highest available CR by default
+	// Auto-select default CRs based on character class
 	$: {
 		if (availableCRs.length > 0) {
-			// Get the maximum CR (last element since array is sorted ascending)
-			const maxAvailableCR = availableCRs[availableCRs.length - 1];
-			selectedCRs = [maxAvailableCR];
+			// Special defaults for specific classes
+			if (isWizard) {
+				// Wizard: Show all options (CR 0 and 1/8)
+				selectedCRs = [...availableCRs];
+			} else if (isPactOfChain) {
+				// Warlock: Show CR 1/4 and CR 1 (fiend options)
+				selectedCRs = availableCRs.filter(cr => cr === 0.25 || cr === 1);
+			} else {
+				// Default: Only highest CR
+				const maxAvailableCR = availableCRs[availableCRs.length - 1];
+				selectedCRs = [maxAvailableCR];
+			}
 		} else {
 			selectedCRs = [];
 		}
@@ -143,7 +168,7 @@
 				beasts: selectedBeastNames
 			});
 
-		} else if (selectedBeasts.length < MAX_SELECTIONS) {
+		} else if (selectedBeasts.length < maxSelections) {
 			// Add the beast if we are able to (under the selection limit)
 			selectedBeasts = [...selectedBeasts, beast];
 			let selectedBeastNames = selectedBeasts.map((beast) => beast.name)
@@ -232,7 +257,7 @@
 				{#if isBeastMaster}
 					<h2>Ranger's Companion</h2>
 					<p>You gain one loyal beast companion (CR 1/4 or lower, Medium or smaller) that fights alongside you.</p>
-					<p class="selection-note">Select up to {MAX_SELECTIONS} stat blocks to print with your character. You can choose which companion to bring each session.</p>
+					<p class="selection-note">Choose 1 companion with whom you share a magical connection.</p>
 				{/if}
 				
 				{#if isWizard}
@@ -255,74 +280,83 @@
 				{/if}
 			</div>
 
-			<!-- Filters and Sorting -->
+			<!-- Filters and Sorting (Collapsible) -->
 			<div class="controls-section">
-				<div class="controls-grid">
-					<div class="control-group">
-						<div class="control-label">Sort by:</div>
-						<div class="sort-controls">
-							<div class="sort-buttons">
-								<button 
-									class="control-button"
-									class:active={sortBy === 'name'}
-									on:click={() => sortBy = 'name'}
-								>
-									Alphabetical
-								</button>
-								<button 
-									class="control-button"
-									class:active={sortBy === 'cr'}
-									on:click={() => sortBy = 'cr'}
-								>
-									Challenge Rating
-								</button>
+				<button 
+					class="filter-toggle"
+					on:click={() => filtersExpanded = !filtersExpanded}
+				>
+					<span class="toggle-text">Filtering Options</span>
+					<!-- <span class="results-count-inline">({filteredBeasts.length} of {availableBeasts.length} shown)</span> -->
+					<span class="toggle-icon">{filtersExpanded ? '–' : '+'}</span>
+				</button>
+				
+				{#if filtersExpanded}
+					<div class="controls-content">
+						<div class="controls-grid">
+							<div class="control-group">
+								<div class="control-label">Sort by:</div>
+								<div class="sort-controls">
+									<div class="sort-buttons">
+										<button 
+											class="control-button"
+											class:active={sortBy === 'name'}
+											on:click={() => sortBy = 'name'}
+										>
+											Alphabetical
+										</button>
+										<button 
+											class="control-button"
+											class:active={sortBy === 'cr'}
+											on:click={() => sortBy = 'cr'}
+										>
+											Challenge Rating
+										</button>
+									</div>
+									<div class="sort-direction">
+										<button 
+											class="control-button"
+											class:active={sortDirection === 'asc'}
+											on:click={() => sortDirection = 'asc'}
+										>
+											{sortBy === 'name' ? 'A → Z' : 'Low → High'}
+										</button>
+										<button 
+											class="control-button"
+											class:active={sortDirection === 'desc'}
+											on:click={() => sortDirection = 'desc'}
+										>
+											{sortBy === 'name' ? 'Z → A' : 'High → Low'}
+										</button>
+									</div>
+								</div>
 							</div>
-							<div class="sort-direction">
-								<button 
-									class="control-button"
-									class:active={sortDirection === 'asc'}
-									on:click={() => sortDirection = 'asc'}
-								>
-									{sortBy === 'name' ? 'A → Z' : 'Low → High'}
-								</button>
-								<button 
-									class="control-button"
-									class:active={sortDirection === 'desc'}
-									on:click={() => sortDirection = 'desc'}
-								>
-									{sortBy === 'name' ? 'Z → A' : 'High → Low'}
-								</button>
+
+							<div class="control-group">
+								<div class="control-label">Filter by CR:</div>
+								<div class="cr-filters">
+									<div class="cr-quick-actions">
+										<button class="link-button" on:click={selectAllCRs}>All</button>
+										<span class="separator">|</span>
+										<button class="link-button" on:click={deselectAllCRs}>None</button>
+									</div>
+									<div class="cr-checkboxes">
+										{#each availableCRs as cr}
+											<label class="checkbox-label">
+												<input 
+													type="checkbox" 
+													checked={selectedCRs.includes(cr)}
+													on:change={() => toggleCR(cr)}
+												/>
+												<span class="cr-label">CR {crToDisplay(cr)}</span>
+											</label>
+										{/each}
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
-
-					<div class="control-group">
-						<div class="control-label">Filter by CR:</div>
-						<div class="cr-filters">
-							<div class="cr-quick-actions">
-								<button class="link-button" on:click={selectAllCRs}>All</button>
-								<span class="separator">|</span>
-								<button class="link-button" on:click={deselectAllCRs}>None</button>
-							</div>
-							<div class="cr-checkboxes">
-								{#each availableCRs as cr}
-									<label class="checkbox-label">
-										<input 
-											type="checkbox" 
-											checked={selectedCRs.includes(cr)}
-											on:change={() => toggleCR(cr)}
-										/>
-										<span class="cr-label">CR {crToDisplay(cr)}</span>
-									</label>
-								{/each}
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<div class="results-count">
-					Showing {filteredBeasts.length} of {availableBeasts.length} beasts
-				</div>
+				{/if}
 			</div>
 
 			<!-- Beast List -->
@@ -415,16 +449,60 @@
 	.controls-section {
 		background: #f1f5f9;
 		border-radius: 6px;
-		padding: 1.25rem;
+		padding: 0;
 		margin-bottom: 1.5rem;
 		border: 1px solid #cbd5e1;
+		overflow: hidden;
+	}
+
+	.filter-toggle {
+		width: 100%;
+		background: #f1f5f9;
+		border: none;
+		padding: 1rem 1.25rem;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		cursor: pointer;
+		transition: background 0.2s ease;
+		text-align: left;
+	}
+
+	.filter-toggle:hover {
+		background: #e2e8f0;
+	}
+
+	.toggle-icon {
+		font-size: 1.2rem;
+		font-weight: bold;
+		color: #334155;
+	}
+
+	.toggle-text {
+		color: #334155;
+		font-weight: 600;
+		font-size: 0.95rem;
+	}
+
+	/* Hidden for now - keeping code in case needed later */
+	.results-count-inline {
+		display: none;
+		color: #64748b;
+		font-size: 0.875rem;
+		font-weight: 400;
+		margin-left: auto;
+	}
+
+	.controls-content {
+		padding: 1.25rem;
+		border-top: 1px solid #cbd5e1;
+		background: #f8fafc;
 	}
 
 	.controls-grid {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: 1.5rem;
-		margin-bottom: 1rem;
 	}
 
 	@media (max-width: 768px) {
@@ -533,15 +611,6 @@
 
 	.cr-label {
 		user-select: none;
-	}
-
-	.results-count {
-		margin-top: 1rem;
-		padding-top: 1rem;
-		border-top: 1px solid #cbd5e1;
-		color: #64748b;
-		font-size: 0.875rem;
-		font-weight: 500;
 	}
 
 	/* Beast List */

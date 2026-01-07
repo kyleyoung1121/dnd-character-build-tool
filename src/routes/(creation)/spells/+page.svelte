@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { get } from 'svelte/store';
+	import { writable } from 'svelte/store';
 	import ConflictWarning from '$lib/components/ConflictWarning.svelte';
 	import { character_store, hasSpellAccess } from '$lib/stores/character_store';
 	import { applyChoice } from '$lib/stores/character_store_helpers';
@@ -8,8 +9,12 @@
 		getSpellsByLevel,
 		getSpellAccessForCharacter,
 		type SpellAccess,
-		type Spell
+		type Spell,
+		type SpellTag
 	} from '$lib/data/spells';
+
+	// Store for toggling rare use spell filtering
+	const showRareUseSpells = writable(false);
 
 	// Helper function to format spell level for display
 	function getSpellLevelText(spell: any): string {
@@ -758,7 +763,8 @@
 				(spell) =>
 					(spell.source === 'class' ||
 					(spell.source === 'subclass' && !spell.sourceName.includes(' - '))) &&
-					spell.source !== 'feature' // Exclude feature sources from base cantrips tab
+					spell.source !== 'feature' && // Exclude feature sources from base cantrips tab
+					!shouldFilterSpell(spell) // Apply rare use filter
 			);
 			return addRacialDuplicates(classSpells, 0);
 		} else if (sourceId === 'level1') {
@@ -766,7 +772,8 @@
 				(spell) =>
 					(spell.source === 'class' ||
 					(spell.source === 'subclass' && !spell.sourceName.includes(' - '))) &&
-					spell.source !== 'feature' // Exclude feature sources from base level1 tab
+					spell.source !== 'feature' && // Exclude feature sources from base level1 tab
+					!shouldFilterSpell(spell) // Apply rare use filter
 			);
 			return addRacialDuplicates(classSpells, 1);
 		} else if (sourceId === 'level2') {
@@ -774,7 +781,8 @@
 				(spell) =>
 					(spell.source === 'class' ||
 					(spell.source === 'subclass' && !spell.sourceName.includes(' - '))) &&
-					spell.source !== 'feature' // Exclude feature sources from base level2 tab
+					spell.source !== 'feature' && // Exclude feature sources from base level2 tab
+					!shouldFilterSpell(spell) // Apply rare use filter
 			);
 			return addRacialDuplicates(classSpells, 2);
 		} else if (sourceId.startsWith('race-')) {
@@ -1118,6 +1126,23 @@
 		return '';
 	}
 
+	// Helper function to check if a spell should be filtered out (rare use)
+	function shouldFilterSpell(spell: Spell): boolean {
+		// Never filter if toggle is off (showing rare use spells)
+		if ($showRareUseSpells) return false;
+		
+		// Never filter if spell is already selected (user chose it)
+		if (selectedSpells.has(spell.name)) return false;
+		
+		// Filter if marked as rare use
+		return spell.isRareUse === true;
+	}
+
+	// Get tag icon path
+	function getTagIconPath(tag: SpellTag): string {
+		return `/spell_tag_icons/${tag}.png`;
+	}
+
 	// Get all spells that are already granted or selected from other sources
 	function getUnavailableSpells(character: any, currentSourceId: string): Set<string> {
 		const unavailable = new Set<string>();
@@ -1386,6 +1411,10 @@
 		}
 	}
 	$: currentTabSpells = activeTab ? getSpellsForSource(character, activeTab) : [];
+	// Force recalculation when toggle changes
+	$: if ($showRareUseSpells !== undefined && activeTab) {
+		currentTabSpells = getSpellsForSource(character, activeTab);
+	}
 	$: currentTabUnavailableSpells = activeTab
 		? getUnavailableSpells(character, activeTab)
 		: new Set();
@@ -1627,6 +1656,19 @@
 										<span class="spell-name" class:racial-duplicate={spell.isRacialDuplicate}
 											>{spell.name}</span
 										>
+										{#if spell.tags && spell.tags.length > 0}
+											<span class="spell-tag-icons">
+												{#each spell.tags as tag}
+													<img 
+														src={getTagIconPath(tag)} 
+														alt={tag} 
+														title={tag}
+														class="tag-icon"
+														on:error={(e) => e.currentTarget.style.display = 'none'}
+													/>
+												{/each}
+											</span>
+										{/if}
 										{#if spell.isRacialDuplicate && spell.racialSource}
 											<span class="spell-tag racial-tag">
 												{spell.racialSource.toUpperCase()} (AUTO)
@@ -1715,6 +1757,21 @@
 						{/each}
 					</div>
 				{/each}
+			</div>
+		{/if}
+		
+		<!-- Floating toggle for rare use spell filtering -->
+		{#if hasSpellAccess(character)}
+			<div class="floating-toggle">
+				<div class="toggle-label">{$showRareUseSpells ? 'All Spells' : 'Recommended'}</div>
+				<label class="toggle-switch">
+					<input 
+						type="checkbox" 
+						checked={$showRareUseSpells}
+						on:change={() => showRareUseSpells.set(!$showRareUseSpells)}
+					/>
+					<span class="toggle-slider"></span>
+				</label>
 			</div>
 		{/if}
 	{/if}
@@ -2076,5 +2133,121 @@
 		font-weight: 500;
 		cursor: not-allowed;
 		opacity: 0.6;
+	}
+
+	/* Spell tag icons */
+	.spell-tag-icons {
+		display: inline-flex;
+		gap: 0.25rem;
+		align-items: center;
+		margin-left: 0.5rem;
+	}
+
+	.tag-icon {
+		height: 60px;
+		width: auto;
+		display: inline-block;
+		vertical-align: middle;
+	}
+
+	/* Floating toggle slider styling (similar to background tab) */
+	.floating-toggle {
+		position: fixed;
+		bottom: 2rem;
+		right: 2rem;
+		background-color: white;
+		border: 2px solid #ccc;
+		border-radius: 50px;
+		padding: 0.75rem 1.25rem;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		z-index: 100;
+		transition: box-shadow 0.3s ease;
+	}
+
+	.floating-toggle:hover {
+		box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+	}
+
+	.toggle-label {
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: #374151;
+		white-space: nowrap;
+	}
+
+	.toggle-switch {
+		position: relative;
+		display: inline-block;
+		width: 48px;
+		height: 24px;
+	}
+
+	.toggle-switch input {
+		opacity: 0;
+		width: 0;
+		height: 0;
+	}
+
+	.toggle-slider {
+		position: absolute;
+		cursor: pointer;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: #2563eb;
+		transition: 0.3s;
+		border-radius: 24px;
+	}
+
+	.toggle-slider:before {
+		position: absolute;
+		content: '';
+		height: 18px;
+		width: 18px;
+		left: 3px;
+		bottom: 3px;
+		background-color: white;
+		transition: 0.3s;
+		border-radius: 50%;
+	}
+
+	input:checked + .toggle-slider {
+		background-color: #10b981;
+	}
+
+	input:checked + .toggle-slider:before {
+		transform: translateX(24px);
+	}
+
+	/* Mobile responsive adjustments */
+	@media (max-width: 768px) {
+		.floating-toggle {
+			bottom: 1rem;
+			right: 1rem;
+			padding: 0.5rem 1rem;
+			gap: 0.5rem;
+		}
+
+		.toggle-label {
+			font-size: 0.8rem;
+		}
+
+		.toggle-switch {
+			width: 40px;
+			height: 20px;
+		}
+
+		.toggle-slider:before {
+			height: 14px;
+			width: 14px;
+		}
+
+		input:checked + .toggle-slider:before {
+			transform: translateX(20px);
+		}
 	}
 </style>

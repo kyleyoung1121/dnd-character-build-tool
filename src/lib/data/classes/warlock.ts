@@ -42,7 +42,7 @@ const otherworldlyPatronPrompt: FeaturePrompt = {
 	name: 'Otherworldly Patron',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'Choose your Otherworldly Patron at 1st level.' },
+			{ type: 'text', text: 'Choose your Otherworldly Patron.' },
 		]
 	},
 	featureOptions: {
@@ -70,7 +70,7 @@ const otherworldlyPatronPrompt: FeaturePrompt = {
 						name: 'Fey Presence',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'As an action, you can cause each creature in a 10-foot cube originating from you to make a Wisdom saving throw against your warlock spell save DC. The creatures that fail their saving throws are all charmed or frightened by you (your choice) until the end of your next turn. Once you use this feature, you can\\' },
+								{ type: 'text', text: 'As an action, you can cause each creature in a 10-foot cube originating from you to make a Wisdom saving throw against your warlock spell save DC. The creatures that fail their saving throws are all charmed or frightened by you (your choice) until the end of your next turn. Once you use this feature, you can\'t use it again until you finish a short or long rest.' },
 							]
 						},
 						source: 'warlock.archfey',
@@ -106,7 +106,23 @@ const otherworldlyPatronPrompt: FeaturePrompt = {
 						name: 'Dark One\'s Blessing',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'When you reduce a hostile creature to 0 hit points, you gain temporary hit points equal to your Charisma modifier + your warlock level (minimum of 1).' },
+								{ type: 'text', text: '' },
+								{
+									type: 'computed-replacement',
+					
+									whenAvailable: [
+										{
+											source: 'derived',
+											formula: 'Math.max(1, CHA_MOD + 3)'
+										}
+									],
+					
+									fallbackText:
+										'When you reduce a hostile creature to 0 hit points, you gain temporary hit points equal to your Charisma modifier + 3 (minimum of 1).',
+										
+									replacementTemplate:
+										'When you reduce a hostile creature to 0 hit points, you gain {value} temporary hit points.'
+								}
 							]
 						},
 						source: 'warlock.fiend',
@@ -130,7 +146,8 @@ const otherworldlyPatronPrompt: FeaturePrompt = {
 						description: {
 							blocks: [
 								{ type: 'text', text: 'The Great Old One lets you choose from an expanded list of spells when you learn a warlock spell. The following spells are added to the warlock spell list for you:' },
-								{ type: 'text', text: '1st Level: Dissonant Whispers, Tasha\\' },
+								{ type: 'text', text: '1st Level: Dissonant Whispers, Tasha\'s Hideous Laughter' },
+								{ type: 'text', text: '2nd Level: Detect Thoughts, Phantasmal Force' },
 							]
 						},
 						source: 'warlock.great_old_one',
@@ -141,7 +158,7 @@ const otherworldlyPatronPrompt: FeaturePrompt = {
 						name: 'Awakened Mind',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'You can communicate telepathically with any creature you can see within 30 feet of you. You don\\' },
+								{ type: 'text', text: 'You can communicate telepathically with any creature you can see within 30 feet of you. You don\'t need to share a language with the creature for it to understand your telepathic utterances, but the creature must be able to understand at least one language.' },
 							]
 						},
 						source: 'warlock.great_old_one',
@@ -173,7 +190,7 @@ const pactMagicPrompt: FeaturePrompt = {
 	name: 'Pact Magic',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'You know two cantrips of your choice from the warlock spell list. 		You know two 1st-level spells. 		You regain spell slots on a short or long rest. 		You use Charisma as your spellcasting ability.' },
+			{ type: 'text', text: 'You know two cantrips and four leveled spells of your choice from the warlock spell list. You cast your spells using a pool of two second-level spell slots. You regain spell slots on a short or long rest. You use Charisma as your spellcasting ability.' },
 		]
 	},
 	source: 'warlock',
@@ -191,7 +208,7 @@ const pactBoonPrompt: FeaturePrompt = {
 	name: 'Pact Boon',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'At 3rd level, your otherworldly patron bestows a gift upon you for your loyal service. You gain one of the following features of your choice.' },
+			{ type: 'text', text: 'Your otherworldly patron bestows a gift upon you for your loyal service. You gain one of the following features of your choice.' },
 		]
 	},
 	featureOptions: {
@@ -206,7 +223,7 @@ const pactBoonPrompt: FeaturePrompt = {
 						name: 'Pact of the Chain',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'You learn the Find Familiar spell and can cast it as a ritual. The spell doesn\\' },
+								{ type: 'text', text: 'You learn the Find Familiar spell and can cast it as a ritual. The spell doesn\'t count against your number of spells known. When you cast the spell, you can choose from one of the normal forms for your familiar or one of the following special forms: imp, pseudodragon, quasit, or sprite. Additionally, when you take the attack action, you can forgo one of your own attacks to allow your familiar to make one attack of its own with its reaction.' },
 							]
 						},
 						source: 'warlock.pact_boon',
@@ -223,7 +240,7 @@ const pactBoonPrompt: FeaturePrompt = {
 						name: 'Eldritch Invocations',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'At 2nd level, you gain two eldritch invocations of your choice. When you gain certain warlock levels, you gain additional invocations of your choice.' },
+								{ type: 'text', text: 'You gain two eldritch invocations of your choice.' },
 							]
 						},
 						source: 'warlock.eldritch_invocations',
@@ -239,8 +256,8 @@ const pactBoonPrompt: FeaturePrompt = {
 											name: 'Agonizing Blast',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip. When you cast Eldritch Blast, add your Charisma modifier to the damage it deals on a hit.' },
-													{ type: 'text', text: 'Note: Don\\' },
+													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip.' },
+													{ type: 'text', text: 'When you cast Eldritch Blast, add your Charisma modifier to the damage it deals on a hit.' },
 												]
 											},
 											source: 'warlock.eldritch_invocations',
@@ -342,8 +359,8 @@ const pactBoonPrompt: FeaturePrompt = {
 											name: 'Eldritch Spear',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip. When you cast Eldritch Blast, its range is 300 feet.' },
-													{ type: 'text', text: 'Note: Don\\' },
+													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip.' },
+													{ type: 'text', text: 'When you cast Eldritch Blast, its range is 300 feet.' },
 												]
 											},
 											source: 'warlock.eldritch_invocations',
@@ -394,7 +411,7 @@ const pactBoonPrompt: FeaturePrompt = {
 											name: 'Gaze of Two Minds',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'You can use your action to touch a willing humanoid and perceive through its senses until the end of your next turn. As long as the creature is on the same plane of existence as you, you can use your action on subsequent turns to maintain this connection, extending the duration until the end of your next turn. While perceiving through the other creature\\' },
+													{ type: 'text', text: 'You can use your action to touch a willing humanoid and perceive through its senses until the end of your next turn. As long as the creature is on the same plane of existence as you, you can use your action on subsequent turns to maintain this connection, extending the duration until the end of your next turn. While perceiving through the other creature\'s senses, you benefit from any special senses possessed by that creature, and you are blinded and deafened to your own surroundings.' },
 												]
 											},
 											source: 'warlock.eldritch_invocations',
@@ -445,8 +462,8 @@ const pactBoonPrompt: FeaturePrompt = {
 											name: 'Repelling Blast',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip. When you hit a creature with Eldritch Blast, you can push the creature up to 10 feet away from you in a straight line.' },
-													{ type: 'text', text: 'Note: Don\\' },
+													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip. ' },
+													{ type: 'text', text: 'When you hit a creature with Eldritch Blast, you can push the creature up to 10 feet away from you in a straight line.' },
 												]
 											},
 											source: 'warlock.eldritch_invocations',
@@ -463,7 +480,7 @@ const pactBoonPrompt: FeaturePrompt = {
 											name: 'Thief of Five Fates',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'You can cast Bane once using a warlock spell slot. You can\\' },
+													{ type: 'text', text: 'You can cast Bane once using a warlock spell slot. You can\'t do so again until you finish a long rest.' },
 												]
 											},
 											source: 'warlock.eldritch_invocations',
@@ -480,7 +497,7 @@ const pactBoonPrompt: FeaturePrompt = {
 											name: 'Voice of the Chain Master',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'Prerequisite: Pact of the Chain. You can communicate telepathically with your familiar and perceive through your familiar\\' },
+													{ type: 'text', text: 'Prerequisite: Pact of the Chain. You can communicate telepathically with your familiar and perceive through your familiar\'s senses as long as you are on the same plane of existence. Additionally, while perceiving through your familiars senses, you can also speak through your familiar in your own voice, even if your familiar is normally incapable of speech.' },
 												]
 											},
 											source: 'warlock.eldritch_invocations',
@@ -527,7 +544,7 @@ const pactBoonPrompt: FeaturePrompt = {
 						name: 'Eldritch Invocations',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'At 2nd level, you gain two eldritch invocations of your choice. When you gain certain warlock levels, you gain additional invocations of your choice.' },
+								{ type: 'text', text: 'You gain two eldritch invocations of your choice.' },
 							]
 						},
 						source: 'warlock.eldritch_invocations',
@@ -543,8 +560,8 @@ const pactBoonPrompt: FeaturePrompt = {
 											name: 'Agonizing Blast',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip. When you cast Eldritch Blast, add your Charisma modifier to the damage it deals on a hit.' },
-													{ type: 'text', text: 'Note: Don\\' },
+													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip.' },
+													{ type: 'text', text: 'When you cast Eldritch Blast, add your Charisma modifier to the damage it deals on a hit.' },
 												]
 											},
 											source: 'warlock.eldritch_invocations',
@@ -646,8 +663,8 @@ const pactBoonPrompt: FeaturePrompt = {
 											name: 'Eldritch Spear',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip. When you cast Eldritch Blast, its range is 300 feet.' },
-													{ type: 'text', text: 'Note: Don\\' },
+													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip.' },
+													{ type: 'text', text: 'When you cast Eldritch Blast, its range is 300 feet.' },
 												]
 											},
 											source: 'warlock.eldritch_invocations',
@@ -698,7 +715,7 @@ const pactBoonPrompt: FeaturePrompt = {
 											name: 'Gaze of Two Minds',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'You can use your action to touch a willing humanoid and perceive through its senses until the end of your next turn. As long as the creature is on the same plane of existence as you, you can use your action on subsequent turns to maintain this connection, extending the duration until the end of your next turn. While perceiving through the other creature\\' },
+													{ type: 'text', text: 'You can use your action to touch a willing humanoid and perceive through its senses until the end of your next turn. As long as the creature is on the same plane of existence as you, you can use your action on subsequent turns to maintain this connection, extending the duration until the end of your next turn. While perceiving through the other creature\'s senses, you benefit from any special senses possessed by that creature, and you are blinded and deafened to your own surroundings.' },
 												]
 											},
 											source: 'warlock.eldritch_invocations',
@@ -749,8 +766,8 @@ const pactBoonPrompt: FeaturePrompt = {
 											name: 'Repelling Blast',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip. When you hit a creature with Eldritch Blast, you can push the creature up to 10 feet away from you in a straight line.' },
-													{ type: 'text', text: 'Note: Don\\' },
+													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip. ' },
+													{ type: 'text', text: 'When you hit a creature with Eldritch Blast, you can push the creature up to 10 feet away from you in a straight line.' },
 												]
 											},
 											source: 'warlock.eldritch_invocations',
@@ -767,7 +784,7 @@ const pactBoonPrompt: FeaturePrompt = {
 											name: 'Thief of Five Fates',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'You can cast Bane once using a warlock spell slot. You can\\' },
+													{ type: 'text', text: 'You can cast Bane once using a warlock spell slot. You can\'t do so again until you finish a long rest.' },
 												]
 											},
 											source: 'warlock.eldritch_invocations',
@@ -797,7 +814,7 @@ const pactBoonPrompt: FeaturePrompt = {
 						name: 'Pact of the Tome',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'Your patron gives you a grimoire called a Book of Shadows. When you gain this feature, choose three cantrips from any class\\' },
+								{ type: 'text', text: 'Your patron gives you a grimoire called a Book of Shadows. When you gain this feature, choose three cantrips from any class\'s spell list. While the book is on your person, you can cast those cantrips at will. They don\'t count against your number of cantrips known, but they do count as Warlock spells for you. If you loose your Book of Shadows, you can summon another one by performing a 1-hour ceremony. This may take place over a short or long rest, and it destroys the previous book.' },
 							]
 						},
 						source: 'warlock.pact_boon',
@@ -814,7 +831,7 @@ const pactBoonPrompt: FeaturePrompt = {
 						name: 'Eldritch Invocations',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'At 2nd level, you gain two eldritch invocations of your choice. When you gain certain warlock levels, you gain additional invocations of your choice.' },
+								{ type: 'text', text: 'You gain two eldritch invocations of your choice.' },
 							]
 						},
 						source: 'warlock.eldritch_invocations',
@@ -830,8 +847,8 @@ const pactBoonPrompt: FeaturePrompt = {
 											name: 'Agonizing Blast',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip. When you cast Eldritch Blast, add your Charisma modifier to the damage it deals on a hit.' },
-													{ type: 'text', text: 'Note: Don\\' },
+													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip.' },
+													{ type: 'text', text: 'When you cast Eldritch Blast, add your Charisma modifier to the damage it deals on a hit.' },
 												]
 											},
 											source: 'warlock.eldritch_invocations',
@@ -899,7 +916,8 @@ const pactBoonPrompt: FeaturePrompt = {
 											name: 'Book of Ancient Secrets',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'Prerequisite: Pact of the Tome. You can now inscribe magical rituals in your Book of Shadows. Choose two 1st-level spells that have the ritual tag from any class\\' },
+													{ type: 'text', text: 'Prerequisite: Pact of the Tome. You can now inscribe magical rituals in your Book of Shadows. Choose two 1st-level spells that have the ritual tag from any class\'s spell list. The spells appear in the book and don\'t count against the number of spells you know. With your Book of Shadows in hand, you can castthe choosen spells as rituals. You cannot cast the spells except as rituals, unless you\'ve learned them from some other source.' },
+													{ type: 'text', text: 'On your adventures, you can add other ritual spells to your Book of Shadows. When you find such a spell, you can add it to your book if the spell\'s level is 1st or 2nd. For each level of the spell, the transcription takes 2 hours and costs 50gp for the rare inks needed to inscribe it.'},
 												]
 											},
 											source: 'warlock.eldritch_invocations',
@@ -950,8 +968,8 @@ const pactBoonPrompt: FeaturePrompt = {
 											name: 'Eldritch Spear',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip. When you cast Eldritch Blast, its range is 300 feet.' },
-													{ type: 'text', text: 'Note: Don\\' },
+													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip.' },
+													{ type: 'text', text: 'When you cast Eldritch Blast, its range is 300 feet.' },
 												]
 											},
 											source: 'warlock.eldritch_invocations',
@@ -1002,7 +1020,7 @@ const pactBoonPrompt: FeaturePrompt = {
 											name: 'Gaze of Two Minds',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'You can use your action to touch a willing humanoid and perceive through its senses until the end of your next turn. As long as the creature is on the same plane of existence as you, you can use your action on subsequent turns to maintain this connection, extending the duration until the end of your next turn. While perceiving through the other creature\\' },
+													{ type: 'text', text: 'You can use your action to touch a willing humanoid and perceive through its senses until the end of your next turn. As long as the creature is on the same plane of existence as you, you can use your action on subsequent turns to maintain this connection, extending the duration until the end of your next turn. While perceiving through the other creature\'s senses, you benefit from any special senses possessed by that creature, and you are blinded and deafened to your own surroundings.' },
 												]
 											},
 											source: 'warlock.eldritch_invocations',
@@ -1053,8 +1071,8 @@ const pactBoonPrompt: FeaturePrompt = {
 											name: 'Repelling Blast',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip. When you hit a creature with Eldritch Blast, you can push the creature up to 10 feet away from you in a straight line.' },
-													{ type: 'text', text: 'Note: Don\\' },
+													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip. ' },
+													{ type: 'text', text: 'When you hit a creature with Eldritch Blast, you can push the creature up to 10 feet away from you in a straight line.' },
 												]
 											},
 											source: 'warlock.eldritch_invocations',
@@ -1071,7 +1089,7 @@ const pactBoonPrompt: FeaturePrompt = {
 											name: 'Thief of Five Fates',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'You can cast Bane once using a warlock spell slot. You can\\' },
+													{ type: 'text', text: 'You can cast Bane once using a warlock spell slot. You can\'t do so again until you finish a long rest.' },
 												]
 											},
 											source: 'warlock.eldritch_invocations',

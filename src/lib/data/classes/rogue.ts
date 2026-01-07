@@ -45,7 +45,7 @@ const expertisePrompt: FeaturePrompt = {
 	name: 'Expertise',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'At 1st level, choose two of your skill proficiencies, or one of your skill proficiencies and your proficiency with thieves\' tools.  		Your proficiency bonus is doubled for any ability check you make that uses either of the chosen proficiencies.' },
+			{ type: 'text', text: 'Choose two of your skill proficiencies, or one of your skill proficiencies and your proficiency with thieves\' tools.  		Your proficiency bonus is doubled for any ability check you make that uses either of the chosen proficiencies.' },
 			{ type: 'text', text: '<strong>Important:</strong> You can only choose expertise in skills you have already selected as proficiencies above, plus Thieves\' Tools (which all rogues are proficient with).' },
 		]
 	},
@@ -77,7 +77,7 @@ const sneakAttackPrompt: FeaturePrompt = {
 	name: 'Sneak Attack',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'Beginning at 1st level, you know how to strike subtly and exploit a foe’s distraction.  		Once per turn, you can deal an extra 2d6 damage to one creature you hit with an attack if you have advantage on the attack roll.  		The attack must use a finesse or a ranged weapon.  		You don\'t need advantage on the attack roll if another enemy of the target is within 5 feet of it, that enemy isn\'t incapacitated, and you don\'t have disadvantage on the attack roll.' },
+			{ type: 'text', text: 'Kou know how to strike subtly and exploit a foe’s distraction. Once per turn, you can deal an extra 2d6 damage to one creature you hit with an attack if you have advantage on the attack roll. The attack must use a finesse or a ranged weapon. You don\'t need advantage on the attack roll if another enemy of the target is within 5 feet of it, that enemy isn\'t incapacitated, and you don\'t have disadvantage on the attack roll.' },
 		]
 	},
 	source: 'rogue',
@@ -95,7 +95,7 @@ const cunningActionPrompt: FeaturePrompt = {
 	name: 'Cunning Action',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'Starting at 2nd level, your quick thinking and agility allow you to move and act quickly.  		You can take a bonus action on each of your turns in combat to Dash, Disengage, or Hide.' },
+			{ type: 'text', text: 'Your quick thinking and agility allow you to move and act quickly. You can take a bonus action on each of your turns in combat to Dash, Disengage, or Hide.' },
 		]
 	},
 	source: 'rogue',
@@ -131,7 +131,7 @@ const rogueArchetypePrompt: FeaturePrompt = {
 	name: 'Roguish Archetype',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'Choose a Roguish Archetype at 3rd level.' },
+			{ type: 'text', text: 'Choose a Roguish Archetype' },
 		]
 	},
 	featureOptions: {
@@ -186,7 +186,7 @@ const rogueArchetypePrompt: FeaturePrompt = {
 						name: 'Bonus Proficiencies',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'When you choose this archetype at 3rd level, you gain proficiency with the disguise kit and the poisoner\'s kit.' },
+								{ type: 'text', text: 'You gain proficiency with the disguise kit and the poisoner\'s kit.' },
 							]
 						},
 						source: 'rogue.assassin',
@@ -232,8 +232,38 @@ const rogueArchetypePrompt: FeaturePrompt = {
 								{ type: 'text', text: 'You know three 1st-level wizard spells of your choice, two of which you must choose from the enchantment and illusion spells on the wizard spell list.' },
 								{ type: 'text', text: '<strong>Spellcasting Ability</strong>' },
 								{ type: 'text', text: 'Intelligence is your spellcasting ability for your wizard spells, since you learn your spells through dedicated study and memorization.' },
-								{ type: 'text', text: '<strong>Spell save DC</strong> = 8 + your proficiency bonus + your Intelligence modifier' },
-								{ type: 'text', text: '<strong>Spell attack modifier</strong> = your proficiency bonus + your Intelligence modifier' },
+								{
+									type: 'computed-replacement',
+					
+									whenAvailable: [
+										{
+											source: 'derived',
+											formula: 'INT_MOD + 10'
+										}
+									],
+					
+									fallbackText:
+										'<strong>Spell save DC</strong> = 10 + your Intelligence modifier',
+										
+									replacementTemplate:
+										'<strong>Spell save DC</strong> = {value}'
+								},
+								{
+									type: 'computed-replacement',
+					
+									whenAvailable: [
+										{
+											source: 'derived',
+											formula: 'INT_MOD + 2'
+										}
+									],
+					
+									fallbackText:
+										'<strong>Spell attack modifier</strong> = your Intelligence modifier + 2',
+					
+									replacementTemplate:
+										'<strong>Spell attack modifier</strong> = +{value}'
+								}
 							]
 						},
 						source: 'rogue.arcane_trickster',

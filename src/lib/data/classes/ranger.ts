@@ -897,7 +897,7 @@ const spellcastingPrompt: FeaturePrompt = {
 	name: 'Spellcasting',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'You can cast prepared ranger spells using Wisdom as your spellcasting ability.  		At level 3, you know three 1st-level ranger spells and have three 1st-level spell slots.' },
+			{ type: 'text', text: 'You can cast prepared ranger spells using Wisdom as your spellcasting ability. You know three 1st-level ranger spells and have three 1st-level spell slots.' },
 		]
 	},
 	source: 'ranger',
@@ -915,7 +915,7 @@ const primevalAwarenessPrompt: FeaturePrompt = {
 	name: 'Primeval Awareness',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'You can use your action and expend one ranger spell slot to focus your awareness on the region around you.  		For 1 minute per level of the spell slot you expend, you can sense whether the following types of creatures are present within 1 mile of you (or within up to 6 miles if you are in your favored terrain): aberrations, celestials, dragons, elementals, fey, fiends, and undead.  		This feature doesn\'t reveal the creatures\' location or number.' },
+			{ type: 'text', text: 'You can use your action and expend one ranger spell slot to focus your awareness on the region around you. For 1 minute per level of the spell slot you expend, you can sense whether the following types of creatures are present within 1 mile of you (or within up to 6 miles if you are in your favored terrain): aberrations, celestials, dragons, elementals, fey, fiends, and undead. This feature doesn\'t reveal the creatures\' location or number.' },
 		]
 	},
 	source: 'ranger',
@@ -933,7 +933,7 @@ const rangerArchetypePrompt: FeaturePrompt = {
 	name: 'Ranger Archetype',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'Choose a Ranger Archetype at 3rd level.' },
+			{ type: 'text', text: 'Choose a Ranger Archetype.' },
 		]
 	},
 	featureOptions: {
@@ -1030,7 +1030,7 @@ const rangerArchetypePrompt: FeaturePrompt = {
 							blocks: [
 								{ type: 'text', text: 'You gain a beast companion that accompanies you on your adventures and is trained to fight alongside you. Choose a beast that is no larger than Medium and that has a challenge rating of 1/4 or lower.' },
 								{ type: 'text', text: '• Add your proficiency bonus to the beast\'s AC, attack rolls, and damage rolls, as well as to any saving throws and skills it is proficient in' },
-								{ type: 'text', text: '• Its hit point maximum equals the hit point number in its stat block or four times your ranger level, whichever is higher' },
+								{ type: 'text', text: '• Its hit point maximum equals the hit point number in its stat block or 12, whichever is higher' },
 								{ type: 'text', text: '• The beast obeys your commands as best as it can and takes its turn on your initiative' },
 								{ type: 'text', text: '• On your turn, you can verbally command the beast where to move (no action required by you)' },
 								{ type: 'text', text: '• You can use your action to verbally command it to take the Attack, Dash, Disengage, or Help action' },
@@ -1103,7 +1103,7 @@ export const ranger: ClassData = {
 				description: 'Choose your melee weapons',
 				options: [
 					{
-						label: 'Two shortswords',
+						label: '2 shortswords',
 						items: ['Shortsword', 'Shortsword']
 					},
 					{

@@ -169,7 +169,7 @@ const secondWindPrompt: FeaturePrompt = {
 	id: 'fighter_second_wind_01',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'You have a limited well of stamina to protect yourself.  		On your turn, you can use a bonus action to regain hit points equal to 1d10 + your fighter level. 		Once used, must finish a short or long rest before using again.' },
+			{ type: 'text', text: 'You have a limited well of stamina to protect yourself. On your turn, you can use a bonus action to regain hit points equal to 1d10 + 3. Once used, must finish a short or long rest before using again.' },
 		]
 	},
 	source: 'fighter',
@@ -226,7 +226,23 @@ const martialArchetypePrompt: FeaturePrompt = {
 						id: 'fighter_battle_master_01',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'You learn maneuvers that are fueled by special dice called superiority dice. You have four superiority dice, which are d8s. A superiority die is expended when you use it. You regain all expended superiority dice when you finish a short or long rest. Some maneuvers require your target to make a saving throw. The saving throw DC equals 8 + your proficiency bonus + your Strength or Dexterity modifier (your choice).' },
+								{ type: 'text', text: 'You learn maneuvers that are fueled by special dice called superiority dice. You have four superiority dice, which are d8s. A superiority die is expended when you use it. You regain all expended superiority dice when you finish a short or long rest. Some maneuvers require your target to make a saving throw.'},
+								{
+									type: 'computed-replacement',
+					
+									whenAvailable: [
+										{
+											source: 'derived',
+											formula: 'Math.max(10 + STR_MOD, 10 + DEX_MOD)'
+										}
+									],
+					
+									fallbackText:
+										'The saving throw DC equals 10 + your Strength or Dexterity modifier (your choice).',
+										
+									replacementTemplate:
+										'The saving throw DC is {value}.'
+								}
 							]
 						},
 						source: 'fighter.battle_master',
@@ -405,7 +421,22 @@ const martialArchetypePrompt: FeaturePrompt = {
 											name: 'Parry',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'When another creature damages you with a melee attack, you can use your reaction and expend one superiority die to reduce the damage by the number you roll on your superiority die + your Dexterity modifier.' },
+													{
+														type: 'computed-replacement',
+										
+														whenAvailable: [
+															{
+																source: 'derived',
+																formula: 'Math.max(0, DEX_MOD)'
+															}
+														],
+										
+														fallbackText:
+															'When another creature damages you with a melee attack, you can use your reaction and expend one superiority die to reduce the damage by the number you roll on your superiority die + your Dexterity modifier.',
+															
+														replacementTemplate:
+															'When another creature damages you with a melee attack, you can use your reaction and expend one superiority die to reduce the damage by the number you roll on your superiority die + {value}.'
+													}
 												]
 											},
 											source: 'fighter.battle_master',
@@ -456,7 +487,23 @@ const martialArchetypePrompt: FeaturePrompt = {
 											name: 'Rally',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'On your turn, you can use a bonus action and expend one superiority die to bolster the resolve of one of your companions. When you do so, choose a friendly creature who can see or hear you. That creature gains temporary hit points equal to the superiority die roll + your Charisma modifier.' },
+													{ type: 'text', text: 'On your turn, you can use a bonus action and expend one superiority die to bolster the resolve of one of your companions. When you do so, choose a friendly creature who can see or hear you.' },
+													{
+														type: 'computed-replacement',
+										
+														whenAvailable: [
+															{
+																source: 'derived',
+																formula: 'Math.max(0, CHA_MOD)'
+															}
+														],
+										
+														fallbackText:
+															'That creature gains temporary hit points equal to the superiority die roll + your Charisma modifier.',
+										
+														replacementTemplate:
+															'That creature gains temporary hit points equal to the superiority die roll + {value}.'
+													}
 												]
 											},
 											source: 'fighter.battle_master',

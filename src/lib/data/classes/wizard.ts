@@ -32,7 +32,7 @@ const arcaneRecoveryPrompt: FeaturePrompt = {
 	name: 'Arcane Recovery',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'Once per day when you finish a short rest, you can recover expended spell slots with a combined level equal to or less than half your wizard level (rounded up).' },
+			{ type: 'text', text: 'Once per day when you finish a short rest, you can recover expended spell slots with a combined level equal to or less than 2.' },
 		]
 	},
 	source: 'wizard',
@@ -44,7 +44,7 @@ const spellcastingPrompt: FeaturePrompt = {
 	name: 'Spellcasting',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'You know three cantrips from the wizard spell list. 		You know six 1st-level wizard spells. 		You prepare spells from your spellbook, using Intelligence as your spellcasting ability.' },
+			{ type: 'text', text: 'You know three cantrips from the wizard spell list. You know six 1st-level wizard spells. You prepare spells from your spellbook, using Intelligence as your spellcasting ability.' },
 		]
 	},
 	source: 'wizard',
@@ -56,7 +56,7 @@ const arcaneTraditionPrompt: FeaturePrompt = {
 	name: 'Arcane Tradition',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'Choose an Arcane Tradition at 2nd level.' },
+			{ type: 'text', text: 'Choose an Arcane Tradition.' },
 		]
 	},
 	featureOptions: {
@@ -84,7 +84,25 @@ const arcaneTraditionPrompt: FeaturePrompt = {
 						name: 'Arcane Ward',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'When you cast an abjuration spell of 1st level or higher, you can simultaneously create a magical ward on yourself that lasts until you finish a long rest. The ward has hit points equal to twice your wizard level + your Intelligence modifier. Whenever you take damage, the ward takes the damage instead. If this damage reduces the ward to 0 hit points, you take any remaining damage.' },
+								{ 
+									type: 'text', text: 'When you cast an abjuration spell of 1st level or higher, you can simultaneously create a magical ward on yourself that lasts until you finish a long rest.' 
+								},
+								{
+									type: 'computed-replacement',
+					
+									whenAvailable: [
+										{
+											source: 'derived',
+											formula: 'INT_MOD + 6'
+										}
+									],
+					
+									fallbackText:
+										'The ward has hit points equal to 6 + your Intelligence modifier. Whenever you take damage, the ward takes the damage instead. If this damage reduces the ward to 0 hit points, you take any remaining damage.',
+										
+									replacementTemplate:
+										'The ward has {value} hit points. Whenever you take damage, the ward takes the damage instead. If this damage reduces the ward to 0 hit points, you take any remaining damage.'
+								}
 							]
 						},
 						source: 'wizard.abjuration',

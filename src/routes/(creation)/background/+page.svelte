@@ -564,15 +564,18 @@
 	</p>
 
 	{#if !selectedBackgroundData}
-		<!-- Toggle button between simple and complex views -->
+		<!-- Floating toggle slider in bottom right -->
 		{#if $character_store.class}
-			<div class="view-toggle">
-				<button 
-					class="toggle-button" 
-					on:click={() => showSimpleView.set(!$showSimpleView)}
-				>
-					{$showSimpleView ? 'See all options' : 'See recommended options'}
-				</button>
+			<div class="floating-toggle">
+				<div class="toggle-label">{$showSimpleView ? 'Recommended' : 'All Options'}</div>
+				<label class="toggle-switch">
+					<input 
+						type="checkbox" 
+						checked={!$showSimpleView}
+						on:change={() => showSimpleView.set(!$showSimpleView)}
+					/>
+					<span class="toggle-slider"></span>
+				</label>
 			</div>
 		{/if}
 
@@ -963,28 +966,108 @@
 		background-color: #fdd;
 	}
 
-	/* View toggle button */
-	.view-toggle {
-		max-width: 50vw;
-		margin: 1.5rem auto 1rem auto;
-		text-align: center;
+	/* Floating toggle slider */
+	.floating-toggle {
+		position: fixed;
+		bottom: 2rem;
+		right: 2rem;
+		background-color: white;
+		border: 2px solid #ccc;
+		border-radius: 50px;
+		padding: 0.75rem 1.25rem;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		z-index: 100;
+		transition: box-shadow 0.3s ease;
 	}
 
-	.toggle-button {
-		background-color: #2563eb;
-		color: white;
-		border: none;
-		padding: 0.75rem 1.5rem;
-		font-size: 1rem;
+	.floating-toggle:hover {
+		box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+	}
+
+	.toggle-label {
+		font-size: 0.9rem;
 		font-weight: 600;
-		border-radius: 6px;
-		cursor: pointer;
-		transition: background-color 0.3s ease;
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+		color: #333;
+		white-space: nowrap;
 	}
 
-	.toggle-button:hover {
-		background-color: #1d4ed8;
+	/* Toggle switch styles */
+	.toggle-switch {
+		position: relative;
+		display: inline-block;
+		width: 48px;
+		height: 24px;
+	}
+
+	.toggle-switch input {
+		opacity: 0;
+		width: 0;
+		height: 0;
+	}
+
+	.toggle-slider {
+		position: absolute;
+		cursor: pointer;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: #2563eb;
+		transition: 0.3s;
+		border-radius: 24px;
+	}
+
+	.toggle-slider:before {
+		position: absolute;
+		content: '';
+		height: 18px;
+		width: 18px;
+		left: 3px;
+		bottom: 3px;
+		background-color: white;
+		transition: 0.3s;
+		border-radius: 50%;
+	}
+
+	input:checked + .toggle-slider {
+		background-color: #10b981;
+	}
+
+	input:checked + .toggle-slider:before {
+		transform: translateX(24px);
+	}
+
+	.toggle-slider:hover {
+		box-shadow: 0 0 4px rgba(37, 99, 235, 0.4);
+	}
+
+	@media (max-width: 768px) {
+		.floating-toggle {
+			bottom: 1rem;
+			right: 1rem;
+			padding: 0.6rem 1rem;
+		}
+
+		.toggle-label {
+			font-size: 0.8rem;
+		}
+
+		.toggle-switch {
+			width: 40px;
+			height: 20px;
+		}
+
+		.toggle-slider:before {
+			height: 14px;
+			width: 14px;
+		}
+
+		input:checked + .toggle-slider:before {
+			transform: translateX(20px);
+		}
 	}
 
 	/* Simple view styles */
@@ -1049,7 +1132,8 @@
 		border-radius: 6px;
 		cursor: pointer;
 		transition: background-color 0.3s ease;
-		width: 100%;
+		width: auto;
+		display: inline-block;
 	}
 
 	.select-background-button:hover {

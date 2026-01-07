@@ -34,7 +34,23 @@ const divineSensePrompt: FeaturePrompt = {
 	name: 'Divine Sense',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'As an action, you can open your awareness to detect good and evil until the start of your next turn.  		You know the location of any celestial, fiend, or undead within 60 feet of you that is not behind total cover. You know the type (celestial, fiend, or undead) of any being whose presence you sense, but not its identity. 		You can use this feature a number of times equal to 1 + your Charisma modifier per long rest.' },
+			{ type: 'text', text: 'As an action, you can open your awareness to detect good and evil until the start of your next turn. You know the location of any celestial, fiend, or undead within 60 feet of you that is not behind total cover. You know the type (celestial, fiend, or undead) of any being whose presence you sense, but not its identity.' },
+			{
+				type: 'computed-replacement',
+
+				whenAvailable: [
+					{
+						source: 'derived',
+						formula: 'Math.max(1, CHA_MOD + 1)'
+					}
+				],
+
+				fallbackText:
+					'You can use this feature a number of times equal to 1 + your Charisma modifier per long rest.',
+
+				replacementTemplate:
+					'You can use this feature {value} times per long rest.'
+			}
 		]
 	},
 	source: 'paladin',
@@ -162,7 +178,7 @@ const spellcastingPrompt: FeaturePrompt = {
 	name: 'Spellcasting',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'You can cast prepared paladin spells using Charisma as your spellcasting ability.  		At level 3, you have access to 1st-level paladin spells.' },
+			{ type: 'text', text: 'You can cast prepared paladin spells using Charisma as your spellcasting ability. You have access to 1st-level paladin spells.' },
 		]
 	},
 	source: 'paladin',
@@ -180,7 +196,7 @@ const divineSmitePrompt: FeaturePrompt = {
 	name: 'Divine Smite',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'When you hit a creature with a melee weapon attack, you can expend one spell slot to deal radiant damage in addition to the weapon\'s damage. 		The extra damage is 2d8 for a 1st-level spell slot.' },
+			{ type: 'text', text: 'When you hit a creature with a melee weapon attack, you can expend one spell slot to deal radiant damage in addition to the weapon\'s damage. The extra damage is 2d8 for a 1st-level spell slot.' },
 		]
 	},
 	source: 'paladin',
@@ -198,7 +214,7 @@ const sacredOathPrompt: FeaturePrompt = {
 	name: 'Sacred Oath',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'Choose a Sacred Oath at 3rd level.' },
+			{ type: 'text', text: 'Choose a Sacred Oath.' },
 		]
 	},
 	featureOptions: {
@@ -213,7 +229,7 @@ const sacredOathPrompt: FeaturePrompt = {
 						name: 'Oath Spells',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'You gain oath-specific spells that are always prepared and don\'t count against your prepared spells limit. At 3rd level, you gain Protection from Evil and Good and Sanctuary.' },
+								{ type: 'text', text: 'You gain oath-specific spells that are always prepared and don\'t count against your prepared spells limit. You gain Protection from Evil and Good, as well as Sanctuary.' },
 							]
 						},
 						source: 'paladin.oath_devotion',
@@ -270,7 +286,7 @@ const sacredOathPrompt: FeaturePrompt = {
 						name: 'Oath Spells',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'You gain oath-specific spells that are always prepared and don\'t count against your prepared spells limit. At 3rd level, you gain Ensnaring Strike and Speak with Animals.' },
+								{ type: 'text', text: 'You gain oath-specific spells that are always prepared and don\'t count against your prepared spells limit. You gain Ensnaring Strike and Speak with Animals.' },
 							]
 						},
 						source: 'paladin.oath_ancients',
@@ -327,7 +343,7 @@ const sacredOathPrompt: FeaturePrompt = {
 						name: 'Oath Spells',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'You gain oath-specific spells that are always prepared and don\'t count against your prepared spells limit. At 3rd level, you gain Bane and Hunter\'s Mark.' },
+								{ type: 'text', text: 'You gain oath-specific spells that are always prepared and don\'t count against your prepared spells limit. You gain Bane and Hunter\'s Mark.' },
 							]
 						},
 						source: 'paladin.oath_vengeance',
@@ -455,7 +471,7 @@ export const paladin: ClassData = {
 				description: 'Choose your ranged or secondary weapon',
 				options: [
 					{
-						label: 'Five javelins',
+						label: '5 javelins',
 						items: ['5 Javelins']
 					},
 					{

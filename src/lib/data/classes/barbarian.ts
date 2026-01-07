@@ -115,7 +115,7 @@ const primalPathPrompt: FeaturePrompt = {
 							blocks: [
 								{
 									type: 'text',
-									text: 'At 3rd level when you adopt this path, you choose a totem spirit and gain its feature. You must make or acquire a physical totem object - an amulet or similar adornment - that incorporates fur or feathers, claws, teeth, or bones of the totem animal.'
+									text: 'When you adopt this path, you choose a totem spirit and gain its feature. You must make or acquire a physical totem object - an amulet or similar adornment - that incorporates fur or feathers, claws, teeth, or bones of the totem animal.'
 								}
 							]
 						},
@@ -362,7 +362,7 @@ export const barbarian: ClassData = {
 	startingEquipment: {
 		fixed: [
 			"Explorer's pack (includes: backpack, bedroll, mess kit, tinderbox, 10 torches, 10 days of rations, waterskin, 50 feet of hempen rope)",
-			'Four javelins'
+			'4 javelins'
 		],
 		choices: [
 			{
@@ -393,7 +393,7 @@ export const barbarian: ClassData = {
 				description: 'Choose your secondary weapon option',
 				options: [
 					{
-						label: 'Two handaxes',
+						label: '2 handaxes',
 						items: ['Handaxe', 'Handaxe']
 					},
 					{

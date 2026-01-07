@@ -34,9 +34,9 @@ const martialArtsPrompt: FeaturePrompt = {
 	name: 'Martial Arts',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'At 1st level, your practice of martial arts gives you mastery of combat styles that use unarmed strikes and monk weapons:' },
+			{ type: 'text', text: 'Your practice of martial arts gives you mastery of combat styles that use unarmed strikes and monk weapons:' },
 			{ type: 'text', text: '• You can use Dexterity instead of Strength for the attack and damage rolls of your unarmed strikes and monk weapons.' },
-			{ type: 'text', text: '• You can roll a d4 in place of the normal damage of your unarmed strike or monk weapon. This die increases as you level.' },
+			{ type: 'text', text: '• You can roll a d4 in place of the normal damage of your unarmed strike or monk weapon.' },
 			{ type: 'text', text: '• When you use the Attack action with an unarmed strike or monk weapon on your turn, you can make one unarmed strike as a bonus action.' },
 		]
 	},
@@ -55,7 +55,23 @@ const kiPrompt: FeaturePrompt = {
 	name: 'Ki',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'Starting at 2nd level, your training allows you to harness the mystic energy of ki. Your access to this energy is represented by a number of ki points. Your monk level determines the number of ki points you have. You can spend these points to fuel various ki features like Flurry of Blows, Patient Defense, and Step of the Wind. When you spend a ki point, it is unavailable until you finish a short or long rest, at the end of which you draw all of your expended ki points back into yourself. You must spend at least 30 minutes of the rest meditating to regain your ki points. Some of your ki features require your target to make a saving throw to resist the feature\'s effects. The saving throw DC is calculated as follows: Ki save DC = 8 + your proficiency bonus + your Wisdom modifier.' },
+			{ type: 'text', text: 'Your training allows you to harness the mystic energy of ki. Your access to this energy is represented by a pool of 3 ki points. You can spend these points to fuel various ki features like Flurry of Blows, Patient Defense, and Step of the Wind. When you spend a ki point, it is unavailable until you finish a short or long rest, at the end of which you draw all of your expended ki points back into yourself. You must spend at least 30 minutes of the rest meditating to regain your ki points. Some of your ki features require your target to make a saving throw to resist the feature\'s effects.' },
+			{
+				type: 'computed-replacement',
+
+				whenAvailable: [
+					{
+						source: 'derived',
+						formula: 'WIS_MOD + 10'
+					}
+				],
+
+				fallbackText:
+					'The saving throw DC equals 10 + your Wisdom modifier.',
+					
+				replacementTemplate:
+					'The saving throw DC equals {value}.'
+			}
 		]
 	},
 	source: 'monk',
@@ -106,7 +122,7 @@ const unarmoredMovementPrompt: FeaturePrompt = {
 	name: 'Unarmored Movement',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'Starting at 2nd level, your speed increases by 10 feet while you are not wearing armor or wielding a shield.' },
+			{ type: 'text', text: 'Your speed increases by 10 feet while you are not wearing armor or wielding a shield.' },
 		]
 	},
 	source: 'monk',
@@ -124,7 +140,28 @@ const deflectMissilesPrompt: FeaturePrompt = {
 	name: 'Deflect Missiles',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'Starting at 3rd level, you can use your reaction to deflect or catch the missile when you are hit by a ranged weapon attack. When you do so, the damage you take from the attack is reduced by 1d10 + your Dexterity modifier + your monk level. If you reduce the damage to 0, you can catch the missile if it is small enough for you to hold in one hand and you have at least one hand free. If you catch a missile in this way, you can spend 1 ki point to make a ranged attack with the weapon or piece of ammunition you just caught, as part of the same reaction. You make this attack with proficiency, regardless of your weapon proficiencies, and the missile counts as a monk weapon for the attack, which has a normal range of 20 feet and a long range of 60 feet.' },
+			{ 
+				type: 'text', text: 'You can use your reaction to deflect or catch the missile when you are hit by a ranged weapon attack.' 
+			},
+			{
+				type: 'computed-replacement',
+
+				whenAvailable: [
+					{
+						source: 'derived',
+						formula: 'DEX_MOD + 3'
+					}
+				],
+
+				fallbackText:
+					'When you do so, the damage you take from the attack is reduced by 1d10 + your Dexterity modifier + 3.',
+					
+				replacementTemplate:
+					'When you do so, the damage you take from the attack is reduced by 1d10 + {value}.'
+			},
+			{ 
+				type: 'text', text: 'If you reduce the damage to 0, you can catch the missile if it is small enough for you to hold in one hand and you have at least one hand free. If you catch a missile in this way, you can spend 1 ki point to make a ranged attack with the weapon or piece of ammunition you just caught, as part of the same reaction. You make this attack with proficiency, regardless of your weapon proficiencies, and the missile counts as a monk weapon for the attack, which has a normal range of 20 feet and a long range of 60 feet.' 
+			},
 		]
 	},
 	source: 'monk',
@@ -142,7 +179,7 @@ const monasticTraditionPrompt: FeaturePrompt = {
 	name: 'Monastic Tradition',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'Choose a monastic tradition (subclass) at 3rd level.' },
+			{ type: 'text', text: 'Choose a monastic tradition (subclass).' },
 		]
 	},
 	featureOptions: {

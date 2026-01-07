@@ -61,7 +61,7 @@ const spellcastingPrompt: FeaturePrompt = {
 				],
 
 				fallbackText:
-					'You know three cantrips and have prepared a number of spells equal to your Wisdom modifier + cleric level.',
+					'You know three cantrips and have prepared a number of spells equal to your Wisdom modifier + 3. (minimum of 1)',
 					
 
 				replacementTemplate:
@@ -164,7 +164,7 @@ const divineDomainPrompt: FeaturePrompt = {
 							blocks: [
 								{
 									type: 'text',
-									text: "As an action, you present your holy symbol and evoke healing energy that can restore a number of hit points equal to five times your cleric level. Choose any creatures within 30 feet of you, and divide those hit points among them. This feature can't restore a creature to more than half of its hit point maximum."
+									text: "As an action, you present your holy symbol and evoke healing energy that can restore 15 hit points. Choose any creatures within 30 feet of you, and divide those hit points among them. This feature can't restore a creature to more than half of its hit point maximum."
 								}
 							]
 						},
@@ -200,7 +200,23 @@ const divineDomainPrompt: FeaturePrompt = {
 							blocks: [
 								{
 									type: 'text',
-									text: "When a creature within 30 feet of you attacks you, you can use your reaction to impose disadvantage on the attack roll, causing light to flare before the attacker before it hits or misses. An attacker that can't be blinded is immune to this feature. You can use this feature a number of times equal to your Wisdom modifier (minimum of once). You regain all expended uses when you finish a long rest."
+									text: "When a creature within 30 feet of you attacks you, you can use your reaction to impose disadvantage on the attack roll, causing light to flare before the attacker before it hits or misses. An attacker that can't be blinded is immune to this feature."
+								},
+								{
+									type: 'computed-replacement',
+					
+									whenAvailable: [
+										{
+											source: 'derived',
+											formula: 'Math.max(1, WIS_MOD)'
+										}
+									],
+					
+									fallbackText:
+										'You can use this feature a number of times equal to your Wisdom modifier (minimum of once). You regain all expended uses when you finish a long rest.',
+										
+									replacementTemplate:
+										'You can use this feature {value} times per long rest.'
 								}
 							]
 						},
@@ -214,7 +230,7 @@ const divineDomainPrompt: FeaturePrompt = {
 							blocks: [
 								{
 									type: 'text',
-									text: "As an action, you present your holy symbol, dispelling any magical darkness within 30 feet of you. Additionally, each hostile creature within 30 feet of you must make a Constitution saving throw. A creature takes radiant damage equal to 2d10 + your cleric level on a failed saving throw, and half as much damage on a successful one. A creature that has total cover from you is not affected."
+									text: "As an action, you present your holy symbol, dispelling any magical darkness within 30 feet of you. Additionally, each hostile creature within 30 feet of you must make a Constitution saving throw. A creature takes radiant damage equal to 2d10 + 3 on a failed saving throw, and half as much damage on a successful one. A creature that has total cover from you is not affected."
 								}
 							]
 						},
@@ -399,7 +415,23 @@ const divineDomainPrompt: FeaturePrompt = {
 							blocks: [
 								{
 									type: 'text',
-									text: "When a creature within 5 feet of you that you can see hits you with an attack, you can use your reaction to cause the creature to make a Dexterity saving throw. The creature takes 2d8 lightning or thunder damage (your choice) on a failed saving throw, and half as much damage on a successful one. You can use this feature a number of times equal to your Wisdom modifier (minimum of once). You regain all expended uses when you finish a long rest."
+									text: "When a creature within 5 feet of you that you can see hits you with an attack, you can use your reaction to cause the creature to make a Dexterity saving throw. The creature takes 2d8 lightning or thunder damage (your choice) on a failed saving throw, and half as much damage on a successful one."
+								},
+								{
+									type: 'computed-replacement',
+					
+									whenAvailable: [
+										{
+											source: 'derived',
+											formula: 'Math.max(1, WIS_MOD)'
+										}
+									],
+					
+									fallbackText:
+										'You can use this feature a number of times equal to your Wisdom modifier (minimum of once). You regain all expended uses when you finish a long rest.',
+										
+									replacementTemplate:
+										'You can use this feature {value} times per long rest.'
 								}
 							]
 						},
@@ -502,7 +534,24 @@ const divineDomainPrompt: FeaturePrompt = {
 							blocks: [
 								{
 									type: 'text',
-									text: "When you use the Attack action, you can make one weapon attack as a bonus action. You can use this feature a number of times equal to your Wisdom modifier (minimum of once). You regain all expended uses when you finish a long rest."
+									text: "When you use the Attack action, you can make one weapon attack as a bonus action."
+								},
+								{
+									type: 'computed-replacement',
+					
+									whenAvailable: [
+										{
+											source: 'derived',
+											formula: 'Math.max(1, WIS_MOD)'
+										}
+									],
+					
+									fallbackText:
+										'You can use this feature a number of times equal to your Wisdom modifier (minimum of once). You regain all expended uses when you finish a long rest.',
+										
+					
+									replacementTemplate:
+										'You can use this feature {value} times per long rest.'
 								}
 							]
 						},

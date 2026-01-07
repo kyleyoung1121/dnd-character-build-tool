@@ -43,7 +43,26 @@ const spellcastingPrompt: FeaturePrompt = {
 	id: 'druid_spellcasting_01',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'You can prepare and cast spells using Wisdom as your spellcasting ability. You know two cantrips and prepare a number of spells equal to your Wisdom modifier + your druid level (minimum of 1 prepared spell).' },
+			{ 
+				type: 'text', text: 'You can prepare and cast spells using Wisdom as your spellcasting ability.' 
+			},
+			{
+				type: 'computed-replacement',
+
+				whenAvailable: [
+					{
+						source: 'derived',
+						formula: 'Math.max(1, WIS_MOD + LEVEL)'
+					}
+				],
+
+				fallbackText:
+					'You know two cantrips and prepare a number of spells equal to your Wisdom modifier + 3 (minimum of 1).',
+					
+
+				replacementTemplate:
+					'You know two cantrips and prepare {value} spells.'
+			}
 		]
 	},
 	source: 'druid',

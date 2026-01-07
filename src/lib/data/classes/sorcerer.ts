@@ -34,7 +34,7 @@ const spellcastingPrompt: FeaturePrompt = {
 	name: 'Spellcasting',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'You know four cantrips of your choice from the sorcerer spell list.  		You know two 1st-level spells of your choice. 		You can cast spells using Charisma as your spellcasting ability.' },
+			{ type: 'text', text: 'You know four cantrips and four leveled spells of your choice from the sorcerer spell list. You have four first-level and two second-level spell slots. You can cast spells using Charisma as your spellcasting ability.' },
 		]
 	},
 	source: 'sorcerer',
@@ -52,7 +52,7 @@ const sorceryPointsPrompt: FeaturePrompt = {
 	name: 'Sorcery Points',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'Starting at 2nd level, you can use sorcery points to fuel your metamagic.  		You have a number of sorcery points equal to your sorcerer level (3). 		You regain all expended sorcery points when you finish a long rest.' },
+			{ type: 'text', text: 'You can use sorcery points to fuel your metamagic. You have a pool of 3 sorcery points. You regain all expended sorcery points when you finish a long rest.' },
 		]
 	},
 	source: 'sorcerer',
@@ -119,7 +119,25 @@ const metamagicPrompt: FeaturePrompt = {
 						name: 'Empowered Spell',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'When you roll damage for a spell, you can spend 1 sorcery point to reroll a number of the damage dice up to your Charisma modifier (minimum of one). You must use the new rolls. You can use Empowered Spell even if you have already used a different Metamagic option during the casting of the spell.' },
+								{
+									type: 'computed-replacement',
+					
+									whenAvailable: [
+										{
+											source: 'derived',
+											formula: 'Math.max(1, CHA_MOD)'
+										}
+									],
+					
+									fallbackText:
+										'When you roll damage for a spell, you can spend 1 sorcery point to reroll a number of the damage dice up to your Charisma modifier (minimum of one).',
+										
+									replacementTemplate:
+										'When you roll damage for a spell, you can spend 1 sorcery point to reroll up to {value} damage dice.'
+								},
+								{ 
+									type: 'text', text: 'You must use the new rolls. You can use Empowered Spell even if you have already used a different Metamagic option during the casting of the spell.' 
+								},
 							]
 						},
 						source: 'sorcerer.metamagic',
@@ -230,7 +248,7 @@ const sorcerousOriginPrompt: FeaturePrompt = {
 	name: 'Sorcerous Origin',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'Choose your Sorcerous Origin at 1st level.' },
+			{ type: 'text', text: 'Choose your Sorcerous Origin.' },
 		]
 	},
 	featureOptions: {

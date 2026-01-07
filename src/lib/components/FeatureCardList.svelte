@@ -25,7 +25,7 @@
 	export let onBumpVersion: () => void;
 
 	// Handle feature option selection
-	function handleSelectOption(feature: FeaturePrompt, index: number, selectedOption: string, parentFeatureName?: string | null) {
+	function handleSelectOption(feature: FeaturePrompt, index: number, selectedOption: string, parentFeatureName?: string | null, parentIndex?: number | null) {
 		if (!selectedOption) return;
 
 		const normalizedChoice = selectedOption;
@@ -50,17 +50,55 @@
 
 		if (prev === normalizedChoice) return;
 
+		// IMPORTANT: When changing from one complex option to another (like switching subclasses),
+		// we need to revert ALL nested feature scopes from the previous selection.
+		// This ensures that selections like Knowledge Domain's languages/skills are cleaned up
+		// when switching to a different domain.
+		if (prev) {
+			// Build the scope ID pattern for the previous selection
+			const prevScopeId = parentFeatureName && parentIndex !== null && parentIndex !== undefined
+				? `feature:${parentFeatureName}:${parentIndex}:${feature.name}:${index}`
+				: `feature:${feature.name}:${index}`;
+			
+			// Find and revert all scopes that are children of this feature
+			// Pattern: starts with prevScopeId followed by a colon (indicating nested scope)
+			const state = get(characterStore);
+			if (state._provenance) {
+				const scopesToRevert = Object.keys(state._provenance).filter(key => 
+					key.startsWith(prevScopeId + ':')
+				);
+				
+				console.log(`[CLEANUP] Looking for nested scopes under: ${prevScopeId}`);
+			console.log(`[CLEANUP] All provenance keys:`, Object.keys(state._provenance));
+			console.log(`[CLEANUP] Found scopes to revert:`, scopesToRevert);
+				
+				for (const scopeKey of scopesToRevert) {
+					revertChanges(state, scopeKey);
+				}
+			}
+			
+			// Also revert the parent scope itself (will be reapplied below)
+			revertChanges(get(characterStore), prevScopeId);
+		}
+
 		// Clear any nested selections under the previous branch
 		featureSelections = clearNestedFeatureSelections(feature, featureSelections);
 
 		// Construct scopeId with parent context for nested features
-		// Format: feature:ParentName:FeatureName:index for nested, or feature:FeatureName:index for top-level
-		const scopeId = parentFeatureName 
-			? `feature:${parentFeatureName}:${feature.name}:${index}`
+		// Format: feature:ParentName:ParentIndex:FeatureName:index for nested, or feature:FeatureName:index for top-level
+		const scopeId = parentFeatureName && parentIndex !== null && parentIndex !== undefined
+			? `feature:${parentFeatureName}:${parentIndex}:${feature.name}:${index}`
 			: `feature:${feature.name}:${index}`;
 		
 		// DEBUG: Log scopeId generation
-		console.log(`[SCOPEID DEBUG] Saving selection: feature='${feature.name}', parent='${parentFeatureName || 'none'}', scopeId='${scopeId}'`);
+		console.log(`[SCOPEID] Saving selection:`, {
+			feature: feature.name,
+			parent: parentFeatureName || 'none',
+			parentIndex: parentIndex !== null && parentIndex !== undefined ? parentIndex : 'none',
+			scopeId,
+			index,
+			selectedOption
+		});
 
 		// Handle reverting any static nested effects that were tied to the previous choice
 		// IMPORTANT: Do this BEFORE applying new effects to avoid smart removal incorrectly
@@ -69,8 +107,8 @@
 			const prevNested = getNestedPrompts(feature, [prev]) || [];
 			for (const nested of prevNested) {
 				if (nested.featureOptions) continue; // only static nested
-				const prevNestedScopeId = parentFeatureName
-					? `feature:${parentFeatureName}:${feature.name}:${index}:${nested.name}`
+				const prevNestedScopeId = parentFeatureName && parentIndex !== null && parentIndex !== undefined
+					? `feature:${parentFeatureName}:${parentIndex}:${feature.name}:${index}:${nested.name}`
 					: `feature:${feature.name}:${index}:${nested.name}`;
 				// Use applyChoice with empty changes to trigger revert of this nested scope
 				applyChoice(prevNestedScopeId, {});
@@ -183,8 +221,8 @@
 			// Skip nested prompts that have their own options; those will be handled by user interaction later
 			if (nested.featureOptions) continue;
 
-			const nestedScopeId = parentFeatureName
-				? `feature:${parentFeatureName}:${feature.name}:${index}:${nested.name}`
+			const nestedScopeId = parentFeatureName && parentIndex !== null && parentIndex !== undefined
+				? `feature:${parentFeatureName}:${parentIndex}:${feature.name}:${index}:${nested.name}`
 				: `feature:${feature.name}:${index}:${nested.name}`;
 			// applyChoice handles reverting automatically, no need for manual revert
 

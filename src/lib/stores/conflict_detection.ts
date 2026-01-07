@@ -155,17 +155,20 @@ function detectSpellLimitViolations(character: Character): Conflict[] {
 		return conflicts;
 	}
 
-	// Extract spell names from character.spells array (may contain strings or objects)
-	const spellNames = character.spells.map((spell) => {
+	// Extract spell names and metadata from character.spells array
+	const spellsWithMetadata: Array<{ name: string; tabSource?: string }> = character.spells.map((spell) => {
 		if (typeof spell === 'string') {
-			return spell;
+			return { name: spell };
 		} else if (typeof spell === 'object' && spell !== null && 'name' in spell) {
-			return (spell as any).name;
+			return {
+				name: (spell as any).name,
+				tabSource: (spell as any).tabSource
+			};
 		}
-		return '';
-	}).filter((name) => name !== '');
+		return { name: '' };
+	}).filter((spell) => spell.name !== '');
 
-	const selectedSpells = new Set(spellNames);
+	const selectedSpells = new Set(spellsWithMetadata.map(s => s.name));
 	console.log('[Spell Limit] Selected spells:', Array.from(selectedSpells));
 
 	// Calculate current spell limits (mirroring the logic from spells page)
@@ -173,7 +176,7 @@ function detectSpellLimitViolations(character: Character): Conflict[] {
 	console.log('[Spell Limit] Calculated limits:', spellLimits);
 
 	// Count selected spells by level
-	const spellCounts = countSelectedSpells(character, selectedSpells);
+	const spellCounts = countSelectedSpells(character, spellsWithMetadata);
 	console.log('[Spell Limit] Spell counts:', spellCounts);
 
 	// Check for violations
@@ -299,8 +302,12 @@ function calculateSpellLimits(character: Character) {
 /**
  * Count selected spells by level using proper spell data
  * Only count spells from sources that contribute to main limits
+ * Excludes spells selected from Circle of Land or feature tabs based on tabSource metadata
  */
-function countSelectedSpells(character: Character, selectedSpells: Set<string>) {
+function countSelectedSpells(
+	character: Character,
+	spellsWithMetadata: Array<{ name: string; tabSource?: string }>
+) {
 	const counts = {
 		cantrips: 0,
 		level1: 0,
@@ -325,14 +332,14 @@ function countSelectedSpells(character: Character, selectedSpells: Set<string>) 
 	// Process each spell access to find which spells count toward limits
 	spellAccess.forEach((access) => {
 		if (access.chooseable !== false) {
-			// Only count class and subclass access toward limits, not race/feat bonuses
-			// Exclude subclass entries with extended names (like "Nature Domain - Druid Cantrip")
-			const countsTowardLimits =
+			// All class and regular subclass spells are in the pool
+			// We'll filter based on tabSource when counting
+			const isStandardAccess =
 				access.source === 'class' ||
 				(access.source === 'subclass' && !access.sourceName.includes(' - ')) ||
 				access.source === 'feature';
 
-			if (countsTowardLimits && access.chooseFrom && access.chooseFrom.length > 0) {
+			if (isStandardAccess && access.chooseFrom && access.chooseFrom.length > 0) {
 				// Add spells from this access to our tracking sets
 				access.chooseFrom.forEach((className) => {
 					// Check cantrips
@@ -358,7 +365,22 @@ function countSelectedSpells(character: Character, selectedSpells: Set<string>) 
 	});
 
 	// Count selected spells that come from limit-counting sources
-	for (const spellName of selectedSpells) {
+	// EXCLUDE spells selected from Circle of Land or feature tabs based on tabSource
+	for (const spell of spellsWithMetadata) {
+		const spellName = spell.name;
+		const tabSource = spell.tabSource || '';
+		
+		// Skip spells selected from Circle of Land tab
+		if (tabSource.includes('Circle of the Land')) {
+			continue;
+		}
+		
+		// Skip spells selected from feature tabs (Pact of the Tome, etc.)
+		if (tabSource.includes('Pact of the') || tabSource.includes('Book of Ancient')) {
+			continue;
+		}
+		
+		// Count the spell if it's in a limit-counting source
 		if (limitCountingSpells.cantrips.has(spellName)) {
 			counts.cantrips++;
 		} else if (limitCountingSpells.level1.has(spellName)) {

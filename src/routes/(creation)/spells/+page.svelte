@@ -64,6 +64,11 @@
 						);
 					}
 					
+					// Apply ritual restriction if present (for Book of Ancient Secrets)
+					if (access.restrictToRituals) {
+						classSpells = classSpells.filter((spell) => spell.ritual === true);
+					}
+					
 					classSpells.forEach((spell) => {
 						// Check for duplicates by both name and sourceName to allow same spell in different tabs
 						// (e.g., Charm Person in both "Enchantment/Illusion" and "Any School" Arcane Trickster tabs)
@@ -84,7 +89,7 @@
 				access.spells.forEach((spellName) => {
 					const spell = spells.find((s) => s.name === spellName && s.level === spellLevel);
 					if (spell) {
-						const existingSpell = availableSpells.find((s) => s.name === spell.name);
+						const existingSpell = availableSpells.find((s) => s.name === spell.name && s.sourceName === access.sourceName);
 
 						// Special handling for warlock patron expanded spell lists
 						// Instead of creating separate tabs, merge them into the class spell list
@@ -93,7 +98,34 @@
 							 access.sourceName === 'The Fiend' || 
 							 access.sourceName === 'The Great Old One');
 
-						if (!existingSpell) {
+						// Special handling for Cleric domain spells
+						// These spells are auto-granted (chooseable: false) and also in the class list
+						// To avoid duplicates, replace the class spell entry with the subclass version
+						const isClericDomain = access.source === 'subclass' && 
+							!access.chooseable && 
+							access.sourceName.includes('Domain');
+						// Note: Circle of Land is NOT included here - we want the class spell to remain visible
+
+						if (isClericDomain) {
+							// For Cleric domains, replace existing class spell entry with subclass version
+							const existingClassSpell = availableSpells.find(
+								(s) => s.name === spell.name && s.source === 'class' && s.sourceName === 'Cleric'
+							);
+							if (existingClassSpell) {
+								// Replace the class spell with the subclass spell (making it auto-granted)
+								existingClassSpell.source = access.source;
+								existingClassSpell.sourceName = access.sourceName;
+								existingClassSpell.chooseable = false;
+							} else {
+								// Spell wasn't in class list, add it as subclass spell
+								availableSpells.push({
+									...spell,
+									source: access.source,
+									sourceName: access.sourceName,
+									chooseable: false
+								});
+							}
+						} else if (!existingSpell) {
 							// Add new spell
 							// If it's a warlock patron spell, add it as a class spell to avoid creating separate tabs
 							availableSpells.push({
@@ -102,18 +134,12 @@
 								sourceName: isWarlockPatron ? 'Warlock' : access.sourceName,
 								chooseable: access.chooseable !== false
 							});
-						} else if (
-							access.source === 'subclass' &&
-							(access.sourceName.includes('Oath') ||
-								access.sourceName.includes('Circle of the Land') ||
-								access.sourceName.includes('Domain')) &&
-							existingSpell.source === 'class'
-						) {
-							// Replace class source with subclass source for oath/circle/domain spells to show proper tags
-							existingSpell.source = access.source;
-							existingSpell.sourceName = access.sourceName;
-							existingSpell.chooseable = access.chooseable !== false;
 						}
+						// NOTE: Removed the else-if block that was replacing class source with subclass source
+						// This was causing duplicates because Circle of Land/Oath/Domain spells would appear
+						// in both standard tabs and special tabs. Now they appear as separate entries:
+						// - One with class source (for standard tabs)
+						// - One with subclass source (for special tabs) - added above
 					}
 				});
 			}
@@ -123,7 +149,7 @@
 				access.cantrips.forEach((spellName) => {
 					const spell = spells.find((s) => s.name === spellName && s.level === 0);
 					if (spell) {
-						const existingSpell = availableSpells.find((s) => s.name === spell.name);
+						const existingSpell = availableSpells.find((s) => s.name === spell.name && s.sourceName === access.sourceName);
 
 						// Special handling for warlock patron expanded spell lists
 						const isWarlockPatron = access.source === 'subclass' && 
@@ -131,26 +157,41 @@
 							 access.sourceName === 'The Fiend' || 
 							 access.sourceName === 'The Great Old One');
 
-						if (!existingSpell) {
-							// Add new spell
-							// If it's a warlock patron spell, add it as a class spell to avoid creating separate tabs
+						// Special handling for Cleric domain cantrips
+						// These cantrips are auto-granted (chooseable: false) and may also be in the class list
+						// To avoid duplicates, replace the class cantrip entry with the subclass version
+						const isClericDomain = access.source === 'subclass' && 
+							!access.chooseable && 
+							access.sourceName.includes('Domain');
+
+						if (isClericDomain) {
+							// For Cleric domains, replace existing class cantrip entry with subclass version
+							const existingClassCantrip = availableSpells.find(
+								(s) => s.name === spell.name && s.source === 'class' && s.sourceName === 'Cleric'
+							);
+							if (existingClassCantrip) {
+								// Replace the class cantrip with the subclass cantrip (making it auto-granted)
+								existingClassCantrip.source = access.source;
+								existingClassCantrip.sourceName = access.sourceName;
+								existingClassCantrip.chooseable = false;
+							} else {
+								// Cantrip wasn't in class list, add it as subclass cantrip
+								availableSpells.push({
+									...spell,
+									source: access.source,
+									sourceName: access.sourceName,
+									chooseable: false
+								});
+							}
+						} else if (!existingSpell) {
+							// Add new cantrip
+							// If it's a warlock patron cantrip, add it as a class cantrip to avoid creating separate tabs
 							availableSpells.push({
 								...spell,
 								source: isWarlockPatron ? 'class' : access.source,
 								sourceName: isWarlockPatron ? 'Warlock' : access.sourceName,
 								chooseable: access.chooseable !== false
 							});
-						} else if (
-							access.source === 'subclass' &&
-							(access.sourceName.includes('Oath') ||
-								access.sourceName.includes('Circle of the Land') ||
-								access.sourceName.includes('Domain')) &&
-							existingSpell.source === 'class'
-						) {
-							// Replace class source with subclass source for oath/circle/domain spells to show proper tags
-							existingSpell.source = access.source;
-							existingSpell.sourceName = access.sourceName;
-							existingSpell.chooseable = access.chooseable !== false;
 						}
 					}
 				});
@@ -210,11 +251,14 @@
 			if (access.chooseable !== false) {
 				// Only count class and subclass access toward limits, not race/feat bonuses or feature sources
 				// Exclude subclass entries with extended names (like "Nature Domain - Druid Cantrip")
+				// Exclude Circle of Land bonus cantrips (they have their own separate tab)
 				// as they are handled in separate tabs
 				// Exclude feature sources (like Pact of the Tome) as they have their own separate tabs and limits
 				const countsTowardLimits =
 					access.source === 'class' ||
-					(access.source === 'subclass' && !access.sourceName.includes(' - '));
+					(access.source === 'subclass' && 
+						!access.sourceName.includes(' - ') &&
+						!access.sourceName.includes('Circle of the Land'));
 
 				// Handle new format with separate cantrip and spell counts
 				if (access.chooseCantripCount !== undefined || access.chooseSpellCount !== undefined) {
@@ -760,29 +804,56 @@
 
 		if (sourceId === 'cantrips') {
 			const classSpells = getAvailableSpells(0, character).filter(
-				(spell) =>
-					(spell.source === 'class' ||
-					(spell.source === 'subclass' && !spell.sourceName.includes(' - '))) &&
-					spell.source !== 'feature' && // Exclude feature sources from base cantrips tab
-					!shouldFilterSpell(spell) // Apply rare use filter
+				(spell) => {
+					// Exclude feature sources from base cantrips tab
+					if (spell.source === 'feature') return false;
+					// Apply rare use filter
+					if (shouldFilterSpell(spell)) return false;
+					// Include class spells
+					if (spell.source === 'class') return true;
+					// Exclude Circle of Land subclass spells (they have a separate tab)
+					// But keep the class versions of those spells
+					if (spell.source === 'subclass' && spell.sourceName.includes('Circle of the Land')) return false;
+					// Include other subclass spells without ' - ' in their name
+					if (spell.source === 'subclass' && !spell.sourceName.includes(' - ')) return true;
+					return false;
+				}
 			);
 			return addRacialDuplicates(classSpells, 0);
 		} else if (sourceId === 'level1') {
 			const classSpells = getAvailableSpells(1, character).filter(
-				(spell) =>
-					(spell.source === 'class' ||
-					(spell.source === 'subclass' && !spell.sourceName.includes(' - '))) &&
-					spell.source !== 'feature' && // Exclude feature sources from base level1 tab
-					!shouldFilterSpell(spell) // Apply rare use filter
+				(spell) => {
+					// Exclude feature sources from base level1 tab
+					if (spell.source === 'feature') return false;
+					// Apply rare use filter
+					if (shouldFilterSpell(spell)) return false;
+					// Include class spells
+					if (spell.source === 'class') return true;
+					// Exclude Circle of Land subclass spells (they have a separate tab)
+					// But keep the class versions of those spells
+					if (spell.source === 'subclass' && spell.sourceName.includes('Circle of the Land')) return false;
+					// Include other subclass spells without ' - ' in their name
+					if (spell.source === 'subclass' && !spell.sourceName.includes(' - ')) return true;
+					return false;
+				}
 			);
 			return addRacialDuplicates(classSpells, 1);
 		} else if (sourceId === 'level2') {
 			const classSpells = getAvailableSpells(2, character).filter(
-				(spell) =>
-					(spell.source === 'class' ||
-					(spell.source === 'subclass' && !spell.sourceName.includes(' - '))) &&
-					spell.source !== 'feature' && // Exclude feature sources from base level2 tab
-					!shouldFilterSpell(spell) // Apply rare use filter
+				(spell) => {
+					// Exclude feature sources from base level2 tab
+					if (spell.source === 'feature') return false;
+					// Apply rare use filter
+					if (shouldFilterSpell(spell)) return false;
+					// Include class spells
+					if (spell.source === 'class') return true;
+					// Exclude Circle of Land subclass spells (they have a separate tab)
+					// But keep the class versions of those spells
+					if (spell.source === 'subclass' && spell.sourceName.includes('Circle of the Land')) return false;
+					// Include other subclass spells without ' - ' in their name
+					if (spell.source === 'subclass' && !spell.sourceName.includes(' - ')) return true;
+					return false;
+				}
 			);
 			return addRacialDuplicates(classSpells, 2);
 		} else if (sourceId.startsWith('race-')) {
@@ -846,32 +917,62 @@
 
 			if (allAccess.length === 0) return [];
 
-			// Determine which spell levels this subclass tab should include
-			const totalCantripCount = allAccess.reduce((sum, access) => {
-				return sum + (access.chooseCantripCount ?? 0) + (access.cantrips?.length ?? 0);
+			// Separate chooseable and auto-granted access
+			const chooseableAccess = allAccess.filter((access) => access.chooseable);
+			const autoGrantedAccess = allAccess.filter((access) => !access.chooseable);
+
+			// Count chooseable cantrips (user can select these)
+			const chooseableCantripCount = chooseableAccess.reduce((sum, access) => {
+				return sum + (access.chooseCantripCount ?? 0);
 			}, 0);
-			const totalSpellCount = allAccess.reduce((sum, access) => {
-				return sum + (access.chooseSpellCount ?? 0) + (access.spells?.length ?? 0);
+
+			// Count chooseable spells (user can select these)
+			const chooseableSpellCount = chooseableAccess.reduce((sum, access) => {
+				return sum + (access.chooseSpellCount ?? 0);
 			}, 0);
+
+			// Check if there are auto-granted spells (purple, already selected)
+			const hasAutoGrantedSpells = autoGrantedAccess.some(
+				(access) => (access.spells && access.spells.length > 0) || (access.cantrips && access.cantrips.length > 0)
+			);
 
 			const results: any[] = [];
 
-			// Only include cantrips if this tab has cantrip access
-			if (totalCantripCount > 0) {
+			// Check if there are auto-granted cantrips (purple, already selected)
+			const hasAutoGrantedCantrips = autoGrantedAccess.some(
+				(access) => access.cantrips && access.cantrips.length > 0
+			);
+
+			// Include cantrips if user can choose them OR if there are auto-granted cantrips
+			if (chooseableCantripCount > 0 || hasAutoGrantedCantrips) {
 				const cantrips = getAvailableSpells(0, character)
-					.filter((spell) => spell.source === 'subclass' && spell.sourceName === sourceName)
+					.filter((spell) => {
+						if (spell.source !== 'subclass' || spell.sourceName !== sourceName) return false;
+						// Include if chooseable and we're allowing choices, OR if auto-granted
+						return (spell.chooseable && chooseableCantripCount > 0) || (!spell.chooseable && hasAutoGrantedCantrips);
+					})
 					.map((spell) => ({ ...spell, spellSection: 'cantrips' }));
 				results.push(...cantrips);
 			}
 
-			// Only include leveled spells if this tab has spell access
-			if (totalSpellCount > 0) {
+			// Include leveled spells:
+			// - If chooseableSpellCount > 0: show chooseable spells (user can select)
+			// - If hasAutoGrantedSpells: show auto-granted spells (purple, already selected)
+			if (chooseableSpellCount > 0 || hasAutoGrantedSpells) {
 				const level1 = getAvailableSpells(1, character)
-					.filter((spell) => spell.source === 'subclass' && spell.sourceName === sourceName)
+					.filter((spell) => {
+						if (spell.source !== 'subclass' || spell.sourceName !== sourceName) return false;
+						// Include if chooseable and we're allowing choices, OR if auto-granted
+						return (spell.chooseable && chooseableSpellCount > 0) || (!spell.chooseable && hasAutoGrantedSpells);
+					})
 					.map((spell) => ({ ...spell, spellSection: 'level1' }));
 
 				const level2 = getAvailableSpells(2, character)
-					.filter((spell) => spell.source === 'subclass' && spell.sourceName === sourceName)
+					.filter((spell) => {
+						if (spell.source !== 'subclass' || spell.sourceName !== sourceName) return false;
+						// Include if chooseable and we're allowing choices, OR if auto-granted
+						return (spell.chooseable && chooseableSpellCount > 0) || (!spell.chooseable && hasAutoGrantedSpells);
+					})
 					.map((spell) => ({ ...spell, spellSection: 'level2' }));
 
 				results.push(...level1, ...level2);
@@ -890,20 +991,35 @@
 
 			if (!access) return [];
 
-			// Return cantrips and spells from this feature
-			const cantrips = getAvailableSpells(0, character).filter(
-				(spell) => spell.source === 'feature' && spell.sourceName === sourceName
-			);
+			// Only include spell levels that this feature actually grants access to
+			const results: any[] = [];
 
-			const level1 = getAvailableSpells(1, character).filter(
-				(spell) => spell.source === 'feature' && spell.sourceName === sourceName
-			);
+			// Include cantrips only if this feature allows choosing cantrips OR has cantrips in its list
+			if ((access.chooseCantripCount ?? 0) > 0 || (access.cantrips && access.cantrips.length > 0)) {
+				const cantrips = getAvailableSpells(0, character).filter(
+					(spell) => spell.source === 'feature' && spell.sourceName === sourceName
+				);
+				results.push(...cantrips);
+			}
 
-			const level2 = getAvailableSpells(2, character).filter(
-				(spell) => spell.source === 'feature' && spell.sourceName === sourceName
-			);
+			// Include leveled spells only if this feature allows choosing spells OR has spells in its list
+			if ((access.chooseSpellCount ?? 0) > 0 || (access.spells && access.spells.length > 0)) {
+				const level1 = getAvailableSpells(1, character).filter(
+					(spell) => spell.source === 'feature' && spell.sourceName === sourceName
+				);
 
-			return [...cantrips, ...level1, ...level2];
+				results.push(...level1);
+
+				// Only include level 2 spells if maxSpellLevel allows it (undefined or >= 2)
+				if (access.maxSpellLevel === undefined || access.maxSpellLevel >= 2) {
+					const level2 = getAvailableSpells(2, character).filter(
+						(spell) => spell.source === 'feature' && spell.sourceName === sourceName
+					);
+					results.push(...level2);
+				}
+			}
+
+			return results;
 		}
 		return [];
 	}
@@ -1350,12 +1466,21 @@
 		(s) => {
 			if (!s.chooseable || !selectedSpells.has(s.name)) return false;
 			if (s.source === 'feature') return false;
+			// Exclude Circle of Land spells from standard tab counts
+			if (s.source === 'subclass' && s.sourceName.includes('Circle of the Land')) return false;
 			if (!(s.source === 'class' || (s.source === 'subclass' && !s.sourceName.includes(' - ')))) return false;
 			
-			// Check if this spell was selected from a feature tab - if so, don't count it
+			// Check if this spell was selected from a feature tab or special subclass tab - if so, don't count it
 			const meta = selectedSpells.get(s.name);
-			if (meta && meta.tabSource && (meta.tabSource.includes('Pact of the') || meta.tabSource.startsWith('feature-'))) {
-				return false;
+			if (meta && meta.tabSource) {
+				// Exclude spells selected from feature tabs
+				if (meta.tabSource.includes('Pact of the') || meta.tabSource.includes('Book of Ancient')) {
+					return false;
+				}
+				// Exclude spells selected from special subclass tabs (Circle of Land, etc.)
+				if (meta.tabSource.includes('Circle of the Land')) {
+					return false;
+				}
 			}
 			
 			return true;
@@ -1365,12 +1490,21 @@
 		(s) => {
 			if (!s.chooseable || !selectedSpells.has(s.name)) return false;
 			if (s.source === 'feature') return false;
+			// Exclude Circle of Land spells from standard tab counts
+			if (s.source === 'subclass' && s.sourceName.includes('Circle of the Land')) return false;
 			if (!(s.source === 'class' || (s.source === 'subclass' && !s.sourceName.includes(' - ')))) return false;
 			
-			// Check if this spell was selected from a feature tab - if so, don't count it
+			// Check if this spell was selected from a feature tab or special subclass tab - if so, don't count it
 			const meta = selectedSpells.get(s.name);
-			if (meta && meta.tabSource && (meta.tabSource.includes('Pact of the') || meta.tabSource.startsWith('feature-'))) {
-				return false;
+			if (meta && meta.tabSource) {
+				// Exclude spells selected from feature tabs
+				if (meta.tabSource.includes('Pact of the') || meta.tabSource.includes('Book of Ancient')) {
+					return false;
+				}
+				// Exclude spells selected from special subclass tabs (Circle of Land, etc.)
+				if (meta.tabSource.includes('Circle of the Land')) {
+					return false;
+				}
 			}
 			
 			return true;
@@ -1380,12 +1514,21 @@
 		(s) => {
 			if (!s.chooseable || !selectedSpells.has(s.name)) return false;
 			if (s.source === 'feature') return false;
+			// Exclude Circle of Land spells from standard tab counts
+			if (s.source === 'subclass' && s.sourceName.includes('Circle of the Land')) return false;
 			if (!(s.source === 'class' || (s.source === 'subclass' && !s.sourceName.includes(' - ')))) return false;
 			
-			// Check if this spell was selected from a feature tab - if so, don't count it
+			// Check if this spell was selected from a feature tab or special subclass tab - if so, don't count it
 			const meta = selectedSpells.get(s.name);
-			if (meta && meta.tabSource && (meta.tabSource.includes('Pact of the') || meta.tabSource.startsWith('feature-'))) {
-				return false;
+			if (meta && meta.tabSource) {
+				// Exclude spells selected from feature tabs
+				if (meta.tabSource.includes('Pact of the') || meta.tabSource.includes('Book of Ancient')) {
+					return false;
+				}
+				// Exclude spells selected from special subclass tabs (Circle of Land, etc.)
+				if (meta.tabSource.includes('Circle of the Land')) {
+					return false;
+				}
 			}
 			
 			return true;
@@ -1704,7 +1847,7 @@
 											{@const isBaseTab = activeTab === 'cantrips' || activeTab === 'level1' || activeTab === 'level2'}
 											{@const isFeatureTab = activeTab.startsWith('feature-')}
 											{@const selectedMeta = selectedSpells.get(spell.name)}
-											{@const selectedFromFeature = selectedMeta && selectedMeta.tabSource && selectedMeta.tabSource.includes('Pact of the')}
+											{@const selectedFromFeature = selectedMeta && selectedMeta.tabSource && (selectedMeta.tabSource.includes('Pact of the') || selectedMeta.tabSource.includes('Book of Ancient') || selectedMeta.tabSource.includes('Circle of the Land'))}
 											{@const selectedFromBase = selectedMeta && selectedMeta.tabSource && (selectedMeta.tabSource === 'cantrips' || selectedMeta.tabSource === 'level1' || selectedMeta.tabSource === 'level2')}
 											{@const showAlreadyKnown = (isBaseTab && selectedFromFeature) || (isFeatureTab && selectedFromBase)}
 											{#if showAlreadyKnown}

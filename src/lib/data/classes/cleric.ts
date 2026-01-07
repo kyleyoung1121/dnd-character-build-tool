@@ -188,12 +188,12 @@ const divineDomainPrompt: FeaturePrompt = {
 							blocks: [
 								{
 									type: 'text',
-									text: "You learn the Light cantrip if you don't already know it. This cantrip doesn't count against the number of cleric cantrips you know."
+									text: "You learn the Light cantrip if you don't already know it. This cantrip doesn't count against the number of cleric cantrips you know. It is automatically added to your spell list."
 								}
 							]
 						},
 						source: 'cleric.light_domain',
-						effects: [{ target: 'spells', action: 'add', value: 'Light' }]
+						effects: [] // Light cantrip is granted via spell access, not effects
 					},
 					{
 						name: 'Warding Flare',
@@ -468,20 +468,6 @@ const divineDomainPrompt: FeaturePrompt = {
 				name: 'Trickery Domain',
 				optionDescription: `The Trickery Domain focuses on deception, stealth, and misdirection to confound enemies and aid allies.`,
 				nestedPrompts: [
-					{
-						name: 'Bonus Proficiencies',
-						id: 'cleric_trickery_skill_01',
-						description: {
-							blocks: [
-								{
-									type: 'text',
-									text: "You gain proficiency with the Stealth skill."
-								}
-							]
-						},
-						source: 'cleric.trickery_domain',
-						effects: [{ target: 'skills', action: 'add', value: 'Stealth' }]
-					},
 					{
 						name: 'Blessing of the Trickster',
 						id: 'cleric_trickery_feature_01',

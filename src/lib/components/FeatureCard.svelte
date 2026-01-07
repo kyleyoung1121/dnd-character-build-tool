@@ -15,9 +15,11 @@
 	export let selectionVersion: number;
 	export let characterStore: any;
 	export let nested: boolean = false;
+	export let parentFeatureName: string | null = null; // Track parent feature for nested scope IDs
+	export let parentIndex: number | null = null; // Track parent feature index for nested scope IDs
 
 	// Event handlers - passed down from parent
-	export let onSelectOption: (feature: FeaturePrompt, index: number, value: string) => void;
+	export let onSelectOption: (feature: FeaturePrompt, index: number, value: string, parentFeatureName?: string | null, parentIndex?: number | null) => void;
 	export let onToggleExpand: (featureName: string) => void;
 
 	// Computed properties
@@ -55,7 +57,7 @@
 	// Handle select change
 	function handleSelectChange(event: Event, index: number) {
 		const target = event.target as HTMLSelectElement;
-		onSelectOption(feature, index, target.value);
+		onSelectOption(feature, index, target.value, parentFeatureName, parentIndex);
 	}
 </script>
 
@@ -119,6 +121,7 @@
 
 			<!-- Render nested prompts -->
 			{#each nestedPrompts as nestedFeature (nestedFeature.name)}
+				{@const parentSelectionIndex = 0} <!-- For now, assuming single-pick features; this would need enhancement for multi-pick -->
 				<svelte:self
 					feature={nestedFeature}
 					{featureSelections}
@@ -127,6 +130,8 @@
 					{characterStore}
 					{onSelectOption}
 					{onToggleExpand}
+					parentFeatureName={feature.name}
+					parentIndex={parentSelectionIndex}
 					nested={true}
 				/>
 			{/each}

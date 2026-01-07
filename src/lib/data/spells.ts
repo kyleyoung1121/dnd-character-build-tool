@@ -290,8 +290,7 @@ export const cantrips: Spell[] = [
 		description:
 			'You touch one willing creature. Once before the spell ends, the target can roll a d4 and add the number rolled to one saving throw of its choice. It can roll the die before or after making the saving throw. The spell then ends.',
 		classes: ['Cleric', 'Druid'],
-		tags: ['Buff'],
-		isRareUse: true
+		tags: ['Buff']
 	},
 	{
 		name: 'Sacred Flame',
@@ -2321,7 +2320,7 @@ export const spellAccess: SpellAccess[] = [
 		source: 'subclass',
 		sourceName: 'Light Domain',
 		spells: ['Burning Hands', 'Faerie Fire', 'Flaming Sphere', 'Scorching Ray'], // 1st and 2nd level domain spells
-		cantrips: [],
+		cantrips: ['Light'],
 		chooseable: false // Domain spells are always prepared
 	},
 	{

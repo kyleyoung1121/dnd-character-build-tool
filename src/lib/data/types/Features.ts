@@ -90,6 +90,16 @@ export interface ComputedReplacementBlock {
 	 * "You can use this ability {value} times."
 	 */
 	replacementTemplate: string;
+
+	/**
+	 * Optional template used when the computed value equals exactly 1.
+	 * This helps avoid grammar issues like "1 times" vs "once".
+	 * No value substitution occurs - this is a hardcoded string.
+	 *
+	 * Example:
+	 * "You can use this ability once per long rest."
+	 */
+	singularTemplate?: string;
 }
 
 // ==============================

@@ -61,11 +61,13 @@ const spellcastingPrompt: FeaturePrompt = {
 				],
 
 				fallbackText:
-					'You know three cantrips and have prepared a number of spells equal to your Wisdom modifier + 3. (minimum of 1)',
-					
+					'You know 3 cantrips and have prepared a number of spells equal to your Wisdom modifier + 3. (minimum of 1)',
 
 				replacementTemplate:
-					'You know three cantrips and have {value} spells prepared.'
+					'You know 3 cantrips and have {value} spells prepared.',
+
+				singularTemplate:
+					'You know 3 cantrips and have 1 leveled spell prepared.',
 			}
 		]
 	},
@@ -216,7 +218,10 @@ const divineDomainPrompt: FeaturePrompt = {
 										'You can use this feature a number of times equal to your Wisdom modifier (minimum of once). You regain all expended uses when you finish a long rest.',
 										
 									replacementTemplate:
-										'You can use this feature {value} times per long rest.'
+										'You can use this feature {value} times per long rest.',
+
+									singularTemplate:
+										'You can use this feature once per long rest.',
 								}
 							]
 						},
@@ -431,7 +436,10 @@ const divineDomainPrompt: FeaturePrompt = {
 										'You can use this feature a number of times equal to your Wisdom modifier (minimum of once). You regain all expended uses when you finish a long rest.',
 										
 									replacementTemplate:
-										'You can use this feature {value} times per long rest.'
+										'You can use this feature {value} times per long rest.',
+
+									singularTemplate:
+										'You can use this feature once per long rest.',
 								}
 							]
 						},
@@ -549,9 +557,11 @@ const divineDomainPrompt: FeaturePrompt = {
 									fallbackText:
 										'You can use this feature a number of times equal to your Wisdom modifier (minimum of once). You regain all expended uses when you finish a long rest.',
 										
-					
 									replacementTemplate:
-										'You can use this feature {value} times per long rest.'
+										'You can use this feature {value} times per long rest.',
+
+									singularTemplate:
+										'You can use this feature once per long rest.',
 								}
 							]
 						},

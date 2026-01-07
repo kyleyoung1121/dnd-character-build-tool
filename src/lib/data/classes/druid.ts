@@ -57,11 +57,13 @@ const spellcastingPrompt: FeaturePrompt = {
 				],
 
 				fallbackText:
-					'You know two cantrips and prepare a number of spells equal to your Wisdom modifier + 3 (minimum of 1).',
-					
+					'You know 2 cantrips and prepare a number of spells equal to your Wisdom modifier + 3 (minimum of 1).',
 
 				replacementTemplate:
-					'You know two cantrips and prepare {value} spells.'
+					'You know 2 cantrips and prepare {value} spells.',
+
+				singularTemplate:
+					'You know 2 cantrips and prepare 1 spell.',
 			}
 		]
 	},

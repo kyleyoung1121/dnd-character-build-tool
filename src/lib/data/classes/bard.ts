@@ -124,7 +124,10 @@ const bardicInspirationPrompt: FeaturePrompt = {
 					'You can use this feature a number of times equal to your Charisma modifier (a minimum of once). You regain any expended uses when you finish a long rest.',
 
 				replacementTemplate:
-					'You can use this feature {value} times per long rest.'
+					'You can use this feature {value} times per long rest.',
+
+				singularTemplate:
+					'You can use this feature once per long rest.',
 			}
 		]
 	},	

@@ -152,7 +152,7 @@
 
 {#each description.blocks as block}
 	{#if block.type === 'text'}
-		<p>{block.text}</p>
+		<p>{@html block.text}</p>
 
 	{:else if block.type === 'computed-inline'}
         {@const value = resolveComputedValue(block.computed)}
@@ -170,8 +170,10 @@
 		{@const value = allValuesAvailable(block.whenAvailable)}
 		{console.log('[complex_desc] Computed replacement value:', value)}
         <p>
-			{value !== null
-				? block.replacementTemplate.replace('{value}', String(value))
+			{@html value !== null
+				? (value === 1 && block.singularTemplate
+					? block.singularTemplate
+					: block.replacementTemplate.replace('{value}', String(value)))
 				: block.fallbackText}
 		</p>
 	{/if}

@@ -102,27 +102,32 @@ function drawSkillWithAbility(
 }
 
 /**
- * Parse text with bold markers and return segments with font info
- * <<BOLD:text>> becomes [{text: 'text', bold: true}]
+ * Parse text with bold and italic markers and return segments with font info
+ * <<BOLD:text>> becomes [{text: 'text', bold: true, italic: false}]
+ * <<ITALIC:text>> becomes [{text: 'text', bold: false, italic: true}]
  */
-function parseTextWithBold(text: string): Array<{text: string; bold: boolean}> {
-	const segments: Array<{text: string; bold: boolean}> = [];
-	const regex = /<<BOLD:([^>]+)>>/g;
+function parseTextWithStyle(text: string): Array<{text: string; bold: boolean; italic: boolean}> {
+	const segments: Array<{text: string; bold: boolean; italic: boolean}> = [];
+	const regex = /<<(BOLD|ITALIC):([^>]+)>>/g;
 	let lastIndex = 0;
 	let match;
 	
 	while ((match = regex.exec(text)) !== null) {
-		// Add text before the bold marker
+		// Add text before the marker
 		if (match.index > lastIndex) {
 			segments.push({
 				text: text.substring(lastIndex, match.index),
-				bold: false
+				bold: false,
+				italic: false
 			});
 		}
-		// Add the bold text
+		// Add the styled text
+		const styleType = match[1];
+		const styleText = match[2];
 		segments.push({
-			text: match[1],
-			bold: true
+			text: styleText,
+			bold: styleType === 'BOLD',
+			italic: styleType === 'ITALIC'
 		});
 		lastIndex = regex.lastIndex;
 	}
@@ -131,7 +136,8 @@ function parseTextWithBold(text: string): Array<{text: string; bold: boolean}> {
 	if (lastIndex < text.length) {
 		segments.push({
 			text: text.substring(lastIndex),
-			bold: false
+			bold: false,
+			italic: false
 		});
 	}
 	
@@ -139,14 +145,15 @@ function parseTextWithBold(text: string): Array<{text: string; bold: boolean}> {
 }
 
 /**
- * Draw multi-line text in a text area with support for bold text
+ * Draw multi-line text in a text area with support for bold and italic text
  */
 function drawTextArea(
 	page: any,
 	text: string,
 	config: TextAreaConfig,
 	font: any,
-	boldFont: any
+	boldFont: any,
+	italicFont: any
 ) {
 	const fontSize = config.fontSize || PDF_CONFIG.defaultFontSize;
 	const lineHeight = config.lineHeight || fontSize * 1.2;
@@ -164,14 +171,21 @@ function drawTextArea(
 	for (const line of lines) {
 		if (currentY < config.y) break; // Stop if we run out of space
 		
-		// Parse line for bold markers
-		const segments = parseTextWithBold(line);
+		// Parse line for style markers
+		const segments = parseTextWithStyle(line);
 		
 		// Process each segment and wrap words
 		let currentX = config.x;
 		
 		for (const segment of segments) {
-			const segmentFont = segment.bold ? boldFont : font;
+			// Choose the appropriate font
+			let segmentFont = font;
+			if (segment.bold) {
+				segmentFont = boldFont;
+			} else if (segment.italic) {
+				segmentFont = italicFont;
+			}
+			
 			const words = segment.text.split(' ');
 			
 			for (let i = 0; i < words.length; i++) {
@@ -216,7 +230,8 @@ async function fillPage1(
 	page: any,
 	data: CharacterSheetData,
 	font: any,
-	boldFont: any
+	boldFont: any,
+	italicFont: any
 ) {
 	// Header
 	drawText(page, data.characterName, PAGE_1_FIELDS.characterName, font);
@@ -306,9 +321,9 @@ async function fillPage1(
 	});
 	
 	// Equipment & Features
-	drawTextArea(page, data.equipment, PAGE_1_FIELDS.equipment, font, boldFont);
-	drawTextArea(page, data.proficienciesAndLanguages, PAGE_1_FIELDS.proficienciesAndLanguages, font, boldFont);
-	drawTextArea(page, data.featuresAndTraits, PAGE_1_FIELDS.featuresAndTraits, font, boldFont);
+	drawTextArea(page, data.equipment, PAGE_1_FIELDS.equipment, font, boldFont, italicFont);
+	drawTextArea(page, data.proficienciesAndLanguages, PAGE_1_FIELDS.proficienciesAndLanguages, font, boldFont, italicFont);
+	drawTextArea(page, data.featuresAndTraits, PAGE_1_FIELDS.featuresAndTraits, font, boldFont, italicFont);
 }
 
 /**
@@ -318,7 +333,8 @@ async function fillPage2(
 	page: any,
 	data: CharacterSheetData,
 	font: any,
-	boldFont: any
+	boldFont: any,
+	italicFont: any
 ) {
 	// Character Name
 	drawText(page, data.characterName, PAGE_2_FIELDS.characterName, font);
@@ -333,24 +349,24 @@ async function fillPage2(
 	
 	// Backstory
 	if (data.personalityTraits) {
-		drawTextArea(page, data.personalityTraits, PAGE_2_FIELDS.personalityTraits, font, boldFont);
+		drawTextArea(page, data.personalityTraits, PAGE_2_FIELDS.personalityTraits, font, boldFont, italicFont);
 	}
 	if (data.ideals) {
-		drawTextArea(page, data.ideals, PAGE_2_FIELDS.ideals, font, boldFont);
+		drawTextArea(page, data.ideals, PAGE_2_FIELDS.ideals, font, boldFont, italicFont);
 	}
 	if (data.bonds) {
-		drawTextArea(page, data.bonds, PAGE_2_FIELDS.bonds, font, boldFont);
+		drawTextArea(page, data.bonds, PAGE_2_FIELDS.bonds, font, boldFont, italicFont);
 	}
 	if (data.flaws) {
-		drawTextArea(page, data.flaws, PAGE_2_FIELDS.flaws, font, boldFont);
+		drawTextArea(page, data.flaws, PAGE_2_FIELDS.flaws, font, boldFont, italicFont);
 	}
 	
 	// Additional Content
 	if (data.additionalFeatures) {
-		drawTextArea(page, data.additionalFeatures, PAGE_2_FIELDS.additionalFeatures, font, boldFont);
+		drawTextArea(page, data.additionalFeatures, PAGE_2_FIELDS.additionalFeatures, font, boldFont, italicFont);
 	}
 	if (data.treasureAndNotes) {
-		drawTextArea(page, data.treasureAndNotes, PAGE_2_FIELDS.treasureAndNotes, font, boldFont);
+		drawTextArea(page, data.treasureAndNotes, PAGE_2_FIELDS.treasureAndNotes, font, boldFont, italicFont);
 	}
 }
 
@@ -375,10 +391,11 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 		// Embed fonts
 		const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
 		const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+		const italicFont = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
 		
 		// Fill pages with data
-		await fillPage1(page1, data, font, boldFont);
-		await fillPage2(page2, data, font, boldFont);
+		await fillPage1(page1, data, font, boldFont, italicFont);
+		await fillPage2(page2, data, font, boldFont, italicFont);
 		
 		const pdfBytes = await pdfDoc.save();
 		const byteArray = new Uint8Array(pdfBytes);

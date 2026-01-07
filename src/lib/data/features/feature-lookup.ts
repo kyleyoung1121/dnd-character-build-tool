@@ -13,7 +13,7 @@
 import type { ClassData } from '$lib/data/types/ClassData';
 import type { SpeciesData } from '$lib/data/types/SpeciesData';
 import type { BackgroundData } from '$lib/data/types/BackgroundData';
-import type { FeaturePrompt } from '$lib/data/types/Features';
+import type { FeaturePrompt, FeatureDescription } from '$lib/data/types/Features';
 
 // Import all classes
 import { barbarian } from '../classes/barbarian';
@@ -98,6 +98,35 @@ backgrounds.forEach(bg => {
 });
 
 /**
+ * Serialize feature description from blocks to plain text
+ */
+function serializeFeatureDescription(
+	description: FeatureDescription
+): string {
+	return description.blocks
+		.map((block) => {
+			switch (block.type) {
+				case 'text':
+					return block.text;
+
+				case 'computed-inline':
+					// PDFs should be readable but deterministic.
+					// We do NOT try to compute here.
+					return block.text;
+
+				case 'computed-replacement':
+					// PDF export happens after character creation,
+					// but to be safe, use fallback text.
+					return block.fallbackText;
+
+				default:
+					return '';
+			}
+		})
+		.join('\n\n');
+}
+
+/**
  * Recursively search for a feature by name in a list of FeaturePrompts
  * This handles nested features in complex options
  */
@@ -159,8 +188,9 @@ function findFeatureInBackground(backgroundName: string, featureName: string): F
 /**
  * Clean HTML tags and special characters from description for PDF display
  * The PDF library (WinAnsi encoding) cannot handle certain special characters
+ * Convert supported HTML tags to PDF markers for styling
  */
-function cleanDescription(description: string): string {
+export function cleanDescription(description: string): string {
 	return description
 		// Convert <br> and <br/> tags to newlines
 		.replace(/<br\s*\/?>/gi, '\n')
@@ -170,6 +200,12 @@ function cleanDescription(description: string): string {
 		// Remove ul/ol tags
 		.replace(/<\/?ul>/gi, '')
 		.replace(/<\/?ol>/gi, '')
+		// Convert <strong> and <b> tags to PDF bold markers
+		.replace(/<strong>([^<]+)<\/strong>/gi, '<<BOLD:$1>>')
+		.replace(/<b>([^<]+)<\/b>/gi, '<<BOLD:$1>>')
+		// Convert <i> and <em> tags to PDF italic markers
+		.replace(/<i>([^<]+)<\/i>/gi, '<<ITALIC:$1>>')
+		.replace(/<em>([^<]+)<\/em>/gi, '<<ITALIC:$1>>')
 		// Remove any remaining HTML tags
 		.replace(/<[^>]+>/g, '')
 		// Replace tabs with spaces (PDF WinAnsi cannot encode tabs)
@@ -259,7 +295,17 @@ export function getFeatureDescription(
 		return null;
 	}
 	
-	return cleanDescription(feature.description);
+	// Serialize the description from blocks to text
+	let descriptionText: string;
+	if (typeof feature.description === 'string') {
+		// Legacy safety
+		descriptionText = feature.description;
+	} else {
+		descriptionText = serializeFeatureDescription(feature.description);
+	}
+	
+	// Clean and return
+	return cleanDescription(descriptionText);
 }
 
 /**

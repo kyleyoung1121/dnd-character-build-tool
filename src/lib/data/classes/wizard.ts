@@ -101,7 +101,10 @@ const arcaneTraditionPrompt: FeaturePrompt = {
 										'The ward has hit points equal to 6 + your Intelligence modifier. Whenever you take damage, the ward takes the damage instead. If this damage reduces the ward to 0 hit points, you take any remaining damage.',
 										
 									replacementTemplate:
-										'The ward has {value} hit points. Whenever you take damage, the ward takes the damage instead. If this damage reduces the ward to 0 hit points, you take any remaining damage.'
+										'The ward has {value} hit points. Whenever you take damage, the ward takes the damage instead. If this damage reduces the ward to 0 hit points, you take any remaining damage.',
+
+									singularTemplate:
+										'The ward has 1 hit point. Whenever you take damage, the ward takes the damage instead. If this damage reduces the ward to 0 hit points, you take any remaining damage.',
 								}
 							]
 						},

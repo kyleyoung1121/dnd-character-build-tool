@@ -15,7 +15,7 @@
  * - Easy to maintain and extend
  */
 
-import { lookupFeature, getFeatureDescription } from './feature-lookup';
+import { lookupFeature, getFeatureDescription, cleanDescription } from './feature-lookup';
 import type { Character } from '$lib/stores/character_store';
 
 export interface FeatureData {
@@ -99,6 +99,9 @@ export function getFeatureData(
 	} else {
 		descriptionText = serializeFeatureDescription(feature.description);
 	}
+
+	// Clean description to remove tabs and other problematic characters for PDF (WinAnsi encoding)
+	descriptionText = cleanDescription(descriptionText);
 
 	return {
 		name: feature.name,

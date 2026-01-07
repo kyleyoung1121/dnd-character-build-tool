@@ -49,7 +49,10 @@ const divineSensePrompt: FeaturePrompt = {
 					'You can use this feature a number of times equal to 1 + your Charisma modifier per long rest.',
 
 				replacementTemplate:
-					'You can use this feature {value} times per long rest.'
+					'You can use this feature {value} times per long rest.',
+
+				singularTemplate:
+					'You can use this feature once per long rest.',
 			}
 		]
 	},

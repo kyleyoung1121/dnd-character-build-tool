@@ -121,7 +121,10 @@ const otherworldlyPatronPrompt: FeaturePrompt = {
 										'When you reduce a hostile creature to 0 hit points, you gain temporary hit points equal to your Charisma modifier + 3 (minimum of 1).',
 										
 									replacementTemplate:
-										'When you reduce a hostile creature to 0 hit points, you gain {value} temporary hit points.'
+										'When you reduce a hostile creature to 0 hit points, you gain {value} temporary hit points.',
+
+									singularTemplate:
+										'When you reduce a hostile creature to 0 hit points, you gain 1 temporary hit point.',
 								}
 							]
 						},

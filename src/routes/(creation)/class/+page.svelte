@@ -287,15 +287,19 @@
 		};
 	
 		// Unified helper to attempt to fetch provenance under multiple plausible key shapes
-		const getProvenanceEntry = (featureName: string, idx?: number, parentFeatureName?: string) => {
+		const getProvenanceEntry = (featureName: string, idx?: number, parentFeatureName?: string, parentIndex?: number) => {
 			const prov = state._provenance || {};
 			const namesToTry: string[] = [];
 	
-			// NEW FORMAT: feature:ParentName:FeatureName:index (for nested features with parent context)
+			// CORRECT FORMAT: feature:ParentName:ParentIndex:FeatureName:index (for nested features with parent context)
+			if (parentFeatureName && typeof parentIndex === 'number' && typeof idx === 'number') {
+				namesToTry.push(`feature:${parentFeatureName}:${parentIndex}:${featureName}:${idx}`);
+			}
+
+			// LEGACY FORMAT: feature:ParentName:FeatureName:index (older format without parentIndex)
 			if (parentFeatureName && typeof idx === 'number') {
 				namesToTry.push(`feature:${parentFeatureName}:${featureName}:${idx}`);
 			}
-	
 			// canonical per-requested scheme: feature:Class:Parent:Feature
 			if (selectedClassData) {
 				if (parentFeatureName) {
@@ -317,7 +321,7 @@
 			}
 	
 			// DEBUG: print attempted key shapes for this lookup
-			console.log(`${DBG} getProvenanceEntry: feature='${featureName}', idx=${String(idx)}, parent='${String(parentFeatureName)}', trying keys:`, namesToTry);
+			console.log(`${DBG} getProvenanceEntry: feature='${featureName}', idx=${String(idx)}, parent='${String(parentFeatureName)}', parentIdx=${String(parentIndex)}, trying keys:`, namesToTry);
 	
 			for (const n of namesToTry) {
 				if (prov[n]) {
@@ -374,11 +378,11 @@
 					continue;
 				}
 	
-				const provLookup = getProvenanceEntry(feature.name, idx, parentFeatureName);
+				const provLookup = getProvenanceEntry(feature.name, idx, parentFeatureName, parentIndex);
 				const stored = provLookup?.entry;
 				const provKey = provLookup?.key;
 	
-				console.log(`${DBG} Nested restore probe: feature='${feature.name}', idx=${idx}, provKey='${provKey}'`);
+				console.log(`${DBG} Nested restore probe: feature='${feature.name}', idx=${idx}, parent='${parentFeatureName}', parentIdx=${parentIndex}, provKey='${provKey}'`);
 			console.log(`${DBG} Stored provenance object:`, JSON.stringify(stored, null, 2));
 			console.log(`${DBG} Feature effects:`, feature.effects);
 	

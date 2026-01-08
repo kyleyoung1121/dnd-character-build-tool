@@ -5,6 +5,7 @@
 	export let isSelected: boolean = false;
 	export let isDisabled: boolean = false;
 	export let onSelect: ((beast: Beast) => void) | undefined = undefined;
+	export let isBeastMaster: boolean = false; // For Beast Master HP minimum rule
 
 	// Calculate ability modifiers
 	function getModifier(score: number): string {
@@ -30,6 +31,9 @@
 			})
 			.join(', ');
 	}
+
+	// Calculate displayed HP (Beast Master rule: minimum 12 HP for level 3 ranger)
+	$: displayedHP = isBeastMaster ? Math.max(beast.hit_points.average, 12) : beast.hit_points.average;
 
 	function handleSelect() {
 		if (onSelect) {
@@ -64,10 +68,11 @@
 			<strong>Armor Class:</strong> {beast.armor_class}
 		</div>
 		<div class="stat-row">
-			<strong>Hit Points:</strong> {beast.hit_points.average}
-			{#if beast.hit_points.formula}
+			<strong>Hit Points:</strong> {displayedHP}
+			<!-- Formula hidden but kept in data for future use -->
+			<!-- {#if beast.hit_points.formula}
 				<span class="formula">({beast.hit_points.formula})</span>
-			{/if}
+			{/if} -->
 		</div>
 	</div>
 

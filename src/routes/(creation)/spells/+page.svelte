@@ -52,6 +52,11 @@
 				if (access.maxSpellLevel !== undefined && spellLevel > access.maxSpellLevel) {
 					return; // Skip this access if spell level exceeds maximum
 				}
+				
+				// Check if this spell level is allowed by minSpellLevel restriction
+				if (access.minSpellLevel !== undefined && spellLevel < access.minSpellLevel) {
+					return; // Skip this access if spell level is below minimum
+				}
 
 				// This access allows choosing from specific class lists
 				access.chooseFrom.forEach((className) => {
@@ -263,16 +268,18 @@
 				// Handle new format with separate cantrip and spell counts
 				if (access.chooseCantripCount !== undefined || access.chooseSpellCount !== undefined) {
 					if (access.chooseFrom && access.chooseFrom.length > 0) {
-						// Determine what spells this access can choose (respecting maxSpellLevel)
+						// Determine what spells this access can choose (respecting maxSpellLevel and minSpellLevel)
 						const canChooseCantrips = getSpellsByLevel(0).some((spell) =>
 							access.chooseFrom!.some((className) => spell.classes.includes(className))
 						);
 						const canChooseLevel1 =
+							(access.minSpellLevel === undefined || access.minSpellLevel <= 1) &&
 							(access.maxSpellLevel === undefined || access.maxSpellLevel >= 1) &&
 							getSpellsByLevel(1).some((spell) =>
 								access.chooseFrom!.some((className) => spell.classes.includes(className))
 							);
 						const canChooseLevel2 =
+							(access.minSpellLevel === undefined || access.minSpellLevel <= 2) &&
 							(access.maxSpellLevel === undefined || access.maxSpellLevel >= 2) &&
 							getSpellsByLevel(2).some((spell) =>
 								access.chooseFrom!.some((className) => spell.classes.includes(className))
@@ -304,16 +311,18 @@
 				// Legacy format support (for backwards compatibility)
 				else if (access.chooseCount && countsTowardLimits) {
 					if (access.chooseFrom && access.chooseFrom.length > 0) {
-						// Determine what spells this access can choose (respecting maxSpellLevel)
+						// Determine what spells this access can choose (respecting maxSpellLevel and minSpellLevel)
 						const canChooseCantrips = getSpellsByLevel(0).some((spell) =>
 							access.chooseFrom!.some((className) => spell.classes.includes(className))
 						);
 						const canChooseLevel1 =
+							(access.minSpellLevel === undefined || access.minSpellLevel <= 1) &&
 							(access.maxSpellLevel === undefined || access.maxSpellLevel >= 1) &&
 							getSpellsByLevel(1).some((spell) =>
 								access.chooseFrom!.some((className) => spell.classes.includes(className))
 							);
 						const canChooseLevel2 =
+							(access.minSpellLevel === undefined || access.minSpellLevel <= 2) &&
 							(access.maxSpellLevel === undefined || access.maxSpellLevel >= 2) &&
 							getSpellsByLevel(2).some((spell) =>
 								access.chooseFrom!.some((className) => spell.classes.includes(className))

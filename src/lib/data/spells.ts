@@ -25,7 +25,9 @@ export interface SpellAccess {
 	chooseCantripCount?: number; // how many cantrips to choose
 	chooseSpellCount?: number; // how many leveled spells to choose
 	maxSpellLevel?: number; // maximum spell level that can be chosen (for limited casters like EK/AT)
+	minSpellLevel?: number; // minimum spell level that can be chosen (for separating level 1 and level 2 limits)
 	restrictToSchools?: string[]; // restrict chooseable spells to specific schools (e.g., ['Enchantment', 'Illusion'] for Arcane Trickster)
+	restrictToRituals?: boolean; // restrict to ritual spells only (for Book of Ancient Secrets)
 }
 
 export const SPELL_TAGS = [
@@ -2135,7 +2137,20 @@ export const spellAccess: SpellAccess[] = [
 		chooseable: true,
 		chooseFrom: ['Wizard'],
 		chooseCantripCount: 3, // 3 cantrips known at level 3
-		chooseSpellCount: 6 // 6 spells known at level 3 (from spellbook)
+		chooseSpellCount: 8, // 8 first level spells in spellbook at level 3
+		maxSpellLevel: 1 // This entry is only for 1st level spells
+	},
+	{
+		source: 'class',
+		sourceName: 'Wizard',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Wizard'],
+		chooseCantripCount: 0, // No additional cantrips (handled by previous entry)
+		chooseSpellCount: 2, // 2 second level spells in spellbook at level 3 (technically, they could have 0-2, but lets force 2.)
+		maxSpellLevel: 2, // This entry allows up to 2nd level
+		minSpellLevel: 2 // Only 2nd level spells for this entry
 	},
 	{
 		source: 'class',

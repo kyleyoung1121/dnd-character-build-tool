@@ -368,6 +368,7 @@
 							isSelected={selectedBeasts.some(b => b.name === beast.name)}
 							isDisabled={!selectedBeasts.some(b => b.name === beast.name) && selectedBeasts.length >= MAX_SELECTIONS}
 							onSelect={handleBeastSelect}
+							{isBeastMaster}
 						/>
 					{/each}
 				</div>

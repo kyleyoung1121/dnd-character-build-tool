@@ -1029,7 +1029,7 @@ const rangerArchetypePrompt: FeaturePrompt = {
 						description: {
 							blocks: [
 								{ type: 'text', text: 'You gain a beast companion that accompanies you on your adventures and is trained to fight alongside you. Choose a beast that is no larger than Medium and that has a challenge rating of 1/4 or lower.' },
-								{ type: 'text', text: '• Add your proficiency bonus to the beast\'s AC, attack rolls, and damage rolls, as well as to any saving throws and skills it is proficient in' },
+								{ type: 'text', text: '• Add your proficiency bonus (+2) to the beast\'s AC, attack rolls, and damage rolls, as well as to any saving throws and skills it is proficient in' },
 								{ type: 'text', text: '• Its hit point maximum equals the hit point number in its stat block or 12, whichever is higher' },
 								{ type: 'text', text: '• The beast obeys your commands as best as it can and takes its turn on your initiative' },
 								{ type: 'text', text: '• On your turn, you can verbally command the beast where to move (no action required by you)' },

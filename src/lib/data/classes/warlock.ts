@@ -255,12 +255,22 @@ const pactBoonPrompt: FeaturePrompt = {
 									optionDescription: 'Add your Charisma modifier to Eldritch Blast damage.',
 									nestedPrompts: [
 										{
-											id: 'warlock_agonizing_blast_desc_chain',
+											id: 'warlock_agonizing_blast_desc_blade',
 											name: 'Agonizing Blast',
 											description: {
 												blocks: [
 													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip.' },
-													{ type: 'text', text: 'When you cast Eldritch Blast, add your Charisma modifier to the damage it deals on a hit.' },
+													{
+														type: 'computed-inline',
+														text: 'When you cast Eldritch Blast, add your Charisma modifier to the damage it deals on a hit.',
+														hints: [
+															{
+																afterText: 'your Charisma modifier',
+																computed: { source: 'abilityMod', ability: 'CHA' },
+																hintFormat: '({value})'
+															}
+														]
+													},
 												]
 											},
 											source: 'warlock.eldritch_invocations',
@@ -564,7 +574,17 @@ const pactBoonPrompt: FeaturePrompt = {
 											description: {
 												blocks: [
 													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip.' },
-													{ type: 'text', text: 'When you cast Eldritch Blast, add your Charisma modifier to the damage it deals on a hit.' },
+													{
+														type: 'computed-inline',
+														text: 'When you cast Eldritch Blast, add your Charisma modifier to the damage it deals on a hit.',
+														hints: [
+															{
+																afterText: 'your Charisma modifier',
+																computed: { source: 'abilityMod', ability: 'CHA' },
+																hintFormat: '({value})'
+															}
+														]
+													},
 												]
 											},
 											source: 'warlock.eldritch_invocations',
@@ -846,12 +866,22 @@ const pactBoonPrompt: FeaturePrompt = {
 									optionDescription: 'Add your Charisma modifier to Eldritch Blast damage.',
 									nestedPrompts: [
 										{
-											id: 'warlock_agonizing_blast_desc_tome',
+											id: 'warlock_agonizing_blast_desc_blade',
 											name: 'Agonizing Blast',
 											description: {
 												blocks: [
 													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip.' },
-													{ type: 'text', text: 'When you cast Eldritch Blast, add your Charisma modifier to the damage it deals on a hit.' },
+													{
+														type: 'computed-inline',
+														text: 'When you cast Eldritch Blast, add your Charisma modifier to the damage it deals on a hit.',
+														hints: [
+															{
+																afterText: 'your Charisma modifier',
+																computed: { source: 'abilityMod', ability: 'CHA' },
+																hintFormat: '({value})'
+															}
+														]
+													},
 												]
 											},
 											source: 'warlock.eldritch_invocations',

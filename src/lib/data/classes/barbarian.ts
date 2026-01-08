@@ -276,8 +276,20 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 		description: {
 			blocks: [
 				{
-					type: 'text',
-					text: 'While not wearing armor, your Armor Class equals 10 + your Dexterity modifier + your Constitution modifier.'
+					type: 'computed-inline',
+					text: 'While not wearing armor, your Armor Class equals 10 + your Dexterity modifier + your Constitution modifier.',
+					hints: [
+						{
+							afterText: 'your Dexterity modifier',
+							computed: { source: 'abilityMod', ability: 'DEX' },
+							hintFormat: '({value})'
+						},
+						{
+							afterText: 'your Constitution modifier',
+							computed: { source: 'abilityMod', ability: 'CON' },
+							hintFormat: '({value})'
+						}
+					]
 				}
 			]
 		},

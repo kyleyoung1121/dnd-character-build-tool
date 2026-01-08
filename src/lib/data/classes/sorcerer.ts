@@ -85,7 +85,25 @@ const metamagicPrompt: FeaturePrompt = {
 						name: 'Careful Spell',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'When you cast a spell that forces other creatures to make a saving throw, you can protect some of those creatures from the spell\\' },
+								{
+									type: 'computed-replacement',
+					
+									whenAvailable: [
+										{
+											source: 'derived',
+											formula: 'Math.max(1, CHA_MOD)'
+										}
+									],
+					
+									fallbackText:
+										'When you cast a spell that forces other creatures to make a saving throw, you can protect some of those creatures from the spell\'s full force. To do so, you spend 1 sorcery point and choose a number of those creatures up to your Charisma modifier (minimum of one creature). A chosen creature automatically succeeds on its saving throw against the spell.',
+										
+									replacementTemplate:
+										'When you cast a spell that forces other creatures to make a saving throw, you can protect some of those creatures from the spell\'s full force. To do so, you spend 1 sorcery point and choose up to {value} of those creatures. A chosen creature automatically succeeds on its saving throw against the spell.',
+
+									singularTemplate:
+										'When you cast a spell that forces other creatures to make a saving throw, you can protect some of those creatures from the spell\'s full force. To do so, you spend 1 sorcery point and choose one of those creatures. That chosen creature automatically succeeds on its saving throw against the spell.',
+								},
 							]
 						},
 						source: 'sorcerer.metamagic',
@@ -225,7 +243,7 @@ const metamagicPrompt: FeaturePrompt = {
 						name: 'Twinned Spell',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'When you cast a spell that targets only one creature and doesn\\' },
+								{ type: 'text', text: 'When you cast a spell that targets only one creature and doesn\'t have a range of self, you can spend a number of sorcery points equal to the spell\'s level to target a second creature in range with the same spell (1 sorcery point if the spell is a cantrip). To be eligible, a spell must be incapable of targeting more than one creature at the spell\'s current level. For example, magic missile and scorching ray aren\'t eligible, but ray of frost and chromatic orb are.' },
 							]
 						},
 						source: 'sorcerer.metamagic',
@@ -266,7 +284,18 @@ const sorcerousOriginPrompt: FeaturePrompt = {
 						name: 'Draconic Resilience',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'Your AC equals 13 + your Dexterity modifier when not wearing armor.' },
+								{ type: 'text', text: '' },
+								{
+									type: 'computed-inline',
+									text: 'Your AC equals 13 + your Dexterity modifier when not wearing armor.',
+									hints: [
+										{
+											afterText: 'your Dexterity modifier',
+											computed: { source: 'abilityMod', ability: 'DEX' },
+											hintFormat: '({value})'
+										}
+									]
+								}
 							]
 						},
 						source: 'sorcerer.draconic_bloodline',

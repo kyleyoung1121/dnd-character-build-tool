@@ -155,15 +155,39 @@
 		<p>{@html block.text}</p>
 
 	{:else if block.type === 'computed-inline'}
-        {@const value = resolveComputedValue(block.computed)}
-        <p>
-            {block.text}
-            <span class="computed-hint">
-                {value !== null
-                    ? block.hintFormat.replace('{value}', String(value))
-                    : block.hintFormat.replace('{value}', '?')}
-            </span>
-        </p>
+		{@const hints = block.hints}
+		{@const processedText = (() => {
+			let result = block.text;
+			let offset = 0;
+			
+			// Sort hints by their position in the text to insert in order
+			const sortedHints = hints
+				.map(hint => ({
+					...hint,
+					position: result.indexOf(hint.afterText)
+				}))
+				.filter(hint => hint.position !== -1)
+				.sort((a, b) => a.position - b.position);
+			
+			// Insert hints from left to right
+			for (const hint of sortedHints) {
+				const value = resolveComputedValue(hint.computed);
+				const hintText = value !== null
+					? hint.hintFormat.replace('{value}', String(value))
+					: hint.hintFormat.replace('{value}', '?');
+				
+				// Find position in current result (accounting for previous insertions)
+				const insertPosition = result.indexOf(hint.afterText, offset);
+				if (insertPosition !== -1) {
+					const insertAt = insertPosition + hint.afterText.length;
+					result = result.slice(0, insertAt) + ' ' + hintText + result.slice(insertAt);
+					offset = insertAt + hintText.length + 1;
+				}
+			}
+			
+			return result;
+		})()}
+        <p>{@html processedText}</p>
 
 
 	{:else if block.type === 'computed-replacement'}

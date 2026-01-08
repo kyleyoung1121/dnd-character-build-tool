@@ -47,8 +47,48 @@ export interface ComputedInlineBlock {
 	 * Example:
 	 * "You can add half your proficiency bonus to any ability check
 	 * you make that doesn't already include your proficiency bonus."
+	 *
+	 * Or for multiple inline hints:
+	 * "While not wearing armor, your Armor Class equals 10 + your Dexterity modifier + your Constitution modifier."
 	 */
 	text: string;
+
+	/**
+	 * Array of inline hints to insert at specific positions in the text.
+	 * Each hint identifies where to insert the computed value.
+	 *
+	 * Example for single hint (backward compatible):
+	 * [
+	 *   {
+	 *     afterText: "half your proficiency bonus",
+	 *     computed: { source: 'derived', formula: 'floor(PROF / 2)' },
+	 *     hintFormat: "(+{value})"
+	 *   }
+	 * ]
+	 *
+	 * Example for multiple hints:
+	 * [
+	 *   {
+	 *     afterText: "your Dexterity modifier",
+	 *     computed: { source: 'abilityMod', ability: 'DEX' },
+	 *     hintFormat: "({value})"
+	 *   },
+	 *   {
+	 *     afterText: "your Constitution modifier",
+	 *     computed: { source: 'abilityMod', ability: 'CON' },
+	 *     hintFormat: "({value})"
+	 *   }
+	 * ]
+	 */
+	hints: InlineHint[];
+}
+
+export interface InlineHint {
+	/**
+	 * Text fragment after which to insert the hint.
+	 * The renderer will search for this exact string and insert the hint after it.
+	 */
+	afterText: string;
 
 	/**
 	 * What value to compute (ability mod, proficiency, derived, etc.)
@@ -60,6 +100,7 @@ export interface ComputedInlineBlock {
 	 * Example:
 	 * "(+{value})"
 	 * "(+{value} ft)"
+	 * "({value})"
 	 */
 	hintFormat: string;
 }

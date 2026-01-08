@@ -170,7 +170,7 @@ const jackOfAllTradesPrompt: FeaturePrompt = {
 		blocks: [
 			{
 				type: 'text',
-				text: "You can add half your proficiency bonus, rounded down, to any ability check you make that doesn't already include your proficiency bonus."
+				text: "You can add +1 to any ability check you make that doesn't already include your proficiency bonus. (automatically added to skill modifiers)"
 			}
 		]
 	},

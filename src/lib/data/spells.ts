@@ -2660,7 +2660,8 @@ export const spellAccess: SpellAccess[] = [
 		chooseable: true,
 		chooseFrom: ['Bard', 'Cleric', 'Druid', 'Sorcerer', 'Warlock', 'Wizard'], // Any class ritual spells
 		chooseCantripCount: 0,
-		chooseSpellCount: 2 // Choose 2 ritual spells
+		chooseSpellCount: 2, // Choose 2 ritual spells
+		restrictToRituals: true // Only show ritual spells
 	},
 
 	// Wizard School Features

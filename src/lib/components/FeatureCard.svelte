@@ -7,6 +7,7 @@
 		getGloballyAvailableOptions
 	} from './feature-card-utils';
 	import { activeConflicts } from '$lib/stores/conflict_store';
+	import { onMount } from 'svelte';
 
 	// Props
 	export let feature: FeaturePrompt;
@@ -22,14 +23,22 @@
 	export let onSelectOption: (feature: FeaturePrompt, index: number, value: string, parentFeatureName?: string | null, parentIndex?: number | null) => void;
 	export let onToggleExpand: (featureName: string) => void;
 
+	// Auto-expand nested features on mount
+	onMount(() => {
+		if (nested && !expandedFeatures.has(feature.name)) {
+			onToggleExpand(feature.name);
+		}
+	});
+
 	// Computed properties
 	$: isExpanded = expandedFeatures.has(feature.name);
 	$: isIncomplete = isFeatureIncomplete(feature, featureSelections);
 	$: isComplete = !isIncomplete && feature.featureOptions;
 	$: nestedPrompts = getNestedPrompts(feature, featureSelections[feature.name] || []);
-	$: hasConflicts = checkFeatureHasConflicts(feature.name);
+	// Make conflict detection reactive to both activeConflicts and selectionVersion
+	$: hasConflicts = checkFeatureHasConflicts(feature.name, selectionVersion);
 
-	function checkFeatureHasConflicts(featureName: string): boolean {
+	function checkFeatureHasConflicts(featureName: string, _version: number): boolean {
 		if (!$activeConflicts.hasConflicts) return false;
 
 		// Check if any conflicts involve scopes related to this feature
@@ -101,22 +110,20 @@
 
 		{#if feature.featureOptions}
 			{#each Array(feature.featureOptions.numPicks) as _, idx}
-				{#key `${feature.name}:${idx}:${selectionVersion}`}
-					<select
-						value={featureSelections[feature.name]?.[idx] || ''}
-						on:change={(e) => handleSelectChange(e, idx)}
-					>
-						<option value="" disabled>
-							{feature.featureOptions.placeholderText || 'Select an option'}
-						</option>
+				<select
+					value={featureSelections[feature.name]?.[idx] || ''}
+					on:change={(e) => handleSelectChange(e, idx)}
+				>
+					<option value="" disabled>
+						{feature.featureOptions.placeholderText || 'Select an option'}
+					</option>
 
-						{#each getAvailableOptions(idx) as option (typeof option === 'string' ? option : option.name)}
-							<option value={typeof option === 'string' ? option : option.name}>
-								{typeof option === 'string' ? option : option.name}
-							</option>
-						{/each}
-					</select>
-				{/key}
+					{#each getAvailableOptions(idx) as option (typeof option === 'string' ? option : option.name)}
+						<option value={typeof option === 'string' ? option : option.name}>
+							{typeof option === 'string' ? option : option.name}
+						</option>
+					{/each}
+				</select>
 			{/each}
 
 			<!-- Render nested prompts -->

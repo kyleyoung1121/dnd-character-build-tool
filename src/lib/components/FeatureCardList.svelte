@@ -261,15 +261,13 @@
 
 <!-- Render all features as collapsible cards -->
 {#each features as feature (feature.name)}
-	{#key `${feature.name}:${selectionVersion}:${$conflicts.hasConflicts}`}
-		<FeatureCard
-			{feature}
-			{featureSelections}
-			{expandedFeatures}
-			{selectionVersion}
-			{characterStore}
-			onSelectOption={handleSelectOption}
-			onToggleExpand={handleToggleExpand}
-		/>
-	{/key}
+	<FeatureCard
+		{feature}
+		{featureSelections}
+		{expandedFeatures}
+		{selectionVersion}
+		{characterStore}
+		onSelectOption={handleSelectOption}
+		onToggleExpand={handleToggleExpand}
+	/>
 {/each}

@@ -585,16 +585,18 @@
 				{#each displayedBackgrounds as backgroundInfo}
 					<div class="simple-background-card">
 						<div class="simple-card-header">
-							<img src={backgroundInfo.image} alt={`${backgroundInfo.name} icon`} class="simple-card-icon" />
-							<h3>{backgroundInfo.name}</h3>
+							<div class="simple-card-header-left">
+								<img src={backgroundInfo.image} alt={`${backgroundInfo.name} icon`} class="simple-card-icon" />
+								<h3>{backgroundInfo.name}</h3>
+							</div>
+							<button 
+								class="select-background-button" 
+								on:click={() => (selectedBackground = backgroundInfo)}
+							>
+								Select {backgroundInfo.name}
+							</button>
 						</div>
 						<p class="simple-card-description">{backgroundInfo.description}</p>
-						<button 
-							class="select-background-button" 
-							on:click={() => (selectedBackground = backgroundInfo)}
-						>
-							Select {backgroundInfo.name}
-						</button>
 					</div>
 				{/each}
 			</div>
@@ -1098,28 +1100,35 @@
 	.simple-card-header {
 		display: flex;
 		align-items: center;
-		gap: 1rem;
-		margin-bottom: 1rem;
+		justify-content: space-between;
+		margin-bottom: 1.25rem;
+	}
+
+	.simple-card-header-left {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
 	}
 
 	.simple-card-icon {
-		width: 50px;
-		height: 50px;
+		width: 40px;
+		height: 40px;
 		object-fit: contain;
+		flex-shrink: 0;
 	}
 
 	.simple-card-header h3 {
 		margin: 0;
-		font-size: 1.5rem;
+		font-size: 1.25rem;
 		color: #333;
 		font-weight: bold;
 	}
 
 	.simple-card-description {
-		margin: 0 0 1rem 0;
-		font-size: 1rem;
-		color: #555;
-		line-height: 1.6;
+		margin: 0;
+		font-size: 1.15rem;
+		color: #444;
+		line-height: 1.7;
 	}
 
 	.select-background-button {
@@ -1134,6 +1143,7 @@
 		transition: background-color 0.3s ease;
 		width: auto;
 		display: inline-block;
+		flex-shrink: 0;
 	}
 
 	.select-background-button:hover {
@@ -1149,12 +1159,26 @@
 			padding: 1rem;
 		}
 
+		.simple-card-header {
+			flex-direction: column;
+			align-items: stretch;
+			gap: 1rem;
+		}
+
+		.simple-card-header-left {
+			justify-content: center;
+		}
+
 		.simple-card-header h3 {
-			font-size: 1.25rem;
+			font-size: 1.1rem;
 		}
 
 		.simple-card-description {
-			font-size: 0.95rem;
+			font-size: 1rem;
+		}
+
+		.select-background-button {
+			width: 100%;
 		}
 	}
 </style>

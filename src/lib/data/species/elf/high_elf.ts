@@ -88,39 +88,11 @@ export const highElf: SpeciesData = {
 			id: 'high_elf_cantrip',
 			description: {
 				blocks: [
-					{ type: 'text', text: 'You know one cantrip of your choice from the wizard spell list. Intelligence is your spellcasting ability for it.' },
+					{ type: 'text', text: 'You know one cantrip of your choice from the wizard spell list. Intelligence is your spellcasting ability for it. (Select this cantrip in the Spells tab)' },
 				]
 			},
-			featureOptions: {
-				placeholderText: '-Choose a Cantrip-',
-				options: [
-					'Acid Splash',
-					'Blade Ward',
-					'Chill Touch',
-					'Dancing Lights',
-					'Fire Bolt',
-					'Friends',
-					'Light',
-					'Mage Hand',
-					'Mending',
-					'Message',
-					'Minor Illusion',
-					'Poison Spray',
-					'Prestidigitation',
-					'Ray of Frost',
-					'Shocking Grasp',
-					'True Strike'
-				],
-				numPicks: 1
-			},
 			source: 'high_elf',
-			effects: [
-				{
-					target: 'spells',
-					action: 'add',
-					value: '{userChoice}'
-				}
-			]
+			effects: []
 		}
 	]
 };

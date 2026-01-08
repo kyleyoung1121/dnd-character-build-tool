@@ -119,6 +119,7 @@ function getSkillModifier(
 ): number {
 	const isProficient = character.skills?.includes(skillName) || false;
 	const hasExpertise = character.expertise?.includes(skillName) || false;
+	const hasJackOfAllTrades = character.features?.includes('Jack of All Trades') || false;
 	
 	let modifier = abilityModifier;
 	if (isProficient) {
@@ -126,6 +127,9 @@ function getSkillModifier(
 	}
 	if (hasExpertise) {
 		modifier += getProficiencyBonus(); // Expertise adds proficiency again
+	}
+	if (!isProficient && hasJackOfAllTrades) {
+		modifier += 1; // Jack of All Trades adds +1 to unproficient skills
 	}
 	
 	return modifier;

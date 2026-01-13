@@ -126,21 +126,26 @@
 				</select>
 			{/each}
 
-			<!-- Render nested prompts -->
-			{#each nestedPrompts as nestedFeature (nestedFeature.name)}
-				{@const parentSelectionIndex = 0} <!-- For now, assuming single-pick features; this would need enhancement for multi-pick -->
-				<svelte:self
-					feature={nestedFeature}
-					{featureSelections}
-					{expandedFeatures}
-					{selectionVersion}
-					{characterStore}
-					{onSelectOption}
-					{onToggleExpand}
-					parentFeatureName={feature.name}
-					parentIndex={parentSelectionIndex}
-					nested={true}
-				/>
+			<!-- Render nested prompts for each selection with correct parent index -->
+			{#each Array(feature.featureOptions.numPicks) as _, selectionIdx}
+				{@const selectedOption = featureSelections[feature.name]?.[selectionIdx]}
+				{#if selectedOption}
+					{@const nestedForThisSelection = getNestedPrompts(feature, [selectedOption])}
+					{#each nestedForThisSelection as nestedFeature (nestedFeature.name + '_' + selectionIdx)}
+						<svelte:self
+							feature={nestedFeature}
+							{featureSelections}
+							{expandedFeatures}
+							{selectionVersion}
+							{characterStore}
+							{onSelectOption}
+							{onToggleExpand}
+							parentFeatureName={feature.name}
+							parentIndex={selectionIdx}
+							nested={true}
+						/>
+					{/each}
+				{/if}
 			{/each}
 		{/if}
 	{/if}

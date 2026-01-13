@@ -325,7 +325,13 @@ const pactBoonPrompt: FeaturePrompt = {
 												]
 											},
 											source: 'warlock.eldritch_invocations',
-											effects: []
+											effects: [
+												{
+													target: 'skills',
+													action: 'add',
+													value: ['Deception', 'Persuasion']
+												}
+											]
 										}
 									]
 								},
@@ -639,7 +645,13 @@ const pactBoonPrompt: FeaturePrompt = {
 												]
 											},
 											source: 'warlock.eldritch_invocations',
-											effects: []
+											effects: [
+												{
+													target: 'skills',
+													action: 'add',
+													value: ['Deception', 'Persuasion']
+												}
+											]
 										}
 									]
 								},
@@ -936,7 +948,13 @@ const pactBoonPrompt: FeaturePrompt = {
 												]
 											},
 											source: 'warlock.eldritch_invocations',
-											effects: []
+											effects: [
+												{
+													target: 'skills',
+													action: 'add',
+													value: ['Deception', 'Persuasion']
+												}
+											]
 										}
 									]
 								},

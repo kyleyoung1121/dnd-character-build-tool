@@ -44,7 +44,7 @@ const spellcastingPrompt: FeaturePrompt = {
 	name: 'Spellcasting',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'You know three cantrips from the wizard spell list. Your spellbook contains ten spells: eight 1st-level spells and two 2nd-level spells. You prepare spells from your spellbook, using Intelligence as your spellcasting ability.' },
+			{ type: 'text', text: 'You know three cantrips from the wizard spell list. You can prepare a number of leveled spells (1st and 2nd level) equal to your Intelligence modifier + 3 (minimum 4), with a maximum of 2 second-level spells. Intelligence is your spellcasting ability.' },
 		]
 	},
 	source: 'wizard',

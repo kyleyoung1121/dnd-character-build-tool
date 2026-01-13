@@ -365,28 +365,43 @@ function countSelectedSpells(
 	});
 
 	// Count selected spells that come from limit-counting sources
-	// EXCLUDE spells selected from Circle of Land or feature tabs based on tabSource
+	// EXCLUDE spells selected from Circle of Land, feature tabs, or race tabs based on tabSource
+	console.log('[Spell Limit] Processing spells with metadata:', spellsWithMetadata);
 	for (const spell of spellsWithMetadata) {
 		const spellName = spell.name;
 		const tabSource = spell.tabSource || '';
+		console.log(`[Spell Limit] Checking spell "${spellName}" with tabSource: "${tabSource}"`);
 		
 		// Skip spells selected from Circle of Land tab
 		if (tabSource.includes('Circle of the Land')) {
+			console.log(`[Spell Limit]   -> Skipping (Circle of the Land)`);
 			continue;
 		}
 		
 		// Skip spells selected from feature tabs (Pact of the Tome, etc.)
 		if (tabSource.includes('Pact of the') || tabSource.includes('Book of Ancient')) {
+			console.log(`[Spell Limit]   -> Skipping (Feature tab)`);
+			continue;
+		}
+		
+		// Skip spells selected from race tabs (High Elf, Tiefling, etc.)
+		if (tabSource.includes('High Elf') || tabSource.includes('Tiefling') || tabSource.includes('Forest Gnome') || tabSource.includes('Dark Elf')) {
+			console.log(`[Spell Limit]   -> Skipping (Race tab)`);
 			continue;
 		}
 		
 		// Count the spell if it's in a limit-counting source
 		if (limitCountingSpells.cantrips.has(spellName)) {
+			console.log(`[Spell Limit]   -> Counting as cantrip (total now: ${counts.cantrips + 1})`);
 			counts.cantrips++;
 		} else if (limitCountingSpells.level1.has(spellName)) {
+			console.log(`[Spell Limit]   -> Counting as level 1 (total now: ${counts.level1 + 1})`);
 			counts.level1++;
 		} else if (limitCountingSpells.level2.has(spellName)) {
+			console.log(`[Spell Limit]   -> Counting as level 2 (total now: ${counts.level2 + 1})`);
 			counts.level2++;
+		} else {
+			console.log(`[Spell Limit]   -> Not in any limit-counting spell list`);
 		}
 	}
 

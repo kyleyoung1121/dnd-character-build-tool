@@ -411,24 +411,24 @@
 	// Persist spell selections to character store
 	function persistSpellSelections() {
 		const scopeId = 'spell_selections';
-		// Store detailed spell selections with metadata in provenance
-		const spellSelections = {
-			spells: Array.from(selectedSpells.keys()) // Just spell names for character.spells array
-		};
-		// Store full metadata separately for restoration
-		const spellMetadata = Array.from(selectedSpells.entries()).map(([name, metadata]) => ({
+		// Store spell selections with metadata in character.spells array
+		const spellSelectionsWithMetadata = Array.from(selectedSpells.entries()).map(([name, metadata]) => ({
 			name,
 			...metadata
 		}));
 		
-		// Apply the spell names to character.spells
+		const spellSelections = {
+			spells: spellSelectionsWithMetadata // Store full objects with metadata
+		};
+		
+		// Apply the spell selections to character.spells
 		applyChoice(scopeId, spellSelections);
 		
 		// Also store metadata in provenance for restoration
 		// Update the provenance to include metadata
 		const char = get(character_store);
 		if (char._provenance && char._provenance[scopeId]) {
-			(char._provenance[scopeId] as any)._metadata = spellMetadata;
+			(char._provenance[scopeId] as any)._metadata = spellSelectionsWithMetadata;
 		}
 	}
 
@@ -1479,7 +1479,7 @@
 			if (s.source === 'subclass' && s.sourceName.includes('Circle of the Land')) return false;
 			if (!(s.source === 'class' || (s.source === 'subclass' && !s.sourceName.includes(' - ')))) return false;
 			
-			// Check if this spell was selected from a feature tab or special subclass tab - if so, don't count it
+			// Check if this spell was selected from a feature tab, race tab, or special subclass tab - if so, don't count it
 			const meta = selectedSpells.get(s.name);
 			if (meta && meta.tabSource) {
 				// Exclude spells selected from feature tabs
@@ -1488,6 +1488,10 @@
 				}
 				// Exclude spells selected from special subclass tabs (Circle of Land, etc.)
 				if (meta.tabSource.includes('Circle of the Land')) {
+					return false;
+				}
+				// Exclude spells selected from race tabs (like High Elf)
+				if (meta.tabSource.includes('High Elf') || meta.tabSource.includes('Tiefling') || meta.tabSource.includes('Forest Gnome') || meta.tabSource.includes('Dark Elf')) {
 					return false;
 				}
 			}
@@ -1503,7 +1507,7 @@
 			if (s.source === 'subclass' && s.sourceName.includes('Circle of the Land')) return false;
 			if (!(s.source === 'class' || (s.source === 'subclass' && !s.sourceName.includes(' - ')))) return false;
 			
-			// Check if this spell was selected from a feature tab or special subclass tab - if so, don't count it
+			// Check if this spell was selected from a feature tab, race tab, or special subclass tab - if so, don't count it
 			const meta = selectedSpells.get(s.name);
 			if (meta && meta.tabSource) {
 				// Exclude spells selected from feature tabs
@@ -1512,6 +1516,10 @@
 				}
 				// Exclude spells selected from special subclass tabs (Circle of Land, etc.)
 				if (meta.tabSource.includes('Circle of the Land')) {
+					return false;
+				}
+				// Exclude spells selected from race tabs
+				if (meta.tabSource.includes('High Elf') || meta.tabSource.includes('Tiefling') || meta.tabSource.includes('Forest Gnome') || meta.tabSource.includes('Dark Elf')) {
 					return false;
 				}
 			}
@@ -1527,7 +1535,7 @@
 			if (s.source === 'subclass' && s.sourceName.includes('Circle of the Land')) return false;
 			if (!(s.source === 'class' || (s.source === 'subclass' && !s.sourceName.includes(' - ')))) return false;
 			
-			// Check if this spell was selected from a feature tab or special subclass tab - if so, don't count it
+			// Check if this spell was selected from a feature tab, race tab, or special subclass tab - if so, don't count it
 			const meta = selectedSpells.get(s.name);
 			if (meta && meta.tabSource) {
 				// Exclude spells selected from feature tabs
@@ -1536,6 +1544,10 @@
 				}
 				// Exclude spells selected from special subclass tabs (Circle of Land, etc.)
 				if (meta.tabSource.includes('Circle of the Land')) {
+					return false;
+				}
+				// Exclude spells selected from race tabs
+				if (meta.tabSource.includes('High Elf') || meta.tabSource.includes('Tiefling') || meta.tabSource.includes('Forest Gnome') || meta.tabSource.includes('Dark Elf')) {
 					return false;
 				}
 			}
@@ -1550,9 +1562,21 @@
 	$: canSelectMoreLevel1 = spellLimits.isSharedLimits
 		? selectedLeveledCount < spellLimits.sharedLeveled
 		: selectedLevel1Count < spellLimits.level1;
-	$: canSelectMoreLevel2 = spellLimits.isSharedLimits
-		? selectedLeveledCount < spellLimits.sharedLeveled
-		: selectedLevel2Count < spellLimits.level2;
+	$: canSelectMoreLevel2 = (() => {
+		// Wizard has special restriction: max 2 second-level spells
+		if (character.class === 'Wizard') {
+			// Check if we've already hit the hard cap of 2 second-level spells
+			if (selectedLevel2Count >= 2) {
+				return false;
+			}
+			// Also check if we have room in the overall leveled spell limit
+			return selectedLeveledCount < spellLimits.sharedLeveled;
+		}
+		// Other classes use normal logic
+		return spellLimits.isSharedLimits
+			? selectedLeveledCount < spellLimits.sharedLeveled
+			: selectedLevel2Count < spellLimits.level2;
+	})();
 
 	// Reactive tab system
 	$: spellSources = hasSpellAccess(character) ? getSpellSources(character) : [];
@@ -1591,7 +1615,15 @@
 			const requiredSpells = access.chooseSpellCount ?? 0;
 			const totalRequired = requiredCantrips + requiredSpells;
 
-			return { selected: selectedCount, total: totalRequired };
+			// Only count spells that were actually selected FROM THIS tab (not from base tabs)
+			const actualSelectedCount = chooseableSpells.filter((spell) => {
+				if (!selectedSpells.has(spell.name)) return false;
+				// Check if this spell was selected from the current tab
+				const selectedFrom = selectedSpells.get(spell.name)?.tabSource;
+				return selectedFrom === sourceName;
+			}).length;
+
+			return { selected: actualSelectedCount, total: totalRequired };
 		} else if (activeTab.startsWith('subclass-')) {
 			const sourceName = activeTab.replace('subclass-', '');
 			const spellAccess = getSpellAccessForCharacter(character);
@@ -1855,10 +1887,12 @@
 										{:else if selectedSpells.has(spell.name)}
 											{@const isBaseTab = activeTab === 'cantrips' || activeTab === 'level1' || activeTab === 'level2'}
 											{@const isFeatureTab = activeTab.startsWith('feature-')}
+											{@const isRaceTab = activeTab.startsWith('race-')}
 											{@const selectedMeta = selectedSpells.get(spell.name)}
 											{@const selectedFromFeature = selectedMeta && selectedMeta.tabSource && (selectedMeta.tabSource.includes('Pact of the') || selectedMeta.tabSource.includes('Book of Ancient') || selectedMeta.tabSource.includes('Circle of the Land'))}
+											{@const selectedFromRace = selectedMeta && selectedMeta.tabSource && (selectedMeta.tabSource.includes('High Elf') || selectedMeta.tabSource.includes('Tiefling') || selectedMeta.tabSource.includes('Forest Gnome') || selectedMeta.tabSource.includes('Dark Elf'))}
 											{@const selectedFromBase = selectedMeta && selectedMeta.tabSource && (selectedMeta.tabSource === 'cantrips' || selectedMeta.tabSource === 'level1' || selectedMeta.tabSource === 'level2')}
-											{@const showAlreadyKnown = (isBaseTab && selectedFromFeature) || (isFeatureTab && selectedFromBase)}
+											{@const showAlreadyKnown = (isBaseTab && (selectedFromFeature || selectedFromRace)) || ((isFeatureTab || isRaceTab) && selectedFromBase)}
 											{#if showAlreadyKnown}
 												<span class="spell-status unavailable-status">Already Known</span>
 											{:else}

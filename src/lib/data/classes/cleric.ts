@@ -305,11 +305,12 @@ const divineDomainPrompt: FeaturePrompt = {
 						source: 'cleric.knowledge_domain',
 						effects: [
 							{ target: 'skills', action: 'add', value: '{userChoice}' },
-							{ target: 'features', action: 'add', value: 'Blessings of Knowledge (Expert)' }
-						]
-					},
-					{
-						name: 'Channel Divinity: Knowledge of the Ages',
+						{ target: 'expertise', action: 'add', value: '{userChoice}' },
+						{ target: 'features', action: 'add', value: 'Blessings of Knowledge: {userChoice}' }
+					]
+				},
+				{
+							name: 'Channel Divinity: Knowledge of the Ages',
 						id: 'cleric_knowledge_channel_01',
 						description: {
 							blocks: [

@@ -2137,8 +2137,8 @@ export const spellAccess: SpellAccess[] = [
 		chooseable: true,
 		chooseFrom: ['Wizard'],
 		chooseCantripCount: 3, // 3 cantrips known at level 3
-		chooseSpellCount: 8, // 8 first level spells in spellbook at level 3
-		maxSpellLevel: 1 // This entry is only for 1st level spells
+		chooseSpellCount: 0, // Handled by leveled spell entry below
+		maxSpellLevel: 0 // This entry is only for cantrips
 	},
 	{
 		source: 'class',
@@ -2147,10 +2147,11 @@ export const spellAccess: SpellAccess[] = [
 		cantrips: [],
 		chooseable: true,
 		chooseFrom: ['Wizard'],
-		chooseCantripCount: 0, // No additional cantrips (handled by previous entry)
-		chooseSpellCount: 2, // 2 second level spells in spellbook at level 3 (technically, they could have 0-2, but lets force 2.)
-		maxSpellLevel: 2, // This entry allows up to 2nd level
-		minSpellLevel: 2 // Only 2nd level spells for this entry
+		chooseCantripCount: 0, // No cantrips (handled by previous entry)
+		chooseSpellCount: 6, // Placeholder - dynamically calculated as INT modifier + 3 (minimum 4) for all leveled prepared spells
+		minSpellLevel: 1, // At least 1st level
+		maxSpellLevel: 2, // Up to 2nd level
+		// Note: Max 2 second-level spells enforced in UI validation
 	},
 	{
 		source: 'class',
@@ -2747,6 +2748,19 @@ export function getSpellAccessForCharacter(character: any): SpellAccess[] {
 				const wisdomScore = rawWisdom < 8 ? 10 : rawWisdom;
 				const wisdomModifier = getAbilityModifier(wisdomScore);
 				const preparedSpellCount = Math.max(1, wisdomModifier + 3);
+
+				return {
+					...access,
+					chooseSpellCount: preparedSpellCount
+				};
+			} else if (access.sourceName === 'Wizard' && access.minSpellLevel === 1 && access.maxSpellLevel === 2) {
+				// Calculate dynamic spell count for all leveled spells: INT modifier + 3 (minimum 4)
+				// If intelligence is very low (1-7), it's likely just racial bonuses without a base score selected
+				// In that case, assume +0 modifier (score of 10) for spell limits
+				const rawIntelligence = character.intelligence || 10;
+				const intelligenceScore = rawIntelligence < 8 ? 10 : rawIntelligence;
+				const intelligenceModifier = getAbilityModifier(intelligenceScore);
+				const preparedSpellCount = Math.max(4, intelligenceModifier + 3); // Minimum 4 (for INT 8-11)
 
 				return {
 					...access,

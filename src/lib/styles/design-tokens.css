@@ -1,0 +1,175 @@
+/**
+ * D&D Character Builder - Design System Tokens
+ * 
+ * This file defines all design tokens (colors, typography, spacing, etc.)
+ * for consistent styling across the application.
+ * 
+ * Usage: Import this file in app.css and reference variables like:
+ * background-color: var(--color-primary);
+ * font-size: var(--font-size-lg);
+ * padding: var(--spacing-4);
+ */
+
+:root {
+	/* ========================================
+	   COLOR PALETTE
+	   ======================================== */
+
+	/* Primary Colors - Navy/Blue (used for headers, primary actions, selected states) */
+	--color-primary-dark: #2c3e50;      /* Dark navy - popup headers, main navigation */
+	--color-primary: #34495e;           /* Navy - secondary headers, accents */
+	--color-primary-light: #4a5f7f;     /* Lighter navy for hover states */
+	--color-primary-blue: #3b82f6;      /* Bright blue - selected items, active tabs */
+	--color-primary-blue-light: #60a5fa; /* Light blue - hover states */
+
+	/* Success Colors - Green (confirm buttons, completed states) */
+	--color-success-dark: #229954;      /* Dark green - button hover */
+	--color-success: #27ae60;           /* Medium green - primary success actions */
+	--color-success-light: #2ecc71;     /* Light green - gradients, highlights */
+	--color-success-bright: #10b981;    /* Bright green - emerald accents */
+
+	/* Warning Colors - Red (incomplete states, delete/remove actions) */
+	--color-warning-dark: #b91c1c;      /* Dark red - active/pressed states */
+	--color-warning: #dc2626;           /* Red - incomplete items, alerts */
+	--color-warning-light: #ef4444;     /* Light red - hover states */
+	--color-warning-bg: #fef2f2;        /* Very light red - warning backgrounds */
+
+	/* Neutral Colors - Grays (backgrounds, text, borders) */
+	--color-neutral-50: #f8f9fa;        /* Lightest gray - backgrounds */
+	--color-neutral-100: #f1f3f4;       /* Very light gray - subtle backgrounds */
+	--color-neutral-200: #e9ecef;       /* Light gray - borders, dividers */
+	--color-neutral-300: #ced4da;       /* Medium-light gray - placeholder borders */
+	--color-neutral-400: #868e96;       /* Medium gray - placeholder text */
+	--color-neutral-500: #6c757d;       /* Gray - secondary text, cancel buttons */
+	--color-neutral-600: #545b62;       /* Dark gray - button hover */
+	--color-neutral-700: #495057;       /* Darker gray - body text */
+	--color-neutral-800: #343a40;       /* Very dark gray - headings */
+	--color-neutral-900: #212529;       /* Almost black - emphasis text */
+
+	/* Accent Colors - Special use cases */
+	--color-accent-gold: #d4af37;       /* Gold - special items, highlights */
+	--color-accent-brown: #5c2e0e;      /* Brown - beast cards, earthy tones */
+	--color-accent-orange: #f59e0b;     /* Orange - warnings, notifications */
+	--color-accent-purple: #9333ea;     /* Purple - special spell sources */
+
+	/* Semantic Colors - Direct mapping for common use cases */
+	--color-background: #ffffff;        /* White - main background */
+	--color-background-alt: #f8f9fa;    /* Off-white - alternate backgrounds */
+	--color-text-primary: #212529;      /* Dark gray - primary text */
+	--color-text-secondary: #495057;    /* Medium-dark gray - secondary text */
+	--color-text-muted: #6c757d;        /* Gray - muted/helper text */
+	--color-border: #e9ecef;            /* Light gray - default borders */
+	--color-border-light: #e2e8f0;      /* Very light gray - subtle borders */
+	--color-border-dark: #ced4da;       /* Medium-light gray - emphasized borders */
+	--color-overlay: rgba(0, 0, 0, 0.6); /* Dark overlay for modals/popups */
+
+	/* Interactive State Colors */
+	--color-hover-overlay: rgba(0, 0, 0, 0.05);   /* Light overlay for hover */
+	--color-selected-overlay: rgba(59, 130, 246, 0.1); /* Blue tint for selected */
+	--color-focus-ring: rgba(59, 130, 246, 0.4);  /* Blue focus indicator */
+
+	/* ========================================
+	   TYPOGRAPHY SCALE
+	   ======================================== */
+
+	/* Font Families */
+	--font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+	--font-family-mono: 'Courier New', Courier, monospace;
+
+	/* Font Sizes - Using a modular scale (1.25 ratio) */
+	--font-size-xs: 0.8rem;      /* 12.8px - tiny text, code */
+	--font-size-sm: 0.875rem;    /* 14px - small text, captions */
+	--font-size-base: 1rem;      /* 16px - body text, buttons */
+	--font-size-md: 1.125rem;    /* 18px - slightly larger body text */
+	--font-size-lg: 1.25rem;     /* 20px - subheadings, card titles */
+	--font-size-xl: 1.5rem;      /* 24px - section headings, popup titles */
+	--font-size-2xl: 2rem;       /* 32px - page titles, hero text */
+
+	/* Font Weights */
+	--font-weight-normal: 400;   /* Regular text */
+	--font-weight-medium: 500;   /* Slightly emphasized */
+	--font-weight-semibold: 600; /* Subheadings, important UI text */
+	--font-weight-bold: 700;     /* Headings, very important text */
+
+	/* Line Heights */
+	--line-height-tight: 1.25;   /* Headings, compact text */
+	--line-height-normal: 1.5;   /* Body text, most UI */
+	--line-height-relaxed: 1.6;  /* Long-form content, descriptions */
+
+	/* ========================================
+	   SPACING SCALE
+	   ======================================== */
+
+	/* Based on 4px base unit for consistent rhythm */
+	--spacing-1: 0.25rem;   /* 4px - tiny gaps */
+	--spacing-2: 0.5rem;    /* 8px - small gaps, compact padding */
+	--spacing-3: 0.75rem;   /* 12px - medium-small gaps */
+	--spacing-4: 1rem;      /* 16px - default spacing unit */
+	--spacing-5: 1.25rem;   /* 20px - comfortable padding */
+	--spacing-6: 1.5rem;    /* 24px - larger padding, section gaps */
+	--spacing-8: 2rem;      /* 32px - large gaps between sections */
+	--spacing-10: 2.5rem;   /* 40px - extra large spacing */
+	--spacing-12: 3rem;     /* 48px - hero spacing */
+	--spacing-16: 4rem;     /* 64px - major section dividers */
+
+	/* ========================================
+	   BORDER RADIUS
+	   ======================================== */
+
+	--radius-sm: 4px;       /* Small - buttons, inputs, tags */
+	--radius-md: 6px;       /* Medium - cards, most containers */
+	--radius-lg: 8px;       /* Large - popups, modals, major containers */
+	--radius-xl: 12px;      /* Extra large - featured cards, special containers */
+	--radius-pill: 50px;    /* Pills - ability score pills, badges */
+	--radius-circle: 50%;   /* Circular - avatars, icon buttons */
+
+	/* ========================================
+	   SHADOWS & ELEVATION
+	   ======================================== */
+
+	/* Subtle shadows for light elevation */
+	--shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+	--shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+	--shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+	
+	/* Medium shadows for cards and dropdowns */
+	--shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
+	--shadow-xl: 0 8px 20px rgba(0, 0, 0, 0.15);
+	
+	/* Strong shadows for modals and major overlays */
+	--shadow-2xl: 0 10px 30px rgba(0, 0, 0, 0.3);
+	
+	/* Colored shadows for interactive states */
+	--shadow-primary: 0 0 0 3px var(--color-focus-ring);
+	--shadow-success: 0 4px 12px rgba(39, 174, 96, 0.2);
+	--shadow-warning: 0 4px 12px rgba(220, 38, 38, 0.2);
+
+	/* ========================================
+	   TRANSITIONS
+	   ======================================== */
+
+	--transition-fast: 0.15s ease;
+	--transition-base: 0.2s ease;
+	--transition-slow: 0.3s ease;
+
+	/* ========================================
+	   Z-INDEX LAYERS
+	   ======================================== */
+
+	--z-base: 1;
+	--z-dropdown: 10;
+	--z-sticky: 20;
+	--z-modal-backdrop: 50;
+	--z-modal: 100;
+	--z-toast: 200;
+}
+
+/* Dark mode support (optional, for future implementation) */
+@media (prefers-color-scheme: dark) {
+	:root {
+		/* These can be uncommented and customized when dark mode is implemented */
+		/* --color-background: #1a1a1a; */
+		/* --color-text-primary: #e0e0e0; */
+		/* etc... */
+	}
+}

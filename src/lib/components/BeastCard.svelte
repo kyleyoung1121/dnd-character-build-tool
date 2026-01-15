@@ -307,31 +307,31 @@
 	}
 
 	.select-button {
-		padding: 0.5rem 1.5rem;
-		font-size: 0.9rem;
-		font-weight: 600;
-		border: 2px solid #8b4513;
-		border-radius: 6px;
-		background: #fff;
-		color: #5c2e0e;
+		padding: var(--spacing-2) var(--spacing-6);
+		font-size: var(--font-size-sm);
+		font-weight: var(--font-weight-semibold);
+		border: 2px solid var(--color-success-bright);
+		border-radius: var(--radius-md);
+		background: var(--color-success-bright);
+		color: white;
 		cursor: pointer;
-		transition: all 0.2s ease;
+		transition: all var(--transition-base);
 	}
 
 	.select-button:hover {
-		background: #f0e6d2;
-		border-color: #5c2e0e;
+		background: #059669;
+		border-color: #059669;
 	}
 
 	.select-button.selected {
-		background: #10b981;
+		background: var(--color-warning);
 		color: white;
-		border-color: #10b981;
+		border-color: var(--color-warning);
 	}
 
 	.select-button.selected:hover {
-		background: #059669;
-		border-color: #059669;
+		background: var(--color-warning-dark);
+		border-color: var(--color-warning-dark);
 	}
 
 	.select-button.disabled,

@@ -24,4 +24,8 @@ export interface BackgroundData {
 	feature: string; // special background feature name
 	featureDescription: string; // description of the special feature
 	backgroundFeatures: FeaturePrompt[];
+	// Enhanced popup content
+	enhancedFlavor?: string; // More immersive version of flavorDescription
+	cultureNotes?: string; // Life before adventuring, connections
+	popupImage?: string; // Enhanced artwork path
 }

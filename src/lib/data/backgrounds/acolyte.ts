@@ -8,6 +8,10 @@ export const acolyte: BackgroundData = {
 		'You have spent your life in service to a temple of a specific god or pantheon of gods.',
 	flavorDescription:
 		'You acted as an intermediary between the holy and mortal worlds, performing sacred rites and offering sacrifices in order to conduct worshipers into the presence of the divine. You are not necessarily a cleric - performing sacred rites is not the same thing as channeling divine power.',
+	// Enhanced popup content for narrative preview
+	enhancedFlavor: "Your hands have been anointed with holy oils, your voice trained in ancient prayers and sacred hymns. You are the bridge between the mortal world and the divine, guiding faithful souls toward salvation.",
+	cultureNotes: "Acolytes often serve in temples, monasteries, or sacred groves, maintaining holy grounds and assisting clerics in their duties. You likely have deep connections within your faith community, contacts in other temples, and a network of fellow believers who share your devotion.",
+	popupImage: "/background-popup-art/acolyte-temple-service.jpg", // Placeholder for professional artwork
 	skillProficiencies: ['Insight', 'Religion'],
 	languageCount: 2,
 	equipment: [

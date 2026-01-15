@@ -1,3 +1,6 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
+
+/* Import Design System Tokens */
+@import './lib/styles/design-tokens.css';

@@ -147,19 +147,19 @@
 <style>
 	.export-page {
 		min-height: 100vh;
-		background: white;
-		padding: 6rem 2rem 2rem 2rem;
+		background: var(--color-background);
+		padding: calc(var(--spacing-16) * 1.5) var(--spacing-8) var(--spacing-8) var(--spacing-8);
 	}
 
 	.header {
 		max-width: 1000px;
-		margin: 0 auto 2rem auto;
+		margin: 0 auto var(--spacing-8) auto;
 		text-align: center;
 	}
 
 	.header p {
-		font-size: 1rem;
-		color: #666;
+		font-size: var(--font-size-base);
+		color: var(--color-text-muted);
 		margin: 0;
 	}
 
@@ -170,56 +170,56 @@
 
 	/* Error State */
 	.error-message {
-		background: white;
-		border: 2px solid #dc2626;
-		border-radius: 8px;
-		padding: 2rem;
+		background: var(--color-background);
+		border: 2px solid var(--color-warning);
+		border-radius: var(--radius-lg);
+		padding: var(--spacing-8);
 		text-align: center;
 	}
 
 	.error-message h3 {
-		color: #dc2626;
-		font-size: 1.25rem;
-		margin: 0 0 0.5rem 0;
+		color: var(--color-warning);
+		font-size: var(--font-size-xl);
+		margin: 0 0 var(--spacing-2) 0;
 	}
 
 	.error-message p {
-		color: #666;
-		margin: 0 0 1rem 0;
+		color: var(--color-text-muted);
+		margin: 0 0 var(--spacing-4) 0;
 	}
 
 	.btn-retry {
-		background: #dc2626;
+		background: var(--color-warning);
 		color: white;
 		border: none;
-		border-radius: 6px;
-		padding: 0.75rem 1.5rem;
-		font-size: 1rem;
-		font-weight: 500;
+		border-radius: var(--radius-md);
+		padding: var(--spacing-3) var(--spacing-6);
+		font-size: var(--font-size-base);
+		font-weight: var(--font-weight-medium);
 		cursor: pointer;
-		transition: background 0.2s;
+		transition: background var(--transition-base);
 	}
 
 	.btn-retry:hover {
-		background: #b91c1c;
+		background: var(--color-warning-dark);
 	}
 
 	/* Loading State */
 	.loading-state {
-		background: white;
-		border-radius: 8px;
-		padding: 3rem;
+		background: var(--color-background);
+		border-radius: var(--radius-lg);
+		padding: var(--spacing-12);
 		text-align: center;
 	}
 
 	.spinner {
 		width: 50px;
 		height: 50px;
-		border: 4px solid #e5e7eb;
-		border-top-color: #3b82f6;
-		border-radius: 50%;
+		border: 4px solid var(--color-border);
+		border-top-color: var(--color-primary-blue);
+		border-radius: var(--radius-circle);
 		animation: spin 1s linear infinite;
-		margin: 0 auto 1rem auto;
+		margin: 0 auto var(--spacing-4) auto;
 	}
 
 	@keyframes spin {
@@ -227,17 +227,17 @@
 	}
 
 	.loading-state p {
-		color: #666;
-		font-size: 1rem;
+		color: var(--color-text-muted);
+		font-size: var(--font-size-base);
 		margin: 0;
 	}
 
 	/* PDF Preview */
 	.pdf-preview-container {
-		background: white;
-		border-radius: 8px;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-		margin-bottom: 2rem;
+		background: var(--color-background);
+		border-radius: var(--radius-lg);
+		box-shadow: var(--shadow-lg);
+		margin-bottom: var(--spacing-8);
 		overflow: hidden;
 		/* Use viewport height - works on any monitor */
 		height: 80vh;
@@ -254,23 +254,23 @@
 	/* Floating Action Button */
 	.fab {
 		position: fixed;
-		bottom: 2rem;
-		right: 2rem;
-		background: #3b82f6;
+		bottom: var(--spacing-8);
+		right: var(--spacing-8);
+		background: var(--color-primary-blue);
 		color: white;
 		border: none;
-		border-radius: 50px;
-		padding: 1rem 2rem;
-		font-size: 1rem;
-		font-weight: 600;
+		border-radius: var(--radius-pill);
+		padding: var(--spacing-4) var(--spacing-8);
+		font-size: var(--font-size-base);
+		font-weight: var(--font-weight-semibold);
 		cursor: pointer;
 		box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-		transition: all 0.3s ease;
+		transition: all var(--transition-slow);
 		z-index: 100;
 	}
 
 	.fab:hover {
-		background: #2563eb;
+		background: var(--color-primary-blue-dark);
 		transform: translateY(-2px);
 		box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
 	}
@@ -282,27 +282,27 @@
 	.btn-primary,
 	.btn-secondary {
 		border: none;
-		border-radius: 6px;
-		padding: 0.875rem 2rem;
-		font-size: 1rem;
-		font-weight: 500;
+		border-radius: var(--radius-md);
+		padding: var(--spacing-3-5) var(--spacing-8);
+		font-size: var(--font-size-base);
+		font-weight: var(--font-weight-medium);
 		cursor: pointer;
-		transition: all 0.2s;
+		transition: all var(--transition-base);
 	}
 
 	.btn-primary {
-		background: #3b82f6;
+		background: var(--color-primary-blue);
 		color: white;
 	}
 
 	.btn-primary:hover {
-		background: #2563eb;
+		background: var(--color-primary-blue-dark);
 	}
 
 	.btn-secondary {
-		background: white;
-		color: #3b82f6;
-		border: 2px solid #3b82f6;
+		background: var(--color-background);
+		color: var(--color-primary-blue);
+		border: 2px solid var(--color-primary-blue);
 	}
 
 	.btn-secondary:hover {
@@ -311,15 +311,15 @@
 
 	/* Empty State */
 	.empty-state {
-		background: white;
-		border-radius: 8px;
-		padding: 3rem;
+		background: var(--color-background);
+		border-radius: var(--radius-lg);
+		padding: var(--spacing-12);
 		text-align: center;
 	}
 
 	.empty-state p {
-		color: #666;
-		font-size: 1rem;
+		color: var(--color-text-muted);
+		font-size: var(--font-size-base);
 		margin: 0;
 	}
 
@@ -330,7 +330,7 @@
 		left: 0;
 		right: 0;
 		bottom: 0;
-		background: rgba(0, 0, 0, 0.5);
+		background: var(--color-overlay);
 		z-index: 200;
 	}
 
@@ -339,32 +339,32 @@
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
-		background: white;
-		border-radius: 8px;
-		padding: 2rem;
+		background: var(--color-background);
+		border-radius: var(--radius-lg);
+		padding: var(--spacing-8);
 		max-width: 400px;
 		width: 90%;
-		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+		box-shadow: var(--shadow-2xl);
 		z-index: 201;
 	}
 
 	.dialog h2 {
-		margin: 0 0 0.5rem 0;
-		font-size: 1.5rem;
-		font-weight: 600;
-		color: #1a1a1a;
+		margin: 0 0 var(--spacing-2) 0;
+		font-size: var(--font-size-2xl);
+		font-weight: var(--font-weight-semibold);
+		color: var(--color-text-primary);
 	}
 
 	.dialog p {
-		margin: 0 0 1.5rem 0;
-		color: #666;
+		margin: 0 0 var(--spacing-6) 0;
+		color: var(--color-text-muted);
 	}
 
 	.dialog-actions {
 		display: flex;
 		flex-direction: column;
-		gap: 0.75rem;
-		margin-bottom: 1rem;
+		gap: var(--spacing-3);
+		margin-bottom: var(--spacing-4);
 	}
 
 	.dialog .btn-primary,
@@ -374,25 +374,25 @@
 
 	.btn-close {
 		width: 100%;
-		background: #f5f5f5;
-		color: #666;
+		background: var(--color-neutral-100);
+		color: var(--color-text-muted);
 		border: none;
-		border-radius: 6px;
-		padding: 0.75rem;
-		font-size: 0.9375rem;
-		font-weight: 500;
+		border-radius: var(--radius-md);
+		padding: var(--spacing-3);
+		font-size: var(--font-size-sm);
+		font-weight: var(--font-weight-medium);
 		cursor: pointer;
-		transition: background 0.2s;
+		transition: background var(--transition-base);
 	}
 
 	.btn-close:hover {
-		background: #e5e7eb;
+		background: var(--color-border);
 	}
 
 	/* Responsive */
 	@media (max-width: 768px) {
 		.export-page {
-			padding: 5rem 1rem 1rem 1rem;
+			padding: calc(var(--spacing-16) * 1.25) var(--spacing-4) var(--spacing-4) var(--spacing-4);
 		}
 
 		.pdf-preview-container {

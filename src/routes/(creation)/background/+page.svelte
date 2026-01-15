@@ -15,6 +15,7 @@
 	import { applyChoice, revertChanges } from '$lib/stores/character_store_helpers';
 	import { get } from 'svelte/store';
 	import { character_store } from '$lib/stores/character_store';
+import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 
 	// Class-to-backgrounds mapping for simple view
 	const classBackgroundsMap: Record<string, string[]> = {
@@ -37,6 +38,8 @@
 
 	let selectedBackground: BackgroundData | null = null;
 	let selectedBackgroundData: BackgroundData | null = null;
+
+
 
 	// featureSelections maps feature.name -> array of picks (by index)
 	let featureSelections: Record<string, (string | null)[]> = {};
@@ -617,31 +620,20 @@
 	{/if}
 
 	{#if selectedBackground}
-		<!-- Popup Preview -->
-		<div class="popup">
-			<div class="popup-content">
-				<div class="popup-header">
-					<span>CONFIRM ADD BACKGROUND</span>
-					<button class="close-button" on:click={() => (selectedBackground = null)}>×</button>
-				</div>
+		<!-- Enhanced Popup Preview -->
+		<EnhancedPopup
+			title="Add {selectedBackground.name} Background"
+			itemName={selectedBackground.name}
+			isOpen={selectedBackground !== null}
+			onClose={() => selectedBackground = null}
+			onConfirm={confirmAddBackground}
+			confirmText="Add Background"
+			flavorText={selectedBackground.enhancedFlavor || selectedBackground.flavorDescription || selectedBackground.description}
+			cultureNotes={selectedBackground.cultureNotes}
+			imagePath={selectedBackground.popupImage || selectedBackground.image}
+			imageAlt={`${selectedBackground.name} artwork`}
 
-				<div class="popup-body">
-					<p class="description">{selectedBackground.description}</p>
-
-					{#each selectedBackground.backgroundFeatures as feature}
-						<div class="feature-card">
-							<h4>{feature.name}</h4>
-							<FeatureDescription description={feature.description} />
-						</div>
-					{/each}
-				</div>
-
-				<div class="popup-footer">
-					<button class="cancel-button" on:click={() => (selectedBackground = null)}>Cancel</button>
-					<button class="add-button" on:click={confirmAddBackground}>Add Background</button>
-				</div>
-			</div>
-		</div>
+		/>
 	{/if}
 
 	{#if selectedBackgroundData}
@@ -681,7 +673,7 @@
 
 <style>
 	.main-content {
-		padding: 2rem 1rem;
+		padding: var(--spacing-8) var(--spacing-4);
 		padding-top: 80px;
 		max-width: 1200px;
 		margin: 0 auto;
@@ -691,51 +683,51 @@
 		max-width: 50vw;
 		margin: 0 auto;
 		text-align: center;
-		font-size: 1.1rem;
-		color: #444;
+		font-size: var(--font-size-md);
+		color: var(--color-text-secondary);
 	}
 
 	.background-cards {
 		display: grid;
-		grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
-		gap: 1rem;
-		margin-top: 2rem;
-		padding: 0 2rem; /* increased horizontal padding for better visual spacing */
+		grid-template-columns: repeat(3, 1fr);
+		gap: var(--spacing-4);
+		margin-top: var(--spacing-8);
+		padding: 0 var(--spacing-8);
 		width: 100%;
-		align-items: start; /* align items to top of their grid area */
+		align-items: start;
 		box-sizing: border-box;
 	}
 
 	/* Responsive grid behavior - matches species page breakpoints */
 	@media (max-width: 768px) {
 		.background-cards {
-			grid-template-columns: repeat(2, 1fr); /* 2 columns on tablets */
-			gap: 0.75rem; /* slightly smaller gap on tablets */
-			padding: 0 1rem; /* medium padding on tablets */
+			grid-template-columns: repeat(2, 1fr);
+			gap: var(--spacing-3);
+			padding: 0 var(--spacing-4);
 		}
 	}
 
 	@media (max-width: 480px) {
 		.background-cards {
-			grid-template-columns: 1fr; /* single column on mobile */
-			gap: 0.5rem; /* smaller gap on mobile */
-			padding: 0 0.5rem; /* reduced padding on mobile */
+			grid-template-columns: 1fr;
+			gap: var(--spacing-2);
+			padding: 0 var(--spacing-2);
 		}
 	}
 
 	.background-card {
-		width: 100%; /* fill grid cell */
+		width: 100%;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: 1rem;
-		padding: 1rem 1.5rem; /* match species padding */
-		font-size: 1.2rem;
+		gap: var(--spacing-4);
+		padding: var(--spacing-4) var(--spacing-6);
+		font-size: var(--font-size-lg);
 		cursor: pointer;
-		border: 2px solid #ccc;
-		border-radius: 0.5rem;
-		background-color: #f8f8f8;
-		transition: background-color 0.2s ease;
+		border: 2px solid var(--color-border);
+		border-radius: var(--radius-md);
+		background-color: var(--color-background-alt);
+		transition: background-color var(--transition-base);
 		text-align: left;
 		box-sizing: border-box;
 	}
@@ -743,7 +735,7 @@
 	.card-left {
 		display: flex;
 		align-items: center;
-		gap: 1rem;
+		gap: var(--spacing-4);
 	}
 
 	.background-card img {
@@ -761,12 +753,12 @@
 
 	.background-card:hover,
 	.background-card:focus {
-		background-color: #e0e0e0;
+		background-color: var(--color-neutral-200);
 		outline: none;
 	}
 
 	.background-card:focus {
-		box-shadow: 0 0 0 3px rgba(100, 149, 237, 0.5);
+		box-shadow: var(--shadow-focus);
 	}
 
 	.popup {
@@ -775,7 +767,7 @@
 		left: 0;
 		width: 100vw;
 		height: 100vh;
-		background-color: rgba(0, 0, 0, 0.6);
+		background-color: var(--color-overlay);
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -783,24 +775,24 @@
 	}
 
 	.popup-content {
-		background: #fff;
+		background: var(--color-background);
 		width: 50vw;
 		height: 80vh;
-		border-radius: 8px;
+		border-radius: var(--radius-lg);
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;
-		box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+		box-shadow: var(--shadow-2xl);
 	}
 
 	.popup-header {
-		background: #222;
+		background: var(--color-primary-dark);
 		color: white;
-		padding: 12px 16px;
+		padding: var(--spacing-3) var(--spacing-4);
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		font-weight: bold;
+		font-weight: var(--font-weight-bold);
 		position: sticky;
 		top: 0;
 		z-index: 10;
@@ -810,123 +802,123 @@
 		background: none;
 		border: none;
 		color: white;
-		font-size: 1.2rem;
+		font-size: var(--font-size-lg);
 		cursor: pointer;
 	}
 
 	.popup-body {
-		padding: 16px;
+		padding: var(--spacing-4);
 		overflow-y: auto;
 		flex: 1;
 	}
 
 	.description {
-		font-size: 0.95rem;
-		color: #555;
-		margin-bottom: 1rem;
+		font-size: var(--font-size-sm);
+		color: var(--color-text-secondary);
+		margin-bottom: var(--spacing-4);
 	}
 
 	.background-details {
-		margin-bottom: 1.5rem;
+		margin-bottom: var(--spacing-6);
 	}
 
 	.detail-section {
-		margin-bottom: 1rem;
+		margin-bottom: var(--spacing-4);
 	}
 
 	.detail-section h4 {
-		font-weight: bold;
-		margin-bottom: 0.25rem;
-		color: #333;
+		font-weight: var(--font-weight-bold);
+		margin-bottom: var(--spacing-1);
+		color: var(--color-text-primary);
 	}
 
 	.detail-section p {
-		color: #666;
+		color: var(--color-text-secondary);
 		margin: 0;
-		font-size: 0.9rem;
+		font-size: var(--font-size-sm);
 	}
 
 	.detail-section ul {
 		margin: 0;
-		padding-left: 1.5rem;
-		color: #666;
-		font-size: 0.9rem;
+		padding-left: var(--spacing-6);
+		color: var(--color-text-secondary);
+		font-size: var(--font-size-sm);
 	}
 
 	.feature-card {
-		border: 1px solid #ddd;
-		border-radius: 6px;
-		padding: 12px;
-		margin-bottom: 12px;
-		background-color: #f9f9f9;
+		border: 1px solid var(--color-border-light);
+		border-radius: var(--radius-md);
+		padding: var(--spacing-3);
+		margin-bottom: var(--spacing-3);
+		background-color: var(--color-neutral-50);
 	}
 
 	.feature-card h4 {
-		margin: 0 0 8px 0;
-		font-size: 1rem;
-		font-weight: bold;
-		color: #333;
+		margin: 0 0 var(--spacing-2) 0;
+		font-size: var(--font-size-base);
+		font-weight: var(--font-weight-bold);
+		color: var(--color-text-primary);
 	}
 
 	.feature-card p {
 		margin: 0;
-		font-size: 0.9rem;
-		color: #555;
+		font-size: var(--font-size-sm);
+		color: var(--color-text-secondary);
 		line-height: 1.4;
 	}
 
 		.popup-footer {
-		padding: 12px 16px;
+		padding: var(--spacing-3) var(--spacing-4);
 		display: flex;
 		justify-content: flex-end;
-		gap: 10px;
-		border-top: 1px solid #ddd;
-		background: #f0f0f0;
+		gap: var(--spacing-3);
+		border-top: 1px solid var(--color-border-light);
+		background: var(--color-neutral-100);
 	}
 
 	.cancel-button {
-		background-color: #333;
+		background-color: var(--color-primary);
 		color: white;
 		border: none;
-		padding: 0.6rem 1.2rem;
-		font-size: 1rem;
-		border-radius: 6px;
+		padding: var(--spacing-3) var(--spacing-5);
+		font-size: var(--font-size-base);
+		border-radius: var(--radius-md);
 		cursor: pointer;
-		transition: background-color 0.3s ease;
+		transition: background-color var(--transition-slow);
 	}
 	.cancel-button:hover {
-		background-color: #555;
+		background-color: var(--color-primary-dark);
 	}
 
 	.add-button {
-		background-color: #2e7d32;
+		background-color: var(--color-success);
 		color: white;
 		border: none;
-		padding: 0.6rem 1.2rem;
-		font-size: 1rem;
-		border-radius: 6px;
+		padding: var(--spacing-3) var(--spacing-5);
+		font-size: var(--font-size-base);
+		border-radius: var(--radius-md);
 		cursor: pointer;
-		transition: background-color 0.3s ease;
+		transition: background-color var(--transition-slow);
 	}
 	.add-button:hover {
-		background-color: #1b4d20;
+		background-color: var(--color-success-light);
 	}
 
 	.selected-background-card {
 		max-width: 50vw;
-		margin: 2rem auto 1rem auto;
-		padding: 1rem 1.5rem;
-		border: 2px solid #888;
-		border-radius: 8px;
-		background-color: #fafafa;
-		box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+		margin: var(--spacing-8) auto var(--spacing-4) auto;
+		padding: var(--spacing-4) var(--spacing-6);
+		border: 2px solid var(--color-neutral-500);
+		border-radius: var(--radius-lg);
+		background-color: var(--color-neutral-50);
+		box-shadow: var(--shadow-md);
 	}
 
 	.selected-background-info {
 		display: flex;
 		align-items: center;
-		gap: 1rem;
-		margin-bottom: 1rem;
+		gap: var(--spacing-4);
+		margin-bottom: var(--spacing-4);
 	}
 
 	.selected-background-icon {
@@ -941,58 +933,58 @@
 
 	.selected-background-text h2 {
 		margin: 0;
-		font-size: 1.5rem;
-		color: #333;
+		font-size: var(--font-size-xl);
+		color: var(--color-text-primary);
 	}
 
 	.selected-background-text .description {
-		margin: 0.25rem 0 0 0;
-		color: #666;
-		font-size: 0.9rem;
+		margin: var(--spacing-1) 0 0 0;
+		color: var(--color-text-secondary);
+		font-size: var(--font-size-sm);
 	}
 
 	.remove-background-button {
-		font-size: 1.5rem;
+		font-size: var(--font-size-xl);
 		cursor: pointer;
 		background: none;
 		border: none;
-		color: #c00;
-		padding: 4px 8px;
-		border-radius: 4px;
-		transition: background-color 0.2s ease;
+		color: var(--color-warning);
+		padding: var(--spacing-1) var(--spacing-2);
+		border-radius: var(--radius-sm);
+		transition: background-color var(--transition-base);
 		margin-left: auto;
 		flex-shrink: 0;
 	}
 
 	.remove-background-button:hover {
-		background-color: #fdd;
+		background-color: var(--color-warning-bg);
 	}
 
 	/* Floating toggle slider */
 	.floating-toggle {
 		position: fixed;
-		bottom: 2rem;
-		right: 2rem;
-		background-color: white;
-		border: 2px solid #ccc;
-		border-radius: 50px;
-		padding: 0.75rem 1.25rem;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+		bottom: var(--spacing-8);
+		right: var(--spacing-8);
+		background-color: var(--color-background);
+		border: 2px solid var(--color-border);
+		border-radius: var(--radius-pill);
+		padding: var(--spacing-3) var(--spacing-5);
+		box-shadow: var(--shadow-lg);
 		display: flex;
 		align-items: center;
-		gap: 0.75rem;
+		gap: var(--spacing-3);
 		z-index: 100;
-		transition: box-shadow 0.3s ease;
+		transition: box-shadow var(--transition-slow);
 	}
 
 	.floating-toggle:hover {
-		box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+		box-shadow: var(--shadow-xl);
 	}
 
 	.toggle-label {
-		font-size: 0.9rem;
-		font-weight: 600;
-		color: #333;
+		font-size: var(--font-size-sm);
+		font-weight: var(--font-weight-semibold);
+		color: var(--color-text-primary);
 		white-space: nowrap;
 	}
 
@@ -1017,8 +1009,8 @@
 		left: 0;
 		right: 0;
 		bottom: 0;
-		background-color: #2563eb;
-		transition: 0.3s;
+		background-color: var(--color-primary-blue);
+		transition: var(--transition-slow);
 		border-radius: 24px;
 	}
 
@@ -1029,13 +1021,13 @@
 		width: 18px;
 		left: 3px;
 		bottom: 3px;
-		background-color: white;
-		transition: 0.3s;
-		border-radius: 50%;
+		background-color: var(--color-background);
+		transition: var(--transition-slow);
+		border-radius: var(--radius-circle);
 	}
 
 	input:checked + .toggle-slider {
-		background-color: #10b981;
+		background-color: var(--color-success);
 	}
 
 	input:checked + .toggle-slider:before {
@@ -1043,18 +1035,18 @@
 	}
 
 	.toggle-slider:hover {
-		box-shadow: 0 0 4px rgba(37, 99, 235, 0.4);
+		box-shadow: 0 0 4px var(--color-primary-blue);
 	}
 
 	@media (max-width: 768px) {
 		.floating-toggle {
-			bottom: 1rem;
-			right: 1rem;
-			padding: 0.6rem 1rem;
+			bottom: var(--spacing-4);
+			right: var(--spacing-4);
+			padding: var(--spacing-3) var(--spacing-4);
 		}
 
 		.toggle-label {
-			font-size: 0.8rem;
+			font-size: var(--font-size-xs);
 		}
 
 		.toggle-switch {
@@ -1076,38 +1068,38 @@
 	.simple-background-cards {
 		display: flex;
 		flex-direction: column;
-		gap: 1.5rem;
-		margin-top: 2rem;
-		padding: 0 2rem;
+		gap: var(--spacing-6);
+		margin-top: var(--spacing-8);
+		padding: 0 var(--spacing-8);
 		max-width: 900px;
 		margin-left: auto;
 		margin-right: auto;
 	}
 
 	.simple-background-card {
-		background-color: #f8f8f8;
-		border: 2px solid #ccc;
-		border-radius: 0.5rem;
-		padding: 1.5rem;
-		transition: border-color 0.2s ease, box-shadow 0.2s ease;
+		background-color: var(--color-background-alt);
+		border: 2px solid var(--color-border);
+		border-radius: var(--radius-md);
+		padding: var(--spacing-6);
+		transition: border-color var(--transition-base), box-shadow var(--transition-base);
 	}
 
 	.simple-background-card:hover {
-		border-color: #2563eb;
-		box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+		border-color: var(--color-primary-blue);
+		box-shadow: var(--shadow-lg);
 	}
 
 	.simple-card-header {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		margin-bottom: 1.25rem;
+		margin-bottom: var(--spacing-5);
 	}
 
 	.simple-card-header-left {
 		display: flex;
 		align-items: center;
-		gap: 0.75rem;
+		gap: var(--spacing-3);
 	}
 
 	.simple-card-icon {
@@ -1119,50 +1111,50 @@
 
 	.simple-card-header h3 {
 		margin: 0;
-		font-size: 1.25rem;
-		color: #333;
-		font-weight: bold;
+		font-size: var(--font-size-lg);
+		color: var(--color-text-primary);
+		font-weight: var(--font-weight-bold);
 	}
 
 	.simple-card-description {
 		margin: 0;
-		font-size: 1.15rem;
-		color: #444;
+		font-size: var(--font-size-md);
+		color: var(--color-text-secondary);
 		line-height: 1.7;
 	}
 
 	.select-background-button {
-		background-color: #2e7d32;
+		background-color: var(--color-success);
 		color: white;
 		border: none;
-		padding: 0.75rem 1.5rem;
-		font-size: 1rem;
-		font-weight: 600;
-		border-radius: 6px;
+		padding: var(--spacing-3) var(--spacing-6);
+		font-size: var(--font-size-base);
+		font-weight: var(--font-weight-semibold);
+		border-radius: var(--radius-md);
 		cursor: pointer;
-		transition: background-color 0.3s ease;
+		transition: background-color var(--transition-slow);
 		width: auto;
 		display: inline-block;
 		flex-shrink: 0;
 	}
 
 	.select-background-button:hover {
-		background-color: #1b5e20;
+		background-color: var(--color-success-light);
 	}
 
 	@media (max-width: 768px) {
 		.simple-background-cards {
-			padding: 0 1rem;
+			padding: 0 var(--spacing-4);
 		}
 
 		.simple-background-card {
-			padding: 1rem;
+			padding: var(--spacing-4);
 		}
 
 		.simple-card-header {
 			flex-direction: column;
 			align-items: stretch;
-			gap: 1rem;
+			gap: var(--spacing-4);
 		}
 
 		.simple-card-header-left {
@@ -1170,11 +1162,11 @@
 		}
 
 		.simple-card-header h3 {
-			font-size: 1.1rem;
+			font-size: var(--font-size-md);
 		}
 
 		.simple-card-description {
-			font-size: 1rem;
+			font-size: var(--font-size-base);
 		}
 
 		.select-background-button {

@@ -9,4 +9,8 @@ export interface SpeciesData {
 	size: string; // Small / Medium
 	knownLanguages: string[];
 	speciesFeatures: FeaturePrompt[]; // parallels classFeatures
+	// Enhanced popup content
+	enhancedFlavor?: string; // 1-2 sentence immersive description
+	cultureNotes?: string; // Common names, customs, traditions
+	popupImage?: string; // Enhanced artwork path
 }

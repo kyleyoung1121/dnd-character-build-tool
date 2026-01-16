@@ -138,9 +138,9 @@
 
 <style>
 	nav {
-		background-color: #1e293b; /* dark blue-gray background */
-		padding: 1rem 2rem;
-		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+		background-color: var(--color-primary-dark); /* dark blue-gray background */
+		padding: var(--spacing-4) var(--spacing-8);
+		box-shadow: var(--shadow-md);
 		position: fixed;
 		top: 0;
 		left: 0;
@@ -153,7 +153,7 @@
 		list-style: none;
 		margin: 0;
 		padding: 0;
-		gap: 1.5rem;
+		gap: var(--spacing-6);
 		justify-content: center;
 	}
 
@@ -163,38 +163,38 @@
 	nav a {
 		color: white;
 		text-decoration: none;
-		font-weight: 600;
-		font-size: 1rem;
-		padding: 0.3rem 0.6rem;
-		border-radius: 4px;
-		transition: background-color 0.3s ease;
+		font-weight: var(--font-weight-semibold);
+		font-size: var(--font-size-base);
+		padding: var(--spacing-2) var(--spacing-3);
+		border-radius: var(--radius-sm);
+		transition: background-color var(--transition-slow);
 	}
 
 	nav a:hover {
-		background-color: #3b82f6; /* bright blue on hover */
+		background-color: var(--color-primary-blue); /* bright blue on hover */
 		color: white;
 	}
 
 	/* Highlight current page */
 	nav a[aria-current='page'] {
-		background-color: #2563eb; /* darker blue for current page */
-		box-shadow: 0 0 8px rgba(37, 99, 235, 0.6);
+		background-color: var(--color-primary-blue); /* blue for current page */
+		box-shadow: var(--shadow-primary);
 	}
 
 	/* Conflict indicator styles */
 	nav a.has-conflict {
 		position: relative;
-		background-color: #dc2626; /* red background for conflicts */
+		background-color: var(--color-warning); /* red background for conflicts */
 		animation: pulse-warning 2s infinite;
 	}
 
 	nav a.has-conflict:hover {
-		background-color: #b91c1c; /* darker red on hover */
+		background-color: var(--color-warning-light); /* darker red on hover */
 	}
 
 	.conflict-indicator {
-		margin-left: 0.5rem;
-		font-size: 0.9em;
+		margin-left: var(--spacing-2);
+		font-size: var(--font-size-sm);
 		filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
 	}
 

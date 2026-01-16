@@ -153,58 +153,58 @@
 
 <style>
 	.feature-card {
-		border: 2px solid #ccc;
-		border-radius: 6px;
-		padding: 10px 12px;
-		margin: 10px 0;
-		background: #f9f9f9;
+		border: 2px solid var(--color-border);
+		border-radius: var(--radius-md);
+		padding: var(--spacing-3) var(--spacing-4);
+		margin: var(--spacing-3) 0;
+		background: var(--color-background-alt);
 		width: 100%;
 		max-width: 50vw;
 		box-sizing: border-box;
-		transition: border-color 0.2s ease;
+		transition: border-color var(--transition-base);
 	}
 
 	.feature-card select {
-		margin-top: 0.5rem;
+		margin-top: var(--spacing-2);
 		width: 100%;
-		padding: 0.3rem 0.5rem;
-		font-size: 1rem;
-		border-radius: 4px;
-		border: 1px solid #aaa;
+		padding: var(--spacing-2) var(--spacing-3);
+		font-size: var(--font-size-base);
+		border-radius: var(--radius-sm);
+		border: 1px solid var(--color-neutral-300);
 	}
 
 	.feature-card.nested {
-		margin-top: 1rem;
-		margin-left: 1.5rem;
-		width: calc(100% - 2rem);
-		background-color: #eee;
-		border-color: #888;
+		margin-top: var(--spacing-4);
+		margin-left: var(--spacing-6);
+		width: calc(100% - var(--spacing-8));
+		background-color: var(--color-neutral-100);
+		border-color: var(--color-neutral-400);
 		border-width: 1px;
-		padding: 8px 10px;
+		padding: var(--spacing-2) var(--spacing-3);
 	}
 
 	/* Enhanced nesting: each level gets progressively more indented and lighter */
 	.feature-card.nested .feature-card.nested {
-		margin-left: 1rem;
-		background-color: #f5f5f5;
-		border-color: #999;
-		padding: 6px 8px;
+		margin-left: var(--spacing-4);
+		background-color: var(--color-neutral-50);
+		border-color: var(--color-neutral-300);
+		padding: var(--spacing-2);
 	}
 
 	.feature-card.nested .feature-card.nested .feature-card.nested {
-		margin-left: 0.75rem;
-		background-color: #fafafa;
-		border-color: #aaa;
-		padding: 4px 6px;
-		font-size: 0.95rem;
+		margin-left: var(--spacing-3);
+		background-color: var(--color-background);
+		border-color: var(--color-border);
+		padding: var(--spacing-1) var(--spacing-2);
+		font-size: var(--font-size-sm);
 	}
 
 	.feature-card.incomplete {
-		border-color: red;
+		border-color: var(--color-warning);
 	}
 
 	.feature-card.complete {
-		border-color: #4a90e2;
+		border-color: var(--color-primary-blue);
 	}
 
 	.feature-header {
@@ -214,9 +214,9 @@
 		width: 100%;
 		background: none;
 		border: none;
-		padding: 0.5rem 0;
-		font-size: 1.1rem;
-		font-weight: bold;
+		padding: var(--spacing-2) 0;
+		font-size: var(--font-size-md);
+		font-weight: var(--font-weight-bold);
 		cursor: pointer;
 		text-align: left;
 	}
@@ -226,21 +226,21 @@
 	}
 
 	.expand-indicator {
-		font-size: 1.2rem;
-		font-weight: bold;
-		padding-left: 1rem;
+		font-size: var(--font-size-lg);
+		font-weight: var(--font-weight-bold);
+		padding-left: var(--spacing-4);
 	}
 
 	/* Conflict indicators */
 	.feature-header.has-conflicts {
-		background-color: #fef2f2;
-		border-left: 4px solid #dc2626;
-		padding-left: 0.75rem;
+		background-color: var(--color-warning-bg);
+		border-left: 4px solid var(--color-warning);
+		padding-left: var(--spacing-3);
 	}
 
 	.conflict-badge {
-		margin-left: 0.5rem;
-		font-size: 1rem;
+		margin-left: var(--spacing-2);
+		font-size: var(--font-size-base);
 	}
 
 	.conflict-badge.user-changeable {

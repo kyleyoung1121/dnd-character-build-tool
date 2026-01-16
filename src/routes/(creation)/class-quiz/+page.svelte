@@ -7,19 +7,79 @@
 	}
 </script>
 
-<div class="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-8">
-	<div class="w-full max-w-4xl rounded-lg bg-white p-8 text-center shadow-xl border border-gray-200">
-		<h1 class="mb-8 text-4xl font-bold text-gray-800">Class Quiz</h1>
+<div class="quiz-container">
+	<div class="quiz-card">
+		<h1>Class Quiz</h1>
 		
-		<div class="mb-8 text-gray-600">
-			<p class="text-lg">Quiz coming soon!</p>
+		<div class="quiz-content">
+			<p>Quiz coming soon!</p>
 		</div>
 
 		<button
 			onclick={returnToClass}
-			class="rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-blue-700"
+			class="return-button"
 		>
 			Return to Class Selection
 		</button>
 	</div>
 </div>
+
+<style>
+	.quiz-container {
+		display: flex;
+		min-height: 100vh;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: var(--spacing-8);
+		padding-top: 80px;
+		background: var(--color-neutral-50);
+	}
+
+	.quiz-card {
+		width: 100%;
+		max-width: 800px;
+		background: var(--color-background);
+		border-radius: var(--radius-lg);
+		padding: var(--spacing-8);
+		text-align: center;
+		box-shadow: var(--shadow-lg);
+		border: 1px solid var(--color-border);
+	}
+
+	h1 {
+		margin-bottom: var(--spacing-8);
+		font-size: var(--font-size-3xl);
+		font-weight: var(--font-weight-bold);
+		color: var(--color-text-primary);
+		font-family: var(--font-family-base);
+	}
+
+	.quiz-content {
+		margin-bottom: var(--spacing-8);
+		color: var(--color-text-muted);
+	}
+
+	.quiz-content p {
+		font-size: var(--font-size-lg);
+		font-family: var(--font-family-base);
+	}
+
+	.return-button {
+		padding: var(--spacing-3) var(--spacing-6);
+		font-size: var(--font-size-base);
+		font-weight: var(--font-weight-semibold);
+		font-family: var(--font-family-base);
+		color: white;
+		background: var(--color-primary-blue);
+		border: none;
+		border-radius: var(--radius-md);
+		cursor: pointer;
+		transition: all var(--transition-base);
+	}
+
+	.return-button:hover {
+		background: #2563eb;
+		box-shadow: var(--shadow-md);
+	}
+</style>

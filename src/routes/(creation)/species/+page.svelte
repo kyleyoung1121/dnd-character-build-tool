@@ -22,6 +22,7 @@
 	import type { FeaturePrompt } from '$lib/data/types/Features';
 	import { isFeatureIncomplete, effectNeedsChoice } from '$lib/components/feature-card-utils';
 	import FeatureDescription from '$lib/components/FeatureDescription.svelte';
+import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 
 	import { applyChoice, revertChanges } from '$lib/stores/character_store_helpers';
 	import { get } from 'svelte/store';
@@ -769,31 +770,19 @@
 	{/if}
 
 	{#if selectedSpecies}
-		<!-- Popup Preview -->
-		<div class="popup">
-			<div class="popup-content">
-				<div class="popup-header">
-					<span>CONFIRM ADD SPECIES</span>
-					<button class="close-button" on:click={() => (selectedSpecies = null)}>×</button>
-				</div>
-
-				<div class="popup-body">
-					<p class="description">{selectedSpecies.description}</p>
-
-					{#each selectedSpecies.speciesFeatures as feature}
-						<div class="feature-card">
-							<h4>{feature.name}</h4>
-							<FeatureDescription description={feature.description} />
-						</div>
-					{/each}
-				</div>
-
-				<div class="popup-footer">
-					<button class="cancel-button" on:click={() => (selectedSpecies = null)}>Cancel</button>
-					<button class="add-button" on:click={confirmAddSpecies}>Add Species</button>
-				</div>
-			</div>
-		</div>
+		<!-- Enhanced Popup Preview -->
+		<EnhancedPopup
+			title="Add {selectedSpecies.name} to Character"
+			itemName={selectedSpecies.name}
+			isOpen={selectedSpecies !== null}
+			onClose={() => selectedSpecies = null}
+			onConfirm={confirmAddSpecies}
+			confirmText="Add Species"
+			flavorText={selectedSpecies.enhancedFlavor || selectedSpecies.description}
+			cultureNotes={selectedSpecies.cultureNotes}
+			imagePath={selectedSpecies.popupImage || selectedSpecies.image}
+			imageAlt={`${selectedSpecies.name} artwork`}
+		/>
 	{/if}
 
 	{#if selectedSpeciesData}
@@ -862,7 +851,7 @@
 
 <style>
 	.main-content {
-		padding: 2rem 1rem;
+		padding: var(--spacing-8) var(--spacing-4);
 		padding-top: 80px;
 		max-width: 1200px;
 		margin: 0 auto;
@@ -872,16 +861,16 @@
 		max-width: 50vw;
 		margin: 0 auto;
 		text-align: center;
-		font-size: 1.1rem;
-		color: #444;
+		font-size: var(--font-size-md);
+		color: var(--color-text-secondary);
 	}
 
 	/* Container for all race cards */
 	.race-cards {
 		display: flex;
-		gap: 1rem;
-		margin-top: 2rem;
-		padding: 0 2rem; /* increased horizontal padding for better visual spacing */
+		gap: var(--spacing-4);
+		margin-top: var(--spacing-8);
+		padding: 0 var(--spacing-8);
 		width: 100%;
 		box-sizing: border-box;
 	}
@@ -891,14 +880,14 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		gap: 0.5rem; /* reduced gap between species */
+		gap: var(--spacing-2);
 	}
 
 	/* Responsive columns behavior */
 	@media (max-width: 768px) {
 		.race-cards {
 			flex-direction: column;
-			padding: 0 1rem; /* medium padding on tablets */
+			padding: 0 var(--spacing-4);
 		}
 
 		.race-column {
@@ -908,7 +897,7 @@
 
 	@media (max-width: 480px) {
 		.race-cards {
-			padding: 0 0.5rem; /* reduced padding on mobile */
+			padding: 0 var(--spacing-2);
 		}
 	}
 
@@ -918,20 +907,20 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 1rem 1.5rem;
-		font-size: 1.2rem;
+		padding: var(--spacing-4) var(--spacing-6);
+		font-size: var(--font-size-lg);
 		cursor: pointer;
-		border: 2px solid #ccc;
-		border-radius: 0.5rem;
-		background-color: #f8f8f8;
-		transition: background-color 0.2s ease;
+		border: 2px solid var(--color-border);
+		border-radius: var(--radius-md);
+		background-color: var(--color-background-alt);
+		transition: background-color var(--transition-base);
 		text-align: left;
 	}
 
 	.card-left {
 		display: flex;
 		align-items: center;
-		gap: 1rem;
+		gap: var(--spacing-4);
 	}
 
 	.race-card img {
@@ -945,17 +934,17 @@
 		height: 24px;
 		object-fit: contain;
 		margin-left: auto;
-		transition: transform 0.2s ease;
+		transition: transform var(--transition-base);
 	}
 
 	.race-card:hover,
 	.race-card:focus {
-		background-color: #e0e0e0;
+		background-color: var(--color-neutral-200);
 		outline: none;
 	}
 
 	.race-card:focus {
-		box-shadow: 0 0 0 3px rgba(100, 149, 237, 0.5);
+		box-shadow: var(--shadow-focus);
 	}
 
 	/* Parent + subrace grouping */
@@ -965,7 +954,7 @@
 		width: 100%; /* fill column */
 		min-width: 220px; /* optional: ensure not too narrow on small screens */
 		box-sizing: border-box;
-		margin-bottom: 0.25rem; /* reduced space between species */
+		margin-bottom: var(--spacing-1); /* reduced space between species */
 	}
 
 	.parent-race-button {
@@ -975,11 +964,11 @@
 	.subrace-cards-container {
 		display: flex;
 		flex-direction: column; /* stack subraces vertically */
-		gap: 0.5rem;
+		gap: var(--spacing-2);
 		width: 100%; /* fill parent container */
 		padding-left: 5rem; /* indent for nesting */
 		box-sizing: border-box;
-		margin-top: 0.5rem; /* space between parent and first subrace */
+		margin-top: var(--spacing-2);
 	}
 
 	/* Subrace card styling */
@@ -988,10 +977,10 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 0.8rem 1rem;
-		border-radius: 6px;
-		border: 2px solid #bbb;
-		background-color: #fafafa;
+		padding: var(--spacing-3) var(--spacing-4);
+		border-radius: var(--radius-md);
+		border: 2px solid var(--color-neutral-400);
+		background-color: var(--color-neutral-50);
 		cursor: pointer;
 	}
 
@@ -1003,7 +992,7 @@
 
 	.subrace-card:hover,
 	.subrace-card:focus {
-		background-color: #e8e8e8;
+		background-color: var(--color-neutral-100);
 	}
 
 	/* Popup and modal styles remain unchanged */
@@ -1013,7 +1002,7 @@
 		left: 0;
 		width: 100vw;
 		height: 100vh;
-		background-color: rgba(0, 0, 0, 0.6);
+		background-color: var(--color-overlay);
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -1021,24 +1010,24 @@
 	}
 
 	.popup-content {
-		background: #fff;
+		background: var(--color-background);
 		width: 50vw;
 		height: 80vh;
-		border-radius: 8px;
+		border-radius: var(--radius-lg);
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;
-		box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+		box-shadow: var(--shadow-2xl);
 	}
 
 	.popup-header {
-		background: #222;
+		background: var(--color-primary-dark);
 		color: white;
-		padding: 12px 16px;
+		padding: var(--spacing-3) var(--spacing-4);
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		font-weight: bold;
+		font-weight: var(--font-weight-bold);
 		position: sticky;
 		top: 0;
 		z-index: 10;
@@ -1048,44 +1037,44 @@
 		background: none;
 		border: none;
 		color: white;
-		font-size: 1.2rem;
+		font-size: var(--font-size-lg);
 		cursor: pointer;
 	}
 
 	.popup-body {
-		padding: 16px;
+		padding: var(--spacing-4);
 		overflow-y: auto;
 		flex: 1;
 	}
 
 	.description {
-		font-size: 0.95rem;
-		color: #555;
-		margin-bottom: 1rem;
+		font-size: var(--font-size-sm);
+		color: var(--color-text-secondary);
+		margin-bottom: var(--spacing-4);
 	}
 
 	.selected-race-card {
 		max-width: 50vw;
-		margin: 2rem auto 1rem auto;
-		padding: 1rem 1.5rem;
-		border: 2px solid #888;
-		border-radius: 8px;
-		background-color: #fafafa;
-		box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+		margin: var(--spacing-8) auto var(--spacing-4) auto;
+		padding: var(--spacing-4) var(--spacing-6);
+		border: 2px solid var(--color-neutral-500);
+		border-radius: var(--radius-lg);
+		background-color: var(--color-neutral-50);
+		box-shadow: var(--shadow-md);
 	}
 
 	.selected-race-info {
 		display: flex;
 		align-items: center;
-		gap: 1rem;
+		gap: var(--spacing-4);
 	}
 
 	.selected-race-icon {
 		width: 60px;
 		height: 60px;
 		object-fit: contain;
-		border-radius: 6px;
-		box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+		border-radius: var(--radius-md);
+		box-shadow: var(--shadow-sm);
 	}
 
 	.selected-race-text {
@@ -1094,38 +1083,38 @@
 
 	.selected-race-text h2 {
 		margin: 0;
-		font-weight: 700;
-		font-size: 1.2rem;
+		font-weight: var(--font-weight-bold);
+		font-size: var(--font-size-lg);
 	}
 
 	.remove-race-button {
-		font-size: 1.5rem;
+		font-size: var(--font-size-xl);
 		cursor: pointer;
 		background: none;
 		border: none;
-		color: #c00;
-		padding: 4px 8px;
-		border-radius: 4px;
-		transition: background-color 0.2s ease;
+		color: var(--color-warning);
+		padding: var(--spacing-1) var(--spacing-2);
+		border-radius: var(--radius-sm);
+		transition: background-color var(--transition-base);
 	}
 	.remove-race-button:hover {
-		background-color: #fdd;
+		background-color: var(--color-warning-bg);
 	}
 
 	/* Feature card styling for popup content */
 	.feature-card {
-		border: 1px solid #ddd;
-		border-radius: 6px;
-		padding: 12px;
-		margin-bottom: 12px;
-		background-color: #f9f9f9;
+		border: 1px solid var(--color-border-light);
+		border-radius: var(--radius-md);
+		padding: var(--spacing-3);
+		margin-bottom: var(--spacing-3);
+		background-color: var(--color-neutral-50);
 	}
 
 	.feature-card h4 {
-		margin: 0 0 8px 0;
-		font-size: 1rem;
-		font-weight: bold;
-		color: #333;
+		margin: 0 0 var(--spacing-2) 0;
+		font-size: var(--font-size-base);
+		font-weight: var(--font-weight-bold);
+		color: var(--color-text-primary);
 	}
 
 	.feature-card p {

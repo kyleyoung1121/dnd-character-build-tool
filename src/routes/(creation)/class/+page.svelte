@@ -24,6 +24,7 @@
 	import { applyChoice, revertChanges } from '$lib/stores/character_store_helpers';
 	import { get } from 'svelte/store';
 	import { character_store } from '$lib/stores/character_store';
+import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 
 	const classes: ClassData[] = [
 		barbarian,
@@ -42,6 +43,8 @@
 
 	let selectedClass: ClassData | null = null;
 	let selectedClassData: ClassData | null = null;
+
+
 
 	// featureSelections maps feature.name -> array of picks (by index)
 	let featureSelections: Record<string, (string | null)[]> = {};
@@ -700,38 +703,20 @@
 	{/if}
 
 	{#if selectedClass}
-		<!-- Popup Preview -->
-		<div class="popup">
-			<div class="popup-content">
-				<div class="popup-header">
-					<span>CONFIRM ADD CLASS</span>
-					<button class="close-button" on:click={() => (selectedClass = null)}>×</button>
-				</div>
+		<!-- Enhanced Popup Preview -->
+		<EnhancedPopup
+			title="Add {selectedClass.name} to Character"
+			itemName={selectedClass.name}
+			isOpen={selectedClass !== null}
+			onClose={() => selectedClass = null}
+			onConfirm={confirmAddClass}
+			confirmText="Add Class"
+			flavorText={selectedClass.enhancedFlavor || selectedClass.description}
+			cultureNotes={selectedClass.cultureNotes}
+			imagePath={selectedClass.popupImage || selectedClass.image}
+			imageAlt={`${selectedClass.name} artwork`}
 
-				<div class="popup-body">
-					<!-- Class description remains a string -->
-					<p class="description">{selectedClass.description}</p>
-
-					<p><strong>Primary Ability:</strong> {selectedClass.primaryAbility}</p>
-
-					{#each selectedClass.classFeatures as feature}
-						<div class="feature-card">
-							<h4>{feature.name}</h4>
-							<FeatureDescription description={feature.description} />
-						</div>
-					{/each}
-				</div>
-
-				<div class="popup-footer">
-					<button class="cancel-button" on:click={() => (selectedClass = null)}>
-						Cancel
-					</button>
-					<button class="add-button" on:click={confirmAddClass}>
-						Add Class
-					</button>
-				</div>
-			</div>
-		</div>
+		/>
 	{/if}
 
 	{#if selectedClassData}
@@ -784,8 +769,8 @@
 		max-width: 50vw;
 		margin: 0 auto;
 		text-align: center;
-		font-size: 1.1rem;
-		color: #444;
+		font-size: var(--font-size-md);
+		color: var(--color-text-secondary);
 	}
 
 	.class-cards {
@@ -821,14 +806,14 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: 1rem;
-		padding: 1rem 1.5rem; /* match species padding */
-		font-size: 1.2rem;
+		gap: var(--spacing-4);
+		padding: var(--spacing-4) var(--spacing-6);
+		font-size: var(--font-size-lg);
 		cursor: pointer;
-		border: 2px solid #ccc;
-		border-radius: 0.5rem;
-		background-color: #f8f8f8;
-		transition: background-color 0.2s ease;
+		border: 2px solid var(--color-border);
+		border-radius: var(--radius-md);
+		background-color: var(--color-background-alt);
+		transition: background-color var(--transition-base);
 		text-align: left;
 		box-sizing: border-box;
 	}
@@ -836,7 +821,7 @@
 	.card-left {
 		display: flex;
 		align-items: center;
-		gap: 1rem;
+		gap: var(--spacing-4);
 	}
 
 	.class-card img {
@@ -854,12 +839,12 @@
 
 	.class-card:hover,
 	.class-card:focus {
-		background-color: #e0e0e0;
+		background-color: var(--color-neutral-200);
 		outline: none;
 	}
 
 	.class-card:focus {
-		box-shadow: 0 0 0 3px rgba(100, 149, 237, 0.5);
+		box-shadow: var(--shadow-focus);
 	}
 
 	.popup {
@@ -914,33 +899,33 @@
 	}
 
 	.description {
-		font-size: 0.95rem;
-		color: #555;
-		margin-bottom: 0.2rem;
+		font-size: var(--font-size-sm);
+		color: var(--color-text-secondary);
+		margin-bottom: var(--spacing-1);
 	}
 
 	.selected-class-card {
 		max-width: 50vw;
-		margin: 2rem auto 1rem auto;
-		padding: 1rem 1.5rem;
-		border: 2px solid #888;
-		border-radius: 8px;
-		background-color: #fafafa;
-		box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+		margin: var(--spacing-8) auto var(--spacing-4) auto;
+		padding: var(--spacing-4) var(--spacing-6);
+		border: 2px solid var(--color-neutral-500);
+		border-radius: var(--radius-lg);
+		background-color: var(--color-neutral-50);
+		box-shadow: var(--shadow-md);
 	}
 
 	.selected-class-info {
 		display: flex;
 		align-items: center;
-		gap: 1rem;
+		gap: var(--spacing-4);
 	}
 
 	.selected-class-icon {
 		width: 60px;
 		height: 60px;
 		object-fit: contain;
-		border-radius: 6px;
-		box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+		border-radius: var(--radius-md);
+		box-shadow: var(--shadow-sm);
 	}
 
 	.selected-class-text {
@@ -949,28 +934,28 @@
 
 	.selected-class-text h2 {
 		margin: 0;
-		font-weight: 700;
-		font-size: 1.2rem;
+		font-weight: var(--font-weight-bold);
+		font-size: var(--font-size-lg);
 	}
 
 	.max-hp {
-		font-size: 0.9rem;
-		color: #666;
-		margin-top: 4px;
+		font-size: var(--font-size-sm);
+		color: var(--color-text-secondary);
+		margin-top: var(--spacing-1);
 	}
 
 	.remove-class-button {
-		font-size: 1.5rem;
+		font-size: var(--font-size-xl);
 		cursor: pointer;
 		background: none;
 		border: none;
-		color: #c00;
-		padding: 4px 8px;
-		border-radius: 4px;
-		transition: background-color 0.2s ease;
+		color: var(--color-warning);
+		padding: var(--spacing-1) var(--spacing-2);
+		border-radius: var(--radius-sm);
+		transition: background-color var(--transition-base);
 	}
 	.remove-class-button:hover {
-		background-color: #fdd;
+		background-color: var(--color-warning-bg);
 	}
 
 	/* Feature card styling for popup content */
@@ -1039,13 +1024,13 @@
 	}
 
 	.quiz-link {
-		color: #2563eb;
-		font-size: 1.1rem;
+		color: var(--color-primary-blue);
+		font-size: var(--font-size-md);
 		text-decoration: underline;
-		transition: color 0.2s ease;
+		transition: color var(--transition-base);
 	}
 
 	.quiz-link:hover {
-		color: #1d4ed8;
+		color: var(--color-primary-dark);
 	}
 </style>

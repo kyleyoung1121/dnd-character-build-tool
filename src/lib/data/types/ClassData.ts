@@ -47,4 +47,8 @@ export interface ClassData {
 		choices: (EquipmentChoice | SimpleEquipmentChoice)[];
 	};
 	classFeatures: FeaturePrompt[];
+	// Enhanced popup content
+	enhancedFlavor?: string; // 1-2 sentence immersive description
+	cultureNotes?: string; // Training, philosophy, typical members
+	popupImage?: string; // Enhanced artwork path
 }

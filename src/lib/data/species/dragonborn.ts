@@ -8,7 +8,7 @@ const abilityScoreChoicePrompt: FeaturePrompt = {
 	id: 'dragonborn_ability_score_choice',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'Your Strength score increases by 2, and your Charisma score increases by 1.' },
+			{ type: 'text', text: 'Your Strength score increases by 2, and your Charisma score increases by 1.' }
 		]
 	},
 	source: 'dragonborn',
@@ -32,7 +32,7 @@ const draconicElementPrompt: FeaturePrompt = {
 	id: 'dragonborn_elemental_affinity',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'Your draconic heritage manifests as a connection to a destructive element. 		Choose the damage type that both your breath weapon and your natural resistance 		are associated with.' },
+			{ type: 'text', text: 'Your draconic heritage manifests as a connection to a destructive element. 		Choose the damage type that both your breath weapon and your natural resistance 		are associated with.' }
 		]
 	},
 	featureOptions: {
@@ -50,48 +50,13 @@ const draconicElementPrompt: FeaturePrompt = {
 	]
 };
 
-// Draconic color prompt
-const draconicColorPrompt: FeaturePrompt = {
-	name: 'Draconic Color',
-	id: 'dragonborn_draconic_color',
-	description: {
-		blocks: [
-			{ type: 'text', text: 'Choose the hue of your scales. Traditionally, a dragonborn’s color hinted at their elemental breath, but here it can simply reflect your style or personality.' },
-		]
-	},
-	featureOptions: {
-		placeholderText: '-Choose a Color-',
-		options: [
-			'Black',
-			'Blue',
-			'Brass',
-			'Bronze',
-			'Copper',
-			'Gold',
-			'Green',
-			'Red',
-			'Silver',
-			'White'
-		],
-		numPicks: 1
-	},
-	source: 'dragonborn',
-	effects: [
-		{
-			target: 'features',
-			action: 'add',
-			value: 'Draconic Color: {userChoice}'
-		}
-	]
-};
-
 // Breath weapon prompt: let user specify shape
 const breathShapePrompt: FeaturePrompt = {
 	name: 'Breath Shape',
 	id: 'dragonborn_breath_shape',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'Your breath weapon takes a particular form. Choose the shape of your exhalation.' },
+			{ type: 'text', text: 'Your breath weapon takes a particular form. Choose the shape of your exhalation.' }
 		]
 	},
 	featureOptions: {
@@ -115,7 +80,7 @@ const speciesFeatures: FeaturePrompt[] = [
 		id: 'dragonborn_breath_weapon',
 		description: {
 			blocks: [
-				{ type: 'text', text: 'You can use your action to exhale destructive energy.  			The damage type is determined by your Elemental Affinity, and the area of effect 			by your chosen Breath Shape.' },
+				{ type: 'text', text: 'You can use your action to exhale destructive energy.  			The damage type is determined by your Elemental Affinity, and the area of effect 			by your chosen Breath Shape.' }
 			]
 		},
 		source: 'dragonborn',
@@ -132,7 +97,7 @@ const speciesFeatures: FeaturePrompt[] = [
 		id: 'dragonborn_damage_resistance',
 		description: {
 			blocks: [
-				{ type: 'text', text: 'You have resistance to the damage type associated with your Elemental Affinity.' },
+				{ type: 'text', text: 'You have resistance to the damage type associated with your Elemental Affinity.' }
 			]
 		},
 		source: 'dragonborn',
@@ -150,7 +115,7 @@ export const dragonborn: SpeciesData = {
 	name: 'Dragonborn',
 	image: base + '/species_icons/dragonborn.jpg',
 	description: `
-		Dragonborn look like dragons who walk on two legs. They don’t have wings or tails, but they still are capable of unleashing the powerful breath of their ancestors.
+		Dragonborn look like dragons who walk on two legs. They don't have wings or tails, but they still are capable of unleashing the powerful breath of their ancestors.
 	`,
 	abilityScoreIncrease: '+2 Strength, +1 Charisma',
 	speed: '30 ft.',
@@ -159,7 +124,6 @@ export const dragonborn: SpeciesData = {
 	speciesFeatures: [
 		abilityScoreChoicePrompt,
 		draconicElementPrompt,
-		draconicColorPrompt,
 		breathShapePrompt,
 		...speciesFeatures
 	]

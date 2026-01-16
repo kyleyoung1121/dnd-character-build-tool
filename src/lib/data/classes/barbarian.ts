@@ -224,6 +224,7 @@ const primalPathPrompt: FeaturePrompt = {
 	]
 };
 
+
 const classFeaturesPrompt: FeaturePrompt[] = [
 	{
 		name: 'Rage',
@@ -366,6 +367,10 @@ export const barbarian: ClassData = {
 	name: 'Barbarian',
 	image: base + '/class_icons/barbarian.jpg',
 	description: 'Frenzied warriors fueled by primal rage.',
+	// Enhanced popup content for narrative preview
+	enhancedFlavor: "In battle, you are a whirlwind of steel and fury, your rage making you nearly unstoppable. You harness primal forces that connect you to the ancient spirits of your ancestors.",
+	cultureNotes: "Barbarians often come from tribal societies where strength and courage are paramount. Training begins in childhood with survival skills, combat techniques, and spiritual attunement to ancestral spirits. Many are protectors of their communities, while others become wanderers seeking glory and understanding of their rage.",
+	popupImage: "/class-popup-art/barbarian-ritual-rage.jpg", // Placeholder for professional artwork
 	hitDie: 'd12',
 	primaryAbility: 'Strength',
 	saves: ['Strength', 'Constitution'],

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { base } from '$app/paths';
+	import { onMount, onDestroy } from 'svelte';
 	
 	export let title: string;
 	export let itemName: string = ''; // The actual name (e.g., "Barbarian") without "Add" or "to Character"
@@ -18,6 +19,21 @@
 	// Enhanced artwork display logic
 	$: hasEnhancedImage = imagePath && imagePath.includes('/popup-art/');
 	$: usePlaceholder = !hasEnhancedImage;
+
+	// ESC key handler
+	function handleKeydown(event: KeyboardEvent) {
+		if (event.key === 'Escape' && isOpen) {
+			onClose();
+		}
+	}
+
+	onMount(() => {
+		window.addEventListener('keydown', handleKeydown);
+	});
+
+	onDestroy(() => {
+		window.removeEventListener('keydown', handleKeydown);
+	});
 </script>
 
 {#if isOpen}

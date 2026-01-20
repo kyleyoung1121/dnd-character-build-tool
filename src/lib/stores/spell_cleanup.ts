@@ -1,4 +1,3 @@
-import { get } from 'svelte/store';
 import { character_store } from './character_store';
 import { applyChoice } from './character_store_helpers';
 import { addNotification } from './notification_store';
@@ -14,6 +13,7 @@ let previousSubclass: string | null = null;
 let previousRace: string | null = null;
 let previousSubrace: string | null = null;
 let previousPactBoon: string | null = null;
+let previousFeatures: string[] | null = null;
 let isInitialized = false;
 
 /**
@@ -32,6 +32,7 @@ export function initializeSpellCleanup() {
 		const currentSubclass = character.subclass || '';
 		const currentRace = character.race || '';
 		const currentSubrace = character.subrace || '';
+		const currentFeatures = character.features || [];
 		
 		// Track pact boon for warlocks
 		let currentPactBoon = '';
@@ -52,13 +53,15 @@ export function initializeSpellCleanup() {
 				subclass: currentSubclass,
 				race: currentRace,
 				subrace: currentSubrace,
-				pactBoon: currentPactBoon
+				pactBoon: currentPactBoon,
+				features: currentFeatures.length
 			});
 			previousClass = currentClass;
 			previousSubclass = currentSubclass;
 			previousRace = currentRace;
 			previousSubrace = currentSubrace;
 			previousPactBoon = currentPactBoon;
+			previousFeatures = currentFeatures;
 			return;
 		}
 
@@ -68,9 +71,10 @@ export function initializeSpellCleanup() {
 		const raceChanged = currentRace !== previousRace;
 		const subraceChanged = currentSubrace !== previousSubrace;
 		const pactBoonChanged = currentPactBoon !== previousPactBoon;
+		const featuresChanged = JSON.stringify(currentFeatures) !== JSON.stringify(previousFeatures);
 
 		// If nothing changed, no cleanup needed
-		if (!classChanged && !subclassChanged && !raceChanged && !subraceChanged && !pactBoonChanged) {
+		if (!classChanged && !subclassChanged && !raceChanged && !subraceChanged && !pactBoonChanged && !featuresChanged) {
 			return;
 		}
 
@@ -80,22 +84,24 @@ export function initializeSpellCleanup() {
 			raceChanged,
 			subraceChanged,
 			pactBoonChanged,
+			featuresChanged,
 			from: { class: previousClass, subclass: previousSubclass, race: previousRace, subrace: previousSubrace, pactBoon: previousPactBoon },
 			to: { class: currentClass, subclass: currentSubclass, race: currentRace, subrace: currentSubrace, pactBoon: currentPactBoon }
 		});
 
 		// Update tracked values BEFORE cleanup so we have the old values for comparison
-		const oldClass = previousClass;
-		const oldSubclass = previousSubclass;
-		const oldRace = previousRace;
-		const oldSubrace = previousSubrace;
-		const oldPactBoon = previousPactBoon;
+		const oldClass = previousClass || '';
+		const oldSubclass = previousSubclass || '';
+		const oldRace = previousRace || '';
+		const oldSubrace = previousSubrace || '';
+		const oldPactBoon = previousPactBoon || '';
 
 		previousClass = currentClass;
 		previousSubclass = currentSubclass;
 		previousRace = currentRace;
 		previousSubrace = currentSubrace;
 		previousPactBoon = currentPactBoon;
+		previousFeatures = currentFeatures;
 
 		// Perform cleanup, passing both old and new values
 		const removedSpells = cleanupInvalidSpells(character, {
@@ -108,7 +114,9 @@ export function initializeSpellCleanup() {
 			newSubclass: currentSubclass,
 			newRace: currentRace,
 			newSubrace: currentSubrace,
-			newPactBoon: currentPactBoon
+			newPactBoon: currentPactBoon,
+			oldFeatures: previousFeatures || [],
+			newFeatures: currentFeatures
 		});
 
 		// Check if this was a warlock patron change and if patron spells were removed
@@ -130,6 +138,17 @@ export function initializeSpellCleanup() {
 				'Pact Boon Changed',
 				`Changing your Pact Boon removed ${removedSpells.pactBoonSpells.length} spell(s) from your previous pact: ${pactBoonSpellNames}. Please visit the Spells tab to select replacement spells if needed.`,
 				10000
+			);
+		}
+
+		// Check if features changed and if feature-granted spells were removed
+		if (featuresChanged && removedSpells.featureSpells.length > 0) {
+			const featureSpellNames = removedSpells.featureSpells.join(', ');
+			addNotification(
+				'info',
+				'Features Changed',
+				`Changing your features removed ${removedSpells.featureSpells.length} auto-granted spell(s): ${featureSpellNames}.`,
+				8000
 			);
 		}
 	});
@@ -161,21 +180,23 @@ function cleanupInvalidSpells(
 		newRace: string;
 		newSubrace: string;
 		newPactBoon: string;
+		oldFeatures: string[];
+		newFeatures: string[];
 	}
-): { patronSpells: string[], pactBoonSpells: string[], otherSpells: string[] } {
+): { patronSpells: string[], pactBoonSpells: string[], featureSpells: string[], otherSpells: string[] } {
 	// Get current spell selections from provenance
 	const scopeId = 'spell_selections';
 	const provenanceData = character._provenance?.[scopeId];
 
 	if (!provenanceData) {
 		console.log('[Spell Cleanup] No spell selections found');
-		return { patronSpells: [], pactBoonSpells: [], otherSpells: [] }; // No spells selected
+		return { patronSpells: [], pactBoonSpells: [], featureSpells: [], otherSpells: [] }; // No spells selected
 	}
 
 	const actualData = (provenanceData as any)._set || provenanceData;
 	if (!actualData.spells || !Array.isArray(actualData.spells)) {
 		console.log('[Spell Cleanup] No spells array found');
-		return { patronSpells: [], pactBoonSpells: [], otherSpells: [] };
+		return { patronSpells: [], pactBoonSpells: [], featureSpells: [], otherSpells: [] };
 	}
 
 	console.log('[Spell Cleanup] Found', actualData.spells.length, 'spells to check');
@@ -185,6 +206,7 @@ function cleanupInvalidSpells(
 	// Track removed spells by type
 	const removedPatronSpells: string[] = [];
 	const removedPactBoonSpells: string[] = [];
+	const removedFeatureSpells: string[] = [];
 	const removedOtherSpells: string[] = [];
 
 	// Get old patron's expanded spells
@@ -205,6 +227,9 @@ function cleanupInvalidSpells(
 			if (item?.name) removedOtherSpells.push(item.name);
 			return false;
 		}
+
+		// Check if this spell's source is still valid
+		const metadata = item;
 
 		// Check if this is a patron spell that's no longer valid due to patron change
 		if (changes.oldClass === 'Warlock' && changes.newClass === 'Warlock' && changes.oldSubclass !== changes.newSubclass) {
@@ -230,8 +255,40 @@ function cleanupInvalidSpells(
 			}
 		}
 
-		// Check if this spell's source is still valid
-		const metadata = item;
+		// Check if this is a feature-granted spell that's no longer valid due to feature change
+		if (changes.oldFeatures && changes.newFeatures) {
+			const wasGrantedByFeature = changes.oldFeatures.some(feature => {
+				// Check if this spell was granted by the old feature
+				if (metadata.tabSource && metadata.tabSource.includes(feature)) {
+					return true;
+				}
+				// Special case for Pact of the Chain Find Familiar
+				if (feature === 'Pact of the Chain' && item.name === 'Find Familiar') {
+					return true;
+				}
+				return false;
+			});
+
+			const isStillGrantedByFeature = changes.newFeatures.some(feature => {
+				// Check if this spell is still granted by current features
+				if (metadata.tabSource && metadata.tabSource.includes(feature)) {
+					return true;
+				}
+				// Special case for Pact of the Chain Find Familiar
+				if (feature === 'Pact of the Chain' && item.name === 'Find Familiar') {
+					return true;
+				}
+				return false;
+			});
+
+			if (wasGrantedByFeature && !isStillGrantedByFeature) {
+				console.log(
+					`[Spell Cleanup] Removing ${item.name} - feature granting spell was removed`
+				);
+				removedFeatureSpells.push(item.name);
+				return false;
+			}
+		}
 
 		// Determine the PRIMARY source of this spell based on tabSource
 		// This tells us what actually granted access to the spell
@@ -320,5 +377,5 @@ function cleanupInvalidSpells(
 		console.log('[Spell Cleanup] No spells removed');
 	}
 
-	return { patronSpells: removedPatronSpells, pactBoonSpells: removedPactBoonSpells, otherSpells: removedOtherSpells };
+	return { patronSpells: removedPatronSpells, pactBoonSpells: removedPactBoonSpells, featureSpells: removedFeatureSpells, otherSpells: removedOtherSpells };
 }

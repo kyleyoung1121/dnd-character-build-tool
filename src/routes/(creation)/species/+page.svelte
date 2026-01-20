@@ -73,11 +73,17 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 	let selectedSpecies: SpeciesData | null = null;
 	let selectedSpeciesData: SpeciesData | null = null;
 
-	// Collapsible parent races
+	// Collapsible parent races - only one can be expanded at a time
 	let expandedSpecies = new Set<string>();
 	function toggleSpeciesExpand(name: string) {
-		if (expandedSpecies.has(name)) expandedSpecies.delete(name);
-		else expandedSpecies.add(name);
+		// If clicking the already-expanded species, close it
+		if (expandedSpecies.has(name)) {
+			expandedSpecies.delete(name);
+		} else {
+			// Otherwise, close all and open this one
+			expandedSpecies.clear();
+			expandedSpecies.add(name);
+		}
 		expandedSpecies = new Set(expandedSpecies); // force reactivity
 	}
 
@@ -598,14 +604,12 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 									<img src={speciesInfo.image} alt={`${speciesInfo.name} icon`} />
 									<span>{speciesInfo.name}</span>
 								</div>
-								<img
-									class="card-arrow"
-									src="{base}/basic_icons/blue_next.png"
-									alt="toggle subraces"
-								/>
+								<!-- Use ellipsis for expandable groups -->
+								<span class="expand-indicator">...</span>
 							</button>
 
-							{#if expandedSpecies.has(speciesInfo.name)}
+							<!-- Drawer-style expansion -->
+							<div class="subrace-drawer" class:open={expandedSpecies.has(speciesInfo.name)}>
 								<div class="subrace-cards-container">
 									{#each speciesInfo.subraces as subrace}
 										<button
@@ -616,15 +620,16 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 												<img src={subrace.image} alt={`${subrace.name} icon`} />
 												<span>{subrace.name}</span>
 											</div>
+											<!-- Use arrow for selectable items -->
 											<img
 												class="card-arrow"
 												src="{base}/basic_icons/blue_next.png"
-												alt="next arrow"
+												alt="select"
 											/>
 										</button>
 									{/each}
 								</div>
-							{/if}
+							</div>
 						</div>
 					{:else}
 						<!-- Single race container -->
@@ -634,7 +639,8 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 									<img src={speciesInfo.image} alt={`${speciesInfo.name} icon`} />
 									<span>{speciesInfo.name}</span>
 								</div>
-								<img class="card-arrow" src="{base}/basic_icons/blue_next.png" alt="next arrow" />
+								<!-- Use arrow for directly selectable species -->
+								<img class="card-arrow" src="{base}/basic_icons/blue_next.png" alt="select" />
 							</button>
 						</div>
 					{/if}
@@ -658,14 +664,12 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 									<img src={speciesInfo.image} alt={`${speciesInfo.name} icon`} />
 									<span>{speciesInfo.name}</span>
 								</div>
-								<img
-									class="card-arrow"
-									src="{base}/basic_icons/blue_next.png"
-									alt="toggle subraces"
-								/>
+								<!-- Use ellipsis for expandable groups -->
+								<span class="expand-indicator">...</span>
 							</button>
 
-							{#if expandedSpecies.has(speciesInfo.name)}
+							<!-- Drawer-style expansion -->
+							<div class="subrace-drawer" class:open={expandedSpecies.has(speciesInfo.name)}>
 								<div class="subrace-cards-container">
 									{#each speciesInfo.subraces as subrace}
 										<button
@@ -676,15 +680,16 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 												<img src={subrace.image} alt={`${subrace.name} icon`} />
 												<span>{subrace.name}</span>
 											</div>
+											<!-- Use arrow for selectable items -->
 											<img
 												class="card-arrow"
 												src="{base}/basic_icons/blue_next.png"
-												alt="next arrow"
+												alt="select"
 											/>
 										</button>
 									{/each}
 								</div>
-							{/if}
+							</div>
 						</div>
 					{:else}
 						<!-- Single race container -->
@@ -694,7 +699,8 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 									<img src={speciesInfo.image} alt={`${speciesInfo.name} icon`} />
 									<span>{speciesInfo.name}</span>
 								</div>
-								<img class="card-arrow" src="{base}/basic_icons/blue_next.png" alt="next arrow" />
+								<!-- Use arrow for directly selectable species -->
+								<img class="card-arrow" src="{base}/basic_icons/blue_next.png" alt="select" />
 							</button>
 						</div>
 					{/if}
@@ -718,14 +724,12 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 									<img src={speciesInfo.image} alt={`${speciesInfo.name} icon`} />
 									<span>{speciesInfo.name}</span>
 								</div>
-								<img
-									class="card-arrow"
-									src="{base}/basic_icons/blue_next.png"
-									alt="toggle subraces"
-								/>
+								<!-- Use ellipsis for expandable groups -->
+								<span class="expand-indicator">...</span>
 							</button>
 
-							{#if expandedSpecies.has(speciesInfo.name)}
+							<!-- Drawer-style expansion -->
+							<div class="subrace-drawer" class:open={expandedSpecies.has(speciesInfo.name)}>
 								<div class="subrace-cards-container">
 									{#each speciesInfo.subraces as subrace}
 										<button
@@ -736,15 +740,16 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 												<img src={subrace.image} alt={`${subrace.name} icon`} />
 												<span>{subrace.name}</span>
 											</div>
+											<!-- Use arrow for selectable items -->
 											<img
 												class="card-arrow"
 												src="{base}/basic_icons/blue_next.png"
-												alt="next arrow"
+												alt="select"
 											/>
 										</button>
 									{/each}
 								</div>
-							{/if}
+							</div>
 						</div>
 					{:else}
 						<!-- Single race container -->
@@ -754,7 +759,8 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 									<img src={speciesInfo.image} alt={`${speciesInfo.name} icon`} />
 									<span>{speciesInfo.name}</span>
 								</div>
-								<img class="card-arrow" src="{base}/basic_icons/blue_next.png" alt="next arrow" />
+								<!-- Use arrow for directly selectable species -->
+								<img class="card-arrow" src="{base}/basic_icons/blue_next.png" alt="select" />
 							</button>
 						</div>
 					{/if}
@@ -855,6 +861,8 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 		padding-top: 80px;
 		max-width: 1200px;
 		margin: 0 auto;
+		min-height: calc(100vh + 1px); /* Force scrollbar on species tab to prevent jitter */
+		box-sizing: border-box;
 	}
 
 	.intro-text {
@@ -950,38 +958,69 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 	/* Parent + subrace grouping */
 	.parent-race-container {
 		display: flex;
-		flex-direction: column; /* stack parent + subraces */
-		width: 100%; /* fill column */
-		min-width: 220px; /* optional: ensure not too narrow on small screens */
+		flex-direction: column;
+		width: 100%;
+		min-width: 220px;
 		box-sizing: border-box;
-		margin-bottom: var(--spacing-1); /* reduced space between species */
+		margin-bottom: var(--spacing-2);
+		overflow: hidden;
 	}
 
 	.parent-race-button {
-		width: 100%; /* fill container */
+		width: 100%;
+		position: relative;
 	}
 
+	/* Expand indicator - replaces arrow for expandable groups */
+	.expand-indicator {
+		font-size: 24px;
+		font-weight: bold;
+		color: var(--color-primary);
+		user-select: none;
+		line-height: 0.5;
+		letter-spacing: 2px;
+	}
+
+	/* Drawer-style expansion container */
+	.subrace-drawer {
+		max-height: 0;
+		overflow: hidden;
+		transition: max-height 0.3s ease-out, opacity 0.2s ease-out;
+		opacity: 0;
+	}
+
+	.subrace-drawer.open {
+		max-height: 800px; /* Adjust based on max expected content */
+		opacity: 1;
+		transition: max-height 0.4s ease-in, opacity 0.3s ease-in 0.1s;
+	}
+
+	/* Container for subrace cards inside drawer */
 	.subrace-cards-container {
 		display: flex;
-		flex-direction: column; /* stack subraces vertically */
+		flex-direction: column;
 		gap: var(--spacing-2);
-		width: 100%; /* fill parent container */
-		padding-left: 5rem; /* indent for nesting */
+		width: 90%; /* Slightly narrower than parent */
+		margin: var(--spacing-3) auto;
+		padding: var(--spacing-3);
+		background-color: var(--color-neutral-100);
+		border-radius: var(--radius-md);
+		border: 1px solid var(--color-neutral-300);
 		box-sizing: border-box;
-		margin-top: var(--spacing-2);
 	}
 
 	/* Subrace card styling */
 	.subrace-card {
-		width: 100%; /* fill subrace container */
+		width: 100%;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		padding: var(--spacing-3) var(--spacing-4);
 		border-radius: var(--radius-md);
 		border: 2px solid var(--color-neutral-400);
-		background-color: var(--color-neutral-50);
+		background-color: var(--color-background);
 		cursor: pointer;
+		transition: all var(--transition-base);
 	}
 
 	.subrace-card img {
@@ -992,7 +1031,9 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 
 	.subrace-card:hover,
 	.subrace-card:focus {
-		background-color: var(--color-neutral-100);
+		background-color: var(--color-neutral-50);
+		border-color: var(--color-primary);
+		transform: translateX(4px);
 	}
 
 	/* Popup and modal styles remain unchanged */

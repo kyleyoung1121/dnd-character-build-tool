@@ -29,9 +29,19 @@ export function applyChoice(
 			const typedKey = key as keyof Character;
 			const current = char[typedKey] as any;
 
+			// Check if this is a selection array that should use SET semantics
+			const selectionArrays = ['beasts', 'spells', 'features', 'skills', 'proficiencies', 'languages', 'inventory', 'attacks'];
+			const shouldSetInsteadOfAdd = selectionArrays.includes(key);
+
 			if (Array.isArray(current) && Array.isArray(value)) {
-				// ADD semantics for arrays
-				(char[typedKey] as any) = [...current, ...value];
+				if (shouldSetInsteadOfAdd) {
+					// SET semantics for selection arrays (replace entire array)
+					prevScalars[typedKey] = current as any;
+					(char[typedKey] as any) = [...value];
+				} else {
+					// ADD semantics for other arrays
+					(char[typedKey] as any) = [...current, ...value];
+				}
 			} else {
 				// SET semantics for scalars (remember prior value for perfect revert)
 				prevScalars[typedKey] = current as any;
@@ -108,16 +118,27 @@ export function revertChanges(char: Character, scopeId: string): Character {
 	if (_set) {
 		for (const [key, value] of Object.entries(_set)) {
 			const typedKey = key as keyof Character;
+			
+			// Check if this is a selection array that should use SET semantics
+			const selectionArrays = ['beasts', 'spells', 'features', 'skills', 'proficiencies', 'languages', 'inventory', 'attacks'];
+			const isSelectionArray = selectionArrays.includes(key);
+			
 			if (Array.isArray(value)) {
-				// Use smart removal that preserves items from other sources
-				// Use provenanceForAnalysis BEFORE we delete the scope
-				(char[typedKey] as any) = smartRemoveFromArray(
-					char[typedKey] as any,
-					value,
-					scopeId,
-					key,
-					provenanceForAnalysis
-				);
+				if (isSelectionArray) {
+					// For selection arrays, restore to previous exact value
+					const prev = _prevScalars?.[typedKey];
+					(char[typedKey] as any) = Array.isArray(prev) ? [...prev] : [];
+				} else {
+					// Use smart removal that preserves items from other sources
+					// Use provenanceForAnalysis BEFORE we delete the scope
+					(char[typedKey] as any) = smartRemoveFromArray(
+						char[typedKey] as any,
+						value,
+						scopeId,
+						key,
+						provenanceForAnalysis
+					);
+				}
 			} else {
 				// restore precise prior scalar if we recorded it; else null fallback
 				const prev = _prevScalars?.[typedKey];

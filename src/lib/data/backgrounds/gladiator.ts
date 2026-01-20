@@ -11,11 +11,18 @@ export const gladiator: BackgroundData = {
 	skillProficiencies: ['Acrobatics', 'Performance'],
 	toolProficiencies: ['Disguise kit', 'One type of unusual weapon'],
 	equipment: [
-		'Unusual weapon (trident, net, or similar)',
 		'Favor of an admirer (letter, trinket, etc)',
 		'Costume',
 		'Belt pouch with 15 gp'
 	],
+	startingEquipment: {
+		fixed: [
+			'Favor of an admirer (letter, trinket, etc)',
+			'Costume',
+			'Belt pouch with 15 gp'
+		],
+		choices: []
+	},
 	feature: 'By Popular Demand',
 	featureDescription:
 		'You can always find a place to perform, usually in gladiatorial arenas, fighting pits, or similar venues. At such a place, you receive free lodging and food of a modest or comfortable standard (depending on the quality of the establishment), as long as you perform each night. In addition, your performance makes you something of a local figure. When strangers recognize you in a town where you have performed, they typically take a liking to you.',
@@ -78,7 +85,6 @@ export const gladiator: BackgroundData = {
 					target: 'inventory',
 					action: 'add',
 					value: [
-						'Unusual weapon (trident, net, or similar)',
 						'Favor of an admirer (letter, trinket, etc)',
 						'Costume',
 						'Belt pouch with 15 gp'

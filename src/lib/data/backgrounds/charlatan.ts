@@ -11,11 +11,18 @@ export const charlatan: BackgroundData = {
 	toolProficiencies: ['Forgery kit', 'One type of gaming set'],
 	equipment: [
 		'Forgery kit',
-		'Gaming set',
 		'Fine clothes',
 		'Signet ring of imaginary person',
 		'Belt pouch with 15 gp'
 	],
+	startingEquipment: {
+		fixed: [
+			'Fine clothes',
+			'Signet ring of imaginary person',
+			'Belt pouch with 15 gp'
+		],
+		choices: []
+	},
 	feature: 'False Identity',
 	featureDescription:
 		'You have created a second identity that includes documentation, established acquaintances, and disguises that allow you to assume that persona. Additionally, you can forge documents including official papers and personal letters, as long as you have seen an example of the kind of document or the handwriting you are trying to copy.',
@@ -73,8 +80,6 @@ export const charlatan: BackgroundData = {
 					target: 'inventory',
 					action: 'add',
 					value: [
-						'Forgery kit',
-						'Gaming set',
 						'Fine clothes',
 						'Signet ring of imaginary person',
 						'Belt pouch with 15 gp'

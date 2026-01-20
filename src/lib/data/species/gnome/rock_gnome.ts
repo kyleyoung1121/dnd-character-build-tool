@@ -88,7 +88,7 @@ export const rockGnome: SpeciesData = {
 			source: 'rock_gnome',
 			effects: [
 				{ target: 'features', action: 'add', value: 'Tinker' },
-				{ target: 'proficiencies', action: 'add', value: "Tinker's Tools" }
+				{ target: 'proficiencies', action: 'add', value: "Tinker's tools" }
 			]
 		}
 	]

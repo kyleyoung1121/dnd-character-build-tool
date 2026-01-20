@@ -11,12 +11,24 @@ export const sailor: BackgroundData = {
 	skillProficiencies: ['Athletics', 'Perception'],
 	toolProficiencies: ["Navigator's tools", 'Vehicles (water)'],
 	equipment: [
+		"Navigator's tools",
 		'Belaying pin (club)',
 		'Silk rope (50 feet)',
 		'Lucky charm such as a rabbit foot or small stone with a hole in the center',
 		'Common clothes',
 		'Belt pouch with 10 gp'
 	],
+	startingEquipment: {
+		fixed: [
+			"Navigator's tools",
+			'Belaying pin (club)',
+			'Silk rope (50 feet)',
+			'Lucky charm such as a rabbit foot or small stone with a hole in the center',
+			'Common clothes',
+			'Belt pouch with 10 gp'
+		],
+		choices: []
+	},
 	feature: "Ship's Passage",
 	featureDescription:
 		"When you need to, you can secure free passage on a sailing ship for yourself and your adventuring companions. You might sail on the ship you served on, or another ship you have good relations with (perhaps one captained by a former crewmate). Because you're calling in a favor, you can't be certain of a schedule or route that will meet your every need. Your Dungeon Master will determine how long it takes to get where you want to go. In return for your free passage, you and your companions are expected to assist the crew during the voyage.",

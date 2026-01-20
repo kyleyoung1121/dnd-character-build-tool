@@ -192,6 +192,11 @@ const rogueArchetypePrompt: FeaturePrompt = {
 						source: 'rogue.assassin',
 						effects: [
 							{
+								target: 'proficiencies',
+								action: 'add',
+								value: ['Disguise kit', "Poisoner's kit"]
+							},
+							{
 								target: 'features',
 								action: 'add',
 								value: "Bonus Proficiencies (Disguise Kit, Poisoner's Kit)"

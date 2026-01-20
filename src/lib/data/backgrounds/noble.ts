@@ -11,6 +11,15 @@ export const noble: BackgroundData = {
 	toolProficiencies: ['One type of gaming set'],
 	languageCount: 1,
 	equipment: ['Fine clothes', 'Signet ring', 'Scroll of pedigree', 'Purse with 25 gp'],
+	startingEquipment: {
+		fixed: [
+			'Fine clothes',
+			'Signet ring',
+			'Scroll of pedigree',
+			'Purse with 25 gp'
+		],
+		choices: []
+	},
 	feature: 'Position of Privilege',
 	featureDescription:
 		'Thanks to your noble birth, people are inclined to think the best of you. You are welcome in high society, and people assume you have the right to be wherever you are. The common folk make every effort to accommodate you and avoid your displeasure, and other people of high birth treat you as a member of the same social sphere.',

@@ -10,6 +10,14 @@ export const criminal: BackgroundData = {
 	skillProficiencies: ['Deception', 'Stealth'],
 	toolProficiencies: ['One type of gaming set', "Thieves' tools"],
 	equipment: ['Crowbar', 'Dark common clothes with hood', 'Belt pouch with 15 gp'],
+	startingEquipment: {
+		fixed: [
+			'Crowbar',
+			'Dark common clothes with hood',
+			'Belt pouch with 15 gp'
+		],
+		choices: []
+	},
 	feature: 'Criminal Contact',
 	featureDescription:
 		'You have a reliable and trustworthy contact who acts as your liaison to a network of other criminals. You know how to get messages to and from your contact, even over great distances; specifically, you know the local messengers, corrupt caravan masters, and seedy sailors who can deliver messages for you.',

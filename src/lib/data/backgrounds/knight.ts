@@ -12,6 +12,15 @@ export const knight: BackgroundData = {
 	toolProficiencies: ['One type of gaming set'],
 	languageCount: 1,
 	equipment: ['Signet ring', 'Scroll of pedigree', 'Fine clothes', 'Belt pouch with 25 gp'],
+	startingEquipment: {
+		fixed: [
+			'Signet ring',
+			'Scroll of pedigree',
+			'Fine clothes',
+			'Belt pouch with 25 gp'
+		],
+		choices: []
+	},
 	feature: 'Retainers',
 	featureDescription:
 		'You have the service of three retainers loyal to your family. One is a noble who serves as your squire, aiding you in exchange for training on their own path to knighthood. Your two remaining retainers might include a groom to care for your horse and a servant to polish your armor. Your retainers can perform mundane tasks for you, but they do not fight for you, will not follow you into obviously dangerous areas, and will leave if they are frequently endangered.',

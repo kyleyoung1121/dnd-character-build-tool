@@ -30,7 +30,7 @@ export function applyChoice(
 			const current = char[typedKey] as any;
 
 			// Check if this is a selection array that should use SET semantics
-			const selectionArrays = ['beasts', 'spells', 'features', 'skills', 'proficiencies', 'languages', 'inventory', 'attacks'];
+			const selectionArrays = ['beasts', 'spells', 'features', 'skills', 'languages', 'inventory', 'attacks'];
 			const shouldSetInsteadOfAdd = selectionArrays.includes(key);
 
 			if (Array.isArray(current) && Array.isArray(value)) {
@@ -120,7 +120,7 @@ export function revertChanges(char: Character, scopeId: string): Character {
 			const typedKey = key as keyof Character;
 			
 			// Check if this is a selection array that should use SET semantics
-			const selectionArrays = ['beasts', 'spells', 'features', 'skills', 'proficiencies', 'languages', 'inventory', 'attacks'];
+			const selectionArrays = ['beasts', 'spells', 'features', 'skills', 'languages', 'inventory', 'attacks'];
 			const isSelectionArray = selectionArrays.includes(key);
 			
 			if (Array.isArray(value)) {

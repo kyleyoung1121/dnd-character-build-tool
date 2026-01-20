@@ -439,28 +439,6 @@ export const bard: ClassData = {
 						]
 					}
 				]
-			} as EquipmentChoice,
-			{
-				name: 'Musical Instrument',
-				description: 'Choose your musical instrument',
-				options: [
-					{
-						label: 'Lute',
-						items: ['Lute']
-					},
-					{
-						label: 'Other musical instrument',
-						subChoices: [
-							{
-								name: 'Musical Instrument',
-								description: 'Choose a musical instrument',
-								type: 'simple-list',
-								options: musicalInstruments.filter((i) => i !== 'Lute'),
-								count: 1
-							}
-						]
-					}
-				]
 			} as EquipmentChoice
 		]
 	},

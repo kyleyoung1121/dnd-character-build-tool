@@ -12,6 +12,15 @@ export const outlander: BackgroundData = {
 	toolProficiencies: ['One type of musical instrument'],
 	languageCount: 1,
 	equipment: ['Staff', 'Hunting trap', "Traveler's clothes", 'Belt pouch with 10 gp'],
+	startingEquipment: {
+		fixed: [
+			'Staff',
+			'Hunting trap',
+			"Traveler's clothes",
+			'Belt pouch with 10 gp'
+		],
+		choices: []
+	},
 	feature: 'Wanderer',
 	featureDescription:
 		'You have an excellent memory for maps and geography, and you can always recall the general layout of terrain, settlements, and other features around you. In addition, you can find food and shelter for yourself and up to five other people each day, provided that the land offers berries, small game, water, and so forth.',

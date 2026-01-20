@@ -4,6 +4,8 @@
 	import { character_store } from '$lib/stores/character_store';
 	import { applyChoice } from '$lib/stores/character_store_helpers';
 	import { base } from '$app/paths';
+	import { getProficiencyGrantedEquipment } from '$lib/stores/proficiency_equipment_sync';
+	import { shouldHideEquipmentChoice, getEquipmentFromProficienciesBySource } from '$lib/data/proficiency-equipment-mapping';
 
 	// Import class data
 	import { fighter } from '$lib/data/classes/fighter';
@@ -64,6 +66,96 @@
 	// Reactive variables for subchoice resolution
 	let subchoiceResolution: Record<number, boolean> = {};
 	let availableSubchoices: Record<number, EquipmentSubChoice[]> = {};
+
+	// Proficiency-granted equipment (reactive, filtered by source)
+	let classProficiencyEquipment: string[] = [];
+	let backgroundProficiencyEquipment: string[] = [];
+	let speciesProficiencyEquipment: string[] = [];
+	
+	$: {
+		const char = $character_store;
+		const proficiencies = char.proficiencies || [];
+		const characterClass = char.class;
+		const characterSubclass = char.subclass;
+		const characterBackground = char.background;
+		const characterSpecies = char.race; // Character store uses 'race' field
+		
+		classProficiencyEquipment = getEquipmentFromProficienciesBySource(proficiencies, characterClass, characterSubclass, characterBackground, characterSpecies, 'class');
+		backgroundProficiencyEquipment = getEquipmentFromProficienciesBySource(proficiencies, characterClass, characterSubclass, characterBackground, characterSpecies, 'background');
+		speciesProficiencyEquipment = getEquipmentFromProficienciesBySource(proficiencies, characterClass, characterSubclass, characterBackground, characterSpecies, 'species');
+	}
+
+	// Helper function to check if a background equipment option should be hidden
+	function shouldHideBackgroundOption(option: string[]): boolean {
+		const char = get(character_store);
+		const proficiencies = char.proficiencies || [];
+		
+		// Hide if ALL items in the option are proficiency-granted
+		// This ensures we only hide complete duplicates
+		return option.every(item => shouldHideEquipmentChoice(item, proficiencies));
+	}
+
+	// Helper function to check if an entire background choice should be hidden
+	// This handles categories like "artisan's tools" or "musical instruments"
+	function shouldHideEntireBackgroundChoice(choice: { name: string; description: string; options: string[][] }): boolean {
+		const char = get(character_store);
+		const proficiencies = char.proficiencies || [];
+		
+		// Define category keywords that indicate this is a category-based choice
+		const categoryKeywords = [
+			"artisan's tool",
+			"artisan tool",
+			"musical instrument",
+			"gaming set",
+			"game set"
+		];
+		
+		// Check if the choice name or description contains a category keyword
+		const choiceText = (choice.name + ' ' + choice.description).toLowerCase();
+		const isCategoryChoice = categoryKeywords.some(keyword => choiceText.includes(keyword));
+		
+		if (!isCategoryChoice) return false;
+		
+		// If this is a category choice, check if user has ANY proficiency from this category
+		// Flatten all options to get all possible items in this category
+		const allItemsInCategory = choice.options.flat();
+		
+		// If user has proficiency in ANY item from this category, hide the entire choice
+		return allItemsInCategory.some(item => {
+			// Check if this item would be granted by proficiencies
+			return shouldHideEquipmentChoice(item, proficiencies);
+		});
+	}
+
+	// Helper function to check if a class equipment choice should be completely hidden
+	function shouldHideClassEquipmentChoice(choice: EquipmentChoice | SimpleEquipmentChoice): boolean {
+		const char = get(character_store);
+		const proficiencies = char.proficiencies || [];
+		
+		if (!isEquipmentChoice(choice)) return false;
+		
+		// Check if ALL options in this choice would grant items that are proficiency-granted
+		const enhancedChoice = choice as EquipmentChoice;
+		return enhancedChoice.options.every(option => {
+			// Check direct items
+			if (option.items) {
+				const allItemsGranted = option.items.every(item => 
+					shouldHideEquipmentChoice(item, proficiencies)
+				);
+				if (allItemsGranted) return true;
+			}
+			
+			// Check subchoice options
+			if (option.subChoices) {
+				const allSubchoicesGranted = option.subChoices.every(subChoice => 
+					subChoice.options.every(item => shouldHideEquipmentChoice(item, proficiencies))
+				);
+				if (allSubchoicesGranted) return true;
+			}
+			
+			return false;
+		});
+	}
 
 	// Reactive statements to get current selections
 	$: {
@@ -650,9 +742,10 @@
 
 			<!-- Equipment Choices -->
 			{#each currentClass.startingEquipment.choices as choice, choiceIndex}
-				<div class="equipment-group">
-					<h3>{choice.name}</h3>
-					<p class="choice-description">{choice.description}</p>
+				{#if !shouldHideClassEquipmentChoice(choice)}
+					<div class="equipment-group">
+						<h3>{choice.name}</h3>
+						<p class="choice-description">{choice.description}</p>
 
 					{#if isEquipmentChoice(choice)}
 						<!-- Enhanced Equipment Choice -->
@@ -788,10 +881,55 @@
 									</button>
 								{/each}
 							</div>
+							{/if}
 						{/if}
-					{/if}
-				</div>
+					</div>
+				{/if}
 			{/each}
+
+			<!-- Equipment from Proficiencies (Class) -->
+			{#if classProficiencyEquipment.length > 0}
+				<div class="equipment-group">
+					<h3>Equipment from Proficiencies</h3>
+					<p class="proficiency-note">
+						Automatically granted based on your class/subclass proficiency selections.
+					</p>
+
+					<div class="equipment-list">
+						{#each classProficiencyEquipment as item}
+							<div class="equipment-item proficiency-granted">
+								<span class="item-name">{item}</span>
+								<span class="item-type">From Proficiency</span>
+							</div>
+						{/each}
+					</div>
+				</div>
+			{/if}
+		</div>
+	{/if}
+
+	<!-- Species Equipment Section (Conditional) -->
+	{#if speciesProficiencyEquipment.length > 0}
+		<div class="equipment-section">
+			<div class="section-header species-section">
+				<h2>{$character_store.race || 'Species'} Equipment</h2>
+			</div>
+
+			<div class="equipment-group">
+				<h3>Equipment from Proficiencies</h3>
+				<p class="proficiency-note">
+					Automatically granted based on your species proficiency selections.
+				</p>
+
+				<div class="equipment-list">
+					{#each speciesProficiencyEquipment as item}
+						<div class="equipment-item proficiency-granted">
+							<span class="item-name">{item}</span>
+							<span class="item-type">From Proficiency</span>
+						</div>
+					{/each}
+				</div>
+			</div>
 		</div>
 	{/if}
 
@@ -822,51 +960,79 @@
 
 				<!-- Background Equipment Choices -->
 				{#each currentBackground.startingEquipment.choices as choice, choiceIndex}
-					<div class="equipment-group">
-						<h3>{choice.name}</h3>
-						<p class="choice-description">{choice.description}</p>
+					{#if !shouldHideEntireBackgroundChoice(choice)}
+						{@const filteredOptions = choice.options.filter((option) => !shouldHideBackgroundOption(option))}
+						{#if filteredOptions.length > 0}
+						<div class="equipment-group">
+							<h3>{choice.name}</h3>
+							<p class="choice-description">{choice.description}</p>
 
-						{#if choice.options.length > 3}
-							<!-- Use dropdown for many options -->
-							<div class="dropdown-container">
-								<select
-									class="equipment-dropdown"
-									value={backgroundEquipmentChoices[choiceIndex] ?? ''}
-									on:change={(e) => {
-										const target = e.target as HTMLSelectElement;
-										if (target.value) {
-											handleBackgroundEquipmentChoice(choiceIndex, parseInt(target.value));
-										}
-									}}
-								>
-									<option value="" disabled>Choose an option...</option>
-									{#each choice.options as option, optionIndex}
-										<option value={optionIndex}>
-											{option.join(', ')}
-										</option>
-									{/each}
-								</select>
-							</div>
-						{:else}
-							<!-- Use buttons for few options -->
-							<div class="choice-options">
-								{#each choice.options as option, optionIndex}
-									<button
-										class="choice-option"
-										class:selected={backgroundEquipmentChoices[choiceIndex] === optionIndex}
-										on:click={() => handleBackgroundEquipmentChoice(choiceIndex, optionIndex)}
+							{#if filteredOptions.length > 3}
+								<!-- Use dropdown for many options -->
+								<div class="dropdown-container">
+									<select
+										class="equipment-dropdown"
+										value={backgroundEquipmentChoices[choiceIndex] ?? ''}
+										on:change={(e) => {
+											const target = e.target as HTMLSelectElement;
+											if (target.value) {
+												// Find original index in unfiltered array
+												const selectedOption = filteredOptions[parseInt(target.value)];
+												const originalIndex = choice.options.indexOf(selectedOption);
+												handleBackgroundEquipmentChoice(choiceIndex, originalIndex);
+											}
+										}}
 									>
-										<div class="option-items">
-											{#each option as item}
-												<span class="option-item">{item}</span>
-											{/each}
-										</div>
-									</button>
-								{/each}
+										<option value="" disabled>Choose an option...</option>
+										{#each filteredOptions as option, optionIndex}
+											<option value={optionIndex}>
+												{option.join(', ')}
+											</option>
+										{/each}
+									</select>
+								</div>
+							{:else}
+								<!-- Use buttons for few options -->
+								<div class="choice-options">
+									{#each filteredOptions as option, optionIndex}
+										{@const originalIndex = choice.options.indexOf(option)}
+										<button
+											class="choice-option"
+											class:selected={backgroundEquipmentChoices[choiceIndex] === originalIndex}
+											on:click={() => handleBackgroundEquipmentChoice(choiceIndex, originalIndex)}
+										>
+											<div class="option-items">
+												{#each option as item}
+													<span class="option-item">{item}</span>
+												{/each}
+											</div>
+										</button>
+									{/each}
+								</div>
+								{/if}
 							</div>
 						{/if}
-					</div>
+					{/if}
 				{/each}
+
+				<!-- Equipment from Proficiencies (Background) -->
+				{#if backgroundProficiencyEquipment.length > 0}
+					<div class="equipment-group">
+						<h3>Equipment from Proficiencies</h3>
+						<p class="proficiency-note">
+							Automatically granted based on your background proficiency selections.
+						</p>
+
+						<div class="equipment-list">
+							{#each backgroundProficiencyEquipment as item}
+								<div class="equipment-item proficiency-granted">
+									<span class="item-name">{item}</span>
+									<span class="item-type">From Proficiency</span>
+								</div>
+							{/each}
+						</div>
+					</div>
+				{/if}
 			{:else}
 				<!-- Fallback to old equipment format -->
 				<div class="equipment-group">
@@ -973,10 +1139,15 @@
 
 	.choice-description,
 	.fixed-equipment-note,
-	.background-note {
+	.background-note,
+	.proficiency-note {
 		color: var(--color-text-muted);
 		margin-bottom: var(--spacing-4);
 		font-size: var(--font-size-sm);
+	}
+
+	.section-header.proficiency-section h2 {
+		color: var(--color-accent-purple);
 	}
 
 	.equipment-list {
@@ -1001,6 +1172,11 @@
 
 	.equipment-item.background {
 		border-left-color: var(--color-success);
+	}
+
+	.equipment-item.proficiency-granted {
+		border-left-color: var(--color-accent-purple);
+		background: var(--color-purple-50, #f5f3ff);
 	}
 
 	.equipment-item-pack {

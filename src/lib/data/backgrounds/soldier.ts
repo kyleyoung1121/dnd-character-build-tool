@@ -16,6 +16,16 @@ export const soldier: BackgroundData = {
 		'Common clothes',
 		'Belt pouch with 10 gp'
 	],
+	startingEquipment: {
+		fixed: [
+			'Insignia of rank',
+			'Trophy from fallen enemy',
+			'Deck of cards',
+			'Common clothes',
+			'Belt pouch with 10 gp'
+		],
+		choices: []
+	},
 	feature: 'Military Rank',
 	featureDescription:
 		'You have a military rank from your career as a soldier. Soldiers loyal to your former military organization still recognize your authority and influence, and they defer to you if they are of a lower rank. You can invoke your rank to exert influence over other soldiers and requisition simple equipment or horses for temporary use.',

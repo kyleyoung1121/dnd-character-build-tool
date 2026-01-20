@@ -11,12 +11,24 @@ export const pirate: BackgroundData = {
 	skillProficiencies: ['Athletics', 'Perception'],
 	toolProficiencies: ["Navigator's tools", 'Vehicles (water)'],
 	equipment: [
+		"Navigator's tools",
 		'Belaying pin (club)',
 		'Silk rope (50 feet)',
 		'Lucky charm such as a rabbit foot or small stone with a hole in the center',
 		'Common clothes',
 		'Belt pouch with 10 gp'
 	],
+	startingEquipment: {
+		fixed: [
+			"Navigator's tools",
+			'Belaying pin (club)',
+			'Silk rope (50 feet)',
+			'Lucky charm such as a rabbit foot or small stone with a hole in the center',
+			'Common clothes',
+			'Belt pouch with 10 gp'
+		],
+		choices: []
+	},
 	feature: 'Bad Reputation',
 	featureDescription:
 		'No matter where you go, people are afraid of you due to your reputation. When you are in a civilized settlement, you can get away with minor criminal offenses, such as refusing to pay for food at a tavern or breaking down doors at a local shop, since most people will not report your activity to the authorities.',

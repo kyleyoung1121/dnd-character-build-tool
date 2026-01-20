@@ -108,7 +108,6 @@ export const hermit: BackgroundData = {
 					target: 'inventory',
 					action: 'add',
 					value: [
-						'Herbalism kit',
 						'Scroll case stuffed full of notes from your studies or prayers',
 						'Winter blanket',
 						'Belt pouch with 5 gp'

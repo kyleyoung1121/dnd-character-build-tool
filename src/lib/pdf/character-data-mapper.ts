@@ -863,27 +863,27 @@ function formatProficienciesAndLanguages(character: Character): string {
 	
 	// Armor proficiencies (single line, bold title)
 	if (armorProfs.length > 0) {
-		lines.push(`<<BOLD:Armor:>> ${armorProfs.join(', ')}`);
+		lines.push(`[[BOLD:Armor:]] ${armorProfs.join(', ')}`);
 	}
 	
 	// Weapon proficiencies (single line, bold title)
 	if (weaponProfs.length > 0) {
-		lines.push(`<<BOLD:Weapons:>> ${weaponProfs.join(', ')}`);
+		lines.push(`[[BOLD:Weapons:]] ${weaponProfs.join(', ')}`);
 	}
 	
 	// Musical instruments (single line, bold title)
 	if (instrumentProfs.length > 0) {
-		lines.push(`<<BOLD:Instruments:>> ${instrumentProfs.join(', ')}`);
+		lines.push(`[[BOLD:Instruments:]] ${instrumentProfs.join(', ')}`);
 	}
 	
 	// Tools (single line, bold title)
 	if (toolProfs.length > 0) {
-		lines.push(`<<BOLD:Tools:>> ${toolProfs.join(', ')}`);
+		lines.push(`[[BOLD:Tools:]] ${toolProfs.join(', ')}`);
 	}
 	
 	// Other proficiencies (single line, bold title)
 	if (otherProfs.length > 0) {
-		lines.push(`<<BOLD:Other:>> ${otherProfs.join(', ')}`);
+		lines.push(`[[BOLD:Other:]] ${otherProfs.join(', ')}`);
 	}
 	
 	// Languages (single line, bold title)
@@ -891,7 +891,7 @@ function formatProficienciesAndLanguages(character: Character): string {
 		if (lines.length > 0) {
 			lines.push(''); // Empty line before languages
 		}
-		lines.push(`<<BOLD:Languages:>> ${character.languages.join(', ')}`);
+		lines.push(`[[BOLD:Languages:]] ${character.languages.join(', ')}`);
 	}
 	
 	return lines.join('\n');

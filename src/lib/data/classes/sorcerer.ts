@@ -39,11 +39,7 @@ const spellcastingPrompt: FeaturePrompt = {
 	},
 	source: 'sorcerer',
 	effects: [
-		{
-			target: 'features',
-			action: 'add',
-			value: 'Spellcasting'
-		}
+		
 	]
 };
 

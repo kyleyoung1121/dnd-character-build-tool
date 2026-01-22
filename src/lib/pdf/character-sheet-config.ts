@@ -199,9 +199,9 @@ export const PAGE_1_FIELDS = {
 	
 	// Proficiencies & Languages (right column)
 	proficienciesAndLanguages: {
-		x: 30,
-		y: -10,
-		width: 200,
+		x: 25,
+		y: -3,
+		width: 170,
 		height: 150,
 		fontSize: 8,
 		lineHeight: 10

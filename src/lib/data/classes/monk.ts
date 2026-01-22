@@ -462,7 +462,41 @@ const monasticTraditionPrompt: FeaturePrompt = {
 	]
 };
 
+const unarmoredDefensePrompt: FeaturePrompt = {
+	id: 'monk_unarmored_defense_01',
+	name: 'Unarmored Defense',
+	description: {
+		blocks: [
+			{
+				type: 'computed-inline',
+				text: 'Beginning at 1st level, while you are wearing no armor and not wielding a shield, your AC equals 10 + your Dexterity modifier + your Wisdom modifier.',
+				hints: [
+					{
+						afterText: 'your Dexterity modifier',
+						computed: { source: 'abilityMod', ability: 'DEX' },
+						hintFormat: '({value})'
+					},
+					{
+						afterText: 'your Wisdom modifier',
+						computed: { source: 'abilityMod', ability: 'WIS' },
+						hintFormat: '({value})'
+					}
+				]
+			}
+		]
+	},
+	source: 'monk',
+	effects: [
+		{
+			target: 'features',
+			action: 'add',
+			value: 'Unarmored Defense'
+		}
+	]
+};
+
 const classFeaturesPrompt: FeaturePrompt[] = [
+	unarmoredDefensePrompt,
 	martialArtsPrompt,
 	kiPrompt,
 	kiFeaturesPrompt,

@@ -40,6 +40,17 @@ export const forestGnome: SpeciesData = {
 	speciesFeatures: [
 		abilityScoreChoicePrompt,
 		{
+			name: 'Speed',
+			id: 'forest_gnome_speed',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'Your base walking speed is 25 feet.' },
+				]
+			},
+			source: 'forest_gnome',
+			effects: [{ target: 'speed', action: 'set', value: '25 ft.' }]
+		},
+		{
 			name: 'Darkvision',
 			id: 'forest_gnome_darkvision',
 			description: {

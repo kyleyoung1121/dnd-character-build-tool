@@ -118,6 +118,17 @@ export const hillDwarf: SpeciesData = {
 	knownLanguages: ['Common', 'Dwarvish'],
 	speciesFeatures: [
 		abilityScoreChoicePrompt,
+		{
+			name: 'Speed',
+			id: 'hill_dwarf_speed',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'Your base walking speed is 25 feet. Your speed is not reduced by wearing heavy armor.' },
+				]
+			},
+			source: 'hill_dwarf',
+			effects: [{ target: 'speed', action: 'set', value: '25 ft.' }]
+		},
 		darkvision,
 		dwarvenResilience,
 		combatTraining,

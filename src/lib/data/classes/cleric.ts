@@ -73,11 +73,7 @@ const spellcastingPrompt: FeaturePrompt = {
 	},
 	source: 'cleric',
 	effects: [
-		{
-			target: 'features',
-			action: 'add',
-			value: 'Spellcasting'
-		}
+		
 	]
 };
 

@@ -105,8 +105,7 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 				prefixes = [
 					`class:${selectedClassData.name}`,
 					...allFeatureNames.map((f) => `feature:${f}`),
-					'class_equipment_',
-					'class_fixed_equipment'
+					'class_equipment_'
 				];
 			} catch (error) {
 				return;
@@ -138,32 +137,16 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 			featureSelections = {};
 			expandedFeatures = new Set();
 
-			console.log('\n=== CONFIRM ADD CLASS ===');
-			console.log(`Class: ${selectedClassData.name}`);
-			console.log(`Total features in classFeatures array: ${selectedClassData.classFeatures?.length || 0}`);
-
 			applyChoice(`class:${selectedClassData.name}`, {
 				class: selectedClassData.name
 			});
 
-			let processedCount = 0;
-			let skippedCount = 0;
-
 			for (const feature of selectedClassData.classFeatures || []) {
-				console.log(`\nFeature: "${feature.name}"`);
-				console.log(`  Has featureOptions: ${!!feature.featureOptions}`);
-				console.log(`  Effects count: ${feature.effects?.length || 0}`);
-
 				// Skip features with options; those will be applied later
-				if (feature.featureOptions) {
-					console.log(`  -> SKIPPED (has featureOptions)`);
-					skippedCount++;
-					continue;
-				}
+				if (feature.featureOptions) continue;
 
 				const scopeId = `feature:${feature.name}`;
-				const prevChar = revertChanges(get(character_store), scopeId);
-				character_store.set(prevChar); // Fix: actually apply the revert!
+				revertChanges(get(character_store), scopeId); // just in case
 
 				const update: Record<string, any> = {};
 				const modify: Record<string, number> = {};
@@ -171,8 +154,6 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 				for (const effect of feature.effects || []) {
 					const target = effect.target;
 					const value = effect.value;
-
-					console.log(`  Effect: ${effect.action} on "${target}" = "${value}"`);
 
 					switch (effect.action) {
 						case 'add': {
@@ -195,14 +176,8 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 					}
 				}
 
-				console.log(`  Calling applyChoice with scopeId="${scopeId}", update=`, update, ', modify=', modify);
 				applyChoice(scopeId, update, modify);
-				processedCount++;
-				console.log(`  -> PROCESSED`);
 			}
-
-			console.log(`\nSummary: Processed ${processedCount} features, skipped ${skippedCount} features`);
-			console.log('=========================\n');
 
 			bumpVersion();
 		}

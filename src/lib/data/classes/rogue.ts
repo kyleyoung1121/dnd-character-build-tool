@@ -272,13 +272,14 @@ const rogueArchetypePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'rogue.arcane_trickster',
-						effects: [
-							{
-								target: 'features',
-								action: 'add',
-								value: 'Arcane Trickster Spellcasting'
-							}
-						]
+						effects: [],
+						// effects: [
+						// 	{
+						// 		target: 'features',
+						// 		action: 'add',
+						// 		value: 'Arcane Trickster Spellcasting'
+						// 	}
+						// ],
 					},
 					{
 						id: 'rogue_arcane_trickster_mage_hand_01',

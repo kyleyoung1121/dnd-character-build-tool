@@ -69,11 +69,7 @@ const spellcastingPrompt: FeaturePrompt = {
 	},
 	source: 'druid',
 	effects: [
-		{
-			target: 'features',
-			action: 'add',
-			value: 'Spellcasting'
-		}
+		
 	]
 };
 

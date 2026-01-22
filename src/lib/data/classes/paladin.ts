@@ -186,11 +186,7 @@ const spellcastingPrompt: FeaturePrompt = {
 	},
 	source: 'paladin',
 	effects: [
-		{
-			target: 'features',
-			action: 'add',
-			value: 'Spellcasting'
-		}
+		
 	]
 };
 

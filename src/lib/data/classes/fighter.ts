@@ -640,7 +640,8 @@ const martialArchetypePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'fighter.eldritch_knight',
-						effects: [{ target: 'features', action: 'add', value: 'Eldritch Knight Spellcasting' }]
+						effects: []
+						//effects: [{ target: 'features', action: 'add', value: 'Eldritch Knight Spellcasting' }]
 					}
 				]
 			}

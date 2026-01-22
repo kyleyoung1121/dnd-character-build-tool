@@ -97,6 +97,7 @@
 			<div class="debug-panel" style="background: #f0f0f0; padding: 1rem; margin-bottom: 1rem; border: 2px solid #888; border-radius: 4px;">
 				<h3 style="margin: 0 0 0.5rem 0;">Debug: Character Data</h3>
 				<div style="font-family: monospace; font-size: 0.9rem;">
+					<strong>Inventory:</strong> {JSON.stringify(character.inventory)}<br/>
 					<strong>Skills:</strong> {JSON.stringify(character.skills)}<br/>
 					<strong>Features:</strong> {JSON.stringify(character.features)}
 				</div>

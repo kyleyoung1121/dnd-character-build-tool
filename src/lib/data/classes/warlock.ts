@@ -198,11 +198,11 @@ const pactMagicPrompt: FeaturePrompt = {
 	},
 	source: 'warlock',
 	effects: [
-		{
-			target: 'features',
-			action: 'add',
-			value: 'Pact Magic'
-		}
+		// {
+		// 	target: 'features',
+		// 	action: 'add',
+		// 	value: 'Pact Magic'
+		// }
 	]
 };
 

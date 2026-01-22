@@ -348,6 +348,46 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 
 	function confirmAddSpecies() {
 		if (selectedSpecies) {
+			// IMPORTANT: If we already have a selected species, clean it up first
+			if (selectedSpeciesData) {
+				character_store.update((state) => {
+					const provKeys = Object.keys(state._provenance || {});
+
+					// Recursively collect all features & nested prompts
+					function collectFeatureNames(features: FeaturePrompt[]): string[] {
+						const names: string[] = [];
+						for (const feat of features) {
+							names.push(feat.name);
+							if (feat.featureOptions) {
+								for (const opt of feat.featureOptions.options) {
+									if (typeof opt !== 'string' && opt.nestedPrompts) {
+										names.push(...collectFeatureNames(opt.nestedPrompts));
+									}
+								}
+							}
+						}
+						return names;
+					}
+
+					const allFeatureNames = collectFeatureNames(selectedSpeciesData.speciesFeatures || []);
+
+					const prefixes = [
+						`race:${selectedSpeciesData.name}`,
+						...allFeatureNames.map((f) => `feature:${f}`)
+					];
+
+					// Revert all changes related to the old species
+					for (const key of provKeys) {
+						if (prefixes.some((prefix) => key.startsWith(prefix))) {
+							// revertChanges mutates state in place and returns it
+							state = revertChanges(state, key);
+						}
+					}
+
+					return state; // Return the modified state to update the store
+				});
+			}
+
 			selectedSpeciesData = selectedSpecies;
 			selectedSpecies = null;
 			featureSelections = {};

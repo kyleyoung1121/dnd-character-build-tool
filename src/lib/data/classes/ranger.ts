@@ -902,11 +902,7 @@ const spellcastingPrompt: FeaturePrompt = {
 	},
 	source: 'ranger',
 	effects: [
-		{
-			target: 'features',
-			action: 'add',
-			value: 'Spellcasting'
-		}
+		
 	]
 };
 

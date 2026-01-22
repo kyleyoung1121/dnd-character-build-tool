@@ -40,6 +40,17 @@ export const rockGnome: SpeciesData = {
 	speciesFeatures: [
 		abilityScoreChoicePrompt,
 		{
+			name: 'Speed',
+			id: 'rock_gnome_speed',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'Your base walking speed is 25 feet.' },
+				]
+			},
+			source: 'rock_gnome',
+			effects: [{ target: 'speed', action: 'set', value: '25 ft.' }]
+		},
+		{
 			name: 'Darkvision',
 			id: 'rock_gnome_darkvision',
 			description: {

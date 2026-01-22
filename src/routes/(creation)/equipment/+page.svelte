@@ -502,6 +502,9 @@
 		const choice = currentClass.startingEquipment.choices[choiceIndex] as EquipmentChoice;
 		const selectedOption = choice.options[optionIndex];
 
+		console.log(`[Equipment] handleMainOptionSelection: choice=${choice.name}, option=${selectedOption.label}`);
+		console.log(`[Equipment] selectedOption:`, selectedOption);
+
 		// Clear any previous selections for this choice first
 		const scopeId = `class_equipment_${choiceIndex}`;
 		applyChoice(scopeId, { inventory: [] });
@@ -529,17 +532,20 @@
 
 		// If this option has direct items (no subchoices), apply immediately
 		if (selectedOption.items && !selectedOption.subChoices) {
+			console.log(`[Equipment] Has direct items, no subchoices:`, selectedOption.items);
 			selectionState.inventory = selectedOption.items;
 			
 			// Extract weapons and add to attacks array
 			const weaponNames = extractWeaponsFromInventory(selectedOption.items);
 			const normalizedWeapons = weaponNames.map(normalizeWeaponName);
 			
+			console.log(`[Equipment] Calling applyChoice with inventory:`, selectedOption.items, ', attacks:', normalizedWeapons);
 			applyChoice(scopeId, {
 				...selectionState,
 				attacks: normalizedWeapons
 			});
 		} else {
+			console.log(`[Equipment] Has subchoices or no items, waiting for subchoice selection`);
 			applyChoice(scopeId, selectionState);
 		}
 		// If it has subchoices, wait for user to select those

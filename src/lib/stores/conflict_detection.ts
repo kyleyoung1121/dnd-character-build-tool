@@ -99,6 +99,11 @@ export function detectConflicts(): {
 		if (conflictType === 'spell_limit') continue; // Skip spell_limit as it's handled separately
 		for (const [value, sources] of Object.entries(valueMap)) {
 			if (sources.length > 1) {
+				// Check if this is a legitimate proficiency overlap that should be allowed
+				if (conflictType === 'proficiency' && isLegitimateProficiencyOverlap(value, sources)) {
+					continue; // Skip this "conflict" - it's actually fine
+				}
+				
 				const affectedTabs = getTabsFromSources(sources);
 
 				conflicts.push({
@@ -453,6 +458,53 @@ function determineSpellLimitCauses(character: Character): string[] {
 	}
 
 	return causes;
+}
+
+/**
+ * Check if a proficiency overlap is actually legitimate (normal D&D behavior)
+ * Armor proficiency stacking is ALWAYS allowed - it's normal D&D and never causes issues
+ */
+function isLegitimateProficiencyOverlap(value: string, sources: string[]): boolean {
+	// Armor proficiencies: ALWAYS allow overlaps (e.g., Fighter + Mountain Dwarf, Bard College of Valor + Mountain Dwarf)
+	const armorKeywords = ['Armor', 'armor', 'Shield', 'shield'];
+	for (const keyword of armorKeywords) {
+		if (value.includes(keyword)) {
+			return true; // All armor overlaps are legitimate
+		}
+	}
+
+	// Weapon proficiencies: Allow comprehensive overlaps
+	const comprehensiveWeaponCategories = {
+		'All Weapons': ['Simple Weapons', 'Martial Weapons'],
+		'All Simple Weapons': ['Light crossbow', 'Handaxe', 'Shortsword', 'Dagger'],
+		'All Martial Weapons': ['Battleaxe', 'Warhammer', 'Rapier']
+	};
+
+	// Check if this value is part of a comprehensive weapon category
+	for (const [comprehensive, includes] of Object.entries(comprehensiveWeaponCategories)) {
+		if (includes.includes(value)) {
+			for (const source of sources) {
+				if (source.includes(comprehensive)) {
+					return true;
+				}
+			}
+		}
+	}
+
+	// Also check for reverse case: comprehensive weapon vs specific
+	for (const [comprehensive, includes] of Object.entries(comprehensiveWeaponCategories)) {
+		if (value === comprehensive) {
+			for (const source of sources) {
+				for (const specific of includes) {
+					if (source.includes(specific)) {
+						return true;
+					}
+				}
+			}
+		}
+	}
+
+	return false; // Not a legitimate overlap - this is a real conflict
 }
 
 /**

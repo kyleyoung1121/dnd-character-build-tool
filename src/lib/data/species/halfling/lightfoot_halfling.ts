@@ -35,6 +35,17 @@ export const lightfootHalfling: SpeciesData = {
 	speciesFeatures: [
 		abilityScoreChoicePrompt,
 		{
+			name: 'Speed',
+			id: 'lightfoot_halfling_speed',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'Your base walking speed is 25 feet.' },
+				]
+			},
+			source: 'lightfoot_halfling',
+			effects: [{ target: 'speed', action: 'set', value: '25 ft.' }]
+		},
+		{
 			name: 'Lucky',
 			id: 'lightfoot_halfling_lucky',
 			description: {

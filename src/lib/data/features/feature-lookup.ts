@@ -366,8 +366,6 @@ function findFeatureInBackground(backgroundName: string, featureName: string): F
  * Convert supported HTML tags to PDF markers for styling
  */
 export function cleanDescription(description: string): string {
-	console.log('[cleanDescription] INPUT:', description.substring(0, 200));
-	
 	let result = description;
 	
 	// Convert <br> and <br/> tags to newlines
@@ -382,26 +380,14 @@ export function cleanDescription(description: string): string {
 	result = result.replace(/<\/?ol>/gi, '');
 	
 	// Convert <strong> and <b> tags to PDF bold markers
-	// Use .*? for non-greedy matching of any content except newlines
-	console.log('[cleanDescription] BEFORE strong replace');
-	console.log('[cleanDescription] Input length:', result.length);
-	let replacementCount = 0;
 	result = result.replace(/<strong>(.*?)<\/strong>/gi, (match, p1) => {
-		replacementCount++;
-		const replacement = `[[BOLD:${p1}]]`;
-		console.log(`[cleanDescription] STRONG MATCH #${replacementCount}:`, match, 'CAPTURED:', p1, 'REPLACING WITH:', replacement);
-		return replacement;
+		return `[[BOLD:${p1}]]`;
 	});
-	console.log('[cleanDescription] Made', replacementCount, 'replacements');
-	console.log('[cleanDescription] Result length after strong:', result.length);
 	result = result.replace(/<b>(.*?)<\/b>/gi, '[[BOLD:$1]]');
 	
 	// Convert <i> and <em> tags to PDF italic markers
 	result = result.replace(/<i>(.*?)<\/i>/gi, '[[ITALIC:$1]]');
 	result = result.replace(/<em>(.*?)<\/em>/gi, '[[ITALIC:$1]]');
-	
-	console.log('[cleanDescription] AFTER tag conversion (first 400 chars):', result.substring(0, 400));
-	console.log('[cleanDescription] AFTER tag conversion (chars 400-800):', result.substring(400, 800));
 	
 	// Remove any remaining HTML tags
 	result = result.replace(/<[^>]+>/g, '');
@@ -423,8 +409,6 @@ export function cleanDescription(description: string): string {
 	
 	// Trim whitespace
 	result = result.trim();
-	
-	console.log('[cleanDescription] OUTPUT:', result.substring(0, 200));
 	
 	return result;
 }

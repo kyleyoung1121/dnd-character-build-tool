@@ -252,11 +252,8 @@ function calculateArmorAC(armor: { baseAC: number; maxDex: number | null }, dexM
  */
 function isWearingArmor(inventory: string[] | undefined): boolean {
 	if (!inventory || inventory.length === 0) {
-		console.log('[isWearingArmor] No inventory');
 		return false;
 	}
-	
-	console.log('[isWearingArmor] Checking inventory:', inventory);
 	
 	const armorKeywords = [
 		'padded', 'leather', 'studded leather',
@@ -264,17 +261,10 @@ function isWearingArmor(inventory: string[] | undefined): boolean {
 		'ring mail', 'chain mail', 'splint', 'plate'
 	];
 	
-	const hasArmor = inventory.some(item => {
+	return inventory.some(item => {
 		const itemLower = item.toLowerCase();
-		const match = armorKeywords.some(keyword => itemLower.includes(keyword));
-		if (match) {
-			console.log(`[isWearingArmor] Found armor: "${item}"`);
-		}
-		return match;
+		return armorKeywords.some(keyword => itemLower.includes(keyword));
 	});
-	
-	console.log('[isWearingArmor] Result:', hasArmor);
-	return hasArmor;
 }
 
 /**
@@ -282,14 +272,10 @@ function isWearingArmor(inventory: string[] | undefined): boolean {
  */
 function hasShield(inventory: string[] | undefined): boolean {
 	if (!inventory || inventory.length === 0) {
-		console.log('[hasShield] No inventory');
 		return false;
 	}
 	
-	console.log('[hasShield] Checking inventory:', inventory);
-	const hasShieldItem = inventory.some(item => item.toLowerCase().includes('shield'));
-	console.log('[hasShield] Result:', hasShieldItem);
-	return hasShieldItem;
+	return inventory.some(item => item.toLowerCase().includes('shield'));
 }
 
 /**
@@ -311,27 +297,16 @@ function calculateHitPoints(
 	const dieMax = parseInt(match[1], 10);
 	const averagePerDie = Math.floor(dieMax / 2) + 1;
 	
-	console.log('\n=== HP CALCULATION ===');
-	console.log(`Class: ${character.class}, Hit Die: ${classData.hitDie}`);
-	console.log(`Die Max: ${dieMax}, Average per Die: ${averagePerDie}`);
-	console.log(`CON Modifier: ${conMod >= 0 ? '+' : ''}${conMod}`);
-	
 	// Level 1: max die
 	// Level 2-3: average die
 	let hp = dieMax + (averagePerDie * 2) + (conMod * 3);
-	console.log(`Formula: ${dieMax} (L1 max) + ${averagePerDie}×2 (L2-3 avg) + ${conMod}×3 (CON) = ${hp}`);
 	
 	// Hill Dwarf Dwarven Toughness: +1 HP per level
 	if (character.features?.includes('Dwarven Toughness')) {
-		console.log(`Dwarven Toughness: +3 HP (level 3)`);
 		hp += 3; // Level 3 character
 	}
 	
-	const finalHP = Math.max(hp, 3);
-	console.log(`Final HP: ${finalHP}`);
-	console.log('======================\n');
-	
-	return finalHP; // Minimum 3 HP (1 per level)
+	return Math.max(hp, 3); // Minimum 3 HP (1 per level)
 }
 
 /**
@@ -347,28 +322,15 @@ function calculateSpeed(
 	const baseSpeedMatch = character.speed?.toString().match(/(\d+)/);
 	let speed = baseSpeedMatch ? parseInt(baseSpeedMatch[1], 10) : 30;
 	
-	console.log('\n=== SPEED CALCULATION ===');
-	console.log(`Race: ${character.race}${character.subrace ? ` (${character.subrace})` : ''}`);
-	console.log(`Base Speed from character.speed: ${character.speed}`);
-	console.log(`Parsed Base Speed: ${speed} ft`);
-	
 	// Monk Unarmored Movement: +10 ft at level 3 (if not wearing armor AND not using shield)
 	if (character.class === 'Monk' && character.features?.includes('Unarmored Movement')) {
 		const wearingArmor = isWearingArmor(inventory);
 		const usingShield = hasShield(inventory);
 		
-		console.log(`Monk Unarmored Movement: wearing armor=${wearingArmor}, using shield=${usingShield}`);
-		
 		if (!wearingArmor && !usingShield) {
-			console.log(`Unarmored Movement bonus: +10 ft`);
 			speed += 10;
-		} else {
-			console.log(`Unarmored Movement not applied (wearing armor or shield)`);
 		}
 	}
-	
-	console.log(`Final Speed: ${speed} ft`);
-	console.log('=========================\n');
 	
 	return `${speed} ft`;
 }
@@ -421,20 +383,11 @@ function calculateArmorClass(
 	const usingShield = hasShield(inventory);
 	let bestAC = 10 + dexMod; // Default unarmored AC
 	
-	console.log('\n=== AC CALCULATION ===');
-	console.log(`Class: ${character.class}`);
-	console.log(`DEX: ${dexMod >= 0 ? '+' : ''}${dexMod}, CON: ${conMod >= 0 ? '+' : ''}${conMod}, WIS: ${wisMod >= 0 ? '+' : ''}${wisMod}`);
-	console.log(`Wearing Armor: ${wearingArmor}, Using Shield: ${usingShield}`);
-	
 	// If wearing armor, calculate AC from armor + DEX
 	if (wearingArmor) {
 		const armor = getEquippedArmor(inventory);
 		if (armor) {
 			bestAC = calculateArmorAC(armor, dexMod);
-			console.log(`Armor: ${armor.type} (base ${armor.baseAC}, max DEX ${armor.maxDex !== null ? armor.maxDex : 'unlimited'})`);
-			console.log(`Armor AC: ${armor.baseAC} + ${armor.maxDex === null ? dexMod : (armor.maxDex === 0 ? 0 : Math.min(dexMod, armor.maxDex))} = ${bestAC}`);
-		} else {
-			console.log(`WARNING: Wearing armor but couldn't find armor data in inventory`);
 		}
 	} else if (!wearingArmor) {
 		// Check for Unarmored Defense and other special AC calculations
@@ -444,7 +397,6 @@ function calculateArmorClass(
 		// Barbarian Unarmored Defense: 10 + DEX + CON (shields allowed)
 		if (character.class === 'Barbarian' && character.features?.includes('Unarmored Defense')) {
 			const barbarianAC = 10 + dexMod + conMod;
-			console.log(`Barbarian Unarmored Defense: 10 + ${dexMod} + ${conMod} = ${barbarianAC}`);
 			alternatives.push(barbarianAC);
 			hasSpecialUnarmoredDefense = true;
 		}
@@ -452,7 +404,6 @@ function calculateArmorClass(
 		// Monk Unarmored Defense: 10 + DEX + WIS (shields NOT allowed)
 		if (character.class === 'Monk' && character.features?.includes('Unarmored Defense') && !usingShield) {
 			const monkAC = 10 + dexMod + wisMod;
-			console.log(`Monk Unarmored Defense: 10 + ${dexMod} + ${wisMod} = ${monkAC}`);
 			alternatives.push(monkAC);
 			hasSpecialUnarmoredDefense = true;
 		}
@@ -460,7 +411,6 @@ function calculateArmorClass(
 		// Draconic Sorcerer: 13 + DEX (shields allowed)
 		if (character.class === 'Sorcerer' && character.features?.includes('Draconic Resilience')) {
 			const draconicAC = 13 + dexMod;
-			console.log(`Draconic Resilience: 13 + ${dexMod} = ${draconicAC}`);
 			alternatives.push(draconicAC);
 			hasSpecialUnarmoredDefense = true;
 		}
@@ -468,7 +418,6 @@ function calculateArmorClass(
 		// Warlock Armor of Shadows: 13 + DEX (at-will Mage Armor, shields allowed)
 		if (character.class === 'Warlock' && character.features?.includes('Armor of Shadows')) {
 			const armorOfShadowsAC = 13 + dexMod;
-			console.log(`Armor of Shadows: 13 + ${dexMod} = ${armorOfShadowsAC}`);
 			alternatives.push(armorOfShadowsAC);
 			hasSpecialUnarmoredDefense = true;
 		}
@@ -476,12 +425,10 @@ function calculateArmorClass(
 		// Only add base unarmored AC if no special Unarmored Defense features
 		if (!hasSpecialUnarmoredDefense) {
 			const baseAC = 10 + dexMod;
-			console.log(`Base unarmored AC: 10 + ${dexMod} = ${baseAC}`);
 			alternatives.push(baseAC);
 		}
 		
 		bestAC = Math.max(...alternatives);
-		console.log(`Best AC from alternatives: ${bestAC}`);
 	}
 	
 	// Add shield bonus (+2) if using shield and it's allowed
@@ -489,21 +436,14 @@ function calculateArmorClass(
 		// Monk Unarmored Defense does NOT allow shields
 		const isMonkWithUnarmored = character.class === 'Monk' && character.features?.includes('Unarmored Defense');
 		if (!isMonkWithUnarmored) {
-			console.log(`Shield bonus: +2`);
 			bestAC += 2;
-		} else {
-			console.log(`Shield bonus not applied (Monk Unarmored Defense)`);
 		}
 	}
 	
 	// Defense Fighting Style: +1 AC when wearing armor
 	if (wearingArmor && character.features?.includes('Defense Fighting Style')) {
-		console.log(`Defense Fighting Style: +1`);
 		bestAC += 1;
 	}
-	
-	console.log(`Final AC: ${bestAC}`);
-	console.log('======================\n');
 	
 	return bestAC;
 }

@@ -312,21 +312,16 @@ export function hasFeatureData(featureName: string, character?: Character): bool
  * @param character - Character object to provide context for lookup
  */
 export function formatFeatureForPDF(featureName: string, character?: Character): string {
-	console.log('[formatFeatureForPDF] Processing feature:', featureName);
 	const featureData = getFeatureData(featureName, character);
 	
 	if (!featureData) {
-		console.log('[formatFeatureForPDF] Feature not found:', featureName);
 		// If feature not found, just show the name with bullet
 		return `• ${featureName}`;
 	}
 	
-	console.log('[formatFeatureForPDF] Feature found:', featureData.name, 'Description length:', featureData.description.length);
 	// Format: [[BOLD:Name]]. Description
 	// Name is marked for bold rendering, followed by period and description on same line
-	const result = `[[BOLD:${featureData.name}]]. ${featureData.description}`;
-	console.log('[formatFeatureForPDF] Result:', result.substring(0, 200));
-	return result;
+	return `[[BOLD:${featureData.name}]]. ${featureData.description}`;
 }
 
 /**
@@ -337,12 +332,9 @@ export function formatFeatureForPDF(featureName: string, character?: Character):
  * @param character - Character object to provide context for lookup
  */
 export function formatFeaturesForPDF(featureNames: string[], character?: Character): string {
-	console.log('[formatFeaturesForPDF] Processing features:', featureNames);
-	const result = featureNames
+	return featureNames
 		.map(name => formatFeatureForPDF(name, character))
 		.join('\n\n'); // Double newline creates space between features
-	console.log('[formatFeaturesForPDF] Final result length:', result.length, 'Preview:', result.substring(0, 300));
-	return result;
 }
 
 /**

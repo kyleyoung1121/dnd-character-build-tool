@@ -107,14 +107,12 @@ function drawSkillWithAbility(
  * [[ITALIC:text]] becomes [{text: 'text', bold: false, italic: true}]
  */
 function parseTextWithStyle(text: string): Array<{text: string; bold: boolean; italic: boolean}> {
-	console.log('[parseTextWithStyle] INPUT:', text.substring(0, 300));
 	const segments: Array<{text: string; bold: boolean; italic: boolean}> = [];
 	const regex = /\[\[(BOLD|ITALIC):([^\]]+)\]\]/g;
 	let lastIndex = 0;
 	let match;
 	
 	while ((match = regex.exec(text)) !== null) {
-		console.log('[parseTextWithStyle] MATCH:', match[0], 'CAPTURED:', match[2]);
 		// Add text before the marker
 		if (match.index > lastIndex) {
 			segments.push({
@@ -143,8 +141,6 @@ function parseTextWithStyle(text: string): Array<{text: string; bold: boolean; i
 		});
 	}
 	
-	console.log('[parseTextWithStyle] SEGMENTS:', segments.length, segments.map(s => s.text.substring(0, 50)));
-	
 	return segments;
 }
 
@@ -159,7 +155,6 @@ function drawTextArea(
 	boldFont: any,
 	italicFont: any
 ) {
-	console.log('[drawTextArea] TEXT INPUT:', text.substring(0, 2000));
 	const fontSize = config.fontSize || PDF_CONFIG.defaultFontSize;
 	const lineHeight = config.lineHeight || fontSize * 1.2;
 	const color = rgb(
@@ -170,15 +165,12 @@ function drawTextArea(
 	
 	// Convert <br> tags to newlines and split text into lines
 	const processedText = text.replace(/<br>/gi, '\n');
-	console.log('[drawTextArea] AFTER <br> replace:', processedText.substring(0, 2000));
 	const lines = processedText.split('\n');
-	console.log('[drawTextArea] NUMBER OF LINES:', lines.length);
 	let currentY = config.y + config.height - lineHeight;
 	
 	for (const line of lines) {
 		if (currentY < config.y) break; // Stop if we run out of space
 		
-		console.log('[drawTextArea] Processing line:', line.substring(0, 150));
 		// Parse line for style markers
 		const segments = parseTextWithStyle(line);
 		

@@ -43,9 +43,9 @@ const draconicElementPrompt: FeaturePrompt = {
 	source: 'dragonborn',
 	effects: [
 		{
-			target: 'features',
-			action: 'add',
-			value: 'Elemental Affinity: {userChoice}'
+			target: 'dragonbornElement',
+			action: 'set',
+			value: '{userChoice}'
 		}
 	]
 };
@@ -67,9 +67,9 @@ const breathShapePrompt: FeaturePrompt = {
 	source: 'dragonborn',
 	effects: [
 		{
-			target: 'features',
-			action: 'add',
-			value: 'Breath Weapon Shape: {userChoice}'
+			target: 'dragonbornBreathShape',
+			action: 'set',
+			value: '{userChoice}'
 		}
 	]
 };
@@ -80,7 +80,25 @@ const speciesFeatures: FeaturePrompt[] = [
 		id: 'dragonborn_breath_weapon',
 		description: {
 			blocks: [
-				{ type: 'text', text: 'You can use your action to exhale destructive energy.  			The damage type is determined by your Elemental Affinity, and the area of effect 			by your chosen Breath Shape.' }
+				{ 
+					type: 'text', 
+					text: 'You can use your action to exhale destructive energy. Each creature in a {{shape}} must make a Dexterity saving throw. '
+				},
+				{
+					type: 'computed-replacement',
+					whenAvailable: [
+						{
+							source: 'derived',
+							formula: '8 + CON_MOD + PROF'
+						}
+					],
+					fallbackText: 'The DC for this saving throw equals 8 + your Constitution modifier + your proficiency bonus. ',
+					replacementTemplate: 'The DC for this saving throw is {value}. '
+				},
+				{
+					type: 'text',
+					text: 'A creature takes 2d6 {{element}} damage on a failed save, and half as much damage on a successful one. You can use your breath weapon once per short or long rest.'
+				}
 			]
 		},
 		source: 'dragonborn',
@@ -97,7 +115,7 @@ const speciesFeatures: FeaturePrompt[] = [
 		id: 'dragonborn_damage_resistance',
 		description: {
 			blocks: [
-				{ type: 'text', text: 'You have resistance to the damage type associated with your Elemental Affinity.' }
+				{ type: 'text', text: 'You have resistance to {{element}} damage.' }
 			]
 		},
 		source: 'dragonborn',

@@ -948,7 +948,26 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 		// Page 1 - Equipment & Features
 		equipment: formatEquipment(character.inventory || []),
 		proficienciesAndLanguages: formatProficienciesAndLanguages(character),
-		featuresAndTraits: formatFeaturesForPDF(character.features || [], character),
+		featuresAndTraits: (() => {
+			console.log('=== FEATURES DEBUG - Character Data Mapper ===');
+			console.log('Character features array:', character.features);
+			console.log('Character class:', character.class);
+			console.log('Character race:', character.race);
+			console.log('Character subclass:', character.subclass);
+			if (character._provenance) {
+				console.log('Character provenance keys:', Object.keys(character._provenance));
+				// Log any provenance entries that might contain totem info
+				for (const [key, value] of Object.entries(character._provenance)) {
+					if (key.includes('totem') || key.includes('eagle')) {
+						console.log(`Totem-related provenance - ${key}:`, value);
+					}
+				}
+			}
+			const result = formatFeaturesForPDF(character.features || [], character);
+			console.log('Formatted features result:', result);
+			console.log('=== END FEATURES DEBUG ===');
+			return result;
+		})(),
 		
 		// Page 2 - Character Details (placeholders for now)
 		age: '',

@@ -223,7 +223,7 @@ const pactBoonPrompt: FeaturePrompt = {
 				nestedPrompts: [
 					{
 						id: 'warlock_pact_chain_desc',
-						name: 'Pact of the Chain',
+						name: 'Pact of the Chain Description',
 						description: {
 							blocks: [
 								{ type: 'text', text: 'You learn the Find Familiar spell and can cast it as a ritual. The spell doesn\'t count against your number of spells known. When you cast the spell, you can choose from one of the normal forms for your familiar or one of the following special forms: imp, pseudodragon, quasit, or sprite. Additionally, when you take the attack action, you can forgo one of your own attacks to allow your familiar to make one attack of its own with its reaction.' },
@@ -543,7 +543,7 @@ const pactBoonPrompt: FeaturePrompt = {
 				nestedPrompts: [
 					{
 						id: 'warlock_pact_blade_desc',
-						name: 'Pact of the Blade',
+						name: 'Pact of the Blade Description',
 						description: {
 							blocks: [
 								{ type: 'text', text: 'You can use your action to create a pact weapon in your empty hand. You can choose the form that this melee weapon takes each time you create it. You are proficient with it while you wield it. This weapon counts as magical for the purpose of overcoming resistance and immunity to nonmagical attacks and damage. Your pact weapon disappears if it is more than 5 feet away from you for 1 minute or more. It also disappears if you use this feature again, if you dismiss the weapon (no action required), or if you die. You can transform one magic weapon into your pact weapon by performing a special ritual while you hold the weapon. You perform the ritual over the course of 1 hour, which can be done during a short rest.' },
@@ -846,7 +846,7 @@ const pactBoonPrompt: FeaturePrompt = {
 				nestedPrompts: [
 					{
 						id: 'warlock_pact_tome_desc',
-						name: 'Pact of the Tome',
+						name: 'Pact of the Tome Description',
 						description: {
 							blocks: [
 								{ type: 'text', text: 'Your patron gives you a grimoire called a Book of Shadows. When you gain this feature, choose three cantrips from any class\'s spell list. While the book is on your person, you can cast those cantrips at will. They don\'t count against your number of cantrips known, but they do count as Warlock spells for you. If you loose your Book of Shadows, you can summon another one by performing a 1-hour ceremony. This may take place over a short or long rest, and it destroys the previous book.' },

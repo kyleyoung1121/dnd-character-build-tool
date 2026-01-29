@@ -173,8 +173,41 @@ function serializeFeatureDescription(description: FeatureDescription, character?
 	return description.blocks
 		.map((block) => {
 			switch (block.type) {
-				case 'text':
-					return block.text;
+				case 'text': {
+					let text = block.text;
+					
+					// Replace dynamic placeholders with character-specific values
+					if (character) {
+						console.log(`[PLACEHOLDER] Processing text block:`, text.substring(0, 50));
+						console.log(`[PLACEHOLDER] Character dragonborn properties:`, {
+							dragonbornElement: character.dragonbornElement,
+							dragonbornBreathShape: character.dragonbornBreathShape
+						});
+						
+						// Dragonborn element placeholder
+						if (text.includes('{{element}}')) {
+							console.log(`[PLACEHOLDER] Found {{element}} placeholder`);
+							if (character.dragonbornElement) {
+								console.log(`[PLACEHOLDER] Replacing with:`, character.dragonbornElement);
+								text = text.replace(/\{\{element\}\}/g, character.dragonbornElement.toLowerCase());
+							} else {
+								console.log(`[PLACEHOLDER] dragonbornElement is not set on character`);
+							}
+						}
+						// Dragonborn breath shape placeholder
+						if (text.includes('{{shape}}')) {
+							console.log(`[PLACEHOLDER] Found {{shape}} placeholder`);
+							if (character.dragonbornBreathShape) {
+								console.log(`[PLACEHOLDER] Replacing with:`, character.dragonbornBreathShape);
+								text = text.replace(/\{\{shape\}\}/g, character.dragonbornBreathShape.toLowerCase());
+							} else {
+								console.log(`[PLACEHOLDER] dragonbornBreathShape is not set on character`);
+							}
+						}
+					}
+					
+					return text;
+				}
 
 				case 'computed-inline': {
 					// Process hints and insert computed values
@@ -213,16 +246,32 @@ function serializeFeatureDescription(description: FeatureDescription, character?
 				case 'computed-replacement': {
 					// Try to compute the value
 					const value = allValuesAvailable(block.whenAvailable, character);
+					console.log(`[computed-replacement] Evaluating block:`, {
+						whenAvailable: block.whenAvailable,
+						computedValue: value,
+						hasCharacter: !!character,
+						characterAbilities: character ? {
+							STR: character.strength,
+							DEX: character.dexterity,
+							CON: character.constitution,
+							INT: character.intelligence,
+							WIS: character.wisdom,
+							CHA: character.charisma
+						} : null
+					});
 
 					if (value !== null) {
 						// Use singular template if value is 1 and singular template exists
 						if (value === 1 && block.singularTemplate) {
+							console.log(`[computed-replacement] Using singular template`);
 							return block.singularTemplate;
 						}
 						// Otherwise use replacement template
+						console.log(`[computed-replacement] Using replacement template with value:`, value);
 						return block.replacementTemplate.replace('{value}', String(value));
 					} else {
 						// Fall back to fallback text
+						console.log(`[computed-replacement] Using fallback text:`, block.fallbackText);
 						return block.fallbackText;
 					}
 				}
@@ -254,11 +303,14 @@ export function getFeatureData(
 	featureName: string,
 	character?: Character
 ): FeatureData | null {
+	console.log(`    getFeatureData called for: "${featureName}"`);
 	const className = character?.class;
 	// Prioritize subrace (e.g., "Rock Gnome") over base race (e.g., "Gnome")
 	// SPECIES_MAP contains subspecies names like "Rock Gnome", "Hill Dwarf", etc.
 	const raceName = character?.subrace || character?.race;
 	const backgroundName = character?.background;
+	
+	console.log(`      Context: class=${className}, race=${raceName}, background=${backgroundName}`);
 
 	const feature = lookupFeature(
 		featureName,
@@ -266,6 +318,7 @@ export function getFeatureData(
 		raceName,
 		backgroundName
 	);
+	console.log(`      Lookup result for "${featureName}":`, feature ? 'Found' : 'Not found');
 
 	if (!feature) {
 		return null;
@@ -312,13 +365,16 @@ export function hasFeatureData(featureName: string, character?: Character): bool
  * @param character - Character object to provide context for lookup
  */
 export function formatFeatureForPDF(featureName: string, character?: Character): string {
+	console.log(`  formatFeatureForPDF called for: "${featureName}"`);
 	const featureData = getFeatureData(featureName, character);
 	
 	if (!featureData) {
+		console.log(`    No feature data found for "${featureName}", using bullet point`);
 		// If feature not found, just show the name with bullet
 		return `• ${featureName}`;
 	}
 	
+	console.log(`    Feature data found for "${featureName}":`, featureData.name);
 	// Format: [[BOLD:Name]]. Description
 	// Name is marked for bold rendering, followed by period and description on same line
 	return `[[BOLD:${featureData.name}]]. ${featureData.description}`;
@@ -332,9 +388,32 @@ export function formatFeatureForPDF(featureName: string, character?: Character):
  * @param character - Character object to provide context for lookup
  */
 export function formatFeaturesForPDF(featureNames: string[], character?: Character): string {
-	return featureNames
-		.map(name => formatFeatureForPDF(name, character))
+	console.log('=== formatFeaturesForPDF called ===');
+	console.log('Features array input:', featureNames);
+	console.log('Character context:', {
+		class: character?.class,
+		race: character?.race,
+		subclass: character?.subclass,
+		background: character?.background
+	});
+	
+	if (!featureNames || featureNames.length === 0) {
+		console.log('No features found, returning default message');
+		return 'No features or traits.';
+	}
+	
+	const result = featureNames
+		.map((name, index) => {
+			console.log(`Processing feature ${index}: "${name}"`);
+			const formatted = formatFeatureForPDF(name, character);
+			console.log(`  Formatted result:`, formatted);
+			return formatted;
+		})
 		.join('\n\n'); // Double newline creates space between features
+	
+	console.log('Final formatted features result:', result);
+	console.log('=== END formatFeaturesForPDF ===');
+	return result;
 }
 
 /**

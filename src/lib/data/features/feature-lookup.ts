@@ -240,8 +240,23 @@ function serializeFeatureDescription(
 	return description.blocks
 		.map((block) => {
 			switch (block.type) {
-				case 'text':
-					return block.text;
+				case 'text': {
+					let text = block.text;
+					
+					// Replace dynamic placeholders with character-specific values
+					if (character) {
+						// Dragonborn element placeholder
+						if (text.includes('{{element}}') && character.dragonbornElement) {
+							text = text.replace(/\{\{element\}\}/g, character.dragonbornElement.toLowerCase());
+						}
+						// Dragonborn breath shape placeholder
+						if (text.includes('{{shape}}') && character.dragonbornBreathShape) {
+							text = text.replace(/\{\{shape\}\}/g, character.dragonbornBreathShape.toLowerCase());
+						}
+					}
+					
+					return text;
+				}
 
 				case 'computed-inline': {
 					// Process hints and insert computed values
@@ -307,21 +322,29 @@ function serializeFeatureDescription(
  */
 function findFeatureInList(featureName: string, features: FeaturePrompt[]): FeaturePrompt | null {
 	const normalizedSearchName = featureName.trim().toLowerCase();
+	console.log(`    findFeatureInList: searching for "${normalizedSearchName}" in ${features.length} features`);
 	
 	for (const feature of features) {
 		// Check if this feature matches
 		const normalizedFeatureName = feature.name.trim().toLowerCase();
+		console.log(`      Checking feature: "${normalizedFeatureName}"`);
 		if (normalizedFeatureName === normalizedSearchName) {
+			console.log(`      MATCH FOUND: ${feature.name}`);
 			return feature;
 		}
 		
 		// Search in nested prompts if this feature has options
 		if (feature.featureOptions?.options) {
+			console.log(`      Feature has ${feature.featureOptions.options.length} options, searching nested prompts`);
 			for (const option of feature.featureOptions.options) {
 				// Handle complex options with nested prompts
 				if (typeof option !== 'string' && option.nestedPrompts) {
+					console.log(`        Searching in option "${option.name}" with ${option.nestedPrompts.length} nested prompts`);
 					const found = findFeatureInList(featureName, option.nestedPrompts);
-					if (found) return found;
+					if (found) {
+						console.log(`        NESTED MATCH FOUND: ${found.name}`);
+						return found;
+					}
 				}
 			}
 		}
@@ -428,10 +451,18 @@ export function lookupFeature(
 	speciesName?: string,
 	backgroundName?: string
 ): FeaturePrompt | null {
+	console.log(`=== lookupFeature called ===`);
+	console.log(`Feature name: "${featureName}"`);
+	console.log(`Class: ${className}, Species: ${speciesName}, Background: ${backgroundName}`);
 	// Try class first if provided
 	if (className) {
+		console.log(`  Searching in class: ${className}`);
 		const feature = findFeatureInClass(className, featureName);
-		if (feature) return feature;
+		if (feature) {
+			console.log(`  Found feature in class: ${feature.name}`);
+			return feature;
+		}
+		console.log(`  Feature not found in class`);
 	}
 	
 	// Try species if provided

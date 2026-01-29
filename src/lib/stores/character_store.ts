@@ -36,6 +36,10 @@ export type Character = {
 	subclass?: string;
 	subrace?: string;
 
+	// Species-specific properties for dynamic feature enhancement
+	dragonbornElement?: string; // Stores the chosen element (Acid, Cold, Fire, Lightning, Poison)
+	dragonbornBreathShape?: string; // Stores the chosen breath shape (15 ft. Cone, 5 ft. by 30 ft. Line)
+
 	// INTERNAL metadata for tracking changes
 	_provenance?: {
 		[scopeId: string]: Partial<Character>;

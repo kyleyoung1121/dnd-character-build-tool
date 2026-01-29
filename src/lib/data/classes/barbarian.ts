@@ -144,7 +144,7 @@ const primalPathPrompt: FeaturePrompt = {
 												{
 													target: 'features',
 													action: 'add',
-													value: 'Bear Totem Spirit'
+													value: 'Bear Totem Warrior'
 												}
 											]
 										}
@@ -171,7 +171,7 @@ const primalPathPrompt: FeaturePrompt = {
 												{
 													target: 'features',
 													action: 'add',
-													value: 'Eagle Totem Spirit'
+													value: 'Eagle Totem Warrior'
 												}
 											]
 										}
@@ -198,7 +198,7 @@ const primalPathPrompt: FeaturePrompt = {
 												{
 													target: 'features',
 													action: 'add',
-													value: 'Wolf Totem Spirit'
+													value: 'Wolf Totem Warrior'
 												}
 											]
 										}

@@ -51,18 +51,26 @@ export function getNestedPrompts(
 	feature: FeaturePrompt,
 	selectedOptions: (string | null)[]
 ): FeaturePrompt[] {
-	if (!feature.featureOptions) return [];
+	console.log(`[getNestedPrompts] Called for feature "${feature.name}" with selected options:`, selectedOptions);
+	if (!feature.featureOptions) {
+		console.log(`[getNestedPrompts] Feature "${feature.name}" has no featureOptions`);
+		return [];
+	}
 	const nested: FeaturePrompt[] = [];
+	console.log(`[getNestedPrompts] Feature has ${feature.featureOptions.options?.length || 0} options to check`);
 	for (const option of feature.featureOptions.options || []) {
 		const optionName = typeof option === 'string' ? option : option.name;
+		console.log(`[getNestedPrompts] Checking option "${optionName}", isSelected: ${selectedOptions.includes(optionName)}`);
 		if (
 			selectedOptions.includes(optionName) &&
 			typeof option !== 'string' &&
 			option.nestedPrompts
 		) {
+			console.log(`[getNestedPrompts] Option "${optionName}" has ${option.nestedPrompts.length} nested prompts`);
 			nested.push(...option.nestedPrompts);
 		}
 	}
+	console.log(`[getNestedPrompts] Returning ${nested.length} nested prompts:`, nested.map(n => n.name));
 	return nested;
 }
 

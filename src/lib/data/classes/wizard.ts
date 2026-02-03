@@ -36,7 +36,14 @@ const arcaneRecoveryPrompt: FeaturePrompt = {
 		]
 	},
 	source: 'wizard',
-	effects: []
+	importance:	'minor',
+	effects: [
+		{
+			target: 'features',
+			action: 'add',
+			value: 'Arcane Recovery'
+		}
+	]
 };
 
 const spellcastingPrompt: FeaturePrompt = {
@@ -109,7 +116,13 @@ const arcaneTraditionPrompt: FeaturePrompt = {
 							]
 						},
 						source: 'wizard.abjuration',
-						effects: []
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Arcane Ward'
+							}
+						]
 					}
 				]
 			},
@@ -139,7 +152,13 @@ const arcaneTraditionPrompt: FeaturePrompt = {
 							]
 						},
 						source: 'wizard.conjuration',
-						effects: []
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Minor Conjuration'
+							}
+						]
 					}
 				]
 			},
@@ -169,7 +188,13 @@ const arcaneTraditionPrompt: FeaturePrompt = {
 							]
 						},
 						source: 'wizard.divination',
-						effects: []
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Portent'
+							}
+						]
 					}
 				]
 			},
@@ -199,7 +224,13 @@ const arcaneTraditionPrompt: FeaturePrompt = {
 							]
 						},
 						source: 'wizard.enchantment',
-						effects: []
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Hypnotic Gaze'
+							}
+						]
 					}
 				]
 			},
@@ -229,7 +260,13 @@ const arcaneTraditionPrompt: FeaturePrompt = {
 							]
 						},
 						source: 'wizard.evocation',
-						effects: []
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Sculpt Spells'
+							}
+						]
 					}
 				]
 			},
@@ -255,11 +292,17 @@ const arcaneTraditionPrompt: FeaturePrompt = {
 						name: 'Improved Minor Illusion',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'You learn the Minor Illusion cantrip. If you already know it, you learn a different wizard cantrip. When you cast Minor Illusion, you can create both a sound and an image with a single casting.' },
+								{ type: 'text', text: 'You learn the Minor Illusion cantrip. When you cast Minor Illusion, you can create both a sound and an image with a single casting.' },
 							]
 						},
 						source: 'wizard.illusion',
-						effects: []
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Improved Minor Illusion'
+							}
+						]
 					}
 				]
 			},
@@ -289,7 +332,13 @@ const arcaneTraditionPrompt: FeaturePrompt = {
 							]
 						},
 						source: 'wizard.necromancy',
-						effects: []
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Grim Harvest'
+							}
+						]
 					}
 				]
 			},
@@ -319,7 +368,13 @@ const arcaneTraditionPrompt: FeaturePrompt = {
 							]
 						},
 						source: 'wizard.transmutation',
-						effects: []
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Minor Alchemy'
+							}
+						]
 					}
 				]
 			}

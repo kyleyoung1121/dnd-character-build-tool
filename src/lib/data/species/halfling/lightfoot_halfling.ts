@@ -76,6 +76,7 @@ export const lightfootHalfling: SpeciesData = {
 				]
 			},
 			source: 'lightfoot_halfling',
+			importance: 'minor',
 			effects: [{ target: 'features', action: 'add', value: 'Halfling Nimbleness' }]
 		},
 		{
@@ -87,6 +88,7 @@ export const lightfootHalfling: SpeciesData = {
 				]
 			},
 			source: 'lightfoot_halfling',
+			importance: 'minor',
 			effects: [{ target: 'features', action: 'add', value: 'Naturally Stealthy' }]
 		}
 	]

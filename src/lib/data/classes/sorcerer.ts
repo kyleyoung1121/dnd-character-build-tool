@@ -295,6 +295,7 @@ const sorcerousOriginPrompt: FeaturePrompt = {
 							]
 						},
 						source: 'sorcerer.draconic_bloodline',
+						importance: 'invisible',
 						effects: [
 							{
 								target: 'features',
@@ -331,7 +332,7 @@ const sorcerousOriginPrompt: FeaturePrompt = {
 						name: 'Tides of Chaos',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'Once you use this feature, you must finish a long rest before you can use it again. Any time before you regain the use of this feature, the DM can have you roll on the Wild Magic Surge table immediately after you cast a sorcerer spell of 1st level or higher. You then regain the use of this feature.' },
+								{ type: 'text', text: 'You can manipulate the forces of chance and chaos to gain advantage on one attack roll, ability check, or saving throw. Once you do so, you must finish a long rest before you can use this feature again. Any time before you regain the use of this feature, the DM can have you roll on the Wild Magic Surge table immediately after you cast a sorcerer spell of 1st level or higher. You then regain the use of this feature.' },
 							]
 						},
 						source: 'sorcerer.wild_magic',

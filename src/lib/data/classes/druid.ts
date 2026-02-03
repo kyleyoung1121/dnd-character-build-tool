@@ -131,6 +131,7 @@ const druidCirclePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'druid.circle_of_the_land_arctic',
+						importance: 'invisible',
 						effects: [{ target: 'features', action: 'add', value: 'Circle Spells' }]
 					},
 					{
@@ -142,6 +143,7 @@ const druidCirclePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'druid.circle_of_the_land_arctic',
+						importance: 'minor',
 						effects: [{ target: 'features', action: 'add', value: 'Natural Recovery' }]
 					}
 				]
@@ -171,6 +173,7 @@ const druidCirclePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'druid.circle_of_the_land_coast',
+						importance: 'invisible',
 						effects: [{ target: 'features', action: 'add', value: 'Circle Spells' }]
 					},
 					{
@@ -182,6 +185,7 @@ const druidCirclePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'druid.circle_of_the_land_coast',
+						importance: 'minor',
 						effects: [{ target: 'features', action: 'add', value: 'Natural Recovery' }]
 					}
 				]
@@ -211,6 +215,7 @@ const druidCirclePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'druid.circle_of_the_land_desert',
+						importance: 'invisible',
 						effects: [{ target: 'features', action: 'add', value: 'Circle Spells' }]
 					},
 					{
@@ -222,6 +227,7 @@ const druidCirclePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'druid.circle_of_the_land_desert',
+						importance: 'minor',
 						effects: [{ target: 'features', action: 'add', value: 'Natural Recovery' }]
 					}
 				]
@@ -251,6 +257,7 @@ const druidCirclePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'druid.circle_of_the_land_forest',
+						importance: 'invisible',
 						effects: [{ target: 'features', action: 'add', value: 'Circle Spells' }]
 					},
 					{
@@ -262,6 +269,7 @@ const druidCirclePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'druid.circle_of_the_land_forest',
+						importance: 'minor',
 						effects: [{ target: 'features', action: 'add', value: 'Natural Recovery' }]
 					}
 				]
@@ -291,6 +299,7 @@ const druidCirclePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'druid.circle_of_the_land_grassland',
+						importance: 'invisible',
 						effects: [{ target: 'features', action: 'add', value: 'Circle Spells' }]
 					},
 					{
@@ -302,6 +311,7 @@ const druidCirclePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'druid.circle_of_the_land_grassland',
+						importance: 'minor',
 						effects: [{ target: 'features', action: 'add', value: 'Natural Recovery' }]
 					}
 				]
@@ -331,6 +341,7 @@ const druidCirclePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'druid.circle_of_the_land_mountain',
+						importance: 'invisible',
 						effects: [{ target: 'features', action: 'add', value: 'Circle Spells' }]
 					},
 					{
@@ -342,6 +353,8 @@ const druidCirclePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'druid.circle_of_the_land_mountain',
+						importance: 'invisible',
+						importance: 'minor',
 						effects: [{ target: 'features', action: 'add', value: 'Natural Recovery' }]
 					}
 				]
@@ -371,6 +384,7 @@ const druidCirclePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'druid.circle_of_the_land_swamp',
+						importance: 'invisible',
 						effects: [{ target: 'features', action: 'add', value: 'Circle Spells' }]
 					},
 					{
@@ -382,6 +396,7 @@ const druidCirclePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'druid.circle_of_the_land_swamp',
+						importance: 'minor',
 						effects: [{ target: 'features', action: 'add', value: 'Natural Recovery' }]
 					}
 				]
@@ -411,6 +426,7 @@ const druidCirclePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'druid.circle_of_the_land_underdark',
+						importance: 'invisible',
 						effects: [{ target: 'features', action: 'add', value: 'Circle Spells' }]
 					},
 					{
@@ -422,6 +438,7 @@ const druidCirclePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'druid.circle_of_the_land_underdark',
+						importance: 'minor',
 						effects: [{ target: 'features', action: 'add', value: 'Natural Recovery' }]
 					}
 				]
@@ -450,6 +467,7 @@ const druidCirclePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'druid.circle_of_the_moon',
+						importance: 'invisible',
 						effects: [{ target: 'features', action: 'add', value: 'Circle Forms' }]
 					}
 				]

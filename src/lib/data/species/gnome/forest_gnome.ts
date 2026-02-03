@@ -81,6 +81,7 @@ export const forestGnome: SpeciesData = {
 				]
 			},
 			source: 'forest_gnome',
+			importance: 'invisible',
 			effects: [{ target: 'features', action: 'add', value: 'Natural Illusionist' }]
 		},
 		{

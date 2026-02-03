@@ -96,6 +96,7 @@ export const charlatan: BackgroundData = {
 				]
 			},
 			source: 'background:Charlatan',
+			importance: 'minor',
 			effects: [
 				{
 					target: 'features',

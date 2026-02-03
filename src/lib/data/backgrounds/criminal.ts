@@ -87,6 +87,7 @@ export const criminal: BackgroundData = {
 				]
 			},
 			source: 'background:Criminal',
+			importance: 'minor',
 			effects: [
 				{
 					target: 'features',

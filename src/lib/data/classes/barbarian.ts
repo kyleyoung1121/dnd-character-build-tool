@@ -100,6 +100,7 @@ const primalPathPrompt: FeaturePrompt = {
 							]
 						},
 						source: 'barbarian.totem_warrior',
+						importance: 'minor',
 						effects: [
 							{
 								target: 'features',
@@ -295,6 +296,7 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 			]
 		},
 		source: 'barbarian',
+		importance: 'invisible',
 		effects: [
 			{
 				target: 'features',

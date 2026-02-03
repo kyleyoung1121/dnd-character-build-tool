@@ -99,6 +99,7 @@ export const pirate: BackgroundData = {
 				]
 			},
 			source: 'background:Pirate',
+			importance: 'minor',
 			effects: [
 				{
 					target: 'features',

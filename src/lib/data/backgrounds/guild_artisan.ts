@@ -179,6 +179,7 @@ export const guildArtisan: BackgroundData = {
 				]
 			},
 			source: 'background:Guild Artisan',
+			importance: 'minor',
 			effects: [
 				{
 					target: 'features',

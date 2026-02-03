@@ -125,6 +125,7 @@ export const entertainer: BackgroundData = {
 				]
 			},
 			source: 'background:Entertainer',
+			importance: 'minor',
 			effects: [
 				{
 					target: 'features',

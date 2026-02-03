@@ -140,6 +140,7 @@ export const outlander: BackgroundData = {
 				]
 			},
 			source: 'background:Outlander',
+			importance: 'minor',
 			effects: [
 				{
 					target: 'features',

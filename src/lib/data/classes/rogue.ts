@@ -117,6 +117,7 @@ const thievesCantPrompt: FeaturePrompt = {
 		]
 	},
 	source: 'rogue',
+	importance: 'invisible',
 	effects: [
 		{
 			target: 'features',
@@ -163,7 +164,7 @@ const rogueArchetypePrompt: FeaturePrompt = {
 						name: 'Second-Story Work',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'In addition, climbing no longer costs you extra movement.' },
+								{ type: 'text', text: 'Climbing no longer costs you extra movement.' },
 							]
 						},
 						source: 'rogue.thief',
@@ -195,11 +196,6 @@ const rogueArchetypePrompt: FeaturePrompt = {
 								target: 'proficiencies',
 								action: 'add',
 								value: ['Disguise kit', "Poisoner's kit"]
-							},
-							{
-								target: 'features',
-								action: 'add',
-								value: "Bonus Proficiencies (Disguise Kit, Poisoner's Kit)"
 							}
 						]
 					},
@@ -208,7 +204,7 @@ const rogueArchetypePrompt: FeaturePrompt = {
 						name: 'Assassinate',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'In addition, any hit you score against a creature that is surprised is a critical hit.' },
+								{ type: 'text', text: 'Any hit you score against a creature that is surprised is a critical hit.' },
 							]
 						},
 						source: 'rogue.assassin',
@@ -231,7 +227,7 @@ const rogueArchetypePrompt: FeaturePrompt = {
 						name: 'Spellcasting',
 						description: {
 							blocks: [
-								{ type: 'text', text: '<strong>Cantrips</strong>' },
+								{ type: 'text', text: '\n<strong>Cantrips</strong>' },
 								{ type: 'text', text: 'You learn three cantrips: mage hand and two other cantrips of your choice from the wizard spell list.' },
 								{ type: 'text', text: '<strong>Spells Known of 1st-Level and Higher</strong>' },
 								{ type: 'text', text: 'You know three 1st-level wizard spells of your choice, two of which you must choose from the enchantment and illusion spells on the wizard spell list.' },

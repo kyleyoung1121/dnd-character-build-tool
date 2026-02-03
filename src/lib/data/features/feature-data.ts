@@ -23,6 +23,7 @@ export interface FeatureData {
 	description: string;
 	source: 'class' | 'race' | 'background' | 'feat' | 'subclass';
 	level?: number; // At what level this feature is gained (for class features)
+	importance?: 'important' | 'minor' | 'invisible'; // For PDF export filtering
 }
 
 import type {
@@ -344,7 +345,8 @@ export function getFeatureData(
 			: feature.source.includes('background')
 			? 'background'
 			: 'race',
-		level: undefined
+		level: undefined,
+		importance: feature.importance || 'important' // Default to 'important' if not specified
 	};
 }
 
@@ -381,13 +383,64 @@ export function formatFeatureForPDF(featureName: string, character?: Character):
 }
 
 /**
+ * Custom descriptions dictionary for special cases where we cannot use the normal lookup
+ * Use cases:
+ * - Multiple effects bundled into one card (e.g., "Ki Features" showing Flurry of Blows, Patient Defense, Step of the Wind)
+ * - Descriptions that need special formatting for the PDF
+ * - Features that don't have a single source to look up from
+ */
+const FEATURE_DESCRIPTION_DICTIONARY: Record<string, string> = {
+	// Example: Monk Ki Features - bundles multiple abilities into one description
+	'Flurry of Blows': 'Immediately after you take the Attack action on your turn, you can spend 1 ki point to make two unarmed strikes as a bonus action.',
+	'Patient Defense': 'You can spend 1 ki point to take the Dodge action as a bonus action on your turn.',
+	'Step of the Wind': 'You can spend 1 ki point to take the Disengage or Dash action as a bonus action on your turn, and your jump distance is doubled for the turn.',
+	// Add more custom descriptions as needed
+};
+
+/**
+ * Blacklist of feature names that should not be displayed in the PDF feature box
+ * Use cases:
+ * - Features that are better represented elsewhere (e.g., skill expertise shown in skills section)
+ * - Duplicate information that clutters the feature box
+ * - Features that are implicit and don't need explicit mention
+ */
+const FEATURE_BLACKLIST: string[] = [
+	// Expertise skills except Thieves' Tools
+	'Expertise: Acrobatics',
+	'Expertise: Animal Handling',
+	'Expertise: Arcana',
+	'Expertise: Athletics',
+	'Expertise: Deception',
+	'Expertise: History',
+	'Expertise: Insight',
+	'Expertise: Intimidation',
+	'Expertise: Investigation',
+	'Expertise: Medicine',
+	'Expertise: Nature',
+	'Expertise: Perception',
+	'Expertise: Performance',
+	'Expertise: Persuasion',
+	'Expertise: Religion',
+	'Expertise: Sleight of Hand',
+	'Expertise: Stealth',
+	'Expertise: Survival'
+	// Note: "Expertise: Thieves' Tools" is NOT blacklisted - it should appear
+	// Add more blacklisted features as needed
+];
+
+/**
  * Format multiple features for PDF display
  * Separates each feature with double newline for spacing
  * 
  * @param featureNames - Array of feature names
  * @param character - Character object to provide context for lookup
+ * @param importanceFilter - Optional filter by importance level (default: includes all)
  */
-export function formatFeaturesForPDF(featureNames: string[], character?: Character): string {
+export function formatFeaturesForPDF(
+	featureNames: string[], 
+	character?: Character,
+	importanceFilter?: 'important' | 'minor' | 'all'
+): string {
 	console.log('=== formatFeaturesForPDF called ===');
 	console.log('Features array input:', featureNames);
 	console.log('Character context:', {
@@ -396,15 +449,70 @@ export function formatFeaturesForPDF(featureNames: string[], character?: Charact
 		subclass: character?.subclass,
 		background: character?.background
 	});
+	console.log('Importance filter:', importanceFilter || 'all');
 	
 	if (!featureNames || featureNames.length === 0) {
 		console.log('No features found, returning default message');
 		return 'No features or traits.';
 	}
 	
-	const result = featureNames
+	// First pass: Filter out blacklisted features
+	const nonBlacklistedFeatures = featureNames.filter(name => {
+		if (FEATURE_BLACKLIST.includes(name)) {
+			console.log(`  Blacklisted feature removed: "${name}"`);
+			return false;
+		}
+		return true;
+	});
+	
+	console.log(`Blacklist filtering: ${featureNames.length} -> ${nonBlacklistedFeatures.length} features`);
+	
+	// Second pass: Filter features based on importance level
+	const filteredFeatures = nonBlacklistedFeatures.filter(name => {
+		const featureData = getFeatureData(name, character);
+		if (!featureData) return true; // Include if we can't find the feature data
+		
+		const importance = featureData.importance || 'important';
+		
+		// Filter out 'invisible' features always
+		if (importance === 'invisible') {
+			console.log(`  Filtering out invisible feature: "${name}"`);
+			return false;
+		}
+		
+		// If filtering for 'important' only, exclude 'minor' features
+		if (importanceFilter === 'important' && importance === 'minor') {
+			console.log(`  Filtering out minor feature: "${name}"`);
+			return false;
+		}
+		
+		// If filtering for 'minor' only, exclude 'important' features
+		if (importanceFilter === 'minor' && importance === 'important') {
+			return false;
+		}
+		
+		return true;
+	});
+	
+	console.log(`Importance filtering: ${nonBlacklistedFeatures.length} -> ${filteredFeatures.length} features`);
+	
+	if (filteredFeatures.length === 0) {
+		return 'No features or traits.';
+	}
+	
+	const result = filteredFeatures
 		.map((name, index) => {
 			console.log(`Processing feature ${index}: "${name}"`);
+			
+			// Check if there's a custom description in the dictionary first
+			if (FEATURE_DESCRIPTION_DICTIONARY[name]) {
+				console.log(`  Using custom dictionary description for: "${name}"`);
+				// Dictionary entries should already be formatted with [[BOLD:Name]]. Description pattern
+				// but we need to add the bold marker for the main feature name
+				return `[[BOLD:${name}]]. ${FEATURE_DESCRIPTION_DICTIONARY[name]}`;
+			}
+			
+			// Otherwise, use normal lookup
 			const formatted = formatFeatureForPDF(name, character);
 			console.log(`  Formatted result:`, formatted);
 			return formatted;

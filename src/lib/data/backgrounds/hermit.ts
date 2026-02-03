@@ -124,6 +124,7 @@ export const hermit: BackgroundData = {
 				]
 			},
 			source: 'background:Hermit',
+			importance: 'minor',
 			effects: [
 				{
 					target: 'features',

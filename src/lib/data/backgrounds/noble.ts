@@ -128,6 +128,7 @@ export const noble: BackgroundData = {
 				]
 			},
 			source: 'background:Noble',
+			importance: 'minor',
 			effects: [
 				{
 					target: 'features',

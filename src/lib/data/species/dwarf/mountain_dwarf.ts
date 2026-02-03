@@ -105,6 +105,7 @@ const stonecunning: FeaturePrompt = {
 		]
 	},
 	source: 'mountain_dwarf',
+	importance: 'minor',
 	effects: [{ target: 'features', action: 'add', value: 'Stonecunning' }]
 };
 

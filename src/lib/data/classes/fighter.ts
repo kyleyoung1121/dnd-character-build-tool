@@ -62,7 +62,13 @@ const fightingStylePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'fighter.fighting_style',
-						effects: []
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Archery Fighting Style'
+							}
+						]
 					}
 				]
 			},
@@ -79,7 +85,14 @@ const fightingStylePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'fighter.fighting_style',
-						effects: []
+						importance: 'invisible',
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Defense Fighting Style'
+							}
+						]
 					}
 				]
 			},
@@ -96,7 +109,13 @@ const fightingStylePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'fighter.fighting_style',
-						effects: []
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Dueling Fighting Style'
+							}
+						]
 					}
 				]
 			},
@@ -113,7 +132,13 @@ const fightingStylePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'fighter.fighting_style',
-						effects: []
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Great Weapon Fighting Style'
+							}
+						]
 					}
 				]
 			},
@@ -130,7 +155,13 @@ const fightingStylePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'fighter.fighting_style',
-						effects: []
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Protection Fighting Style'
+							}
+						]
 					}
 				]
 			},
@@ -147,7 +178,13 @@ const fightingStylePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'fighter.fighting_style',
-						effects: []
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Two-Weapon Fighting Style'
+							}
+						]
 					}
 				]
 			}
@@ -155,13 +192,7 @@ const fightingStylePrompt: FeaturePrompt = {
 		numPicks: 1
 	},
 	source: 'fighter',
-	effects: [
-		{
-			target: 'features',
-			action: 'add',
-			value: '{userChoice} Fighting Style'
-		}
-	]
+	effects: []
 };
 
 const secondWindPrompt: FeaturePrompt = {

@@ -101,6 +101,7 @@ export const gladiator: BackgroundData = {
 				]
 			},
 			source: 'background:Gladiator',
+			importance: 'minor',
 			effects: [
 				{
 					target: 'features',

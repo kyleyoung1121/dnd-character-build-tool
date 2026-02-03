@@ -100,6 +100,7 @@ export const urchin: BackgroundData = {
 				]
 			},
 			source: 'background:Urchin',
+			importance: 'minor',
 			effects: [
 				{
 					target: 'features',

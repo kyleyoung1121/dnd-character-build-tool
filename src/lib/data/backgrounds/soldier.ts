@@ -101,6 +101,7 @@ export const soldier: BackgroundData = {
 				]
 			},
 			source: 'background:Soldier',
+			importance: 'minor',
 			effects: [
 				{
 					target: 'features',

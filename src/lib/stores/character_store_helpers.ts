@@ -36,7 +36,8 @@ export function applyChoice(
 			// Check if this is a selection array that should use SET semantics
 			// NOTE: 'features' is NOT in this list because features should accumulate (ADD semantics)
 			// NOTE: 'inventory' and 'attacks' removed from list so equipment accumulates from multiple sources
-			const selectionArrays = ['beasts', 'spells', 'skills', 'languages'];
+			// NOTE: 'skills' and 'languages' removed so they can accumulate from multiple features with numPicks > 1
+			const selectionArrays = ['beasts', 'spells'];
 			const shouldSetInsteadOfAdd = selectionArrays.includes(key);
 
 			if (Array.isArray(current) && Array.isArray(value)) {
@@ -128,7 +129,8 @@ export function revertChanges(char: Character, scopeId: string): Character {
 			// Check if this is a selection array that should use SET semantics
 			// NOTE: 'features' is NOT in this list because features should accumulate (ADD semantics)
 			// NOTE: 'inventory' and 'attacks' removed from list so equipment accumulates from multiple sources
-			const selectionArrays = ['beasts', 'spells', 'skills', 'languages'];
+			// NOTE: 'skills' and 'languages' removed so they can accumulate from multiple features with numPicks > 1
+			const selectionArrays = ['beasts', 'spells'];
 			const isSelectionArray = selectionArrays.includes(key);
 			
 			if (Array.isArray(value)) {

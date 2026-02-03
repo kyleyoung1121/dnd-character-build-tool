@@ -129,6 +129,7 @@ export const knight: BackgroundData = {
 				]
 			},
 			source: 'background:Knight',
+			importance: 'minor',
 			effects: [
 				{
 					target: 'features',

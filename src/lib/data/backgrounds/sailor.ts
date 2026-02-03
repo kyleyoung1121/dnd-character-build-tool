@@ -99,6 +99,7 @@ export const sailor: BackgroundData = {
 				]
 			},
 			source: 'background:Sailor',
+			importance: 'minor',
 			effects: [
 				{
 					target: 'features',

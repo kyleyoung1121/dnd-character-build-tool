@@ -70,6 +70,7 @@ export const tiefling: SpeciesData = {
 				]
 			},
 			source: 'tiefling',
+			importance: 'minor',
 			effects: [{ target: 'features', action: 'add', value: 'Infernal Legacy' }]
 		}
 	]

@@ -154,6 +154,7 @@ const spellcastingPrompt: FeaturePrompt = {
 		]
 	},
 	source: 'bard',
+	importance: 'invisible',
 	effects: [
 		{
 			target: 'features',
@@ -175,6 +176,7 @@ const jackOfAllTradesPrompt: FeaturePrompt = {
 		]
 	},
 	source: 'bard',
+	importance: 'invisible', // Already factored into skill modifiers, no need to display
 	effects: [
 		{
 			target: 'features',

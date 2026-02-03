@@ -93,6 +93,7 @@ const stonecunning: FeaturePrompt = {
 		]
 	},
 	source: 'hill_dwarf',
+	importance: 'minor',
 	effects: [{ target: 'features', action: 'add', value: 'Stonecunning' }]
 };
 
@@ -105,6 +106,7 @@ const dwarvenToughness: FeaturePrompt = {
 		]
 	},
 	source: 'hill_dwarf',
+	importance: 'invisible',
 	effects: [{ target: 'features', action: 'add', value: 'Dwarven Toughness' }]
 };
 

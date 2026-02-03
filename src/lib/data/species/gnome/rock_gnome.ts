@@ -81,6 +81,7 @@ export const rockGnome: SpeciesData = {
 				]
 			},
 			source: 'rock_gnome',
+			importance: 'minor',
 			effects: [{ target: 'features', action: 'add', value: "Artificer's Lore" }]
 		},
 		{

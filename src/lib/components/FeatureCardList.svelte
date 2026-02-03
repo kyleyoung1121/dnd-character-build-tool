@@ -93,6 +93,8 @@
 
 		// Construct scopeId with parent context for nested features
 		// Format: feature:ParentName:ParentIndex:FeatureName:index for nested, or feature:FeatureName:index for top-level
+		// NOTE: The 'index' represents which dropdown (0, 1, 2...) for numPicks > 1
+		// This ensures each selection gets its own scopeId and doesn't overwrite previous ones
 		const scopeId = parentFeatureName && parentIndex !== null && parentIndex !== undefined
 			? `feature:${parentFeatureName}:${parentIndex}:${feature.name}:${index}`
 			: `feature:${feature.name}:${index}`;
@@ -113,12 +115,25 @@
 		if (prev) {
 			const prevNested = getNestedPrompts(feature, [prev]) || [];
 			for (const nested of prevNested) {
-				if (nested.featureOptions) continue; // only static nested
-				const prevNestedScopeId = parentFeatureName && parentIndex !== null && parentIndex !== undefined
-					? `feature:${parentFeatureName}:${parentIndex}:${feature.name}:${index}:${nested.name}`
-					: `feature:${feature.name}:${index}:${nested.name}`;
-				// Use applyChoice with empty changes to trigger revert of this nested scope
-				applyChoice(prevNestedScopeId, {});
+				if (nested.featureOptions) {
+					// For nested features with featureOptions (e.g., Knowledge Domain skills/languages),
+					// we need to revert ALL possible selections (numPicks)
+					const numPicks = nested.featureOptions.numPicks || 1;
+					for (let nestedIdx = 0; nestedIdx < numPicks; nestedIdx++) {
+						const prevNestedScopeId = parentFeatureName && parentIndex !== null && parentIndex !== undefined
+							? `feature:${parentFeatureName}:${parentIndex}:${feature.name}:${index}:${nested.name}:${nestedIdx}`
+							: `feature:${feature.name}:${index}:${nested.name}:${nestedIdx}`;
+						console.log(`[CLEANUP] Reverting nested feature with options: ${prevNestedScopeId}`);
+						applyChoice(prevNestedScopeId, {});
+					}
+				} else {
+					// Static nested features (no user options)
+					const prevNestedScopeId = parentFeatureName && parentIndex !== null && parentIndex !== undefined
+						? `feature:${parentFeatureName}:${parentIndex}:${feature.name}:${index}:${nested.name}`
+						: `feature:${feature.name}:${index}:${nested.name}`;
+					// Use applyChoice with empty changes to trigger revert of this nested scope
+					applyChoice(prevNestedScopeId, {});
+				}
 			}
 
 			// ALSO revert nested prompt effects from the previous option's nestedPrompts
@@ -211,6 +226,13 @@
 			const target = replaceUC(effect.target, true);
 			const value = replaceUC(effect.value);
 
+			// DEFENSIVE: Skip this effect if value still contains {userChoice} after replacement
+			// This should never happen if effectNeedsChoice works correctly, but prevents bugs
+			if (typeof value === 'string' && value.includes('{userChoice}')) {
+				console.warn(`[APPLY_EFFECTS] Skipping effect because value still contains {userChoice}:`, effect);
+				continue;
+			}
+
 			switch (effect.action) {
 				case 'add': {
 					const arr = Array.isArray(value) ? value : [value];
@@ -273,6 +295,13 @@
 				const target = effect.target;
 				const value = effect.value;
 
+				// DEFENSIVE: Skip this static nested effect if it contains {userChoice}
+				// Static nested features should never have {userChoice} placeholders
+				if (typeof value === 'string' && value.includes('{userChoice}')) {
+					console.warn(`[NESTED] Skipping static nested effect with {userChoice}:`, effect);
+					continue;
+				}
+
 				switch (effect.action) {
 					case 'add': {
 						const arr = Array.isArray(value) ? value : [value];
@@ -321,6 +350,13 @@
 					for (const effect of optionNested.effects || []) {
 						const target = effect.target;
 						const value = effect.value;
+
+						// DEFENSIVE: Skip this option nested effect if it contains {userChoice}
+						// Option nested features should never have {userChoice} placeholders
+						if (typeof value === 'string' && value.includes('{userChoice}')) {
+							console.warn(`[OPTION_NESTED] Skipping effect with {userChoice}:`, effect);
+							continue;
+						}
 
 						switch (effect.action) {
 							case 'add': {

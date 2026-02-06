@@ -494,7 +494,8 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 export const paladin: ClassData = {
 	name: 'Paladin',
 	image: base + '/class_icons/paladin.jpg',
-	description: 'Holy warriors bound by sacred oaths, wielding divine power to protect and smite.',
+	description: 'You are a holy warrior bound to a sacred oath.',
+	cultureNotes: 'Paladins swear to uphold justice and righteousness, to stand with the good things of the world against the encroaching darkness, and to hunt the forces of evil wherever they lurk.',
 	hitDie: 'd10',
 	primaryAbility: 'Strength & Charisma',
 	saves: ['Wisdom', 'Charisma'],

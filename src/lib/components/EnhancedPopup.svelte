@@ -83,7 +83,7 @@
 					<!-- Culture & Society -->
 					{#if cultureNotes}
 						<div class="content-section">
-							<h3 class="section-title">Culture & Society</h3>
+							<h3 class="section-title">Culture & Motivation</h3>
 							<div class="culture-content">
 								{cultureNotes}
 							</div>

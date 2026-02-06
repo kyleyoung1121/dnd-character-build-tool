@@ -368,7 +368,8 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 export const sorcerer: ClassData = {
 	name: 'Sorcerer',
 	image: base + '/class_icons/sorcerer.jpg',
-	description: 'Spellcasters who draw power from innate magical bloodlines or forces.',
+	description: 'You are a spellcaster who draws on inherent magic from a gift or bloodline.',
+	cultureNotes: 'Sorcerers are connected to raw magic. It suffuses body, mind, and spirit with a latent power that waits to be tapped. A sorcerer\'s magic wants to be wielded, and it has a tendency to spill out in unpredictable ways if it isn’t called upon.',
 	hitDie: 'd6',
 	primaryAbility: 'Charisma',
 	saves: ['Constitution', 'Charisma'],

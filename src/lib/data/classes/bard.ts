@@ -388,7 +388,8 @@ const classFeaturesPrompt = [
 export const bard: ClassData = {
 	name: 'Bard',
 	image: base + '/class_icons/bard.jpg',
-	description: 'Inspiring leaders who weave magic through words and music.',
+	description: 'You are an inspiring leader whose power echoes the music of creation.',
+	cultureNotes: 'Bards thrive on stories, whether those stories are true or not. A bard weaves magic through words and music to inspire allies, demoralize foes, manipulate minds, create illusions, and even heal wounds.',
 	hitDie: 'd8',
 	primaryAbility: 'Charisma',
 	saves: ['Dexterity', 'Charisma'],

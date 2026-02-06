@@ -322,7 +322,8 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 export const rogue: ClassData = {
 	name: 'Rogue',
 	image: base + '/class_icons/rogue.jpg',
-	description: 'Sneaky and dexterous masters of stealth and trickery.',
+	description: 'You are a scoundrel who uses stealth and trickery to overcome obstacles and enemies.',
+	cultureNotes: 'Rogues rely on skill, stealth, and their foes’ vulnerabilities to get the upper hand in any situation. They have a knack for finding the solution to just about any problem, demonstrating resourcefulness and versatility that pairs well with any successful adventuring party.',
 	hitDie: 'd8',
 	primaryAbility: 'Dexterity',
 	saves: ['Dexterity', 'Intelligence'],

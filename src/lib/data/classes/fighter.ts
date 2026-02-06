@@ -698,7 +698,8 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 export const fighter: ClassData = {
 	name: 'Fighter',
 	image: base + '/class_icons/fighter.jpg',
-	description: 'Versatile warriors skilled in all forms of combat.',
+	description: 'You are a master of combat, skilled with a variety of weapons and armor.',
+	cultureNotes: 'Fighters hold an unparalleled mastery with weapons and armor, having an excellent foundation in all aspects of battle. Fighters hold a keen understanding of reading a battlefield and executing a well-planned strategy.',
 	hitDie: 'd10',
 	primaryAbility: 'Strength or Dexterity',
 	saves: ['Strength', 'Constitution'],

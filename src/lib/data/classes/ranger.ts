@@ -1089,7 +1089,8 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 export const ranger: ClassData = {
 	name: 'Ranger',
 	image: base + '/class_icons/ranger.jpg',
-	description: 'Skilled hunters and trackers, masters of nature and survival.',
+	description: 'You are a warrior who uses martial prowess and nature magic to combat threats on the edges of civilization.',
+	cultureNotes: 'Rangers specialize in hunting the monsters that threaten the edges of settlements. Particularly familiar with the wilds, rangers are excellent trackers and make use of nature magic to enhance their combat abilities, emphasize speed, stealth, and the hunt.',
 	hitDie: 'd10',
 	primaryAbility: 'Dexterity & Wisdom',
 	saves: ['Strength', 'Dexterity'],

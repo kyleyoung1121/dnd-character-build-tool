@@ -400,7 +400,8 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 export const wizard: ClassData = {
 	name: 'Wizard',
 	image: base + '/class_icons/wizard.jpg',
-	description: 'Scholars of magic who manipulate arcane forces through study and practice.',
+	description: 'You are a scholarly magic-user capable of manipulating the structures of reality.',
+	cultureNotes: 'Wizards seek to master the mysteries of magic. Wizards live and die by their spells, spending years of apprenticeship and countless hours of study to become adept in manipulating the weave. When not studying, wizards often find themselves in crumbling ruins and lost cities, seeking knowledge that has been lost to time.',
 	hitDie: 'd6',
 	primaryAbility: 'Intelligence',
 	saves: ['Intelligence', 'Wisdom'],

@@ -2,7 +2,7 @@ import { base } from '$app/paths';
 import type { BackgroundData } from '../types/BackgroundData';
 
 export const criminal: BackgroundData = {
-	name: 'Criminal',
+	name: 'Former Criminal',
 	image: base + '/background_icons/criminal.jpg',
 	description: 'You are an experienced criminal with a history of breaking the law.',
 	flavorDescription:

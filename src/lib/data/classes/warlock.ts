@@ -1180,7 +1180,8 @@ const classFeaturesPrompt: FeaturePrompt[] = [pactMagicPrompt, pactBoonPrompt];
 export const warlock: ClassData = {
 	name: 'Warlock',
 	image: base + '/class_icons/warlock.jpg',
-	description: 'A wielder of magic granted by a pact with an otherworldly being.',
+	description: 'You are a wielder of magic that is derived from a bargain with an otherworldly entity.',
+	cultureNotes: 'Warlocks are usually driven by a need for knowledge and power, which compels them into their pacts and shapes their lives. These pacts unlock magical effects, both subtle and spectacular. These gifts come at the cost of occasional gifts or services performed on the patron\'s behalf.',
 	hitDie: 'd8',
 	primaryAbility: 'Charisma',
 	saves: ['Wisdom', 'Charisma'],

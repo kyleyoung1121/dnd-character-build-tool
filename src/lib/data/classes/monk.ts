@@ -510,7 +510,8 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 export const monk: ClassData = {
 	name: 'Monk',
 	image: base + '/class_icons/monk.jpg',
-	description: 'Masters of martial arts harnessing the power of ki.',
+	description: 'You are a master of martial arts, harnessing the power of the body in pursuit of physical and spiritual perfection.',
+	cultureNotes: 'Monks make use of Ki, the magic that flows through living bodies, to create magical effects and to extend their bodies’ physical capabilities. Monks take their quests seriously, seeing them as personal tests of their physical and spiritual growth.',
 	hitDie: 'd8',
 	primaryAbility: 'Dexterity & Wisdom',
 	saves: ['Strength', 'Dexterity'],

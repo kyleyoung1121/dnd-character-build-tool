@@ -106,9 +106,9 @@ function drawSkillWithAbility(
  * [[BOLD:text]] becomes [{text: 'text', bold: true, italic: false}]
  * [[ITALIC:text]] becomes [{text: 'text', bold: false, italic: true}]
  */
-function parseTextWithStyle(text: string): Array<{text: string; bold: boolean; italic: boolean}> {
-	const segments: Array<{text: string; bold: boolean; italic: boolean}> = [];
-	const regex = /\[\[(BOLD|ITALIC):([^\]]+)\]\]/g;
+function parseTextWithStyle(text: string): Array<{text: string; bold: boolean; italic: boolean; largeBold?: boolean}> {
+	const segments: Array<{text: string; bold: boolean; italic: boolean; largeBold?: boolean}> = [];
+	const regex = /\[\[(BOLD|ITALIC|LARGEBOLD):([^\]]+)\]\]/g;
 	let lastIndex = 0;
 	let match;
 	
@@ -126,8 +126,9 @@ function parseTextWithStyle(text: string): Array<{text: string; bold: boolean; i
 		const styleText = match[2];
 		segments.push({
 			text: styleText,
-			bold: styleType === 'BOLD',
-			italic: styleType === 'ITALIC'
+			bold: styleType === 'BOLD' || styleType === 'LARGEBOLD',
+			italic: styleType === 'ITALIC',
+			largeBold: styleType === 'LARGEBOLD'
 		});
 		lastIndex = regex.lastIndex;
 	}
@@ -180,7 +181,12 @@ function drawTextArea(
 		for (const segment of segments) {
 			// Choose the appropriate font
 			let segmentFont = font;
-			if (segment.bold) {
+			let segmentFontSize = fontSize;
+			
+			if (segment.largeBold) {
+				segmentFont = boldFont;
+				segmentFontSize = fontSize + 2; // Make spell names 2 points larger (10pt instead of 8pt)
+			} else if (segment.bold) {
 				segmentFont = boldFont;
 			} else if (segment.italic) {
 				segmentFont = italicFont;
@@ -190,8 +196,8 @@ function drawTextArea(
 			
 			for (let i = 0; i < words.length; i++) {
 				const word = words[i];
-				const wordWidth = segmentFont.widthOfTextAtSize(word, fontSize);
-				const spaceWidth = segmentFont.widthOfTextAtSize(' ', fontSize);
+				const wordWidth = segmentFont.widthOfTextAtSize(word, segmentFontSize);
+				const spaceWidth = segmentFont.widthOfTextAtSize(' ', segmentFontSize);
 				
 				// Check if word fits on current line
 				if (currentX + wordWidth > config.x + config.width && currentX > config.x) {
@@ -205,7 +211,7 @@ function drawTextArea(
 				page.drawText(word, {
 					x: currentX,
 					y: currentY,
-					size: fontSize,
+					size: segmentFontSize,
 					font: segmentFont,
 					color
 				});
@@ -362,8 +368,20 @@ async function fillPage2(
 	}
 	
 	// Additional Content
+	// Features & Traits (continued from page 1)
+	if (data.featuresAndTraitsContinued) {
+		drawTextArea(page, data.featuresAndTraitsContinued, PAGE_2_FIELDS.featuresAndTraitsContinued, font, boldFont, italicFont);
+	}
 	if (data.additionalFeatures) {
 		drawTextArea(page, data.additionalFeatures, PAGE_2_FIELDS.additionalFeatures, font, boldFont, italicFont);
+	}
+	// Spells & Cantrips (middle column)
+	if (data.spellsAndCantrips) {
+		drawTextArea(page, data.spellsAndCantrips, PAGE_2_FIELDS.spellsAndCantrips, font, boldFont, italicFont);
+	}
+	// Spells & Cantrips Continued (rightmost column - for overflow)
+	if (data.spellsAndCantripsContinued) {
+		drawTextArea(page, data.spellsAndCantripsContinued, PAGE_2_FIELDS.spellsAndCantripsContinued, font, boldFont, italicFont);
 	}
 	if (data.treasureAndNotes) {
 		drawTextArea(page, data.treasureAndNotes, PAGE_2_FIELDS.treasureAndNotes, font, boldFont, italicFont);

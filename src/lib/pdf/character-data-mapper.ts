@@ -7,7 +7,8 @@
 
 import type { Character } from '$lib/stores/character_store';
 import { getWeaponData } from '$lib/data/equipment/weapon-data';
-import { formatFeaturesForPDF } from '$lib/data/features/feature-data';
+import { formatFeatureForPDF } from '$lib/data/features/feature-data';
+import { prepareFeaturesWithOverflow } from '$lib/data/features/feature-overflow';
 import { barbarian } from '$lib/data/classes/barbarian';
 import { bard } from '$lib/data/classes/bard';
 import { cleric } from '$lib/data/classes/cleric';
@@ -20,6 +21,8 @@ import { rogue } from '$lib/data/classes/rogue';
 import { sorcerer } from '$lib/data/classes/sorcerer';
 import { warlock } from '$lib/data/classes/warlock';
 import { wizard } from '$lib/data/classes/wizard';
+import { spells } from '$lib/data/spells';
+import type { Spell } from '$lib/data/spells';
 
 export interface CharacterSheetData {
 	// Page 1 - Header
@@ -95,6 +98,9 @@ export interface CharacterSheetData {
 	
 	// Page 2 - Additional Content
 	additionalFeatures: string;
+	featuresAndTraitsContinued: string; // Overflow from page 1
+	spellsAndCantrips: string; // Spell list with descriptions
+	spellsAndCantripsContinued: string; // Spell overflow from middle column
 	treasureAndNotes: string;
 }
 
@@ -838,9 +844,212 @@ function formatProficienciesAndLanguages(character: Character): string {
 }
 
 /**
+ * Estimate lines for a spell entry (name + description)
+ */
+function estimateSpellLines(spell: Spell, maxWidth: number, fontSize: number): number {
+	const charsPerLine = 42; // Same as feature estimation for 170pt width, 8pt font
+	
+	// Spell name (larger font, estimate ~1-2 lines)
+	const nameLines = Math.ceil(spell.name.length / 30); // Larger font = fewer chars per line
+	
+	// Casting details line: "Casting Time: X | Range: Y | Duration: Z"
+	const detailsLine = `${spell.castingTime} | ${spell.range} | ${spell.duration}`;
+	const detailsLines = Math.ceil(detailsLine.length / charsPerLine);
+	
+	// Description lines
+	const descriptionLines = Math.ceil(spell.description.length / charsPerLine);
+	
+	// Add 1 line for spacing after spell
+	return nameLines + detailsLines + descriptionLines + 1;
+}
+
+/**
+ * Format spells with descriptions for PDF export
+ * Looks up spell data and formats with name and description
+ * Separates cantrips from leveled spells
+ * Handles overflow to second column
+ */
+function formatSpells(
+	character: Character,
+	maxLinesColumn1: number = 63 // 630pt height / 10pt lineHeight
+): {
+	column1Text: string;
+	column2Text: string;
+	hasOverflow: boolean;
+} {
+	if (!character.spells || character.spells.length === 0) {
+		return {
+			column1Text: '',
+			column2Text: '',
+			hasOverflow: false
+		};
+	}
+	
+	// Extract spell names (handle both string and object format)
+	const spellNames = character.spells.map((spell: any) => {
+		if (typeof spell === 'string') {
+			return spell;
+		} else if (spell && typeof spell === 'object' && 'name' in spell) {
+			return spell.name as string;
+		}
+		return '';
+	}).filter(name => name !== '');
+	
+	if (spellNames.length === 0) {
+		return {
+			column1Text: '',
+			column2Text: '',
+			hasOverflow: false
+		};
+	}
+	
+	// Look up spell data for each spell
+	const spellData: Array<{ name: string; spell: Spell | undefined }> = spellNames.map(name => ({
+		name,
+		spell: spells.find(s => s.name === name)
+	}));
+	
+	// Separate cantrips from leveled spells
+	const cantrips = spellData.filter(s => s.spell && s.spell.level === 0);
+	const leveledSpells = spellData.filter(s => s.spell && s.spell.level > 0);
+	
+	// Build all spell lines first, tracking which lines belong to which spell
+	const allSpellLines: Array<{ lines: string[]; estimatedLines: number }> = [];
+	let totalEstimatedLines = 0;
+	
+	// Format cantrips
+	if (cantrips.length > 0) {
+		const headerLines = ['=== CANTRIPS ===', ''];
+		allSpellLines.push({ lines: headerLines, estimatedLines: 2 });
+		totalEstimatedLines += 2;
+		
+		for (const { name, spell } of cantrips) {
+			const spellLines: string[] = [];
+			
+			if (!spell) {
+				spellLines.push(`[[LARGEBOLD:${name}]]`);
+				spellLines.push('(Description not found)');
+				spellLines.push('');
+				const estimated = 3;
+				allSpellLines.push({ lines: spellLines, estimatedLines: estimated });
+				totalEstimatedLines += estimated;
+				continue;
+			}
+			
+			// Format: [[LARGEBOLD:Spell Name]] (larger font)
+			spellLines.push(`[[LARGEBOLD:${spell.name}]]`);
+			
+			// Add casting details
+			spellLines.push(`${spell.castingTime} | ${spell.range} | ${spell.duration}`);
+			
+			// Add description
+			spellLines.push(spell.description);
+			spellLines.push('');
+			
+			const estimated = estimateSpellLines(spell, 170, 8);
+			allSpellLines.push({ lines: spellLines, estimatedLines: estimated });
+			totalEstimatedLines += estimated;
+		}
+	}
+	
+	// Format leveled spells
+	if (leveledSpells.length > 0) {
+		const headerLines: string[] = [];
+		if (cantrips.length > 0) {
+			headerLines.push(''); // Extra space between sections
+		}
+		headerLines.push('=== SPELLS ===');
+		headerLines.push('');
+		allSpellLines.push({ lines: headerLines, estimatedLines: headerLines.length });
+		totalEstimatedLines += headerLines.length;
+		
+		// Group spells by level
+		const spellsByLevel: Record<number, Array<{ name: string; spell: Spell }>> = {};
+		for (const spellEntry of leveledSpells) {
+			if (!spellEntry.spell) continue;
+			
+			const level = spellEntry.spell.level;
+			if (!spellsByLevel[level]) {
+				spellsByLevel[level] = [];
+			}
+			spellsByLevel[level].push(spellEntry as { name: string; spell: Spell });
+		}
+		
+		// Sort by level and format
+		const sortedLevels = Object.keys(spellsByLevel).map(Number).sort((a, b) => a - b);
+		
+		for (const level of sortedLevels) {
+			const spellsAtLevel = spellsByLevel[level];
+			
+			// Add level header
+			const levelText = level === 1 ? '1st Level' : level === 2 ? '2nd Level' : `${level}th Level`;
+			const levelHeaderLines = [`--- ${levelText} ---`, ''];
+			allSpellLines.push({ lines: levelHeaderLines, estimatedLines: 2 });
+			totalEstimatedLines += 2;
+			
+			for (const { name, spell } of spellsAtLevel) {
+				const spellLines: string[] = [];
+				
+				if (!spell) {
+					spellLines.push(`[[LARGEBOLD:${name}]]`);
+					spellLines.push('(Description not found)');
+					spellLines.push('');
+					const estimated = 3;
+					allSpellLines.push({ lines: spellLines, estimatedLines: estimated });
+					totalEstimatedLines += estimated;
+					continue;
+				}
+				
+				// Format: [[LARGEBOLD:Spell Name]] (larger font)
+				spellLines.push(`[[LARGEBOLD:${spell.name}]]`);
+				
+				// Add casting details
+				spellLines.push(`${spell.castingTime} | ${spell.range} | ${spell.duration}`);
+				
+				// Add description
+				spellLines.push(spell.description);
+				spellLines.push('');
+				
+				const estimated = estimateSpellLines(spell, 170, 8);
+				allSpellLines.push({ lines: spellLines, estimatedLines: estimated });
+				totalEstimatedLines += estimated;
+			}
+		}
+	}
+	
+	// Now split between columns
+	const column1Lines: string[] = [];
+	const column2Lines: string[] = [];
+	let currentLines = 0;
+	let hasOverflow = false;
+	
+	for (const spellBlock of allSpellLines) {
+		// Check if this spell block fits in column 1
+		if (currentLines + spellBlock.estimatedLines <= maxLinesColumn1) {
+			// Fits in column 1
+			column1Lines.push(...spellBlock.lines);
+			currentLines += spellBlock.estimatedLines;
+		} else {
+			// Overflow to column 2
+			hasOverflow = true;
+			column2Lines.push(...spellBlock.lines);
+		}
+	}
+	
+	return {
+		column1Text: column1Lines.join('\n'),
+		column2Text: column2Lines.length > 0 ? column2Lines.join('\n') : '',
+		hasOverflow
+	};
+}
+
+/**
  * Map character store data to PDF field data
  */
 export function mapCharacterToSheetData(character: Character): CharacterSheetData {
+	// Variable to store page 2 overflow features
+	let characterSheetData_featuresPage2 = '';
+	
 	// Calculate ability modifiers
 	const strMod = getModifier(character.strength);
 	const dexMod = getModifier(character.dexterity);
@@ -954,19 +1163,27 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 			console.log('Character class:', character.class);
 			console.log('Character race:', character.race);
 			console.log('Character subclass:', character.subclass);
-			if (character._provenance) {
-				console.log('Character provenance keys:', Object.keys(character._provenance));
-				// Log any provenance entries that might contain totem info
-				for (const [key, value] of Object.entries(character._provenance)) {
-					if (key.includes('totem') || key.includes('eagle')) {
-						console.log(`Totem-related provenance - ${key}:`, value);
-					}
-				}
-			}
-			const result = formatFeaturesForPDF(character.features || [], character);
-			console.log('Formatted features result:', result);
+			
+			// Use new overflow system
+			// Height: 595pt, lineHeight: 10pt -> 59.5 max lines
+			// Use 57 to leave small safety margin for rounding
+			const result = prepareFeaturesWithOverflow(
+				character.features || [],
+				character,
+				formatFeatureForPDF,
+				57, // Max lines on page 1 (based on 595pt height / 10pt lineHeight)
+				{ width: 165, fontSize: 8 } // Page 1 text area config
+			);
+			
+			console.log('Overflow stats:', result.stats);
+			console.log('Has overflow:', result.hasOverflow);
 			console.log('=== END FEATURES DEBUG ===');
-			return result;
+			
+			// Store page 2 text in temporary variable for now
+			// We'll access it below in the page 2 section
+			characterSheetData_featuresPage2 = result.page2Text;
+			
+			return result.page1Text;
 		})(),
 		
 		// Page 2 - Character Details (placeholders for now)
@@ -985,6 +1202,15 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 		
 		// Page 2 - Additional Content
 		additionalFeatures: '', // Could add spell list here
+		featuresAndTraitsContinued: characterSheetData_featuresPage2,
+		// Spells with overflow handling
+		...(() => {
+			const spellResult = formatSpells(character);
+			return {
+				spellsAndCantrips: spellResult.column1Text,
+				spellsAndCantripsContinued: spellResult.column2Text
+			};
+		})(),
 		treasureAndNotes: ''
 	};
 }

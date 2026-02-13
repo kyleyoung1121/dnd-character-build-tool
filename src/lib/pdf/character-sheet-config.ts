@@ -286,9 +286,9 @@ export const PAGE_2_FIELDS = {
 	// This is the first column on page 2 for feature overflow
 	featuresAndTraitsContinued: {
 		x: 25,
-		y: 110,
-		width: 170,
-		height: 630,
+		y: 415,
+		width: 260,
+		height: 330,
 		fontSize: 8,
 		lineHeight: 10
 	} as TextAreaConfig,
@@ -306,10 +306,10 @@ export const PAGE_2_FIELDS = {
 	// Positioned to the right of "Features cont." section
 	// Uses same height and positioning as featuresAndTraitsContinued for alignment
 	spellsAndCantrips: {
-		x: 220,
-		y: 110,
-		width: 170,
-		height: 630,
+		x: 25,
+		y: 45,
+		width: 260,
+		height: 330,
 		fontSize: 8,
 		lineHeight: 10
 	} as TextAreaConfig,
@@ -317,10 +317,10 @@ export const PAGE_2_FIELDS = {
 	// Spells & Cantrips Continued (rightmost column on page 2)
 	// For spell overflow from the middle column
 	spellsAndCantripsContinued: {
-		x: 410,
-		y: 110,
-		width: 160,
-		height: 630,
+		x: 300,
+		y: 45,
+		width: 260,
+		height: 330,
 		fontSize: 8,
 		lineHeight: 10
 	} as TextAreaConfig,

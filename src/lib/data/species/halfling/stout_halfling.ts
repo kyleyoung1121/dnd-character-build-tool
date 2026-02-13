@@ -40,6 +40,17 @@ export const stoutHalfling: SpeciesData = {
 	speciesFeatures: [
 		abilityScoreChoicePrompt,
 		{
+			name: 'Speed',
+			id: 'stout_halfling_speed',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'Your base walking speed is 25 feet.' },
+				]
+			},
+			source: 'stout_halfling',
+			effects: [{ target: 'speed', action: 'set', value: '25 ft.' }]
+		},
+		{
 			name: 'Lucky',
 			id: 'stout_halfling_lucky',
 			description: {

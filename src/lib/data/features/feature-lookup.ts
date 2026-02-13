@@ -13,7 +13,8 @@
 import type { ClassData } from '$lib/data/types/ClassData';
 import type { SpeciesData } from '$lib/data/types/SpeciesData';
 import type { BackgroundData } from '$lib/data/types/BackgroundData';
-import type { FeaturePrompt, FeatureDescription } from '$lib/data/types/Features';
+import type { FeaturePrompt, FeatureDescription, ComputedValue } from '$lib/data/types/Features';
+import type { Character } from '$lib/stores/character_store';
 
 // Import all classes
 import { barbarian } from '../classes/barbarian';
@@ -98,32 +99,221 @@ backgrounds.forEach(bg => {
 });
 
 /**
- * Serialize feature description from blocks to plain text
+ * Calculate ability modifier from ability score
+ */
+function abilityMod(score: number | null): number | null {
+	if (score === null || score === 0) return null;
+	return Math.floor((score - 10) / 2);
+}
+
+/**
+ * Resolve a computed value using character data
+ */
+function resolveComputedValue(value: ComputedValue, character?: Character): number | null {
+	if (!character) return null;
+
+	const ABILITY_KEY_MAP: Record<string, keyof Pick<Character, 'strength' | 'dexterity' | 'constitution' | 'intelligence' | 'wisdom' | 'charisma'>> = {
+		STR: 'strength',
+		DEX: 'dexterity',
+		CON: 'constitution',
+		INT: 'intelligence',
+		WIS: 'wisdom',
+		CHA: 'charisma'
+	};
+
+	switch (value.source) {
+		case 'abilityScore': {
+			const key = ABILITY_KEY_MAP[value.ability];
+			return character[key];
+		}
+		case 'abilityMod': {
+			const key = ABILITY_KEY_MAP[value.ability];
+			return abilityMod(character[key]);
+		}
+		case 'derived': {
+			return evaluateFormula(value.formula, character);
+		}
+		default:
+			return null;
+	}
+}
+
+/**
+ * Evaluate a formula with character context
+ */
+function evaluateFormula(formula: string, character: Character): number | null {
+	// --- Ability scores ---
+	const STR = character.strength;
+	const DEX = character.dexterity;
+	const CON = character.constitution;
+	const INT = character.intelligence;
+	const WIS = character.wisdom;
+	const CHA = character.charisma;
+
+	// If any referenced score is missing, bail
+	if (formula.includes('STR') && STR === null) return null;
+	if (formula.includes('DEX') && DEX === null) return null;
+	if (formula.includes('CON') && CON === null) return null;
+	if (formula.includes('INT') && INT === null) return null;
+	if (formula.includes('WIS') && WIS === null) return null;
+	if (formula.includes('CHA') && CHA === null) return null;
+
+	// --- Ability modifiers ---
+	const STR_MOD = abilityMod(STR);
+	const DEX_MOD = abilityMod(DEX);
+	const CON_MOD = abilityMod(CON);
+	const INT_MOD = abilityMod(INT);
+	const WIS_MOD = abilityMod(WIS);
+	const CHA_MOD = abilityMod(CHA);
+
+	if (formula.includes('STR_MOD') && STR_MOD === null) return null;
+	if (formula.includes('DEX_MOD') && DEX_MOD === null) return null;
+	if (formula.includes('CON_MOD') && CON_MOD === null) return null;
+	if (formula.includes('INT_MOD') && INT_MOD === null) return null;
+	if (formula.includes('WIS_MOD') && WIS_MOD === null) return null;
+	if (formula.includes('CHA_MOD') && CHA_MOD === null) return null;
+
+	// Known Constants
+	const PROF = 2;
+	const LEVEL = 3;
+
+	try {
+		// Controlled evaluation: formulas come from your data files only
+		return Function(
+			'STR',
+			'DEX',
+			'CON',
+			'INT',
+			'WIS',
+			'CHA',
+			'STR_MOD',
+			'DEX_MOD',
+			'CON_MOD',
+			'INT_MOD',
+			'WIS_MOD',
+			'CHA_MOD',
+			'PROF',
+			'LEVEL',
+			`return ${formula};`
+		)(
+			STR,
+			DEX,
+			CON,
+			INT,
+			WIS,
+			CHA,
+			STR_MOD,
+			DEX_MOD,
+			CON_MOD,
+			INT_MOD,
+			WIS_MOD,
+			CHA_MOD,
+			PROF,
+			LEVEL
+		);
+	} catch (e) {
+		console.error('[PDF] Formula eval failed:', formula, e);
+		return null;
+	}
+}
+
+/**
+ * Check if all computed values are available
+ */
+function allValuesAvailable(values: ComputedValue[], character?: Character): number | null {
+	const resolved = values.map((v) => resolveComputedValue(v, character));
+
+	if (resolved.some((v) => v === null || Number.isNaN(v))) {
+		return null;
+	}
+
+	return resolved[0];
+}
+
+/**
+ * Serialize feature description from blocks to plain text with fancy description computation
  */
 function serializeFeatureDescription(
-	description: FeatureDescription
+	description: FeatureDescription,
+	character?: Character
 ): string {
 	return description.blocks
 		.map((block) => {
 			switch (block.type) {
-				case 'text':
-					return block.text;
+				case 'text': {
+					let text = block.text;
+					
+					// Replace dynamic placeholders with character-specific values
+					if (character) {
+						// Dragonborn element placeholder
+						if (text.includes('{{element}}') && character.dragonbornElement) {
+							text = text.replace(/\{\{element\}\}/g, character.dragonbornElement.toLowerCase());
+						}
+						// Dragonborn breath shape placeholder
+						if (text.includes('{{shape}}') && character.dragonbornBreathShape) {
+							text = text.replace(/\{\{shape\}\}/g, character.dragonbornBreathShape.toLowerCase());
+						}
+					}
+					
+					return text;
+				}
 
-				case 'computed-inline':
-					// PDFs should be readable but deterministic.
-					// We do NOT try to compute here.
-					return block.text;
+				case 'computed-inline': {
+					// Process hints and insert computed values
+					let result = block.text;
+					let offset = 0;
 
-				case 'computed-replacement':
-					// PDF export happens after character creation,
-					// but to be safe, use fallback text.
-					return block.fallbackText;
+					// Sort hints by their position in the text to insert in order
+					const sortedHints = block.hints
+						.map((hint) => ({
+							...hint,
+							position: result.indexOf(hint.afterText)
+						}))
+						.filter((hint) => hint.position !== -1)
+						.sort((a, b) => a.position - b.position);
+
+					// Insert hints from left to right
+					for (const hint of sortedHints) {
+						const value = resolveComputedValue(hint.computed, character);
+						const hintText =
+							value !== null
+								? hint.hintFormat.replace('{value}', String(value))
+								: hint.hintFormat.replace('{value}', '?');
+
+						// Find position in current result (accounting for previous insertions)
+						const insertPosition = result.indexOf(hint.afterText, offset);
+						if (insertPosition !== -1) {
+							const insertAt = insertPosition + hint.afterText.length;
+							result = result.slice(0, insertAt) + ' ' + hintText + result.slice(insertAt);
+							offset = insertAt + hintText.length + 1;
+						}
+					}
+
+					return result;
+				}
+
+				case 'computed-replacement': {
+					// Try to compute the value
+					const value = allValuesAvailable(block.whenAvailable, character);
+
+					if (value !== null) {
+						// Use singular template if value is 1 and singular template exists
+						if (value === 1 && block.singularTemplate) {
+							return block.singularTemplate;
+						}
+						// Otherwise use replacement template
+						return block.replacementTemplate.replace('{value}', String(value));
+					} else {
+						// Fall back to fallback text when values not available
+						return block.fallbackText;
+					}
+				}
 
 				default:
 					return '';
 			}
 		})
-		.join('\n\n');
+		.join('\n');
 }
 
 /**
@@ -132,21 +322,29 @@ function serializeFeatureDescription(
  */
 function findFeatureInList(featureName: string, features: FeaturePrompt[]): FeaturePrompt | null {
 	const normalizedSearchName = featureName.trim().toLowerCase();
+	console.log(`    findFeatureInList: searching for "${normalizedSearchName}" in ${features.length} features`);
 	
 	for (const feature of features) {
 		// Check if this feature matches
 		const normalizedFeatureName = feature.name.trim().toLowerCase();
+		console.log(`      Checking feature: "${normalizedFeatureName}"`);
 		if (normalizedFeatureName === normalizedSearchName) {
+			console.log(`      MATCH FOUND: ${feature.name}`);
 			return feature;
 		}
 		
 		// Search in nested prompts if this feature has options
 		if (feature.featureOptions?.options) {
+			console.log(`      Feature has ${feature.featureOptions.options.length} options, searching nested prompts`);
 			for (const option of feature.featureOptions.options) {
 				// Handle complex options with nested prompts
 				if (typeof option !== 'string' && option.nestedPrompts) {
+					console.log(`        Searching in option "${option.name}" with ${option.nestedPrompts.length} nested prompts`);
 					const found = findFeatureInList(featureName, option.nestedPrompts);
-					if (found) return found;
+					if (found) {
+						console.log(`        NESTED MATCH FOUND: ${found.name}`);
+						return found;
+					}
 				}
 			}
 		}
@@ -191,35 +389,51 @@ function findFeatureInBackground(backgroundName: string, featureName: string): F
  * Convert supported HTML tags to PDF markers for styling
  */
 export function cleanDescription(description: string): string {
-	return description
-		// Convert <br> and <br/> tags to newlines
-		.replace(/<br\s*\/?>/gi, '\n')
-		// Remove list item tags but keep bullets
-		.replace(/<li>/gi, '')
-		.replace(/<\/li>/gi, '\n')
-		// Remove ul/ol tags
-		.replace(/<\/?ul>/gi, '')
-		.replace(/<\/?ol>/gi, '')
-		// Convert <strong> and <b> tags to PDF bold markers
-		.replace(/<strong>([^<]+)<\/strong>/gi, '<<BOLD:$1>>')
-		.replace(/<b>([^<]+)<\/b>/gi, '<<BOLD:$1>>')
-		// Convert <i> and <em> tags to PDF italic markers
-		.replace(/<i>([^<]+)<\/i>/gi, '<<ITALIC:$1>>')
-		.replace(/<em>([^<]+)<\/em>/gi, '<<ITALIC:$1>>')
-		// Remove any remaining HTML tags
-		.replace(/<[^>]+>/g, '')
-		// Replace tabs with spaces (PDF WinAnsi cannot encode tabs)
-		.replace(/\t/g, ' ')
-		// Replace other problematic whitespace characters
-		.replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F]/g, '')
-		// Normalize multiple spaces to single space
-		.replace(/ {2,}/g, ' ')
-		// Clean up whitespace at start/end of lines
-		.split('\n').map(line => line.trim()).join('\n')
-		// Clean up multiple newlines
-		.replace(/\n{3,}/g, '\n\n')
-		// Trim whitespace
-		.trim();
+	let result = description;
+	
+	// Convert <br> and <br/> tags to newlines
+	result = result.replace(/<br\s*\/?>/gi, '\n');
+	
+	// Remove list item tags but keep bullets
+	result = result.replace(/<li>/gi, '');
+	result = result.replace(/<\/li>/gi, '\n');
+	
+	// Remove ul/ol tags
+	result = result.replace(/<\/?ul>/gi, '');
+	result = result.replace(/<\/?ol>/gi, '');
+	
+	// Convert <strong> and <b> tags to PDF bold markers
+	result = result.replace(/<strong>(.*?)<\/strong>/gi, (match, p1) => {
+		return `[[BOLD:${p1}]]`;
+	});
+	result = result.replace(/<b>(.*?)<\/b>/gi, '[[BOLD:$1]]');
+	
+	// Convert <i> and <em> tags to PDF italic markers
+	result = result.replace(/<i>(.*?)<\/i>/gi, '[[ITALIC:$1]]');
+	result = result.replace(/<em>(.*?)<\/em>/gi, '[[ITALIC:$1]]');
+	
+	// Remove any remaining HTML tags
+	result = result.replace(/<[^>]+>/g, '');
+	
+	// Replace tabs with spaces (PDF WinAnsi cannot encode tabs)
+	result = result.replace(/\t/g, ' ');
+	
+	// Replace other problematic whitespace characters
+	result = result.replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F]/g, '');
+	
+	// Normalize multiple spaces to single space
+	result = result.replace(/ {2,}/g, ' ');
+	
+	// Clean up whitespace at start/end of lines
+	result = result.split('\n').map(line => line.trim()).join('\n');
+	
+	// Clean up multiple newlines
+	result = result.replace(/\n{3,}/g, '\n\n');
+	
+	// Trim whitespace
+	result = result.trim();
+	
+	return result;
 }
 
 /**
@@ -237,10 +451,18 @@ export function lookupFeature(
 	speciesName?: string,
 	backgroundName?: string
 ): FeaturePrompt | null {
+	console.log(`=== lookupFeature called ===`);
+	console.log(`Feature name: "${featureName}"`);
+	console.log(`Class: ${className}, Species: ${speciesName}, Background: ${backgroundName}`);
 	// Try class first if provided
 	if (className) {
+		console.log(`  Searching in class: ${className}`);
 		const feature = findFeatureInClass(className, featureName);
-		if (feature) return feature;
+		if (feature) {
+			console.log(`  Found feature in class: ${feature.name}`);
+			return feature;
+		}
+		console.log(`  Feature not found in class`);
 	}
 	
 	// Try species if provided
@@ -285,6 +507,7 @@ export function lookupFeature(
  */
 export function getFeatureDescription(
 	featureName: string,
+	character?: Character,
 	className?: string,
 	speciesName?: string,
 	backgroundName?: string
@@ -301,7 +524,7 @@ export function getFeatureDescription(
 		// Legacy safety
 		descriptionText = feature.description;
 	} else {
-		descriptionText = serializeFeatureDescription(feature.description);
+		descriptionText = serializeFeatureDescription(feature.description, character);
 	}
 	
 	// Clean and return

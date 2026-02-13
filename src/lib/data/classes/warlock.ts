@@ -70,7 +70,22 @@ const otherworldlyPatronPrompt: FeaturePrompt = {
 						name: 'Fey Presence',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'As an action, you can cause each creature in a 10-foot cube originating from you to make a Wisdom saving throw against your warlock spell save DC. The creatures that fail their saving throws are all charmed or frightened by you (your choice) until the end of your next turn. Once you use this feature, you can\'t use it again until you finish a short or long rest.' },
+								{
+									type: 'computed-replacement',
+					
+									whenAvailable: [
+										{
+											source: 'derived',
+											formula: '10 + CHA_MOD'
+										}
+									],
+					
+									fallbackText:
+										'As an action, you can cause each creature in a 10-foot cube originating from you to make a Wisdom saving throw (DC 10 + CHA). The creatures that fail their saving throws are all charmed or frightened by you (your choice) until the end of your next turn. Once you use this feature, you can\'t use it again until you finish a short or long rest.',
+					
+									replacementTemplate:
+										'As an action, you can cause each creature in a 10-foot cube originating from you to make a Wisdom saving throw (DC {value}). The creatures that fail their saving throws are all charmed or frightened by you (your choice) until the end of your next turn. Once you use this feature, you can\'t use it again until you finish a short or long rest.',
+								}
 							]
 						},
 						source: 'warlock.archfey',
@@ -198,11 +213,11 @@ const pactMagicPrompt: FeaturePrompt = {
 	},
 	source: 'warlock',
 	effects: [
-		{
-			target: 'features',
-			action: 'add',
-			value: 'Pact Magic'
-		}
+		// {
+		// 	target: 'features',
+		// 	action: 'add',
+		// 	value: 'Pact Magic'
+		// }
 	]
 };
 
@@ -259,7 +274,6 @@ const pactBoonPrompt: FeaturePrompt = {
 											name: 'Agonizing Blast',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip.' },
 													{
 														type: 'computed-inline',
 														text: 'When you cast Eldritch Blast, add your Charisma modifier to the damage it deals on a hit.',
@@ -378,7 +392,6 @@ const pactBoonPrompt: FeaturePrompt = {
 											name: 'Eldritch Spear',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip.' },
 													{ type: 'text', text: 'When you cast Eldritch Blast, its range is 300 feet.' },
 												]
 											},
@@ -481,7 +494,6 @@ const pactBoonPrompt: FeaturePrompt = {
 											name: 'Repelling Blast',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip. ' },
 													{ type: 'text', text: 'When you hit a creature with Eldritch Blast, you can push the creature up to 10 feet away from you in a straight line.' },
 												]
 											},
@@ -516,7 +528,7 @@ const pactBoonPrompt: FeaturePrompt = {
 											name: 'Voice of the Chain Master',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'Prerequisite: Pact of the Chain. You can communicate telepathically with your familiar and perceive through your familiar\'s senses as long as you are on the same plane of existence. Additionally, while perceiving through your familiars senses, you can also speak through your familiar in your own voice, even if your familiar is normally incapable of speech.' },
+													{ type: 'text', text: 'You can communicate telepathically with your familiar and perceive through your familiar\'s senses as long as you are on the same plane of existence. Additionally, while perceiving through your familiars senses, you can also speak through your familiar in your own voice, even if your familiar is normally incapable of speech.' },
 												]
 											},
 											source: 'warlock.eldritch_invocations',
@@ -579,7 +591,6 @@ const pactBoonPrompt: FeaturePrompt = {
 											name: 'Agonizing Blast',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip.' },
 													{
 														type: 'computed-inline',
 														text: 'When you cast Eldritch Blast, add your Charisma modifier to the damage it deals on a hit.',
@@ -698,7 +709,6 @@ const pactBoonPrompt: FeaturePrompt = {
 											name: 'Eldritch Spear',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip.' },
 													{ type: 'text', text: 'When you cast Eldritch Blast, its range is 300 feet.' },
 												]
 											},
@@ -801,7 +811,6 @@ const pactBoonPrompt: FeaturePrompt = {
 											name: 'Repelling Blast',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip. ' },
 													{ type: 'text', text: 'When you hit a creature with Eldritch Blast, you can push the creature up to 10 feet away from you in a straight line.' },
 												]
 											},
@@ -853,6 +862,7 @@ const pactBoonPrompt: FeaturePrompt = {
 							]
 						},
 						source: 'warlock.pact_boon',
+						importance: 'minor',
 						effects: [
 							{
 								target: 'features',
@@ -882,7 +892,6 @@ const pactBoonPrompt: FeaturePrompt = {
 											name: 'Agonizing Blast',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip.' },
 													{
 														type: 'computed-inline',
 														text: 'When you cast Eldritch Blast, add your Charisma modifier to the damage it deals on a hit.',
@@ -967,8 +976,8 @@ const pactBoonPrompt: FeaturePrompt = {
 											name: 'Book of Ancient Secrets',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'Prerequisite: Pact of the Tome. You can now inscribe magical rituals in your Book of Shadows. Choose two 1st-level spells that have the ritual tag from any class\'s spell list. The spells appear in the book and don\'t count against the number of spells you know. With your Book of Shadows in hand, you can castthe choosen spells as rituals. You cannot cast the spells except as rituals, unless you\'ve learned them from some other source.' },
-													{ type: 'text', text: 'On your adventures, you can add other ritual spells to your Book of Shadows. When you find such a spell, you can add it to your book if the spell\'s level is 1st or 2nd. For each level of the spell, the transcription takes 2 hours and costs 50gp for the rare inks needed to inscribe it.'},
+													{ type: 'text', text: 'You can now inscribe magical rituals in your Book of Shadows. Choose two 1st-level spells that have the ritual tag from any class\'s spell list. The spells appear in the book and don\'t count against the number of spells you know. With your Book of Shadows in hand, you can castthe choosen spells as rituals. You cannot cast the spells except as rituals, unless you\'ve learned them from some other source.' },
+													//{ type: 'text', text: 'On your adventures, you can add other ritual spells to your Book of Shadows. When you find such a spell, you can add it to your book if the spell\'s level is 1st or 2nd. For each level of the spell, the transcription takes 2 hours and costs 50gp for the rare inks needed to inscribe it.'},
 												]
 											},
 											source: 'warlock.eldritch_invocations',
@@ -1019,7 +1028,6 @@ const pactBoonPrompt: FeaturePrompt = {
 											name: 'Eldritch Spear',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip.' },
 													{ type: 'text', text: 'When you cast Eldritch Blast, its range is 300 feet.' },
 												]
 											},
@@ -1122,7 +1130,6 @@ const pactBoonPrompt: FeaturePrompt = {
 											name: 'Repelling Blast',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'Prerequisite: Eldritch Blast cantrip. ' },
 													{ type: 'text', text: 'When you hit a creature with Eldritch Blast, you can push the creature up to 10 feet away from you in a straight line.' },
 												]
 											},
@@ -1165,13 +1172,7 @@ const pactBoonPrompt: FeaturePrompt = {
 		numPicks: 1
 	},
 	source: 'warlock',
-	effects: [
-		{
-			target: 'features',
-			action: 'add',
-			value: '{userChoice}'
-		}
-	]
+	effects: []
 };
 
 const classFeaturesPrompt: FeaturePrompt[] = [pactMagicPrompt, pactBoonPrompt];
@@ -1179,7 +1180,8 @@ const classFeaturesPrompt: FeaturePrompt[] = [pactMagicPrompt, pactBoonPrompt];
 export const warlock: ClassData = {
 	name: 'Warlock',
 	image: base + '/class_icons/warlock.jpg',
-	description: 'A wielder of magic granted by a pact with an otherworldly being.',
+	description: 'You are a wielder of magic that is derived from a bargain with an otherworldly entity.',
+	cultureNotes: 'Warlocks are usually driven by a need for knowledge and power, which compels them into their pacts and shapes their lives. These pacts unlock magical effects, both subtle and spectacular. These gifts come at the cost of occasional gifts or services performed on the patron\'s behalf.',
 	hitDie: 'd8',
 	primaryAbility: 'Charisma',
 	saves: ['Wisdom', 'Charisma'],

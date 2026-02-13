@@ -117,6 +117,7 @@ const thievesCantPrompt: FeaturePrompt = {
 		]
 	},
 	source: 'rogue',
+	importance: 'invisible',
 	effects: [
 		{
 			target: 'features',
@@ -163,7 +164,7 @@ const rogueArchetypePrompt: FeaturePrompt = {
 						name: 'Second-Story Work',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'In addition, climbing no longer costs you extra movement.' },
+								{ type: 'text', text: 'Climbing no longer costs you extra movement.' },
 							]
 						},
 						source: 'rogue.thief',
@@ -192,9 +193,9 @@ const rogueArchetypePrompt: FeaturePrompt = {
 						source: 'rogue.assassin',
 						effects: [
 							{
-								target: 'features',
+								target: 'proficiencies',
 								action: 'add',
-								value: "Bonus Proficiencies (Disguise Kit, Poisoner's Kit)"
+								value: ['Disguise kit', "Poisoner's kit"]
 							}
 						]
 					},
@@ -203,7 +204,7 @@ const rogueArchetypePrompt: FeaturePrompt = {
 						name: 'Assassinate',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'In addition, any hit you score against a creature that is surprised is a critical hit.' },
+								{ type: 'text', text: 'Any hit you score against a creature that is surprised is a critical hit.' },
 							]
 						},
 						source: 'rogue.assassin',
@@ -226,7 +227,7 @@ const rogueArchetypePrompt: FeaturePrompt = {
 						name: 'Spellcasting',
 						description: {
 							blocks: [
-								{ type: 'text', text: '<strong>Cantrips</strong>' },
+								{ type: 'text', text: '\n<strong>Cantrips</strong>' },
 								{ type: 'text', text: 'You learn three cantrips: mage hand and two other cantrips of your choice from the wizard spell list.' },
 								{ type: 'text', text: '<strong>Spells Known of 1st-Level and Higher</strong>' },
 								{ type: 'text', text: 'You know three 1st-level wizard spells of your choice, two of which you must choose from the enchantment and illusion spells on the wizard spell list.' },
@@ -267,13 +268,14 @@ const rogueArchetypePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'rogue.arcane_trickster',
-						effects: [
-							{
-								target: 'features',
-								action: 'add',
-								value: 'Arcane Trickster Spellcasting'
-							}
-						]
+						effects: [],
+						// effects: [
+						// 	{
+						// 		target: 'features',
+						// 		action: 'add',
+						// 		value: 'Arcane Trickster Spellcasting'
+						// 	}
+						// ],
 					},
 					{
 						id: 'rogue_arcane_trickster_mage_hand_01',
@@ -320,7 +322,8 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 export const rogue: ClassData = {
 	name: 'Rogue',
 	image: base + '/class_icons/rogue.jpg',
-	description: 'Sneaky and dexterous masters of stealth and trickery.',
+	description: 'You are a scoundrel who uses stealth and trickery to overcome obstacles and enemies.',
+	cultureNotes: 'Rogues rely on skill, stealth, and their foes’ vulnerabilities to get the upper hand in any situation. They have a knack for finding the solution to just about any problem, demonstrating resourcefulness and versatility that pairs well with any successful adventuring party.',
 	hitDie: 'd8',
 	primaryAbility: 'Dexterity',
 	saves: ['Dexterity', 'Intelligence'],

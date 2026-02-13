@@ -57,6 +57,7 @@ const divineSensePrompt: FeaturePrompt = {
 		]
 	},
 	source: 'paladin',
+	importance: 'invisible',
 	effects: [
 		{
 			target: 'features',
@@ -71,7 +72,7 @@ const layOnHandsPrompt: FeaturePrompt = {
 	name: 'Lay on Hands',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'You have a pool of healing power that replenishes when you take a long rest.  		With that pool, you can restore a total of 15 hit points. 		As an action, you can touch a creature to restore any number of hit points remaining in the pool. 		Alternatively, you can expend 5 hit points from your pool of healing to cure the target of one disease or neutralize one poison affecting it. You can cure multiple diseases and neutralize multiple poisons with a single use of Lay on Hands, expending hit points separately for each one. 		This feature has no effect on undead and constructs.' },
+			{ type: 'text', text: 'You have a pool of healing power that replenishes when you take a long rest.  		With that pool, you can restore a total of 15 hit points. 		As an action, you can touch a creature to restore any number of hit points remaining in the pool. 		Alternatively, you can expend 5 hit points from your pool of healing to cure the target of one disease or neutralize one poison affecting it.  		This feature has no effect on undead and constructs.' },
 		]
 	},
 	source: 'paladin',
@@ -108,7 +109,14 @@ const fightingStylePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'paladin.fighting_style',
-						effects: []
+						importance: 'invisible',
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Defense Fighting Style'
+							}
+						]
 					}
 				]
 			},
@@ -125,7 +133,13 @@ const fightingStylePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'paladin.fighting_style',
-						effects: []
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Dueling Fighting Style'
+							}
+						]
 					}
 				]
 			},
@@ -142,7 +156,13 @@ const fightingStylePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'paladin.fighting_style',
-						effects: []
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Great Weapon Fighting Style'
+							}
+						]
 					}
 				]
 			},
@@ -159,7 +179,13 @@ const fightingStylePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'paladin.fighting_style',
-						effects: []
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Protection Fighting Style'
+							}
+						]
 					}
 				]
 			}
@@ -168,11 +194,7 @@ const fightingStylePrompt: FeaturePrompt = {
 	},
 	source: 'paladin',
 	effects: [
-		{
-			target: 'features',
-			action: 'add',
-			value: '{userChoice} Fighting Style'
-		}
+		
 	]
 };
 
@@ -186,11 +208,7 @@ const spellcastingPrompt: FeaturePrompt = {
 	},
 	source: 'paladin',
 	effects: [
-		{
-			target: 'features',
-			action: 'add',
-			value: 'Spellcasting'
-		}
+		
 	]
 };
 
@@ -236,6 +254,7 @@ const sacredOathPrompt: FeaturePrompt = {
 							]
 						},
 						source: 'paladin.oath_devotion',
+						importance: 'invisible',
 						effects: [
 							{
 								target: 'features',
@@ -251,7 +270,7 @@ const sacredOathPrompt: FeaturePrompt = {
 							blocks: [
 								{
 									type: 'computed-inline',
-									text: 'As an action, you can imbue one weapon that you are holding with positive energy. For 1 minute, you add your Charisma modifier to attack rolls made with that weapon (with a minimum bonus of +1). The weapon also emits bright light in a 20-foot radius and dim light 20 feet beyond that. If the weapon is not already magical, it becomes magical for the duration. You can end this effect on your turn as part of any other action. If you are no longer holding or carrying this weapon, or if you fall unconscious, this effect ends.',
+									text: 'As an action, you can imbue one weapon that you are holding with positive energy. For 1 minute, you add +1, or your Charisma modifier to that weapon\'s attack rolls, whichever is higher. Additionally, the weapon glows with light and becomes magical for the duration. ',
 									hints: [
 										{
 											afterText: 'Charisma modifier',
@@ -276,7 +295,22 @@ const sacredOathPrompt: FeaturePrompt = {
 						name: 'Turn the Unholy',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'As an action, you present your holy symbol and speak a prayer censuring fiends and undead. Each fiend or undead that can see or hear you within 30 feet of you must make a Wisdom saving throw. If the creature fails its saving throw, it is turned for 1 minute or until it takes any damage. A turned creature must spend its turns trying to move as far away from you as it can, and it can\'t willingly move to a space within 30 feet of you. It also can\'t take reactions. For its action, it can use only the Dash action or try to escape from an effect that prevents it from moving. If there\'s nowhere to move, the creature can use the Dodge action.' },
+								{
+									type: 'computed-replacement',
+					
+									whenAvailable: [
+										{
+											source: 'derived',
+											formula: '10 + CHA_MOD'
+										}
+									],
+					
+									fallbackText:
+										'As an action, you present your holy symbol, repelling fiends and undead. Such creatures within 30 feet must make a Wisdom saving throw (DC 10 + CHA) or become turned for 1 minute (or until it takes damage). A turned creature must spend its turns moving as far away from you as it can. For its action, it can only use the Dash action. It may also use the Dodge action if it has nowhere to move. It also can\'t take reactions.',
+					
+									replacementTemplate:
+										'As an action, you present your holy symbol, repelling fiends and undead. Such creatures within 30 feet must make a Wisdom saving throw (DC {value}) or become turned for 1 minute (or until it takes damage). A turned creature must spend its turns moving as far away from you as it can. For its action, it can only use the Dash action. It may also use the Dodge action if it has nowhere to move. It also can\'t take reactions.',
+								}
 							]
 						},
 						source: 'paladin.oath_devotion',
@@ -303,6 +337,7 @@ const sacredOathPrompt: FeaturePrompt = {
 							]
 						},
 						source: 'paladin.oath_ancients',
+						importance: 'invisible',
 						effects: [
 							{
 								target: 'features',
@@ -333,7 +368,22 @@ const sacredOathPrompt: FeaturePrompt = {
 						name: 'Turn the Faithless',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'As an action, you present your holy symbol and speak a prayer censuring fey and fiends. Each fey or fiend that can see or hear you within 30 feet of you must make a Wisdom saving throw. If the creature fails its saving throw, it is turned for 1 minute or until it takes any damage. A turned creature must spend its turns trying to move as far away from you as it can, and it can\'t willingly move to a space within 30 feet of you. It also can\'t take reactions. For its action, it can use only the Dash action or try to escape from an effect that prevents it from moving. If there\'s nowhere to move, the creature can use the Dodge action.' },
+								{
+									type: 'computed-replacement',
+					
+									whenAvailable: [
+										{
+											source: 'derived',
+											formula: '10 + CHA_MOD'
+										}
+									],
+					
+									fallbackText:
+										'As an action, you present your holy symbol, repelling fey and fiends. Such creatures within 30 feet must make a Wisdom saving throw (DC 10 + CHA) or become turned for 1 minute (or until it takes damage). A turned creature must spend its turns moving as far away from you as it can. For its action, it can only use the Dash action. It may also use the Dodge action if it has nowhere to move. It also can\'t take reactions.',
+					
+									replacementTemplate:
+										'As an action, you present your holy symbol, repelling fey and fiends. Such creatures within 30 feet must make a Wisdom saving throw (DC {value}) or become turned for 1 minute (or until it takes damage). A turned creature must spend its turns moving as far away from you as it can. For its action, it can only use the Dash action. It may also use the Dodge action if it has nowhere to move. It also can\'t take reactions.',
+								}
 							]
 						},
 						source: 'paladin.oath_ancients',
@@ -360,6 +410,7 @@ const sacredOathPrompt: FeaturePrompt = {
 							]
 						},
 						source: 'paladin.oath_vengeance',
+						importance: 'invisible',
 						effects: [
 							{
 								target: 'features',
@@ -373,7 +424,22 @@ const sacredOathPrompt: FeaturePrompt = {
 						name: 'Abjure Enemy',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'As an action, you present your holy symbol and speak a prayer of denunciation, using your Channel Divinity. Choose one creature within 60 feet of you that you can see. That creature must make a Wisdom saving throw, unless it is immune to being frightened. Fiends and undead have disadvantage on this saving throw. On a failed save, the creature is frightened for 1 minute or until it takes any damage. While frightened, the creature\'s speed is 0, and it can\'t benefit from any bonus to its speed. On a successful save, the creature\'s speed is halved for 1 minute or until the creature takes any damage.' },
+								{
+									type: 'computed-replacement',
+					
+									whenAvailable: [
+										{
+											source: 'derived',
+											formula: '10 + CHA_MOD'
+										}
+									],
+					
+									fallbackText:
+										'As an action, you present your holy symbol and speak a prayer of denunciation, using your Channel Divinity. Choose one creature within 60 feet of you that you can see. That creature must make a Wisdom saving throw (DC 10 + CHA), unless it is immune to being frightened. Fiends and undead have disadvantage on this saving throw. On a failed save, the creature is frightened for 1 minute or until it takes any damage. While frightened, the creature\'s speed is 0. On a successful save, the creature\'s speed is halved for 1 minute or until the creature takes any damage.',
+					
+									replacementTemplate:
+										'As an action, you present your holy symbol and speak a prayer of denunciation, using your Channel Divinity. Choose one creature within 60 feet of you that you can see. That creature must make a Wisdom saving throw (DC {value}), unless it is immune to being frightened. Fiends and undead have disadvantage on this saving throw. On a failed save, the creature is frightened for 1 minute or until it takes any damage. While frightened, the creature\'s speed is 0. On a successful save, the creature\'s speed is halved for 1 minute or until the creature takes any damage.',
+								}
 							]
 						},
 						source: 'paladin.oath_vengeance',
@@ -428,7 +494,8 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 export const paladin: ClassData = {
 	name: 'Paladin',
 	image: base + '/class_icons/paladin.jpg',
-	description: 'Holy warriors bound by sacred oaths, wielding divine power to protect and smite.',
+	description: 'You are a holy warrior bound to a sacred oath.',
+	cultureNotes: 'Paladins swear to uphold justice and righteousness, to stand with the good things of the world against the encroaching darkness, and to hunt the forces of evil wherever they lurk.',
 	hitDie: 'd10',
 	primaryAbility: 'Strength & Charisma',
 	saves: ['Wisdom', 'Charisma'],

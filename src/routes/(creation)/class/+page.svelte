@@ -69,33 +69,8 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 
 	function removeSelectedClass() {
 		if (selectedClassData) {
-			if (typeof window !== 'undefined') {
-				(window as any).classRemovalDebug = {
-					attemptedClass: selectedClassData.name,
-					steps: ['Starting removal process'],
-					timestamp: new Date().toISOString(),
-					hasExpertiseFeature: selectedClassData.classFeatures?.some(
-						(f) =>
-							f.name.toLowerCase().includes('expertise') ||
-							f.featureOptions?.dynamicOptionsGenerator?.type === 'proficient-skills-plus-tools'
-					),
-					expertiseFeatures: selectedClassData.classFeatures
-						?.filter(
-							(f) =>
-								f.name.toLowerCase().includes('expertise') ||
-								f.featureOptions?.dynamicOptionsGenerator?.type === 'proficient-skills-plus-tools'
-						)
-						.map((f) => f.name)
-				};
-			}
-
 			const state = get(character_store);
 			const provKeys = Object.keys(state._provenance || {});
-
-			if (typeof window !== 'undefined' && (window as any).classRemovalDebug) {
-				(window as any).classRemovalDebug.steps.push(`Found ${provKeys.length} provenance keys`);
-				(window as any).classRemovalDebug.provKeys = provKeys;
-			}
 
 			function collectFeatureNames(features: FeaturePrompt[]): string[] {
 				try {
@@ -118,7 +93,6 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 					}
 					return names;
 				} catch (error) {
-					console.error('Error in collectFeatureNames:', error);
 					throw error;
 				}
 			}
@@ -131,24 +105,20 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 				prefixes = [
 					`class:${selectedClassData.name}`,
 					...allFeatureNames.map((f) => `feature:${f}`),
-					'class_equipment_'
+					'class_equipment_',
+					'class_fixed_equipment'
 				];
 			} catch (error) {
-				console.error('Error during feature collection:', error);
 				return;
 			}
-
-			const revertedKeys: string[] = [];
-			const revertErrors: Array<{ key: string; error: any }> = [];
 
 			for (const key of provKeys) {
 				if (prefixes.some((prefix) => key.startsWith(prefix))) {
 					try {
-						revertChanges(get(character_store), key);
-						revertedKeys.push(key);
+						const newChar = revertChanges(get(character_store), key);
+						character_store.set(newChar);
 					} catch (error) {
-						revertErrors.push({ key, error });
-						console.error('Error reverting key:', key, error);
+						// Error reverting key
 					}
 				}
 			}
@@ -168,16 +138,32 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 			featureSelections = {};
 			expandedFeatures = new Set();
 
+			console.log('\n=== CONFIRM ADD CLASS ===');
+			console.log(`Class: ${selectedClassData.name}`);
+			console.log(`Total features in classFeatures array: ${selectedClassData.classFeatures?.length || 0}`);
+
 			applyChoice(`class:${selectedClassData.name}`, {
 				class: selectedClassData.name
 			});
 
+			let processedCount = 0;
+			let skippedCount = 0;
+
 			for (const feature of selectedClassData.classFeatures || []) {
+				console.log(`\nFeature: "${feature.name}"`);
+				console.log(`  Has featureOptions: ${!!feature.featureOptions}`);
+				console.log(`  Effects count: ${feature.effects?.length || 0}`);
+
 				// Skip features with options; those will be applied later
-				if (feature.featureOptions) continue;
+				if (feature.featureOptions) {
+					console.log(`  -> SKIPPED (has featureOptions)`);
+					skippedCount++;
+					continue;
+				}
 
 				const scopeId = `feature:${feature.name}`;
-				revertChanges(get(character_store), scopeId); // just in case
+				const prevChar = revertChanges(get(character_store), scopeId);
+				character_store.set(prevChar); // Fix: actually apply the revert!
 
 				const update: Record<string, any> = {};
 				const modify: Record<string, number> = {};
@@ -185,6 +171,8 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 				for (const effect of feature.effects || []) {
 					const target = effect.target;
 					const value = effect.value;
+
+					console.log(`  Effect: ${effect.action} on "${target}" = "${value}"`);
 
 					switch (effect.action) {
 						case 'add': {
@@ -207,8 +195,14 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 					}
 				}
 
+				console.log(`  Calling applyChoice with scopeId="${scopeId}", update=`, update, ', modify=', modify);
 				applyChoice(scopeId, update, modify);
+				processedCount++;
+				console.log(`  -> PROCESSED`);
 			}
+
+			console.log(`\nSummary: Processed ${processedCount} features, skipped ${skippedCount} features`);
+			console.log('=========================\n');
 
 			bumpVersion();
 		}
@@ -235,33 +229,19 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 
 	// --- onMount for class feature restoration ---
 	onMount(async () => {
-		const DBG = '[NESTED RESTORE DEBUG]';
 		const state = get(character_store);
 		if (!state.class) {
-			console.log(`${DBG} No class selected, skipping restoration`);
 			return;
 		}
-	
-		console.log(`${DBG} Starting class restoration for:`, state.class);
-	
-		// Find selected class
+
 		const found = classes.find((c) => c.name === state.class);
 		if (!found) {
-			console.log(`${DBG} Class not found in data:`, state.class);
 			return;
 		}
-	
-		console.log(`${DBG} Found class data:`, found.name, 'with', found.classFeatures?.length || 0, 'features');
-	
+
 		selectedClassData = found;
 		featureSelections = {};
-	
-		// small helper to show a short sample of provenance keys for debugging
-		const provSample = () => {
-			const provKeys = Object.keys(state._provenance || {});
-			return provKeys.slice(0, 40); // first 40 keys to avoid flooding the console
-		};
-	
+
 		const toSnakeCase = (str: string) =>
 			str
 				? str
@@ -269,7 +249,7 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 						.replace(/[^a-z0-9]+/g, '_')
 						.replace(/^_+|_+$/g, '')
 				: '';
-	
+
 		// Helper: convert stored snake_case value to display label
 		const tryRestoreFromValue = (val: string, optionMap: Map<string, string>) => {
 			if (!val) return null;
@@ -288,12 +268,12 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 			}
 			return null;
 		};
-	
+
 		// Unified helper to attempt to fetch provenance under multiple plausible key shapes
 		const getProvenanceEntry = (featureName: string, idx?: number, parentFeatureName?: string, parentIndex?: number) => {
 			const prov = state._provenance || {};
 			const namesToTry: string[] = [];
-	
+
 			// CORRECT FORMAT: feature:ParentName:ParentIndex:FeatureName:index (for nested features with parent context)
 			if (parentFeatureName && typeof parentIndex === 'number' && typeof idx === 'number') {
 				namesToTry.push(`feature:${parentFeatureName}:${parentIndex}:${featureName}:${idx}`);
@@ -311,31 +291,26 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 				// canonical top-level with class
 				namesToTry.push(`feature:${selectedClassData.name}:${featureName}`);
 			}
-	
+
 			// legacy or simpler shapes that we observed in logs
 			if (typeof idx === 'number') {
 				namesToTry.push(`feature:${featureName}:${idx}`);
 			}
 			namesToTry.push(`feature:${featureName}`);
-	
+
 			// also try class + idx variant just in case
 			if (selectedClassData && typeof idx === 'number') {
 				namesToTry.push(`feature:${selectedClassData.name}:${featureName}:${idx}`);
 			}
-	
-			// DEBUG: print attempted key shapes for this lookup
-			console.log(`${DBG} getProvenanceEntry: feature='${featureName}', idx=${String(idx)}, parent='${String(parentFeatureName)}', parentIdx=${String(parentIndex)}, trying keys:`, namesToTry);
-	
+
 			for (const n of namesToTry) {
 				if (prov[n]) {
-					console.log(`${DBG} Provenance hit: key='${n}' for feature='${featureName}'`);
 					return { key: n, entry: prov[n] };
 				}
 			}
-			console.log(`${DBG} No provenance entry found for feature='${featureName}' (sample prov keys):`, provSample());
 			return null;
 		};
-	
+
 		// Helper: recursively check if any deeper nested features have provenance (matches any key shape)
 		const checkDeeperNestedProvenance = (feature: any): boolean => {
 			const prov = state._provenance || {};
@@ -346,7 +321,6 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 						// check for any key that mentions nested.name
 						const foundAny = Object.keys(prov).some((k) => k.includes(`feature:${nested.name}`) || k.includes(`:${nested.name}:`));
 						if (foundAny) {
-							console.log(`${DBG} checkDeeperNestedProvenance: found provenance mentioning nested='${nested.name}'`);
 							return true;
 						}
 						if (checkDeeperNestedProvenance(nested)) return true;
@@ -355,40 +329,32 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 			}
 			return false;
 		};
-	
+
 		// restore nested feature selections (parentFeatureName used for key shaping, parentIndex kept for logical recursion)
 		const restoreNestedFeatureSelection = async (feature: FeaturePrompt, parentFeatureName: string, parentIndex: number) => {
-			console.log(`${DBG} restoreNestedFeatureSelection start: feature='${feature.name}', parent='${parentFeatureName}', parentIndex=${parentIndex}`);
 			const numPicks = feature.featureOptions?.numPicks || 1;
-	
+
 			// ensure selection array exists and is correct length
 			if (!featureSelections[feature.name]) featureSelections[feature.name] = Array(numPicks).fill(null);
 			ensureArrayLen(featureSelections[feature.name], numPicks);
-			console.log(`${DBG} selection slot for '${feature.name}' prepared:`, featureSelections[feature.name]);
-	
+
 			const optionMap = new Map(
 				(feature.featureOptions?.options || []).map((o) => [
 					toSnakeCase(typeof o === 'string' ? o : o.name),
 					typeof o === 'string' ? o : o.name
 				])
 			);
-			console.log(`${DBG} optionMap for '${feature.name}':`, Array.from(optionMap.entries()));
-	
+
 			for (let idx = 0; idx < numPicks; idx++) {
 				// skip if already restored
 				if (featureSelections[feature.name][idx]) {
-					console.log(`${DBG} skip restore for '${feature.name}' idx=${idx} (already set):`, featureSelections[feature.name][idx]);
 					continue;
 				}
-	
+
 				const provLookup = getProvenanceEntry(feature.name, idx, parentFeatureName, parentIndex);
 				const stored = provLookup?.entry;
 				const provKey = provLookup?.key;
-	
-				console.log(`${DBG} Nested restore probe: feature='${feature.name}', idx=${idx}, parent='${parentFeatureName}', parentIdx=${parentIndex}, provKey='${provKey}'`);
-			console.log(`${DBG} Stored provenance object:`, JSON.stringify(stored, null, 2));
-			console.log(`${DBG} Feature effects:`, feature.effects);
-	
+
 				// try to restore from direct provenance entry
 				let restored: string | null = null;
 				
@@ -398,7 +364,6 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 					const maybe = tryRestoreFromValue(choiceValue, optionMap);
 					if (maybe) {
 						restored = maybe;
-						console.log(`${DBG} Restored from __userChoice marker: feature='${feature.name}', idx=${idx}, value='${choiceValue}', mapped='${maybe}'`);
 					}
 				}
 				
@@ -411,7 +376,6 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 								const maybe = tryRestoreFromValue(val, optionMap);
 								if (maybe) {
 									restored = maybe;
-									console.log(`${DBG} Restored from _set array match: feature='${feature.name}', idx=${idx}, value='${val}', mapped='${maybe}'`);
 									break;
 								}
 							}
@@ -419,25 +383,23 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 							const maybe = tryRestoreFromValue(arr, optionMap);
 							if (maybe) {
 								restored = maybe;
-								console.log(`${DBG} Restored from _set string match: feature='${feature.name}', idx=${idx}, value='${arr}', mapped='${maybe}'`);
 							}
 						}
 						if (restored) break;
 					}
 				}
-	
+
 				// _mods fallback
 				if (!restored && stored?._mods) {
 					for (const modKey of Object.keys(stored._mods)) {
 						const maybe = tryRestoreFromValue(modKey, optionMap);
 						if (maybe) {
 							restored = maybe;
-							console.log(`${DBG} Restored from _mods key match: feature='${feature.name}', idx=${idx}, modKey='${modKey}', mapped='${maybe}'`);
 							break;
 						}
 					}
 				}
-	
+
 				// If no direct provenance, try to infer by checking deeper nested provenance for each option
 				if (!restored && feature.featureOptions?.options) {
 					for (const opt of feature.featureOptions.options) {
@@ -448,28 +410,23 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 							const hasDeeperProv = opt.nestedPrompts.some((n) => checkDeeperNestedProvenance(n));
 							if (hasNestedProv || hasDeeperProv) {
 								restored = opt.name;
-								console.log(`${DBG} Inferred parent selection '${restored}' for '${feature.name}' because nested provenance present`);
 								break;
 							}
 						}
 					}
 				}
-	
+
 				if (restored) {
 					featureSelections[feature.name][idx] = restored;
-					console.log(`${DBG} Applied restored nested selection: feature='${feature.name}' idx=${idx} => '${restored}'`);
-				} else {
-					console.log(`${DBG} No restored value for nested feature='${feature.name}' idx=${idx}`);
 				}
 			}
-	
+
 			// Recurse into deeper nested prompts if any (use parent index inferred from selection)
 			if (feature.featureOptions?.options) {
 				for (const o of feature.featureOptions.options) {
 					if (typeof o !== 'string' && o.nestedPrompts) {
 						const parentIdx = featureSelections[feature.name].findIndex((v) => v === o.name);
 						if (parentIdx !== -1) {
-							console.log(`${DBG} Recursing into nested prompts for parent option='${o.name}' parentIdx=${parentIdx}`);
 							for (const nested of o.nestedPrompts) {
 								await restoreNestedFeatureSelection(nested, feature.name, parentIdx);
 							}
@@ -480,13 +437,11 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 									k.includes(`feature:${nested.name}`) || k.includes(`:${nested.name}:`)
 								);
 								if (hasNestedProv) {
-									console.log(`${DBG} Found nested provenance for '${nested.name}' even though parent '${o.name}' not set; forcing parent pick`);
 									// ensure parent pick exists
 									if (!featureSelections[feature.name].includes(o.name)) {
 										const emptyIdx = featureSelections[feature.name].findIndex((v) => v === null);
 										if (emptyIdx !== -1) {
 											featureSelections[feature.name][emptyIdx] = o.name;
-											console.log(`${DBG} Forced parent selection '${o.name}' into slot idx=${emptyIdx} for feature='${feature.name}'`);
 										}
 									}
 									const resolvedParentIdx = featureSelections[feature.name].findIndex((v) => v === o.name);
@@ -499,18 +454,15 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 					}
 				}
 			}
-			console.log(`${DBG} restoreNestedFeatureSelection end: feature='${feature.name}'`);
 		};
-	
+
 		// Restore top-level features and their nested prompts
 		const restoreFeatureSelection = async (feature: FeaturePrompt) => {
-			console.log(`${DBG} restoreFeatureSelection start: '${feature.name}'`);
 			const numPicks = feature.featureOptions?.numPicks || 1;
-	
+
 			if (!featureSelections[feature.name]) featureSelections[feature.name] = Array(numPicks).fill(null);
 			ensureArrayLen(featureSelections[feature.name], numPicks);
-			console.log(`${DBG} prepared selection array for '${feature.name}':`, featureSelections[feature.name]);
-	
+
 			// build option map (including dynamic generation when necessary)
 			let opts: (string | { name: string })[] = feature.featureOptions?.options || [];
 			if (feature.featureOptions?.dynamicOptionsGenerator) {
@@ -523,40 +475,36 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 					);
 					opts = dynamicOpts;
 				} catch (error) {
-					console.warn(`${DBG} Failed to generate dynamic options for restoration for '${feature.name}':`, error);
+					// Failed to generate dynamic options
 				}
 			}
-	
+
 			const optionMap = new Map(
 				(opts as any[]).map((o) => [toSnakeCase(typeof o === 'string' ? o : o.name), typeof o === 'string' ? o : o.name])
 			);
-			console.log(`${DBG} optionMap for top-level feature '${feature.name}':`, Array.from(optionMap.entries()));
-	
+
 			for (let idx = 0; idx < numPicks; idx++) {
 				if (featureSelections[feature.name][idx]) {
-					console.log(`${DBG} skip top-level restore for '${feature.name}' idx=${idx} (already set):`, featureSelections[feature.name][idx]);
 					continue;
 				}
-	
+
 				// try multiple possible provenance key shapes
 				const provLookup = getProvenanceEntry(feature.name, idx);
 				const stored = provLookup?.entry;
 				const provKey = provLookup?.key;
-				console.log(`${DBG} Top-level restore probe: feature='${feature.name}', idx=${idx}, provKey='${provKey}', stored=`, stored);
-	
+
 				let restored: string | null = null;
-	
+
 				// FIRST: Check for __userChoice marker (for features with no effects)
 				if (stored?._set?.['__userChoice']) {
 					const choiceValue = stored._set['__userChoice'];
 					const maybe = tryRestoreFromValue(choiceValue, optionMap);
 					if (maybe) {
 						restored = maybe;
-						console.log(`${DBG} Restored from __userChoice marker: feature='${feature.name}', idx=${idx}, value='${choiceValue}', mapped='${maybe}'`);
 					}
 				}
 
-				if (!restored && stored?._set) {
+			if (!restored && stored?._set) {
 					for (const effect of feature.effects || []) {
 						const target = effect.target;
 						const arr = stored._set?.[target];
@@ -565,7 +513,6 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 								const maybe = tryRestoreFromValue(val, optionMap);
 								if (maybe) {
 									restored = maybe;
-									console.log(`${DBG} Restored top-level from _set array: feature='${feature.name}' idx=${idx} => '${maybe}'`);
 									break;
 								}
 							}
@@ -573,24 +520,22 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 							const maybe = tryRestoreFromValue(arr, optionMap);
 							if (maybe) {
 								restored = maybe;
-								console.log(`${DBG} Restored top-level from _set string: feature='${feature.name}' idx=${idx} => '${maybe}'`);
 							}
 						}
 						if (restored) break;
 					}
 				}
-	
-				if (!restored && stored?._mods) {
+
+			if (!restored && stored?._mods) {
 					for (const modKey of Object.keys(stored._mods)) {
 						const maybe = tryRestoreFromValue(modKey, optionMap);
 						if (maybe) {
 							restored = maybe;
-							console.log(`${DBG} Restored top-level from _mods key: feature='${feature.name}', modKey='${modKey}' => '${maybe}'`);
 							break;
 						}
 					}
 				}
-	
+
 				// If still not restored, infer from nested provenance (handles empty-effect features)
 				if (!restored && feature.featureOptions?.options) {
 					for (const opt of feature.featureOptions.options) {
@@ -601,27 +546,22 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 							const hasDeeperProv = opt.nestedPrompts.some((n) => checkDeeperNestedProvenance(n));
 							if (hasNestedProv || hasDeeperProv) {
 								restored = opt.name;
-								console.log(`${DBG} Inferred top-level selection '${restored}' for '${feature.name}' from nested provenance`);
 								break;
 							}
 						}
 					}
 				}
-	
+
 				if (restored) {
 					featureSelections[feature.name][idx] = restored;
-					console.log(`${DBG} Applied restored top-level selection: feature='${feature.name}' idx=${idx} => '${restored}'`);
-				} else {
-					console.log(`${DBG} No restored value for top-level feature='${feature.name}' idx=${idx}`);
 				}
-	
+
 				// Recurse into nested prompts for this pick
 				if (feature.featureOptions?.options) {
 					for (const o of feature.featureOptions.options) {
 						if (typeof o !== 'string' && o.nestedPrompts) {
 							const parentIdx = featureSelections[feature.name].findIndex((v) => v === o.name);
 							if (parentIdx !== -1) {
-								console.log(`${DBG} Recurse nested for parent option='${o.name}' at parentIdx=${parentIdx}`);
 								for (const nested of o.nestedPrompts) {
 									await restoreNestedFeatureSelection(nested, feature.name, parentIdx);
 								}
@@ -632,12 +572,10 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 										k.includes(`feature:${nested.name}`) || k.includes(`:${nested.name}:`)
 									);
 									if (hasNestedProv) {
-										console.log(`${DBG} Nested provenance exists for '${nested.name}', forcing parent '${o.name}'`);
 										if (!featureSelections[feature.name].includes(o.name)) {
 											const emptyIdx = featureSelections[feature.name].findIndex((v) => v === null);
 											if (emptyIdx !== -1) {
 												featureSelections[feature.name][emptyIdx] = o.name;
-												console.log(`${DBG} Forced parent '${o.name}' into slot idx=${emptyIdx}`);
 											}
 										}
 										const resolvedParentIdx = featureSelections[feature.name].findIndex((v) => v === o.name);
@@ -651,20 +589,16 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 					}
 				}
 			}
-	
-			console.log(`${DBG} restoreFeatureSelection end: '${feature.name}'`);
 		};
-	
+
 		// Restore all top-level features
-		console.log(`${DBG} Beginning restoration of all top-level features (sample prov keys):`, provSample());
 		for (const feature of found.classFeatures || []) {
 			await restoreFeatureSelection(feature);
 		}
-	
+
 		// Trigger Svelte reactivity
 		featureSelections = { ...featureSelections };
 		bumpVersion();
-		console.log(`${DBG} Restoration complete. Final featureSelections:`, featureSelections);
 	}); // end onMount
 
 

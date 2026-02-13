@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Features Array</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #00ff00;
+        }
+        .debug-section {
+            border: 1px solid #333;
+            padding: 15px;
+            margin: 10px 0;
+            background: #222;
+        }
+        .feature-item {
+            background: #2a2a2a;
+            padding: 8px;
+            margin: 5px 0;
+            border-left: 3px solid #00ff00;
+        }
+        button {
+            background: #333;
+            color: #00ff00;
+            border: 1px solid #666;
+            padding: 10px 15px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #444;
+        }
+        .error {
+            color: #ff4444;
+            border-left-color: #ff4444;
+        }
+        .warning {
+            color: #ffaa00;
+            border-left-color: #ffaa00;
+        }
+    </style>
+</head>
+<body>
+    <h1>Debug Features Array - Character Store</h1>
+    
+    <div class="debug-section">
+        <h2>Character Info</h2>
+        <div id="character-info">Loading...</div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>Features Array</h2>
+        <div id="features-list">Loading...</div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>Provenance Debugging</h2>
+        <div id="provenance-debug">Loading...</div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>Manual Test - Add Eagle Totem Spirit</h2>
+        <button onclick="addEagleTotem()">Add "Eagle Totem Spirit" to Features</button>
+        <button onclick="addEagleTotemWarrior()">Add "Eagle Totem Warrior" to Features</button>
+        <button onclick="clearFeatures()">Clear All Features</button>
+        <div id="test-results"></div>
+    </div>
+
+    <div class="debug-section">
+        <h2>Test Feature Lookup</h2>
+        <button onclick="testLookup()">Test Feature Lookup</button>
+        <div id="lookup-results"></div>
+    </div>
+
+    <script type="module">
+        // We need to access the character store from the running app
+        // This is a debugging tool to inspect what's happening
+        
+        let characterStore = null;
+        
+        // Try to access the store from the parent window or global
+        if (window.parent && window.parent !== window) {
+            try {
+                characterStore = window.parent.character_store;
+            } catch (e) {
+                console.log('Could not access parent store');
+            }
+        }
+        
+        function updateDebugInfo() {
+            const charInfo = document.getElementById('character-info');
+            const featuresList = document.getElementById('features-list');
+            const provenanceDebug = document.getElementById('provenance-debug');
+            
+            if (!characterStore) {
+                charInfo.innerHTML = '<span class="error">Character store not accessible. Please open this in the context of the running app.</span>';
+                featuresList.innerHTML = '<span class="error">No access to character store</span>';
+                provenanceDebug.innerHTML = '<span class="error">No access to character store</span>';
+                return;
+            }
+            
+            let character;
+            characterStore.subscribe(value => {
+                character = value;
+            })();
+            
+            // Character Info
+            charInfo.innerHTML = `
+                <div class="feature-item">
+                    <strong>Name:</strong> ${character.name || 'N/A'}<br>
+                    <strong>Class:</strong> ${character.class || 'N/A'}<br>
+                    <strong>Subclass:</strong> ${character.subclass || 'N/A'}<br>
+                    <strong>Race:</strong> ${character.race || 'N/A'}<br>
+                    <strong>Background:</strong> ${character.background || 'N/A'}
+                </div>
+            `;
+            
+            // Features Array
+            if (!character.features || character.features.length === 0) {
+                featuresList.innerHTML = '<span class="warning">No features found</span>';
+            } else {
+                featuresList.innerHTML = character.features.map((feature, index) => `
+                    <div class="feature-item">
+                        <strong>[${index}]</strong> ${feature}
+                    </div>
+                `).join('');
+            }
+            
+            // Provenance
+            if (character._provenance) {
+                const provenanceKeys = Object.keys(character._provenance);
+                provenanceDebug.innerHTML = `
+                    <strong>Total provenance keys:</strong> ${provenanceKeys.length}<br>
+                    ${provenanceKeys.map(key => `
+                        <div class="feature-item">
+                            <strong>Key:</strong> ${key}<br>
+                            <strong>Data:</strong> ${JSON.stringify(character._provenance[key], null, 2)}
+                        </div>
+                    `).join('')}
+                `;
+            } else {
+                provenanceDebug.innerHTML = '<span class="warning">No provenance data</span>';
+            }
+        }
+        
+        // Manual functions for testing
+        window.addEagleTotem = function() {
+            if (!characterStore) {
+                document.getElementById('test-results').innerHTML = '<span class="error">Character store not accessible</span>';
+                return;
+            }
+            
+            characterStore.update(char => {
+                if (!char.features) char.features = [];
+                if (!char.features.includes('Eagle Totem Spirit')) {
+                    char.features.push('Eagle Totem Spirit');
+                }
+                return char;
+            });
+            
+            document.getElementById('test-results').innerHTML = '<span>Added "Eagle Totem Spirit"</span>';
+            setTimeout(updateDebugInfo, 100);
+        };
+        
+        window.addEagleTotemWarrior = function() {
+            if (!characterStore) {
+                document.getElementById('test-results').innerHTML = '<span class="error">Character store not accessible</span>';
+                return;
+            }
+            
+            characterStore.update(char => {
+                if (!char.features) char.features = [];
+                if (!char.features.includes('Eagle Totem Warrior')) {
+                    char.features.push('Eagle Totem Warrior');
+                }
+                return char;
+            });
+            
+            document.getElementById('test-results').innerHTML = '<span>Added "Eagle Totem Warrior"</span>';
+            setTimeout(updateDebugInfo, 100);
+        };
+        
+        window.clearFeatures = function() {
+            if (!characterStore) {
+                document.getElementById('test-results').innerHTML = '<span class="error">Character store not accessible</span>';
+                return;
+            }
+            
+            characterStore.update(char => {
+                char.features = [];
+                return char;
+            });
+            
+            document.getElementById('test-results').innerHTML = '<span>Cleared all features</span>';
+            setTimeout(updateDebugInfo, 100);
+        };
+        
+        window.testLookup = function() {
+            const lookupResults = document.getElementById('lookup-results');
+            
+            try {
+                // Test feature lookup for Eagle Totem Spirit
+                const testFeatures = ['Eagle Totem Spirit', 'Eagle Totem Warrior', 'Spirit Seeker', 'Totem Spirit'];
+                
+                let results = '<h3>Feature Lookup Results:</h3>';
+                
+                testFeatures.forEach(featureName => {
+                    results += `<div class="feature-item">
+                        <strong>Feature:</strong> "${featureName}"<br>
+                        <strong>Status:</strong> Testing lookup...<br>
+                    </div>`;
+                });
+                
+                lookupResults.innerHTML = results;
+                
+                // In a real scenario, we would test the lookup function here
+                // For now, this is a placeholder for the lookup testing
+                
+            } catch (error) {
+                lookupResults.innerHTML = `<span class="error">Error testing lookup: ${error.message}</span>`;
+            }
+        };
+        
+        // Initial load
+        setTimeout(updateDebugInfo, 1000);
+        
+        // Update every 2 seconds
+        setInterval(updateDebugInfo, 2000);
+    </script>
+</body>
+</html>

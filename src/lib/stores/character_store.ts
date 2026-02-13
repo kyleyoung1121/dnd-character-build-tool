@@ -36,6 +36,10 @@ export type Character = {
 	subclass?: string;
 	subrace?: string;
 
+	// Species-specific properties for dynamic feature enhancement
+	dragonbornElement?: string; // Stores the chosen element (Acid, Cold, Fire, Lightning, Poison)
+	dragonbornBreathShape?: string; // Stores the chosen breath shape (15 ft. Cone, 5 ft. by 30 ft. Line)
+
 	// INTERNAL metadata for tracking changes
 	_provenance?: {
 		[scopeId: string]: Partial<Character>;
@@ -185,7 +189,14 @@ export function hasBeastAccess(character: Character): boolean {
 	if (
 		character.class === 'Wizard' &&
 		character.spells &&
-		character.spells.includes('Find Familiar')
+		character.spells.some((spell: any) => {
+			// Handle both object format (new) and string format (old)
+			const spellName = typeof spell === 'string' ? spell : spell.name;
+			return spellName === 'Find Familiar' || 
+				   spellName === 'find familiar' ||
+				   spellName === 'Find Familiar (ritual only)' ||
+				   spellName === 'find familiar';
+		})
 	) {
 		return true;
 	}

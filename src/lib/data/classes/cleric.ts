@@ -73,11 +73,7 @@ const spellcastingPrompt: FeaturePrompt = {
 	},
 	source: 'cleric',
 	effects: [
-		{
-			target: 'features',
-			action: 'add',
-			value: 'Spellcasting'
-		}
+		
 	]
 };
 
@@ -96,11 +92,6 @@ const channelDivinityPrompt: FeaturePrompt = {
 				text:
 					'Turn Undead: As an action, each undead within 30 feet of you must make a Wisdom saving throw. If the creature fails its saving throw, it is turned for 1 minute or until it takes any damage. A turned creature must spend its turns trying to move as far away from you as it can.'
 			},
-			{
-				type: 'text',
-				text:
-					'Your Divine Domain grants additional ways to use Channel Divinity.'
-			}
 		]
 	},
 	source: 'cleric',
@@ -284,6 +275,7 @@ const divineDomainPrompt: FeaturePrompt = {
 							numPicks: 2
 						},
 						source: 'cleric.knowledge_domain',
+						importance: 'invisible', // Languages are shown in the languages section
 						effects: [{ target: 'languages', action: 'add', value: '{userChoice}' }]
 					},
 					{
@@ -303,12 +295,12 @@ const divineDomainPrompt: FeaturePrompt = {
 							numPicks: 2
 						},
 						source: 'cleric.knowledge_domain',
+						importance: 'invisible', // Skills and expertise are shown in the skills section
 						effects: [
 							{ target: 'skills', action: 'add', value: '{userChoice}' },
-						{ target: 'expertise', action: 'add', value: '{userChoice}' },
-						{ target: 'features', action: 'add', value: 'Blessings of Knowledge: {userChoice}' }
-					]
-				},
+							{ target: 'expertise', action: 'add', value: '{userChoice}' }
+						]
+					},
 				{
 							name: 'Channel Divinity: Knowledge of the Ages',
 						id: 'cleric_knowledge_channel_01',
@@ -352,6 +344,7 @@ const divineDomainPrompt: FeaturePrompt = {
 							numPicks: 1
 						},
 						source: 'cleric.nature_domain',
+						importance: 'invisible',
 						effects: [
 							{ target: 'skills', action: 'add', value: '{userChoice}' },
 							{ target: 'features', action: 'add', value: 'Acolyte of Nature' }
@@ -591,7 +584,8 @@ const classFeaturesPrompt: FeaturePrompt[] = [spellcastingPrompt, channelDivinit
 export const cleric: ClassData = {
 	name: 'Cleric',
 	image: base + '/class_icons/cleric.jpg',
-	description: 'Holy warriors who wield divine magic to heal, protect, and smite foes.',
+	description: 'You are a priestly champion who wields divine magic in service to a higher power.',
+	cultureNotes: 'Clerics are the connection between the mortal world and the distant planes of the gods. They use their divine magic to heal and inspire their allies, but are also capable of unleashing spells that devastate evildoers.',
 	hitDie: 'd8',
 	primaryAbility: 'Wisdom',
 	saves: ['Wisdom', 'Charisma'],

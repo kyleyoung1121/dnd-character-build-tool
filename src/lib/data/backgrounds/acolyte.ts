@@ -115,6 +115,7 @@ export const acolyte: BackgroundData = {
 				]
 			},
 			source: 'background:Acolyte',
+			importance: 'minor',
 			effects: [
 				{
 					target: 'features',

@@ -11,6 +11,7 @@
 	import NotificationToast from '$lib/components/NotificationToast.svelte';
 	import { onMount } from 'svelte';
 	import { initializeSpellCleanup } from '$lib/stores/spell_cleanup';
+	import { initializeBeastCleanup } from '$lib/stores/beast_cleanup';
 	import { initializeEquipmentCleanup } from '$lib/stores/equipment_cleanup';
 	import { debugConflicts } from '$lib/debug/conflict_debug';
 
@@ -18,6 +19,7 @@
 	// This ensures spells are cleaned up when class/race/subclass changes,
 	// even if the user never visits the spells page again
 	initializeSpellCleanup();
+	initializeBeastCleanup();
 
 	// Initialize equipment cleanup service when app loads
 	// This ensures equipment selections are cleared when proficiencies are lost,

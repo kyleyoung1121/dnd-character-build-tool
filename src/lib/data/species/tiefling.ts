@@ -66,10 +66,11 @@ export const tiefling: SpeciesData = {
 			id: 'tiefling_infernal_legacy',
 			description: {
 				blocks: [
-					{ type: 'text', text: 'You know the Thaumaturgy cantrip. Once you reach 3rd level, you can cast Hellish Rebuke once per long rest as a 2nd-level spell.  				Once you reach 5th level, you can also cast Darkness once per long rest. Charisma is your spellcasting ability for these spells.' },
+					{ type: 'text', text: 'You know the Thaumaturgy cantrip. Also, you can cast Hellish Rebuke once per long rest as a 2nd-level spell. Charisma is your spellcasting ability for these spells.' },
 				]
 			},
 			source: 'tiefling',
+			importance: 'minor',
 			effects: [{ target: 'features', action: 'add', value: 'Infernal Legacy' }]
 		}
 	]

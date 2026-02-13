@@ -580,25 +580,25 @@
 				</div>
 
 				<!-- Bonus -->
-				<div class="text-center font-semibold text-gray-700">
+				<div class="species-bonus-column text-center font-semibold">
 					{#if bonuses[stat] > 0}
 						+{bonuses[stat]}
 					{:else if bonuses[stat] < 0}
 						{bonuses[stat]}
 					{:else}
-						0
+						<!-- Leave blank instead of showing 0 -->
 					{/if}
 				</div>
 
 				<!-- Total -->
-				<div class="text-center font-semibold text-gray-800">
+				<div class="total-column text-center font-semibold">
 					{selectedScores[stat] !== null && selectedScores[stat] > 0
 						? selectedScores[stat] + (bonuses[stat] ?? 0)
 						: ''}
 				</div>
 
 				<!-- Modifier -->
-				<div class="text-center font-mono font-bold text-indigo-600">
+				<div class="modifier-column text-center font-mono font-bold text-indigo-600">
 					{selectedScores[stat] !== null && selectedScores[stat] > 0
 						? getModifierString(selectedScores[stat] + (bonuses[stat] ?? 0))
 						: ''}
@@ -1232,5 +1232,16 @@
 			transform: translateY(0);
 			opacity: 1;
 		}
+	}
+
+	/* Species bonus and total columns - grey text for reduced visual clutter */
+	.species-bonus-column,
+	.total-column {
+		color: var(--color-text-muted);
+	}
+
+	/* Modifier column - larger font size to emphasize importance */
+	.modifier-column {
+		font-size: var(--font-size-lg);
 	}
 </style>

@@ -154,6 +154,7 @@ const spellcastingPrompt: FeaturePrompt = {
 		]
 	},
 	source: 'bard',
+	importance: 'invisible',
 	effects: [
 		{
 			target: 'features',
@@ -175,6 +176,7 @@ const jackOfAllTradesPrompt: FeaturePrompt = {
 		]
 	},
 	source: 'bard',
+	importance: 'invisible', // Already factored into skill modifiers, no need to display
 	effects: [
 		{
 			target: 'features',
@@ -386,7 +388,8 @@ const classFeaturesPrompt = [
 export const bard: ClassData = {
 	name: 'Bard',
 	image: base + '/class_icons/bard.jpg',
-	description: 'Inspiring leaders who weave magic through words and music.',
+	description: 'You are an inspiring leader whose power echoes the music of creation.',
+	cultureNotes: 'Bards thrive on stories, whether those stories are true or not. A bard weaves magic through words and music to inspire allies, demoralize foes, manipulate minds, create illusions, and even heal wounds.',
 	hitDie: 'd8',
 	primaryAbility: 'Charisma',
 	saves: ['Dexterity', 'Charisma'],
@@ -436,28 +439,6 @@ export const bard: ClassData = {
 						label: "Entertainer's pack",
 						items: [
 							"Entertainer's pack (includes: backpack, bedroll, 2 costumes, 5 candles, 5 days of rations, waterskin, disguise kit)"
-						]
-					}
-				]
-			} as EquipmentChoice,
-			{
-				name: 'Musical Instrument',
-				description: 'Choose your musical instrument',
-				options: [
-					{
-						label: 'Lute',
-						items: ['Lute']
-					},
-					{
-						label: 'Other musical instrument',
-						subChoices: [
-							{
-								name: 'Musical Instrument',
-								description: 'Choose a musical instrument',
-								type: 'simple-list',
-								options: musicalInstruments.filter((i) => i !== 'Lute'),
-								count: 1
-							}
 						]
 					}
 				]

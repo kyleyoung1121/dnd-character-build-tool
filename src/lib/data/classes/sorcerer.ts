@@ -39,11 +39,7 @@ const spellcastingPrompt: FeaturePrompt = {
 	},
 	source: 'sorcerer',
 	effects: [
-		{
-			target: 'features',
-			action: 'add',
-			value: 'Spellcasting'
-		}
+		
 	]
 };
 
@@ -299,6 +295,7 @@ const sorcerousOriginPrompt: FeaturePrompt = {
 							]
 						},
 						source: 'sorcerer.draconic_bloodline',
+						importance: 'invisible',
 						effects: [
 							{
 								target: 'features',
@@ -335,7 +332,7 @@ const sorcerousOriginPrompt: FeaturePrompt = {
 						name: 'Tides of Chaos',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'Once you use this feature, you must finish a long rest before you can use it again. Any time before you regain the use of this feature, the DM can have you roll on the Wild Magic Surge table immediately after you cast a sorcerer spell of 1st level or higher. You then regain the use of this feature.' },
+								{ type: 'text', text: 'You can manipulate the forces of chance and chaos to gain advantage on one attack roll, ability check, or saving throw. Once you do so, you must finish a long rest before you can use this feature again. Any time before you regain the use of this feature, the DM can have you roll on the Wild Magic Surge table immediately after you cast a sorcerer spell of 1st level or higher. You then regain the use of this feature.' },
 							]
 						},
 						source: 'sorcerer.wild_magic',
@@ -371,7 +368,8 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 export const sorcerer: ClassData = {
 	name: 'Sorcerer',
 	image: base + '/class_icons/sorcerer.jpg',
-	description: 'Spellcasters who draw power from innate magical bloodlines or forces.',
+	description: 'You are a spellcaster who draws on inherent magic from a gift or bloodline.',
+	cultureNotes: 'Sorcerers are connected to raw magic. It suffuses body, mind, and spirit with a latent power that waits to be tapped. A sorcerer\'s magic wants to be wielded, and it has a tendency to spill out in unpredictable ways if it isn’t called upon.',
 	hitDie: 'd6',
 	primaryAbility: 'Charisma',
 	saves: ['Constitution', 'Charisma'],

@@ -660,7 +660,7 @@ const naturalExplorerPrompt: FeaturePrompt = {
 						name: 'Natural Explorer: Arctic',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'When you make an Intelligence or Wisdom check related to your favored terrain, your proficiency bonus is doubled if you are using a skill that you\'re proficient in. While traveling for an hour or more in your favored terrain, you remain alert to danger, and if you are traveling alone, you can move stealthily at a normal pace.' },
+								{ type: 'text', text: 'When you make an Intelligence or Wisdom check related to your favored terrain, your proficiency bonus is doubled if you are using a skill that you\'re proficient in. While traveling for an hour or more in your favored terrain, you remain alert to danger.' },
 							]
 						},
 						source: 'ranger.natural_explorer',
@@ -677,7 +677,7 @@ const naturalExplorerPrompt: FeaturePrompt = {
 						name: 'Natural Explorer: Forest',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'When you make an Intelligence or Wisdom check related to your favored terrain, your proficiency bonus is doubled if you are using a skill that you\'re proficient in. While traveling for an hour or more in your favored terrain, you remain alert to danger, and if you are traveling alone, you can move stealthily at a normal pace.' },
+								{ type: 'text', text: 'When you make an Intelligence or Wisdom check related to your favored terrain, your proficiency bonus is doubled if you are using a skill that you\'re proficient in. While traveling for an hour or more in your favored terrain, you remain alert to danger.' },
 							]
 						},
 						source: 'ranger.natural_explorer',
@@ -694,7 +694,7 @@ const naturalExplorerPrompt: FeaturePrompt = {
 						name: 'Natural Explorer: Grassland',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'When you make an Intelligence or Wisdom check related to your favored terrain, your proficiency bonus is doubled if you are using a skill that you\'re proficient in. While traveling for an hour or more in your favored terrain, you remain alert to danger, and if you are traveling alone, you can move stealthily at a normal pace.' },
+								{ type: 'text', text: 'When you make an Intelligence or Wisdom check related to your favored terrain, your proficiency bonus is doubled if you are using a skill that you\'re proficient in. While traveling for an hour or more in your favored terrain, you remain alert to danger.' },
 							]
 						},
 						source: 'ranger.natural_explorer',
@@ -711,7 +711,7 @@ const naturalExplorerPrompt: FeaturePrompt = {
 						name: 'Natural Explorer: Mountains',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'When you make an Intelligence or Wisdom check related to your favored terrain, your proficiency bonus is doubled if you are using a skill that you\'re proficient in. While traveling for an hour or more in your favored terrain, you remain alert to danger, and if you are traveling alone, you can move stealthily at a normal pace.' },
+								{ type: 'text', text: 'When you make an Intelligence or Wisdom check related to your favored terrain, your proficiency bonus is doubled if you are using a skill that you\'re proficient in. While traveling for an hour or more in your favored terrain, you remain alert to danger.' },
 							]
 						},
 						source: 'ranger.natural_explorer',
@@ -728,7 +728,7 @@ const naturalExplorerPrompt: FeaturePrompt = {
 						name: 'Natural Explorer: Swamp',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'When you make an Intelligence or Wisdom check related to your favored terrain, your proficiency bonus is doubled if you are using a skill that you\'re proficient in. While traveling for an hour or more in your favored terrain, you remain alert to danger, and if you are traveling alone, you can move stealthily at a normal pace.' },
+								{ type: 'text', text: 'When you make an Intelligence or Wisdom check related to your favored terrain, your proficiency bonus is doubled if you are using a skill that you\'re proficient in. While traveling for an hour or more in your favored terrain, you remain alert to danger.' },
 							]
 						},
 						source: 'ranger.natural_explorer',
@@ -745,7 +745,7 @@ const naturalExplorerPrompt: FeaturePrompt = {
 						name: 'Natural Explorer: Coast',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'When you make an Intelligence or Wisdom check related to your favored terrain, your proficiency bonus is doubled if you are using a skill that you\'re proficient in. While traveling for an hour or more in your favored terrain, you remain alert to danger, and if you are traveling alone, you can move stealthily at a normal pace.' },
+								{ type: 'text', text: 'When you make an Intelligence or Wisdom check related to your favored terrain, your proficiency bonus is doubled if you are using a skill that you\'re proficient in. While traveling for an hour or more in your favored terrain, you remain alert to danger.' },
 							]
 						},
 						source: 'ranger.natural_explorer',
@@ -762,7 +762,7 @@ const naturalExplorerPrompt: FeaturePrompt = {
 						name: 'Natural Explorer: Desert',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'When you make an Intelligence or Wisdom check related to your favored terrain, your proficiency bonus is doubled if you are using a skill that you\'re proficient in. While traveling for an hour or more in your favored terrain, you remain alert to danger, and if you are traveling alone, you can move stealthily at a normal pace.' },
+								{ type: 'text', text: 'When you make an Intelligence or Wisdom check related to your favored terrain, your proficiency bonus is doubled if you are using a skill that you\'re proficient in. While traveling for an hour or more in your favored terrain, you remain alert to danger.' },
 							]
 						},
 						source: 'ranger.natural_explorer',
@@ -779,7 +779,7 @@ const naturalExplorerPrompt: FeaturePrompt = {
 						name: 'Natural Explorer: Underdark',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'When you make an Intelligence or Wisdom check related to your favored terrain, your proficiency bonus is doubled if you are using a skill that you\'re proficient in. While traveling for an hour or more in your favored terrain, you remain alert to danger, and if you are traveling alone, you can move stealthily at a normal pace.' },
+								{ type: 'text', text: 'When you make an Intelligence or Wisdom check related to your favored terrain, your proficiency bonus is doubled if you are using a skill that you\'re proficient in. While traveling for an hour or more in your favored terrain, you remain alert to danger.' },
 							]
 						},
 						source: 'ranger.natural_explorer',
@@ -824,7 +824,13 @@ const fightingStylePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'ranger.fighting_style',
-						effects: []
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Archery Fighting Style'
+							}
+						]
 					}
 				]
 			},
@@ -841,7 +847,14 @@ const fightingStylePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'ranger.fighting_style',
-						effects: []
+						importance: 'invisible',
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Defense Fighting Style'
+							}
+						]
 					}
 				]
 			},
@@ -858,7 +871,13 @@ const fightingStylePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'ranger.fighting_style',
-						effects: []
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Dueling Fighting Style'
+							}
+						]
 					}
 				]
 			},
@@ -875,7 +894,13 @@ const fightingStylePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'ranger.fighting_style',
-						effects: []
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Two-Weapon Fighting Style'
+							}
+						]
 					}
 				]
 			}
@@ -883,13 +908,7 @@ const fightingStylePrompt: FeaturePrompt = {
 		numPicks: 1
 	},
 	source: 'ranger',
-	effects: [
-		{
-			target: 'features',
-			action: 'add',
-			value: '{userChoice} Fighting Style'
-		}
-	]
+	effects: []
 };
 
 const spellcastingPrompt: FeaturePrompt = {
@@ -902,11 +921,7 @@ const spellcastingPrompt: FeaturePrompt = {
 	},
 	source: 'ranger',
 	effects: [
-		{
-			target: 'features',
-			action: 'add',
-			value: 'Spellcasting'
-		}
+		
 	]
 };
 
@@ -915,7 +930,7 @@ const primevalAwarenessPrompt: FeaturePrompt = {
 	name: 'Primeval Awareness',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'You can use your action and expend one ranger spell slot to focus your awareness on the region around you. For 1 minute per level of the spell slot you expend, you can sense whether the following types of creatures are present within 1 mile of you (or within up to 6 miles if you are in your favored terrain): aberrations, celestials, dragons, elementals, fey, fiends, and undead. This feature doesn\'t reveal the creatures\' location or number.' },
+			{ type: 'text', text: 'You can use your action and one spell slot to focus your awareness on the region around you. For 1 minute per level of the spell slot you expend, you can sense whether the following types of creatures are present within 1 mile of you (or within up to 6 miles if you are in your favored terrain): aberrations, celestials, dragons, elementals, fey, fiends, and undead. This feature doesn\'t reveal the creatures\' location or number.' },
 		]
 	},
 	source: 'ranger',
@@ -980,7 +995,7 @@ const rangerArchetypePrompt: FeaturePrompt = {
 											name: 'Giant Killer',
 											description: {
 												blocks: [
-													{ type: 'text', text: 'When a Large or larger creature within 5 feet of you hits or misses you with an attack, you can use your reaction to attack that creature immediately after its attack, provided that you can see the creature.' },
+													{ type: 'text', text: 'After a Large (or larger) creature hits or misses you with an attack, you can use your reaction to strike back, given that you are within 5 feet and can see the creature.' },
 												]
 											},
 											source: 'ranger.hunter',
@@ -1035,7 +1050,6 @@ const rangerArchetypePrompt: FeaturePrompt = {
 								{ type: 'text', text: '• On your turn, you can verbally command the beast where to move (no action required by you)' },
 								{ type: 'text', text: '• You can use your action to verbally command it to take the Attack, Dash, Disengage, or Help action' },
 								{ type: 'text', text: '• If you don\'t issue a command, the beast takes the Dodge action' },
-								{ type: 'text', text: 'While traveling through your favored terrain with only the beast, you can move stealthily at a normal pace.' },
 								{ type: 'text', text: 'If the beast dies, you can obtain a new companion by spending 8 hours magically bonding with a beast that isn\'t hostile to you and that meets the requirements.' },
 							]
 						},
@@ -1075,7 +1089,8 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 export const ranger: ClassData = {
 	name: 'Ranger',
 	image: base + '/class_icons/ranger.jpg',
-	description: 'Skilled hunters and trackers, masters of nature and survival.',
+	description: 'You are a warrior who uses martial prowess and nature magic to combat threats on the edges of civilization.',
+	cultureNotes: 'Rangers specialize in hunting the monsters that threaten the edges of settlements. Particularly familiar with the wilds, rangers are excellent trackers and make use of nature magic to enhance their combat abilities, emphasize speed, stealth, and the hunt.',
 	hitDie: 'd10',
 	primaryAbility: 'Dexterity & Wisdom',
 	saves: ['Strength', 'Dexterity'],

@@ -110,6 +110,7 @@ export const sage: BackgroundData = {
 				]
 			},
 			source: 'background:Sage',
+			importance: 'minor',
 			effects: [
 				{
 					target: 'features',

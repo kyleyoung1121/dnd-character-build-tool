@@ -9,6 +9,18 @@ export interface FeaturePrompt {
 	featureOptions?: SelectOptions;
 	source: string; // class, subclass, race, background, etc.
 	effects?: FeatureEffect[];
+	/**
+	 * Importance level for PDF export filtering
+	 * - 'important' (default): Appears in main Features and Traits box on page 1
+	 * - 'minor': Appears in secondary features section on page 2 or later
+	 * - 'invisible': Not displayed on character sheet (but effects still apply for calculations)
+	 * 
+	 * Examples:
+	 * - 'important': Rage, Spellcasting, Breath Weapon
+	 * - 'minor': Tool proficiencies, languages, situational features
+	 * - 'invisible': Jack of All Trades (factored into skill modifiers), Unarmored Defense (factored into AC)
+	 */
+	importance?: 'important' | 'minor' | 'invisible';
 }
 
 // ==============================

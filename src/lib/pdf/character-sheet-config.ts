@@ -199,9 +199,9 @@ export const PAGE_1_FIELDS = {
 	
 	// Proficiencies & Languages (right column)
 	proficienciesAndLanguages: {
-		x: 30,
-		y: -10,
-		width: 200,
+		x: 25,
+		y: -3,
+		width: 170,
 		height: 150,
 		fontSize: 8,
 		lineHeight: 10
@@ -283,21 +283,54 @@ export const PAGE_2_FIELDS = {
 	} as TextAreaConfig,
 	
 	// Additional Features & Traits (continued from page 1)
-	additionalFeatures: {
-		x: 100,
-		y: 200,
-		width: 480,
-		height: 180,
+	// This is the first column on page 2 for feature overflow
+	featuresAndTraitsContinued: {
+		x: 25,
+		y: 415,
+		width: 260,
+		height: 330,
 		fontSize: 8,
 		lineHeight: 10
 	} as TextAreaConfig,
 	
-	// Treasure & Notes
-	treasureAndNotes: {
-		x: 100,
+	additionalFeatures: {
+		x: 220,
 		y: 50,
-		width: 480,
-		height: 140,
+		width: 170,
+		height: 400,
+		fontSize: 8,
+		lineHeight: 10
+	} as TextAreaConfig,
+	
+	// Spells & Cantrips (middle column on page 2)
+	// Positioned to the right of "Features cont." section
+	// Uses same height and positioning as featuresAndTraitsContinued for alignment
+	spellsAndCantrips: {
+		x: 25,
+		y: 45,
+		width: 260,
+		height: 330,
+		fontSize: 8,
+		lineHeight: 10
+	} as TextAreaConfig,
+	
+	// Spells & Cantrips Continued (rightmost column on page 2)
+	// For spell overflow from the middle column
+	spellsAndCantripsContinued: {
+		x: 300,
+		y: 45,
+		width: 260,
+		height: 330,
+		fontSize: 8,
+		lineHeight: 10
+	} as TextAreaConfig,
+	
+	// Treasure & Notes (NOTE: This will be replaced by spell overflow when spells are present)
+	treasureAndNotes: {
+		x: 410,
+		y: 50,
+		width: 180,
+		height: 630,
 		fontSize: 8,
 		lineHeight: 10
 	} as TextAreaConfig

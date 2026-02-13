@@ -55,7 +55,7 @@ const kiPrompt: FeaturePrompt = {
 	name: 'Ki',
 	description: {
 		blocks: [
-			{ type: 'text', text: 'Your training allows you to harness the mystic energy of ki. Your access to this energy is represented by a pool of 3 ki points. You can spend these points to fuel various ki features like Flurry of Blows, Patient Defense, and Step of the Wind. When you spend a ki point, it is unavailable until you finish a short or long rest, at the end of which you draw all of your expended ki points back into yourself. You must spend at least 30 minutes of the rest meditating to regain your ki points. Some of your ki features require your target to make a saving throw to resist the feature\'s effects.' },
+			{ type: 'text', text: 'Your training allows you to harness the mystic energy of ki. You have a pool of 3 ki points. You can spend these points to fuel various ki features. You regain all ki points on a short or long rest. Some of your ki features require your target to make a saving throw to resist the feature\'s effects.' },
 			{
 				type: 'computed-replacement',
 
@@ -126,6 +126,7 @@ const unarmoredMovementPrompt: FeaturePrompt = {
 		]
 	},
 	source: 'monk',
+	importance: 'invisible',
 	effects: [
 		{
 			target: 'features',
@@ -160,7 +161,7 @@ const deflectMissilesPrompt: FeaturePrompt = {
 					'When you do so, the damage you take from the attack is reduced by 1d10 + {value}.'
 			},
 			{ 
-				type: 'text', text: 'If you reduce the damage to 0, you can catch the missile if it is small enough for you to hold in one hand and you have at least one hand free. If you catch a missile in this way, you can spend 1 ki point to make a ranged attack with the weapon or piece of ammunition you just caught, as part of the same reaction. You make this attack with proficiency, regardless of your weapon proficiencies, and the missile counts as a monk weapon for the attack, which has a normal range of 20 feet and a long range of 60 feet.' 
+				type: 'text', text: 'If you reduce the damage to 0, you can catch the missile. You can then spend 1 ki point to make a ranged attack with the caught item, as part of the same reaction.' 
 			},
 		]
 	},
@@ -220,7 +221,7 @@ const monasticTraditionPrompt: FeaturePrompt = {
 						name: 'Shadow Arts',
 						description: {
 							blocks: [
-								{ type: 'text', text: 'As an action, you can spend 2 ki points to cast darkness, darkvision, pass without trace, or silence, without providing material components. Additionally, you gain the minor illusion cantrip if you don\'t already know it.' },
+								{ type: 'text', text: 'As an action, you can spend 2 ki points to cast darkness, darkvision, pass without trace, or silence.' },
 							]
 						},
 						source: 'monk.shadow',
@@ -439,6 +440,7 @@ const monasticTraditionPrompt: FeaturePrompt = {
 							numPicks: 1
 						},
 						source: 'monk.four_elements',
+						importance: 'invisible',
 						effects: [
 							{
 								target: 'features',
@@ -462,7 +464,42 @@ const monasticTraditionPrompt: FeaturePrompt = {
 	]
 };
 
+const unarmoredDefensePrompt: FeaturePrompt = {
+	id: 'monk_unarmored_defense_01',
+	name: 'Unarmored Defense',
+	description: {
+		blocks: [
+			{
+				type: 'computed-inline',
+				text: 'Beginning at 1st level, while you are wearing no armor and not wielding a shield, your AC equals 10 + your Dexterity modifier + your Wisdom modifier.',
+				hints: [
+					{
+						afterText: 'your Dexterity modifier',
+						computed: { source: 'abilityMod', ability: 'DEX' },
+						hintFormat: '({value})'
+					},
+					{
+						afterText: 'your Wisdom modifier',
+						computed: { source: 'abilityMod', ability: 'WIS' },
+						hintFormat: '({value})'
+					}
+				]
+			}
+		]
+	},
+	source: 'monk',
+	importance: 'invisible',
+	effects: [
+		{
+			target: 'features',
+			action: 'add',
+			value: 'Unarmored Defense'
+		}
+	]
+};
+
 const classFeaturesPrompt: FeaturePrompt[] = [
+	unarmoredDefensePrompt,
 	martialArtsPrompt,
 	kiPrompt,
 	kiFeaturesPrompt,
@@ -473,7 +510,8 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 export const monk: ClassData = {
 	name: 'Monk',
 	image: base + '/class_icons/monk.jpg',
-	description: 'Masters of martial arts harnessing the power of ki.',
+	description: 'You are a master of martial arts, harnessing the power of the body in pursuit of physical and spiritual perfection.',
+	cultureNotes: 'Monks make use of Ki, the magic that flows through living bodies, to create magical effects and to extend their bodies’ physical capabilities. Monks take their quests seriously, seeing them as personal tests of their physical and spiritual growth.',
 	hitDie: 'd8',
 	primaryAbility: 'Dexterity & Wisdom',
 	saves: ['Strength', 'Dexterity'],

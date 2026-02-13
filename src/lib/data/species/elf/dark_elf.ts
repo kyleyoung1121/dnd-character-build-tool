@@ -81,6 +81,7 @@ export const darkElf: SpeciesData = {
 				]
 			},
 			source: 'dark_elf',
+			importance: 'minor',
 			effects: [{ target: 'features', action: 'add', value: 'Trance' }]
 		},
 		{
@@ -92,6 +93,7 @@ export const darkElf: SpeciesData = {
 				]
 			},
 			source: 'dark_elf',
+			importance: 'minor',
 			effects: [{ target: 'features', action: 'add', value: 'Drow Magic' }]
 		},
 		{

@@ -131,6 +131,7 @@ export const folkHero: BackgroundData = {
 				]
 			},
 			source: 'background:Folk Hero',
+			importance: 'minor',
 			effects: [
 				{
 					target: 'features',

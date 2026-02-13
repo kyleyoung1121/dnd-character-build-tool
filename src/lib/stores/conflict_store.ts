@@ -12,17 +12,7 @@ type ConflictDetectionResult = {
  * Reactive store that automatically detects conflicts when character changes
  */
 export const conflicts = derived(character_store, ($character) => {
-	console.log('[Conflict Store] Character changed, detecting conflicts...');
-	console.log('[Conflict Store] Character:', {
-		class: $character?.class,
-		race: $character?.race,
-		subrace: $character?.subrace,
-		charisma: $character?.charisma,
-		spells: $character?.spells,
-		spellsLength: $character?.spells?.length
-	});
 	const result = detectConflicts();
-	console.log('[Conflict Store] Detection result:', result);
 	return result;
 });
 
@@ -37,12 +27,7 @@ export const visitedTabs = writable<Set<string>>(new Set());
  * Only shows warnings for tabs that have been visited (configured)
  */
 export const activeConflicts = derived([conflicts, visitedTabs], ([conflictResult, visited]) => {
-	console.log('[Active Conflicts] Deriving active conflicts...');
-	console.log('[Active Conflicts] Input conflicts:', conflictResult);
-	console.log('[Active Conflicts] Visited tabs:', Array.from(visited));
-	
 	if (!conflictResult.hasConflicts) {
-		console.log('[Active Conflicts] No conflicts detected');
 		return {
 			hasConflicts: false,
 			conflicts: [],
@@ -84,7 +69,6 @@ export const activeConflicts = derived([conflicts, visitedTabs], ([conflictResul
 		conflicts: filteredConflicts,
 		tabsNeedingAttention
 	};
-	console.log('[Active Conflicts] Final result:', result);
 	return result;
 });
 

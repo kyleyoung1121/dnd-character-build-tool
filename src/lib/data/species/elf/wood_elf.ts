@@ -80,6 +80,7 @@ export const woodElf: SpeciesData = {
 				]
 			},
 			source: 'wood_elf',
+			importance: 'minor',
 			effects: [{ target: 'features', action: 'add', value: 'Trance' }]
 		},
 		{

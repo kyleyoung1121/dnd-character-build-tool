@@ -81,6 +81,7 @@ export const highElf: SpeciesData = {
 				]
 			},
 			source: 'high_elf',
+			importance: 'minor',
 			effects: [{ target: 'features', action: 'add', value: 'Trance' }]
 		},
 		{

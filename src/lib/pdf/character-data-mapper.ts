@@ -82,7 +82,8 @@ export interface CharacterSheetData {
 	// Page 1 - Equipment & Features
 	equipment: string;
 	proficienciesAndLanguages: string;
-	featuresAndTraits: string;
+	features: string[];
+	featuresAndTraitsBuilt: string;
 	
 	spells: Spell[];
 
@@ -1182,7 +1183,8 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 		// Page 1 - Equipment & Features
 		equipment: formatEquipment(character.inventory || []),
 		proficienciesAndLanguages: formatProficienciesAndLanguages(character),
-		featuresAndTraits: (() => {
+		features: character.features,
+		featuresAndTraitsBuilt: (() => {
 			//console.log('=== FEATURES DEBUG - Character Data Mapper ===');
 			//console.log('Character features array:', character.features);
 			//console.log('Character class:', character.class);

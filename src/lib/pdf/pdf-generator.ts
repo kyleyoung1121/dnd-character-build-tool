@@ -268,164 +268,164 @@ function drawTextArea(
 	}
 }
 
-/**
- * Fill Page 1 with character data
- */
-async function fillPage1(
-	page: any,
-	data: CharacterSheetData,
-	font: any,
-	boldFont: any,
-	italicFont: any
-) {
-	// Header
-	drawText(page, data.characterName, PAGE_1_FIELDS.characterName, font);
-	drawText(page, data.classAndLevel, PAGE_1_FIELDS.classAndLevel, font);
-	drawText(page, data.background, PAGE_1_FIELDS.background, font);
-	drawText(page, data.species, PAGE_1_FIELDS.species, font);
-	drawText(page, data.alignment, PAGE_1_FIELDS.alignment, font);
-	// Removed: experiencePoints and proficiencyBonus
-	// drawText(page, data.experiencePoints, PAGE_1_FIELDS.experiencePoints, font);
-	// drawText(page, data.proficiencyBonus, PAGE_1_FIELDS.proficiencyBonus, font);
+// /**
+//  * Fill Page 1 with character data
+//  */
+// async function fillPage1(
+// 	page: any,
+// 	data: CharacterSheetData,
+// 	font: any,
+// 	boldFont: any,
+// 	italicFont: any
+// ) {
+// 	// Header
+// 	drawText(page, data.characterName, PAGE_1_FIELDS.characterName, font);
+// 	drawText(page, data.classAndLevel, PAGE_1_FIELDS.classAndLevel, font);
+// 	drawText(page, data.background, PAGE_1_FIELDS.background, font);
+// 	drawText(page, data.species, PAGE_1_FIELDS.species, font);
+// 	drawText(page, data.alignment, PAGE_1_FIELDS.alignment, font);
+// 	// Removed: experiencePoints and proficiencyBonus
+// 	// drawText(page, data.experiencePoints, PAGE_1_FIELDS.experiencePoints, font);
+// 	// drawText(page, data.proficiencyBonus, PAGE_1_FIELDS.proficiencyBonus, font);
 	
-	// Ability Scores
-	const abilities = PAGE_1_FIELDS.abilityScores;
-	drawText(page, data.abilityScores.strength.score, abilities.strength.score, font);
-	drawText(page, data.abilityScores.strength.modifier, abilities.strength.modifier, font);
-	drawText(page, data.abilityScores.dexterity.score, abilities.dexterity.score, font);
-	drawText(page, data.abilityScores.dexterity.modifier, abilities.dexterity.modifier, font);
-	drawText(page, data.abilityScores.constitution.score, abilities.constitution.score, font);
-	drawText(page, data.abilityScores.constitution.modifier, abilities.constitution.modifier, font);
-	drawText(page, data.abilityScores.intelligence.score, abilities.intelligence.score, font);
-	drawText(page, data.abilityScores.intelligence.modifier, abilities.intelligence.modifier, font);
-	drawText(page, data.abilityScores.wisdom.score, abilities.wisdom.score, font);
-	drawText(page, data.abilityScores.wisdom.modifier, abilities.wisdom.modifier, font);
-	drawText(page, data.abilityScores.charisma.score, abilities.charisma.score, font);
-	drawText(page, data.abilityScores.charisma.modifier, abilities.charisma.modifier, font);
+// 	// Ability Scores
+// 	const abilities = PAGE_1_FIELDS.abilityScores;
+// 	drawText(page, data.abilityScores.strength.score, abilities.strength.score, font);
+// 	drawText(page, data.abilityScores.strength.modifier, abilities.strength.modifier, font);
+// 	drawText(page, data.abilityScores.dexterity.score, abilities.dexterity.score, font);
+// 	drawText(page, data.abilityScores.dexterity.modifier, abilities.dexterity.modifier, font);
+// 	drawText(page, data.abilityScores.constitution.score, abilities.constitution.score, font);
+// 	drawText(page, data.abilityScores.constitution.modifier, abilities.constitution.modifier, font);
+// 	drawText(page, data.abilityScores.intelligence.score, abilities.intelligence.score, font);
+// 	drawText(page, data.abilityScores.intelligence.modifier, abilities.intelligence.modifier, font);
+// 	drawText(page, data.abilityScores.wisdom.score, abilities.wisdom.score, font);
+// 	drawText(page, data.abilityScores.wisdom.modifier, abilities.wisdom.modifier, font);
+// 	drawText(page, data.abilityScores.charisma.score, abilities.charisma.score, font);
+// 	drawText(page, data.abilityScores.charisma.modifier, abilities.charisma.modifier, font);
 	
-	// Saving Throws
-	const saves = PAGE_1_FIELDS.savingThrows;
-	drawText(page, data.savingThrows.strength, saves.strength, font);
-	drawText(page, data.savingThrows.dexterity, saves.dexterity, font);
-	drawText(page, data.savingThrows.constitution, saves.constitution, font);
-	drawText(page, data.savingThrows.intelligence, saves.intelligence, font);
-	drawText(page, data.savingThrows.wisdom, saves.wisdom, font);
-	drawText(page, data.savingThrows.charisma, saves.charisma, font);
+// 	// Saving Throws
+// 	const saves = PAGE_1_FIELDS.savingThrows;
+// 	drawText(page, data.savingThrows.strength, saves.strength, font);
+// 	drawText(page, data.savingThrows.dexterity, saves.dexterity, font);
+// 	drawText(page, data.savingThrows.constitution, saves.constitution, font);
+// 	drawText(page, data.savingThrows.intelligence, saves.intelligence, font);
+// 	drawText(page, data.savingThrows.wisdom, saves.wisdom, font);
+// 	drawText(page, data.savingThrows.charisma, saves.charisma, font);
 	
-	// Skills with ability abbreviations
-	const skillsConfig = PAGE_1_FIELDS.skills;
-	const skillAbilities: Record<string, string> = {
-		acrobatics: 'DEX',
-		animalHandling: 'WIS',
-		arcana: 'INT',
-		athletics: 'STR',
-		deception: 'CHA',
-		history: 'INT',
-		insight: 'WIS',
-		intimidation: 'CHA',
-		investigation: 'INT',
-		medicine: 'WIS',
-		nature: 'INT',
-		perception: 'WIS',
-		performance: 'CHA',
-		persuasion: 'CHA',
-		religion: 'INT',
-		sleightOfHand: 'DEX',
-		stealth: 'DEX',
-		survival: 'WIS'
-	};
+// 	// Skills with ability abbreviations
+// 	const skillsConfig = PAGE_1_FIELDS.skills;
+// 	const skillAbilities: Record<string, string> = {
+// 		acrobatics: 'DEX',
+// 		animalHandling: 'WIS',
+// 		arcana: 'INT',
+// 		athletics: 'STR',
+// 		deception: 'CHA',
+// 		history: 'INT',
+// 		insight: 'WIS',
+// 		intimidation: 'CHA',
+// 		investigation: 'INT',
+// 		medicine: 'WIS',
+// 		nature: 'INT',
+// 		perception: 'WIS',
+// 		performance: 'CHA',
+// 		persuasion: 'CHA',
+// 		religion: 'INT',
+// 		sleightOfHand: 'DEX',
+// 		stealth: 'DEX',
+// 		survival: 'WIS'
+// 	};
 
-	(Object.keys(skillsConfig) as Array<keyof typeof skillsConfig>).forEach(key => {
-		const skillValue = data.skills[key];
-		if (skillValue) {
-			drawSkillWithAbility(page, skillValue, skillAbilities[key], skillsConfig[key], font);
-		}
-	});
+// 	(Object.keys(skillsConfig) as Array<keyof typeof skillsConfig>).forEach(key => {
+// 		const skillValue = data.skills[key];
+// 		if (skillValue) {
+// 			drawSkillWithAbility(page, skillValue, skillAbilities[key], skillsConfig[key], font);
+// 		}
+// 	});
 	
-	// Removed: passivePerception
-	// drawText(page, data.passivePerception, PAGE_1_FIELDS.passivePerception, font);
+// 	// Removed: passivePerception
+// 	// drawText(page, data.passivePerception, PAGE_1_FIELDS.passivePerception, font);
 	
-	// Combat Stats
-	drawText(page, data.armorClass, PAGE_1_FIELDS.armorClass, font);
-	drawText(page, data.initiative, PAGE_1_FIELDS.initiative, font);
-	drawText(page, data.speed, PAGE_1_FIELDS.speed, font);
-	drawText(page, data.hitPointMaximum, PAGE_1_FIELDS.hitPointMaximum, font);
-	drawText(page, data.currentHitPoints, PAGE_1_FIELDS.currentHitPoints, font);
-	drawText(page, data.temporaryHitPoints, PAGE_1_FIELDS.temporaryHitPoints, font);
-	// Removed: hitDice
-	// drawText(page, data.hitDice, PAGE_1_FIELDS.hitDice, font);
+// 	// Combat Stats
+// 	drawText(page, data.armorClass, PAGE_1_FIELDS.armorClass, font);
+// 	drawText(page, data.initiative, PAGE_1_FIELDS.initiative, font);
+// 	drawText(page, data.speed, PAGE_1_FIELDS.speed, font);
+// 	drawText(page, data.hitPointMaximum, PAGE_1_FIELDS.hitPointMaximum, font);
+// 	drawText(page, data.currentHitPoints, PAGE_1_FIELDS.currentHitPoints, font);
+// 	drawText(page, data.temporaryHitPoints, PAGE_1_FIELDS.temporaryHitPoints, font);
+// 	// Removed: hitDice
+// 	// drawText(page, data.hitDice, PAGE_1_FIELDS.hitDice, font);
 	
-	// Attacks
-	data.attacks.forEach((attack, index) => {
-		if (index < PAGE_1_FIELDS.attacks.length) {
-			const attackConfig = PAGE_1_FIELDS.attacks[index];
-			drawText(page, attack.name, attackConfig.name, font);
-			drawText(page, attack.bonus, attackConfig.bonus, font);
-			drawText(page, attack.damage, attackConfig.damage, font);
-		}
-	});
+// 	// Attacks
+// 	data.attacks.forEach((attack, index) => {
+// 		if (index < PAGE_1_FIELDS.attacks.length) {
+// 			const attackConfig = PAGE_1_FIELDS.attacks[index];
+// 			drawText(page, attack.name, attackConfig.name, font);
+// 			drawText(page, attack.bonus, attackConfig.bonus, font);
+// 			drawText(page, attack.damage, attackConfig.damage, font);
+// 		}
+// 	});
 	
-	// Equipment & Features
-	drawTextArea(page, data.equipment, PAGE_1_FIELDS.equipment, font, boldFont, italicFont);
-	drawTextArea(page, data.proficienciesAndLanguages, PAGE_1_FIELDS.proficienciesAndLanguages, font, boldFont, italicFont);
-	drawTextArea(page, data.featuresAndTraits, PAGE_1_FIELDS.featuresAndTraits, font, boldFont, italicFont);
-}
+// 	// Equipment & Features
+// 	drawTextArea(page, data.equipment, PAGE_1_FIELDS.equipment, font, boldFont, italicFont);
+// 	drawTextArea(page, data.proficienciesAndLanguages, PAGE_1_FIELDS.proficienciesAndLanguages, font, boldFont, italicFont);
+// 	drawTextArea(page, data.featuresAndTraitsBuilt, PAGE_1_FIELDS.featuresAndTraits, font, boldFont, italicFont);
+// }
 
-/**
- * Fill Page 2 with character data
- */
-async function fillPage2(
-	page: any,
-	data: CharacterSheetData,
-	font: any,
-	boldFont: any,
-	italicFont: any
-) {
-	// Character Name
-	drawText(page, data.characterName, PAGE_2_FIELDS.characterName, font);
+// /**
+//  * Fill Page 2 with character data
+//  */
+// async function fillPage2(
+// 	page: any,
+// 	data: CharacterSheetData,
+// 	font: any,
+// 	boldFont: any,
+// 	italicFont: any
+// ) {
+// 	// Character Name
+// 	drawText(page, data.characterName, PAGE_2_FIELDS.characterName, font);
 	
-	// Character Description
-	if (data.age) drawText(page, data.age, PAGE_2_FIELDS.age, font);
-	if (data.height) drawText(page, data.height, PAGE_2_FIELDS.height, font);
-	if (data.weight) drawText(page, data.weight, PAGE_2_FIELDS.weight, font);
-	if (data.eyes) drawText(page, data.eyes, PAGE_2_FIELDS.eyes, font);
-	if (data.skin) drawText(page, data.skin, PAGE_2_FIELDS.skin, font);
-	if (data.hair) drawText(page, data.hair, PAGE_2_FIELDS.hair, font);
+// 	// Character Description
+// 	if (data.age) drawText(page, data.age, PAGE_2_FIELDS.age, font);
+// 	if (data.height) drawText(page, data.height, PAGE_2_FIELDS.height, font);
+// 	if (data.weight) drawText(page, data.weight, PAGE_2_FIELDS.weight, font);
+// 	if (data.eyes) drawText(page, data.eyes, PAGE_2_FIELDS.eyes, font);
+// 	if (data.skin) drawText(page, data.skin, PAGE_2_FIELDS.skin, font);
+// 	if (data.hair) drawText(page, data.hair, PAGE_2_FIELDS.hair, font);
 	
-	// Backstory
-	if (data.personalityTraits) {
-		drawTextArea(page, data.personalityTraits, PAGE_2_FIELDS.personalityTraits, font, boldFont, italicFont);
-	}
-	if (data.ideals) {
-		drawTextArea(page, data.ideals, PAGE_2_FIELDS.ideals, font, boldFont, italicFont);
-	}
-	if (data.bonds) {
-		drawTextArea(page, data.bonds, PAGE_2_FIELDS.bonds, font, boldFont, italicFont);
-	}
-	if (data.flaws) {
-		drawTextArea(page, data.flaws, PAGE_2_FIELDS.flaws, font, boldFont, italicFont);
-	}
+// 	// Backstory
+// 	if (data.personalityTraits) {
+// 		drawTextArea(page, data.personalityTraits, PAGE_2_FIELDS.personalityTraits, font, boldFont, italicFont);
+// 	}
+// 	if (data.ideals) {
+// 		drawTextArea(page, data.ideals, PAGE_2_FIELDS.ideals, font, boldFont, italicFont);
+// 	}
+// 	if (data.bonds) {
+// 		drawTextArea(page, data.bonds, PAGE_2_FIELDS.bonds, font, boldFont, italicFont);
+// 	}
+// 	if (data.flaws) {
+// 		drawTextArea(page, data.flaws, PAGE_2_FIELDS.flaws, font, boldFont, italicFont);
+// 	}
 	
-	// Additional Content
-	// Features & Traits (continued from page 1)
-	if (data.featuresAndTraitsContinued) {
-		drawTextArea(page, data.featuresAndTraitsContinued, PAGE_2_FIELDS.featuresAndTraitsContinued, font, boldFont, italicFont);
-	}
-	if (data.additionalFeatures) {
-		drawTextArea(page, data.additionalFeatures, PAGE_2_FIELDS.additionalFeatures, font, boldFont, italicFont);
-	}
-	// // Spells & Cantrips (middle column)
-	// if (data.spellsAndCantrips) {
-	// 	drawTextArea(page, data.spellsAndCantrips, PAGE_2_FIELDS.spellsAndCantrips, font, boldFont, italicFont);
-	// }
-	// // Spells & Cantrips Continued (rightmost column - for overflow)
-	// if (data.spellsAndCantripsContinued) {
-	// 	drawTextArea(page, data.spellsAndCantripsContinued, PAGE_2_FIELDS.spellsAndCantripsContinued, font, boldFont, italicFont);
-	// }
-	if (data.treasureAndNotes) {
-		drawTextArea(page, data.treasureAndNotes, PAGE_2_FIELDS.treasureAndNotes, font, boldFont, italicFont);
-	}
-}
+// 	// Additional Content
+// 	// Features & Traits (continued from page 1)
+// 	if (data.featuresAndTraitsContinued) {
+// 		drawTextArea(page, data.featuresAndTraitsContinued, PAGE_2_FIELDS.featuresAndTraitsContinued, font, boldFont, italicFont);
+// 	}
+// 	if (data.additionalFeatures) {
+// 		drawTextArea(page, data.additionalFeatures, PAGE_2_FIELDS.additionalFeatures, font, boldFont, italicFont);
+// 	}
+// 	// // Spells & Cantrips (middle column)
+// 	// if (data.spellsAndCantrips) {
+// 	// 	drawTextArea(page, data.spellsAndCantrips, PAGE_2_FIELDS.spellsAndCantrips, font, boldFont, italicFont);
+// 	// }
+// 	// // Spells & Cantrips Continued (rightmost column - for overflow)
+// 	// if (data.spellsAndCantripsContinued) {
+// 	// 	drawTextArea(page, data.spellsAndCantripsContinued, PAGE_2_FIELDS.spellsAndCantripsContinued, font, boldFont, italicFont);
+// 	// }
+// 	if (data.treasureAndNotes) {
+// 		drawTextArea(page, data.treasureAndNotes, PAGE_2_FIELDS.treasureAndNotes, font, boldFont, italicFont);
+// 	}
+// }
 
 function fillFormField(form: any, fieldName: string, value: string) {
 	form.getTextField(fieldName).setText(value)
@@ -545,7 +545,8 @@ async function fillPageOneNew(
 	// TODO: go through all damage cantrips and add to the appropriate array
 	if (data.spells) {
 		
-		let str = JSON.stringify(data, null, 4); // (Optional) beautiful indented output.
+		// JSON DEBUGGING
+		let str = JSON.stringify(data, null, 4); // Indented output.
 		console.log(str); // Logs output to dev tools console.
 
 		let damageCantrips: Spell[];
@@ -658,10 +659,99 @@ async function fillPageOneNew(
 	// Core Actions
 	let core_actions: string[] = []
 	let core_bonus_actions: string[] = []
-	let core_reactions: string[] = []
+	let core_other: string[] = []
 
 	// TODO: based on class, subclass, species, and selected spells,
-	//		 populate the arrays with recommended actions, bonus actions, and reactions
+	//		 populate the arrays with recommended actions, bonus actions, and other (reactions & more)
+	
+	let str = JSON.stringify(data.features, null, 4); // (Optional) beautiful indented output.
+	console.log(str); // Logs output to dev tools console.
+
+	switch(data.classAndLevel.trim()) {
+		// Barbarian mostly does Attack & Rage, but has some subclass adds
+		case 'Barbarian':
+			core_actions.push('Attack');
+			core_actions.push('Reckless Attack');
+			core_bonus_actions.push('Rage');
+			
+			if (data.features.includes('Eagle Totem Warrior')) {
+				core_bonus_actions.push('Dash');
+			}
+
+			if (data.features.includes('Frenzy')) {
+				core_bonus_actions.push('Frenzy Attack');
+			}
+			break;
+
+		// Bard has a BA spell and a subclass feature
+		case 'Bard':
+			core_actions.push('Spellcasting');
+			core_actions.push('Attack');
+			core_bonus_actions.push('Bardic Inspiration');
+			
+			if (data.spells.filter(spell => {return spell.name == 'Healing Word'})) {
+				core_bonus_actions.push('Healing Word');
+			}
+
+			if (data.features.includes('Cutting Words')) {
+				core_bonus_actions.push('Cutting Words');
+			}
+			break;
+			
+		// Cleric has a variety of subclass adds, and BA spells.
+		case 'Cleric':
+			core_actions.push('Attack');
+			core_actions.push('Spellcasting');
+			core_actions.push('Channel Divinity');
+
+			if (data.features.includes('Blessing of the Trickster')) {
+				core_actions.push('Blessing of the Trickster')
+			}
+
+			if (data.features.includes('War Priest')) {
+				core_bonus_actions.push('War Priest Attack');
+			}
+
+			
+
+			break;
+
+		case 'Druid':
+			
+			break;
+
+		case 'Fighter':
+			
+			break;
+			
+		case 'Monk':
+			
+			break;
+		
+		case 'Paladin':
+			
+			break;
+
+		case 'Ranger':
+			
+			break;
+			
+		case 'Rogue':
+			
+			break;
+		
+		case 'Sorcerer':
+			
+			break;
+
+		case 'Warlock':
+			
+			break;
+			
+		case 'Wizard':
+			
+			break;
+	}
 
 	form.flatten()
 }

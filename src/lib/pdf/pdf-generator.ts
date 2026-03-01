@@ -5,21 +5,60 @@
  * at the positions defined in character-sheet-config.ts
  */
 
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { PDFDocument, rgb, StandardFonts, PDFForm, PDFFont, numberToString } from 'pdf-lib';
 import { PAGE_1_FIELDS, PAGE_2_FIELDS, PDF_CONFIG } from './character-sheet-config';
+import fontkit from '@pdf-lib/fontkit';
 import type { CharacterSheetData } from './character-data-mapper';
 import type { FieldConfig, TextAreaConfig } from './character-sheet-config';
+import type { Spell } from '$lib/data/spells';
 
 /**
  * Load the blank PDF template from static folder
  */
-async function loadTemplate(): Promise<PDFDocument> {
-	const response = await fetch(PDF_CONFIG.templatePath);
+
+async function loadTemplate(templateNumber: number): Promise<PDFDocument> {	
+	if (templateNumber < 0 || templateNumber > PDF_CONFIG.templatePaths.length - 1) {
+		throw new Error(`PDF template number out of range`);
+	}
+
+	const response = await fetch(PDF_CONFIG.templatePaths[templateNumber]);
 	if (!response.ok) {
 		throw new Error(`Failed to load PDF template: ${response.statusText}`);
 	}
 	const arrayBuffer = await response.arrayBuffer();
-	return await PDFDocument.load(arrayBuffer);
+
+	return await PDFDocument.load(arrayBuffer)
+}
+
+async function loadFontBuffer(fontNumber: number): Promise<ArrayBuffer> {
+	if (fontNumber < 0 || fontNumber > PDF_CONFIG.fontPaths.length - 1) {
+		throw new Error(`PDF font number out of range`);
+	}
+	
+	const response = await fetch(PDF_CONFIG.fontPaths[fontNumber]);
+	if (!response.ok) {
+		throw new Error(`Failed to load PDF font: ${response.statusText}`);
+	}
+	const arrayBuffer = await response.arrayBuffer();
+	return arrayBuffer
+}
+
+function fillField(
+	page: any,
+	field_name: string,
+	value: any,
+	config: FieldConfig,
+	font: any,
+) {
+	const fontSize = config.fontSize || PDF_CONFIG.defaultFontSize;
+	const color = rgb(
+		PDF_CONFIG.defaultColor.r,
+		PDF_CONFIG.defaultColor.g,
+		PDF_CONFIG.defaultColor.b
+	);
+
+	
+
 }
 
 /**
@@ -375,17 +414,273 @@ async function fillPage2(
 	if (data.additionalFeatures) {
 		drawTextArea(page, data.additionalFeatures, PAGE_2_FIELDS.additionalFeatures, font, boldFont, italicFont);
 	}
-	// Spells & Cantrips (middle column)
-	if (data.spellsAndCantrips) {
-		drawTextArea(page, data.spellsAndCantrips, PAGE_2_FIELDS.spellsAndCantrips, font, boldFont, italicFont);
-	}
-	// Spells & Cantrips Continued (rightmost column - for overflow)
-	if (data.spellsAndCantripsContinued) {
-		drawTextArea(page, data.spellsAndCantripsContinued, PAGE_2_FIELDS.spellsAndCantripsContinued, font, boldFont, italicFont);
-	}
+	// // Spells & Cantrips (middle column)
+	// if (data.spellsAndCantrips) {
+	// 	drawTextArea(page, data.spellsAndCantrips, PAGE_2_FIELDS.spellsAndCantrips, font, boldFont, italicFont);
+	// }
+	// // Spells & Cantrips Continued (rightmost column - for overflow)
+	// if (data.spellsAndCantripsContinued) {
+	// 	drawTextArea(page, data.spellsAndCantripsContinued, PAGE_2_FIELDS.spellsAndCantripsContinued, font, boldFont, italicFont);
+	// }
 	if (data.treasureAndNotes) {
 		drawTextArea(page, data.treasureAndNotes, PAGE_2_FIELDS.treasureAndNotes, font, boldFont, italicFont);
 	}
+}
+
+function fillFormField(form: any, fieldName: string, value: string) {
+	form.getTextField(fieldName).setText(value)
+}
+
+async function fillPageOneNew(
+	page: any,
+	data: CharacterSheetData,
+	font: any,
+	boldFont: any,
+	italicFont: any
+) {
+	
+	const form = page.getForm();
+	
+	// - - - - -
+	// Info Box
+	fillFormField(form, 'class_info', data.classAndLevel);
+	fillFormField(form, 'background_info', data.background);
+	//fillFormField(form, 'player_info', 'value');
+	fillFormField(form, 'species_info', data.species);
+	//fillFormField(form, 'alignment_info', 'value');
+	//fillFormField(form, 'character_name', 'value');
+
+	// - - - - -
+	// Stats
+	fillFormField(form, 'str_mod', data.abilityScores.strength.modifier);
+	fillFormField(form, 'dex_mod', data.abilityScores.dexterity.modifier);
+	fillFormField(form, 'con_mod', data.abilityScores.constitution.modifier);
+	fillFormField(form, 'int_mod', data.abilityScores.intelligence.modifier);
+	fillFormField(form, 'wis_mod', data.abilityScores.wisdom.modifier);
+	fillFormField(form, 'cha_mod', data.abilityScores.charisma.modifier);
+
+	fillFormField(form, 'str_stat', data.abilityScores.strength.score);
+	fillFormField(form, 'dex_stat', data.abilityScores.dexterity.score);
+	fillFormField(form, 'con_stat', data.abilityScores.constitution.score);
+	fillFormField(form, 'int_stat', data.abilityScores.intelligence.score);
+	fillFormField(form, 'wis_stat', data.abilityScores.wisdom.score);
+	fillFormField(form, 'cha_stat', data.abilityScores.charisma.score);
+
+	// - - - - -
+	// Battle Stats
+	fillFormField(form, 'armor_class', data.armorClass);
+	fillFormField(form, 'initiative', data.initiative);
+	fillFormField(form, 'speed', data.speed);
+	fillFormField(form, 'health', '/' + data.hitPointMaximum);
+
+	// - - - - -
+	// Saving Throws
+	fillFormField(form, 'str_save', data.savingThrows.strength);
+	fillFormField(form, 'dex_save', data.savingThrows.dexterity);
+	fillFormField(form, 'con_save', data.savingThrows.constitution);
+	fillFormField(form, 'int_save', data.savingThrows.intelligence);
+	fillFormField(form, 'wis_save', data.savingThrows.wisdom);
+	fillFormField(form, 'cha_save', data.savingThrows.charisma);
+
+	// - - - - -
+	// Skills
+	fillFormField(form, 'acrobatics', data.skills['acrobatics']);
+	fillFormField(form, 'animal_handling', data.skills['animalHandling']);
+	fillFormField(form, 'arcana', data.skills['arcana']);
+	fillFormField(form, 'athletics', data.skills['athletics']);
+	fillFormField(form, 'deception', data.skills['deception']);
+	fillFormField(form, 'history', data.skills['history']);
+	fillFormField(form, 'insight', data.skills['insight']);
+	fillFormField(form, 'intimidation', data.skills['intimidation']);
+	fillFormField(form, 'investigation', data.skills['investigation']);
+	fillFormField(form, 'medicine', data.skills['medicine']);
+	fillFormField(form, 'nature', data.skills['nature']);
+	fillFormField(form, 'perception', data.skills['perception']);
+	fillFormField(form, 'performance', data.skills['performance']);
+	fillFormField(form, 'persuasion', data.skills['persuasion']);
+	fillFormField(form, 'religion', data.skills['religion']);
+	fillFormField(form, 'sleight_of_hand', data.skills['sleightOfHand']);
+	fillFormField(form, 'stealth', data.skills['stealth']);
+	fillFormField(form, 'survival', data.skills['survival']);
+
+	// - - - - -
+	// Attacks & Spellcasting
+	let attacks_names: string[] = [];
+	let attacks_to_hit: string[] = [];
+	let attacks_damage: string[] = [];
+	let attacks_notes: string[] = [];
+	
+	data.attacks.forEach((attack, index) => {
+		if (index < PAGE_1_FIELDS.attacks.length) {
+			attacks_names.push(attack.name);
+			attacks_to_hit.push('d20 ' + attack.bonus);
+			attacks_damage.push(attack.damage);
+			
+			let build_attacks_notes = "";
+			let properties_blacklist = ["Ammunition", "Heavy", "Loading"];
+			for (let i = 0; i < attack.properties.length; i++) {
+				if (!properties_blacklist.includes(attack.properties[i])) {
+					build_attacks_notes += attack.properties[i] + ", ";
+				}
+			}
+			// Trim away the final trailing comma and space
+			if (build_attacks_notes.length > 2) {
+				build_attacks_notes = build_attacks_notes.slice(0, build_attacks_notes.length - 2)
+			}
+			attacks_notes.push(build_attacks_notes);
+		}
+	});
+
+	let attacks_names_string: string = "";
+	let attacks_to_hit_string: string = "";
+	let attacks_damage_string: string = "";
+	let attacks_notes_string: string = "";
+	for (let i = 0; i < attacks_names.length; i++) {
+		attacks_names_string += attacks_names[i] + '\n';
+		attacks_to_hit_string += attacks_to_hit[i] + '\n';
+		attacks_damage_string += attacks_damage[i] + '\n';
+		attacks_notes_string += attacks_notes[i] + '\n';
+	}
+
+	// TODO: go through all damage cantrips and add to the appropriate array
+	if (data.spells) {
+		
+		let str = JSON.stringify(data, null, 4); // (Optional) beautiful indented output.
+		console.log(str); // Logs output to dev tools console.
+
+		let damageCantrips: Spell[];
+		damageCantrips = data.spells.filter(spell => {
+			if (spell.level == 0 && spell.tags) {
+				return (spell.tags.includes('SpellAttack')) || (spell.tags.includes('SpellSave'))
+			}
+		})
+
+		if (damageCantrips.length >= 1) {
+			attacks_names_string += '\n';
+			attacks_to_hit_string += '\n';
+			attacks_damage_string += '\n';
+			attacks_notes_string += '\n';
+		}
+
+		for (let i = 0; i < damageCantrips.length; i++) {
+			// Cantrip name
+			attacks_names_string += damageCantrips[i].name + '\n';
+
+			// TODO: To Hit / DC 
+			// First, figure out what class we are and what ability score we are looking for
+			const castingAbilities = new Map([
+				// barbarian is included just for completeness. If they have spells that use a casting modifier, they probably got it from a species. 
+				//			 I set the default to be intelligence, since most species that give magic use that. The only significant exception is Drow, but this is a quick solution.
+				["Barbarian", "intelligence"],
+				["Bard", "charisma"],
+				["Cleric", "wisdom"],
+				["Druid", "wisdom"],
+				// Eld Knight
+				["Fighter", "intelligence"],
+				// Ki-based disciplines
+				["Monk", "wisdom"],
+				["Paladin", "charisma"],
+				["Ranger", "wisdom"],
+				// Trickster
+				["Rogue", "intelligence"],
+				["Sorcerer", "charisma"],
+				["Warlock", "charisma"],
+				["Wizard", "intelligence"],
+			]);
+
+			let relevantCastingAbility = castingAbilities.get(data.classAndLevel.trim())
+			let castingAbilityScore: string
+
+			switch(relevantCastingAbility) {
+				case 'intelligence':
+					castingAbilityScore = data.abilityScores.intelligence.score;
+					break;
+				case 'wisdom':
+					castingAbilityScore = data.abilityScores.wisdom.score;
+					break;
+				case 'charisma':
+					castingAbilityScore = data.abilityScores.charisma.score;
+					break;
+				default:
+					castingAbilityScore = data.abilityScores.intelligence.score;
+					break;
+				}
+
+			// Once a score is fetched, find the modifier (doing it this way so we dont have to deal with the already signed mod value)
+			let castingAbilityMod = Math.floor((Number(castingAbilityScore) - 10) / 2);
+			
+			// Compute Spell Save & Spell Attack
+			let spellSaveDC = 10 + castingAbilityMod;
+			let spellAttackBonus = 2 + castingAbilityMod;
+
+			// After the math is complete, we can finally add a '+' if needed. 
+			let spellAttackBonusSigned: string;
+			if (spellAttackBonus > 0) {
+				spellAttackBonusSigned = '+' + spellAttackBonus;
+			} else {
+				spellAttackBonusSigned = '' + spellAttackBonus;
+			}
+
+			let cantripTags = damageCantrips[i].tags
+			// Spell Attack cantrips: format like 'd20 + 5'
+			if (cantripTags && cantripTags.includes('SpellAttack')) {
+				attacks_to_hit_string += 'd20 ' + spellAttackBonusSigned + '\n';
+			// Spell Save cantrips: format like 'DC 12'
+			} else if (cantripTags && cantripTags.includes('SpellSave')) {
+				attacks_to_hit_string += 'DC ' + spellSaveDC + '\n';
+			// If something goes wrong, still increment our newline spacing
+			} else {
+				attacks_to_hit_string += '\n';
+			}
+
+			// Cantrip damage & type
+			if (damageCantrips[i].quickReferenceStats && damageCantrips[i].quickReferenceStats?.get('damage')) {
+				attacks_damage_string += damageCantrips[i].quickReferenceStats?.get('damage') + '\n';
+			} else {
+				attacks_damage_string += '\n';
+			}
+
+			// Cantrip Notes
+			if (damageCantrips[i].quickReferenceStats && damageCantrips[i].quickReferenceStats?.get('properties')) {
+				attacks_notes_string += damageCantrips[i].quickReferenceStats?.get('properties') + '\n';
+			} else {
+				attacks_notes_string += '\n';
+			}
+		}
+	}
+
+	fillFormField(form, 'attacks_names', attacks_names_string);
+	fillFormField(form, 'attacks_to_hit', attacks_to_hit_string);
+	fillFormField(form, 'attacks_damage', attacks_damage_string);
+	fillFormField(form, 'attacks_notes', attacks_notes_string);
+	
+	// - - - - -
+	// Core Actions
+	let core_actions: string[] = []
+	let core_bonus_actions: string[] = []
+	let core_reactions: string[] = []
+
+	// TODO: based on class, subclass, species, and selected spells,
+	//		 populate the arrays with recommended actions, bonus actions, and reactions
+
+	form.flatten()
+}
+
+async function fillPageTwoNew(
+	page: any,
+	data: CharacterSheetData,
+	font: any,
+	boldFont: any,
+	italicFont: any
+) {
+	const form = page.getForm()
+
+	//console.log('data dump: ' + data.spells)
+	// let str = JSON.stringify(data, null, 4); // (Optional) beautiful indented output.
+	// console.log(str); // Logs output to dev tools console.
+	// alert(str); // Displays output using window.alert()
+
+	form.flatten()
 }
 
 /**
@@ -394,28 +689,53 @@ async function fillPage2(
  */
 export async function generateCharacterSheet(data: CharacterSheetData): Promise<string> {
 	try {
-		// Load template
-		const pdfDoc = await loadTemplate();
-		
-		// Get pages
-		const pages = pdfDoc.getPages();
-		if (pages.length < 2) {
-			throw new Error('PDF template must have at least 2 pages');
+		// Load templates
+		const pageOneDoc = await loadTemplate(0);
+		const pageTwoDoc = await loadTemplate(1);
+
+		const fontOneBuffer = await loadFontBuffer(0);
+		//const fontTwoBuffer = await loadFontBuffer(1);
+
+		pageOneDoc.registerFontkit(fontkit);
+		let pageOneFonts: PDFFont[] = [
+			await pageOneDoc.embedFont(StandardFonts.Helvetica),
+			await pageOneDoc.embedFont(StandardFonts.HelveticaBold),
+			await pageOneDoc.embedFont(StandardFonts.HelveticaOblique),
+			await pageOneDoc.embedFont(fontOneBuffer),
+			// Consider adding other custom font (#2 and onwards)
+		]
+
+		pageTwoDoc.registerFontkit(fontkit);
+		let pageTwoFonts: PDFFont[] = [
+			await pageTwoDoc.embedFont(StandardFonts.Helvetica),
+			await pageTwoDoc.embedFont(StandardFonts.HelveticaBold),
+			await pageTwoDoc.embedFont(StandardFonts.HelveticaOblique),
+			await pageTwoDoc.embedFont(fontOneBuffer),
+			// Consider adding other custom font (#2 and onwards)
+		]
+			
+		// Check that we have the expected template docs
+		if (!pageOneDoc || !pageTwoDoc) {
+			throw new Error('Missing PDF Template');
 		}
 		
-		const page1 = pages[0];
-		const page2 = pages[1];
-		
-		// Embed fonts
-		const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-		const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-		const italicFont = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
+		const page_one = pageOneDoc.getPages()[0];
+		const page_two = pageTwoDoc.getPages()[0];
 		
 		// Fill pages with data
-		await fillPage1(page1, data, font, boldFont, italicFont);
-		await fillPage2(page2, data, font, boldFont, italicFont);
+		await fillPageOneNew(pageOneDoc, data, pageOneFonts[3], pageOneFonts[1], pageOneFonts[2]);
+		await fillPageTwoNew(pageTwoDoc, data, pageTwoFonts[3], pageTwoFonts[1], pageTwoFonts[2]);
 		
-		const pdfBytes = await pdfDoc.save();
+		let freshPdfDoc = await PDFDocument.create()
+
+		const [firstPageCopy] = await freshPdfDoc.copyPages(pageOneDoc, [0])
+		const [secondPageCopy] = await freshPdfDoc.copyPages(pageTwoDoc, [0])
+
+		freshPdfDoc.addPage(firstPageCopy)
+		freshPdfDoc.addPage(secondPageCopy)
+
+		const pdfBytes = await freshPdfDoc.save();
+
 		const byteArray = new Uint8Array(pdfBytes);
 		const blob = new Blob([byteArray], { type: 'application/pdf' });
 		return URL.createObjectURL(blob);

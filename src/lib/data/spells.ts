@@ -12,6 +12,7 @@ export interface Spell {
 	ritual?: boolean;
 	isRareUse?: boolean;
 	tags?: SpellTag[];
+	quickReferenceStats?: Map<string, string>;
 }
 
 export interface SpellAccess {
@@ -54,7 +55,11 @@ export const cantrips: Spell[] = [
 		description:
 			'You hurl a bubble of acid. Choose one or two creatures you can see within range. If you choose two, they must be within 5 feet of each other. A target must succeed on a Dexterity saving throw or take 1d6 acid damage.',
 		classes: ['Druid', 'Sorcerer', 'Wizard'],
-		tags: ['SpellSave']
+		tags: ['SpellSave'],
+		quickReferenceStats: new Map([
+			["damage", "1d6 Acid"],
+			["properties", "Range (60ft), Two Target (5ft)"],
+		]),
 	},
 	{
 		name: 'Blade Ward',
@@ -81,7 +86,11 @@ export const cantrips: Spell[] = [
 		description:
 			"You create a ghostly, skeletal hand in the space of a creature within range. Make a ranged spell attack against the creature to assail it with the chill of the grave. On a hit, the target takes 1d8 necrotic damage, and it can't regain hit points until the start of your next turn. Until then, the hand clings to the target. \nIf you hit an undead target, it also has disadvantage on attack rolls against you until the end of your next turn.",
 		classes: ['Druid', 'Sorcerer', 'Warlock', 'Wizard'],
-		tags: ['SpellAttack', 'Debuff']
+		tags: ['SpellAttack', 'Debuff'],
+		quickReferenceStats: new Map([
+			["damage", "1d8 Necrotic"],
+			["properties", "Range (120ft), Debuff"],
+		]),
 	},
 	{
 		name: 'Dancing Lights',
@@ -120,7 +129,11 @@ export const cantrips: Spell[] = [
 		description:
 			'A beam of crackling energy streaks toward a creature within range. Make a ranged spell attack against the target. On a hit, the target takes 1d10 force damage.',
 		classes: ['Warlock'],
-		tags: ['SpellAttack']
+		tags: ['SpellAttack'],
+		quickReferenceStats: new Map([
+			["damage", "1d10 Force"],
+			["properties", "Range (120ft)"],
+		]),
 	},
 	{
 		name: 'Fire Bolt',
@@ -133,7 +146,11 @@ export const cantrips: Spell[] = [
 		description:
 			"You hurl a mote of fire at a creature or object within range. Make a ranged spell attack against the target. On a hit, the target takes 1d10 fire damage. A flammable object hit by this spell ignites if it isn't being worn or carried.",
 		classes: ['Sorcerer', 'Wizard'],
-		tags: ['SpellAttack']
+		tags: ['SpellAttack'],
+		quickReferenceStats: new Map([
+			["damage", "1d10 Fire"],
+			["properties", "Range (120ft)"],
+		]),
 	},
 	{
 		name: 'Friends',
@@ -240,7 +257,11 @@ export const cantrips: Spell[] = [
 		description:
 			'You extend your hand toward a creature you can see within range and project a puff of noxious gas from your palm. The creature must succeed on a Constitution saving throw or take 1d12 poison damage.',
 		classes: ['Druid', 'Sorcerer', 'Warlock', 'Wizard'],
-		tags: ['SpellSave']
+		tags: ['SpellSave'],
+		quickReferenceStats: new Map([
+			["damage", "1d12 Poison"],
+			["properties", "Range (10ft)"],
+		]),
 	},
 	{
 		name: 'Prestidigitation',
@@ -266,7 +287,11 @@ export const cantrips: Spell[] = [
 		description:
 			'A flickering flame appears in your hand. The flame remains there for the duration and harms neither you nor your equipment. The flame sheds bright light in a 10-foot radius and dim light for an additional 10 feet. The spell ends if you dismiss it as an action or if you cast it again.\nYou can also attack with the flame, although doing so ends the spell. When you cast this spell, or as an action on a later turn, you can hurl the flame at a creature within 30 feet of you. Make a ranged spell attack. On a hit, the target takes 1d8 fire damage.',
 		classes: ['Druid'],
-		tags: ['SpellAttack', 'Utility']
+		tags: ['SpellAttack', 'Utility'],
+		quickReferenceStats: new Map([
+			["damage", "1d8 Fire"],
+			["properties", "Range (30ft)"],
+		]),
 	},
 	{
 		name: 'Ray of Frost',
@@ -279,7 +304,11 @@ export const cantrips: Spell[] = [
 		description:
 			'A frigid beam of blue-white light streaks toward a creature within range. Make a ranged spell attack against the target. On a hit, it takes 1d8 cold damage, and its speed is reduced by 10 feet until the start of your next turn.',
 		classes: ['Sorcerer', 'Wizard'],
-		tags: ['SpellAttack', 'Debuff']
+		tags: ['SpellAttack', 'Debuff'],
+		quickReferenceStats: new Map([
+			["damage", "1d8 Cold"],
+			["properties", "Range (60ft), Debuff"],
+		]),
 	},
 	{
 		name: 'Resistance',
@@ -305,7 +334,11 @@ export const cantrips: Spell[] = [
 		description:
 			'Flame-like radiance descends on a creature that you can see within range. The target must succeed on a Dexterity saving throw or take 1d8 radiant damage. The target gains no benefit from cover for this saving throw.',
 		classes: ['Cleric'],
-		tags: ['SpellSave']
+		tags: ['SpellSave'],
+		quickReferenceStats: new Map([
+			["damage", "1d8 Radiant"],
+			["properties", "Range (60ft)"],
+		]),
 	},
 	{
 		name: 'Shillelagh',
@@ -331,7 +364,11 @@ export const cantrips: Spell[] = [
 		description:
 			"Lightning springs from your hand to deliver a shock to a creature you try to touch. Make a melee spell attack against the target. You have advantage on the attack roll if the target is wearing armor made of metal. On a hit, the target takes 1d8 lightning damage, and it can't take reactions until the start of its next turn.",
 		classes: ['Sorcerer', 'Wizard'],
-		tags: ['SpellAttack', 'Debuff']
+		tags: ['SpellAttack', 'Debuff'],
+		quickReferenceStats: new Map([
+			["damage", "1d8 Lightning"],
+			["properties", ""],
+		]),
 	},
 	{
 		name: 'Spare the Dying',
@@ -371,7 +408,11 @@ export const cantrips: Spell[] = [
 		description:
 			'You create a long, vine-like whip covered in thorns that lashes out at your command toward a creature in range. Make a melee spell attack against the target. If the attack hits, the creature takes 1d6 piercing damage, and if the creature is Large or smaller, you pull the creature up to 10 feet closer to you.',
 		classes: ['Druid'],
-		tags: ['SpellAttack']
+		tags: ['SpellAttack'],
+		quickReferenceStats: new Map([
+			["damage", "1d6 Piercing"],
+			["properties", "Range (30ft), Pull (10ft)"],
+		]),
 	},
 	{
 		name: 'True Strike',
@@ -398,7 +439,11 @@ export const cantrips: Spell[] = [
 		description:
 			'You unleash a string of insults laced with subtle enchantments at a creature you can see within range. If the target can hear you (though it need not understand you), it must succeed on a Wisdom saving throw or take 1d4 psychic damage and have disadvantage on the next attack roll it makes before the end of its next turn.',
 		classes: ['Bard'],
-		tags: ['SpellSave', 'Debuff']
+		tags: ['SpellSave', 'Debuff'],
+		quickReferenceStats: new Map([
+			["damage", "1d4 Psychic"],
+			["properties", "Range (60ft), Debuff"],
+		]),
 	}
 ];
 
@@ -2793,4 +2838,16 @@ export function getSpellAccessForCharacter(character: any): SpellAccess[] {
 	}
 
 	return access;
+}
+
+// Look up a Spell object by name. Returns the first spell of that name, or undefined.
+export function getSpellByName(spellName: string): Spell | undefined {
+	var result = spells.filter(spell => {
+	return spell.name === spellName
+	})
+	
+	if (result && result.length >= 1) {
+		return result[0]
+	}
+	return undefined
 }

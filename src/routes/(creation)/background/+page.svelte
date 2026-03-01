@@ -190,20 +190,20 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 	onMount(async () => {
 		const state = get(character_store);
 		if (!state.background) {
-			console.log('[BG DEBUG] No background selected, skipping restoration');
+			//console.log('[BG DEBUG] No background selected, skipping restoration');
 			return;
 		}
 
-		console.log('[BG DEBUG] Starting background restoration for:', state.background);
+		//console.log('[BG DEBUG] Starting background restoration for:', state.background);
 
 		// Find selected background
 		const found = backgrounds.find((bg) => bg.name === state.background);
 		if (!found) {
-			console.log('[BG DEBUG] Background not found in data:', state.background);
+			//console.log('[BG DEBUG] Background not found in data:', state.background);
 			return;
 		}
 
-		console.log('[BG DEBUG] Found background data:', found.name, 'with', found.backgroundFeatures?.length || 0, 'features');
+		//console.log('[BG DEBUG] Found background data:', found.name, 'with', found.backgroundFeatures?.length || 0, 'features');
 
 		selectedBackgroundData = found;
 		featureSelections = {};
@@ -213,14 +213,14 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 		// Helper: convert stored snake_case value to display label
 		const tryRestoreFromValue = (val: string, optionMap: Map<string, string>) => {
 			const snakeVal = toSnakeCase(val);
-			console.log('[BG DEBUG] Trying to restore value:', val, '-> snake_case:', snakeVal);
+			//console.log('[BG DEBUG] Trying to restore value:', val, '-> snake_case:', snakeVal);
 			for (const [key, label] of optionMap.entries()) {
 				if (snakeVal.includes(key)) {
-					console.log('[BG DEBUG] Match found!', snakeVal, 'matches', key, '-> label:', label);
+					//console.log('[BG DEBUG] Match found!', snakeVal, 'matches', key, '-> label:', label);
 					return label;
 				}
 			}
-			console.log('[BG DEBUG] No match found for:', snakeVal);
+			//console.log('[BG DEBUG] No match found for:', snakeVal);
 			return null;
 		};
 
@@ -243,7 +243,7 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 
 		// Recursive function to restore nested features with parent context
 		const restoreNestedFeatureSelection = async (feature: FeaturePrompt, parentFeatureName: string, parentIndex: number) => {
-			console.log('[BG DEBUG] Restoring nested feature:', feature.name, 'with parent:', parentFeatureName, 'index:', parentIndex);
+			//console.log('[BG DEBUG] Restoring nested feature:', feature.name, 'with parent:', parentFeatureName, 'index:', parentIndex);
 
 			const numPicks = feature.featureOptions?.numPicks || 1;
 			
@@ -264,7 +264,7 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 			for (let idx = 0; idx < numPicks; idx++) {
 				// Skip if already restored
 				if (featureSelections[feature.name][idx]) {
-					console.log('[BG DEBUG] Nested feature', feature.name, 'index', idx, 'already restored');
+					//console.log('[BG DEBUG] Nested feature', feature.name, 'index', idx, 'already restored');
 					continue;
 				}
 
@@ -272,7 +272,7 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 				const key = `feature:${parentFeatureName}:${parentIndex}:${feature.name}:${idx}`;
 				const stored: any = prov[key];
 
-				console.log('[BG DEBUG] Nested restore: Feature', feature.name, 'parent', parentFeatureName, 'idx', idx, 'key', key, 'stored:', stored);
+				//console.log('[BG DEBUG] Nested restore: Feature', feature.name, 'parent', parentFeatureName, 'idx', idx, 'key', key, 'stored:', stored);
 
 				let restored: string | null = null;
 
@@ -308,10 +308,10 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 
 				// If no direct provenance found, try to infer from deeper nested provenance
 				if (!restored && feature.featureOptions?.options) {
-					console.log('[BG DEBUG] Nested feature', feature.name, 'has no direct provenance, checking deeper nested options...');
+					//console.log('[BG DEBUG] Nested feature', feature.name, 'has no direct provenance, checking deeper nested options...');
 					for (const opt of feature.featureOptions.options) {
 						if (typeof opt !== 'string' && opt.nestedPrompts) {
-							console.log('[BG DEBUG] Checking nested option', opt.name, 'with', opt.nestedPrompts.length, 'nested prompts');
+							//console.log('[BG DEBUG] Checking nested option', opt.name, 'with', opt.nestedPrompts.length, 'nested prompts');
 							// Check if any deeper nested prompt of this option has provenance
 							for (const nested of opt.nestedPrompts) {
 								const hasNestedProv = Object.keys(prov).some(k => 
@@ -319,11 +319,11 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 								);
 								const hasDeeperProv = checkDeeperNestedProvenance(nested, prov);
 								
-								console.log('[BG DEBUG] Nested Feature', feature.name, 'Option', opt.name, 'Deeper Nested', nested.name, 'hasNestedProv:', hasNestedProv, 'hasDeeperProv:', hasDeeperProv);
+								//console.log('[BG DEBUG] Nested Feature', feature.name, 'Option', opt.name, 'Deeper Nested', nested.name, 'hasNestedProv:', hasNestedProv, 'hasDeeperProv:', hasDeeperProv);
 								
 								if (hasNestedProv || hasDeeperProv) {
 									restored = opt.name;
-									console.log('[BG DEBUG] Inferred nested selection:', opt.name, 'for nested feature', feature.name);
+									//console.log('[BG DEBUG] Inferred nested selection:', opt.name, 'for nested feature', feature.name);
 									break;
 								}
 							}
@@ -334,7 +334,7 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 
 				if (restored) {
 					featureSelections[feature.name][idx] = restored;
-					console.log('[BG DEBUG] Set nested featureSelections[\'', feature.name, '\'][', idx, '] =', restored);
+					//console.log('[BG DEBUG] Set nested featureSelections[\'', feature.name, '\'][', idx, '] =', restored);
 				}
 			}
 			
@@ -356,16 +356,16 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 
 		// Recursive function to restore a feature and its nested prompts
 		const restoreFeatureSelection = async (feature: FeaturePrompt) => {
-			console.log('[BG DEBUG] Processing feature:', feature.name, 'with options:', !!feature.featureOptions);
+			//console.log('[BG DEBUG] Processing feature:', feature.name, 'with options:', !!feature.featureOptions);
 
 			// Skip features without options - they don't need restoration
 			if (!feature.featureOptions) {
-				console.log('[BG DEBUG] Skipping feature', feature.name, 'no featureOptions');
+				//console.log('[BG DEBUG] Skipping feature', feature.name, 'no featureOptions');
 				return;
 			}
 
 			const numPicks = feature.featureOptions.numPicks || 1;
-			console.log('[BG DEBUG] Feature', feature.name, 'numPicks:', numPicks);
+			//console.log('[BG DEBUG] Feature', feature.name, 'numPicks:', numPicks);
 
 			if (!featureSelections[feature.name]) {
 				featureSelections[feature.name] = Array(numPicks).fill(null);
@@ -380,25 +380,25 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 					typeof o === 'string' ? o : o.name
 				])
 			);
-			console.log('[BG DEBUG] Feature', feature.name, 'has', opts.length, 'options:', opts.map(o => typeof o === 'string' ? o : o.name));
+			//console.log('[BG DEBUG] Feature', feature.name, 'has', opts.length, 'options:', opts.map(o => typeof o === 'string' ? o : o.name));
 
 			const prov = state._provenance || {};
-			console.log('[BG DEBUG] Provenance keys for', feature.name, ':', Object.keys(prov).filter(k => k.includes(feature.name)));
+			//console.log('[BG DEBUG] Provenance keys for', feature.name, ':', Object.keys(prov).filter(k => k.includes(feature.name)));
 
 			for (let idx = 0; idx < numPicks; idx++) {
 				// Skip if already restored
 				if (featureSelections[feature.name][idx]) {
-					console.log('[BG DEBUG] Feature', feature.name, 'index', idx, 'already restored');
+					//console.log('[BG DEBUG] Feature', feature.name, 'index', idx, 'already restored');
 					continue;
 				}
 
 				const key = `feature:${feature.name}:${idx}`;
 				const stored: any = prov[key];
 
-				console.log('[BG DEBUG] Restore: Feature', feature.name, 'idx', idx, 'key', key, 'stored:', stored);
+				//console.log('[BG DEBUG] Restore: Feature', feature.name, 'idx', idx, 'key', key, 'stored:', stored);
 
 				if (!stored) {
-					console.log('[BG DEBUG] No stored data for key:', key);
+					//console.log('[BG DEBUG] No stored data for key:', key);
 					continue;
 				}
 
@@ -406,7 +406,7 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 
 				// Try to restore from _set values
 				if (stored._set) {
-					console.log('[BG DEBUG] Found _set data for', feature.name, ':', stored._set);
+					//console.log('[BG DEBUG] Found _set data for', feature.name, ':', stored._set);
 					
 					// First try matching against effect targets
 					for (const effect of feature.effects || []) {
@@ -429,9 +429,9 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 
 					// If not found via effects, try all _set keys directly
 					if (!restored) {
-						console.log('[BG DEBUG] Trying all _set keys directly for', feature.name);
+						//console.log('[BG DEBUG] Trying all _set keys directly for', feature.name);
 						for (const [setKey, setVal] of Object.entries(stored._set)) {
-							console.log('[BG DEBUG] Checking _set key:', setKey, 'value:', setVal);
+							//console.log('[BG DEBUG] Checking _set key:', setKey, 'value:', setVal);
 							if (Array.isArray(setVal)) {
 								for (const val of setVal) {
 									const maybe = tryRestoreFromValue(String(val), optionMap);
@@ -451,7 +451,7 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 
 				// Try to restore from _mods (for ability score bumps etc.)
 				if (!restored && stored._mods) {
-					console.log('[BG DEBUG] Trying _mods for', feature.name, ':', stored._mods);
+					//console.log('[BG DEBUG] Trying _mods for', feature.name, ':', stored._mods);
 					for (const modKey of Object.keys(stored._mods)) {
 						const maybe = tryRestoreFromValue(modKey, optionMap);
 						if (maybe) {
@@ -464,10 +464,10 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 				// If no direct provenance found, try to infer from nested provenance
 				// This handles features with empty effects
 				if (!restored && feature.featureOptions?.options) {
-					console.log('[BG DEBUG] Feature', feature.name, 'has no direct provenance, checking nested options...');
+					//console.log('[BG DEBUG] Feature', feature.name, 'has no direct provenance, checking nested options...');
 					for (const opt of feature.featureOptions.options) {
 						if (typeof opt !== 'string' && opt.nestedPrompts) {
-							console.log('[BG DEBUG] Checking option', opt.name, 'with', opt.nestedPrompts.length, 'nested prompts');
+							//console.log('[BG DEBUG] Checking option', opt.name, 'with', opt.nestedPrompts.length, 'nested prompts');
 							// Check if any nested prompt of this option has provenance
 							for (const nested of opt.nestedPrompts) {
 								const hasNestedProv = Object.keys(prov).some(k => 
@@ -475,11 +475,11 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 								);
 								const hasDeeperProv = checkDeeperNestedProvenance(nested, prov);
 								
-								console.log('[BG DEBUG] Feature', feature.name, 'Option', opt.name, 'Nested', nested.name, 'hasNestedProv:', hasNestedProv, 'hasDeeperProv:', hasDeeperProv);
+								//console.log('[BG DEBUG] Feature', feature.name, 'Option', opt.name, 'Nested', nested.name, 'hasNestedProv:', hasNestedProv, 'hasDeeperProv:', hasDeeperProv);
 								
 								if (hasNestedProv || hasDeeperProv) {
 									restored = opt.name;
-									console.log('[BG DEBUG] Inferred selection:', opt.name, 'for feature', feature.name);
+									//console.log('[BG DEBUG] Inferred selection:', opt.name, 'for feature', feature.name);
 									break;
 								}
 							}
@@ -490,9 +490,9 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 
 				if (restored) {
 					featureSelections[feature.name][idx] = restored;
-					console.log('[BG DEBUG] Set featureSelections[\'', feature.name, '\'][', idx, '] =', restored);
+					//console.log('[BG DEBUG] Set featureSelections[\'', feature.name, '\'][', idx, '] =', restored);
 				} else {
-					console.log('[BG DEBUG] Failed to restore any value for feature:', feature.name, 'index:', idx);
+					//console.log('[BG DEBUG] Failed to restore any value for feature:', feature.name, 'index:', idx);
 				}
 			}
 
@@ -502,7 +502,7 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 					if (typeof o !== 'string' && o.nestedPrompts) {
 						const selectedVal = featureSelections[feature.name].find((v) => v === o.name);
 						if (selectedVal) {
-							console.log('[BG DEBUG] Found selection for', o.name, 'restoring nested prompts');
+							//console.log('[BG DEBUG] Found selection for', o.name, 'restoring nested prompts');
 							for (const nested of o.nestedPrompts) {
 								// Pass parent context to nested restoration
 								await restoreNestedFeatureSelection(nested, feature.name, 0);
@@ -510,7 +510,7 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 						} else {
 							// Even if parent selection is not restored, check if nested prompts have provenance data
 							// This handles cases where the parent selection restoration failed but nested data exists
-							console.log('[BG DEBUG] Parent selection for', o.name, 'not found, checking for nested provenance');
+							//console.log('[BG DEBUG] Parent selection for', o.name, 'not found, checking for nested provenance');
 							for (const nested of o.nestedPrompts) {
 								// Check for provenance at any index for this nested feature
 								const hasNestedProvenance = Object.keys(prov).some(k => 
@@ -521,14 +521,14 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 								const hasDeeperNestedProvenance = checkDeeperNestedProvenance(nested, prov);
 								
 								if (hasNestedProvenance || hasDeeperNestedProvenance) {
-									console.log('[BG DEBUG] Found nested provenance for', nested.name, 'forcing parent selection');
+									//console.log('[BG DEBUG] Found nested provenance for', nested.name, 'forcing parent selection');
 									// Force parent selection to match this nested data existence
 									if (!featureSelections[feature.name].includes(o.name)) {
 										// Find first empty slot and set the parent selection
 										const emptyIdx = featureSelections[feature.name].findIndex((v) => v === null);
 										if (emptyIdx !== -1) {
 											featureSelections[feature.name][emptyIdx] = o.name;
-											console.log('[BG DEBUG] Set parent selection', o.name, 'at index', emptyIdx);
+											//console.log('[BG DEBUG] Set parent selection', o.name, 'at index', emptyIdx);
 										}
 									}
 									// Now restore the nested prompt with parent context
@@ -542,17 +542,17 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 		};
 
 		// Restore all top-level features that have options
-		console.log('[BG DEBUG] Starting restoration of', found.backgroundFeatures?.length || 0, 'background features');
+		//console.log('[BG DEBUG] Starting restoration of', found.backgroundFeatures?.length || 0, 'background features');
 		for (const feature of found.backgroundFeatures || []) {
 			await restoreFeatureSelection(feature);
 		}
 
-		console.log('[BG DEBUG] Final featureSelections:', featureSelections);
+		//console.log('[BG DEBUG] Final featureSelections:', featureSelections);
 
 		// Trigger Svelte reactivity
 		featureSelections = { ...featureSelections };
 		bumpVersion();
-		console.log('[BG DEBUG] Background restoration completed');
+		//console.log('[BG DEBUG] Background restoration completed');
 	});
 </script>
 

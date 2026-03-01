@@ -6,6 +6,7 @@
  */
 
 import type { Character } from '$lib/stores/character_store';
+import { hasSpellAccess } from '$lib/stores/character_store';
 import { getWeaponData } from '$lib/data/equipment/weapon-data';
 import { formatFeatureForPDF } from '$lib/data/features/feature-data';
 import { prepareFeaturesWithOverflow } from '$lib/data/features/feature-overflow';
@@ -21,7 +22,7 @@ import { rogue } from '$lib/data/classes/rogue';
 import { sorcerer } from '$lib/data/classes/sorcerer';
 import { warlock } from '$lib/data/classes/warlock';
 import { wizard } from '$lib/data/classes/wizard';
-import { spells } from '$lib/data/spells';
+import { spells, getSpellByName } from '$lib/data/spells';
 import type { Spell } from '$lib/data/spells';
 
 export interface CharacterSheetData {
@@ -75,6 +76,7 @@ export interface CharacterSheetData {
 		name: string;
 		bonus: string;
 		damage: string;
+		properties: string[];
 	}>;
 	
 	// Page 1 - Equipment & Features
@@ -82,6 +84,8 @@ export interface CharacterSheetData {
 	proficienciesAndLanguages: string;
 	featuresAndTraits: string;
 	
+	spells: Spell[];
+
 	// Page 2 - Character Details
 	age: string;
 	height: string;
@@ -99,8 +103,8 @@ export interface CharacterSheetData {
 	// Page 2 - Additional Content
 	additionalFeatures: string;
 	featuresAndTraitsContinued: string; // Overflow from page 1
-	spellsAndCantrips: string; // Spell list with descriptions
-	spellsAndCantripsContinued: string; // Spell overflow from middle column
+	// spellsAndCantrips: string; // Spell list with descriptions
+	// spellsAndCantripsContinued: string; // Spell overflow from middle column
 	treasureAndNotes: string;
 }
 
@@ -462,18 +466,18 @@ function calculateAttacks(
 	character: Character,
 	strMod: number,
 	dexMod: number
-): Array<{ name: string; bonus: string; damage: string }> {
+): Array<{ name: string; bonus: string; damage: string; properties: string[] }> {
 	if (!character.attacks || character.attacks.length === 0) {
 		return [];
 	}
 	
 	const proficiencyBonus = getProficiencyBonus();
-	const attacks: Array<{ name: string; bonus: string; damage: string }> = [];
+	const attacks: Array<{ name: string; bonus: string; damage: string; properties: string[] }> = [];
 	
 	// Assume proficiency with all weapons in attacks array
 	// Players can only select weapons they're proficient with through the equipment tab
 	
-	for (const weaponName of character.attacks.slice(0, 5)) {
+	for (const weaponName of character.attacks) {
 		const weaponData = getWeaponData(weaponName);
 		
 		if (!weaponData) {
@@ -481,7 +485,8 @@ function calculateAttacks(
 			attacks.push({
 				name: weaponName,
 				bonus: formatModifier(proficiencyBonus), // Still add prof bonus
-				damage: ''
+				damage: '',
+				properties: [],
 			});
 			continue;
 		}
@@ -521,11 +526,28 @@ function calculateAttacks(
 		attacks.push({
 			name: weaponData.name,
 			bonus: formatModifier(attackBonus),
-			damage: damageWithModifier.trim()
+			damage: damageWithModifier.trim(),
+			properties: weaponData.properties,
 		});
 	}
 	
 	return attacks;
+}
+
+
+function buildSpells(character: Character): Spell[] {
+	let buildSpells: Spell[] = [];
+	
+	if (character.spells) {
+		for (let i = 0; i < character.spells?.length; i++) {
+			let result = getSpellByName(character.spells[i])
+			if (result) {
+				buildSpells.push(result)
+			}
+		}
+	}
+	
+	return buildSpells;
 }
 
 /**
@@ -1110,34 +1132,34 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 		
 		// Page 1 - Saving Throws
 		savingThrows: {
-			strength: `${formatModifier(getSavingThrowModifier(character, 'Strength', strMod))} Strength Save`,
-			dexterity: `${formatModifier(getSavingThrowModifier(character, 'Dexterity', dexMod))} Dexterity Save`,
-			constitution: `${formatModifier(getSavingThrowModifier(character, 'Constitution', conMod))} Constitution Save`,
-			intelligence: `${formatModifier(getSavingThrowModifier(character, 'Intelligence', intMod))} Intelligence Save`,
-			wisdom: `${formatModifier(getSavingThrowModifier(character, 'Wisdom', wisMod))} Wisdom Save`,
-			charisma: `${formatModifier(getSavingThrowModifier(character, 'Charisma', chaMod))} Charisma Save`
+			strength: `${formatModifier(getSavingThrowModifier(character, 'Strength', strMod))}`,
+			dexterity: `${formatModifier(getSavingThrowModifier(character, 'Dexterity', dexMod))}`,
+			constitution: `${formatModifier(getSavingThrowModifier(character, 'Constitution', conMod))}`,
+			intelligence: `${formatModifier(getSavingThrowModifier(character, 'Intelligence', intMod))}`,
+			wisdom: `${formatModifier(getSavingThrowModifier(character, 'Wisdom', wisMod))}`,
+			charisma: `${formatModifier(getSavingThrowModifier(character, 'Charisma', chaMod))}`
 		},
 		
 		// Page 1 - Skills (ability abbreviations drawn separately in gray)
 		skills: {
-			acrobatics: `${formatModifier(getSkillModifier(character, dexMod, 'Acrobatics'))} Acrobatics`,
-			animalHandling: `${formatModifier(getSkillModifier(character, wisMod, 'Animal Handling'))} Animal Handling`,
-			arcana: `${formatModifier(getSkillModifier(character, intMod, 'Arcana'))} Arcana`,
-			athletics: `${formatModifier(getSkillModifier(character, strMod, 'Athletics'))} Athletics`,
-			deception: `${formatModifier(getSkillModifier(character, chaMod, 'Deception'))} Deception`,
-			history: `${formatModifier(getSkillModifier(character, intMod, 'History'))} History`,
-			insight: `${formatModifier(getSkillModifier(character, wisMod, 'Insight'))} Insight`,
-			intimidation: `${formatModifier(getSkillModifier(character, chaMod, 'Intimidation'))} Intimidation`,
-			investigation: `${formatModifier(getSkillModifier(character, intMod, 'Investigation'))} Investigation`,
-			medicine: `${formatModifier(getSkillModifier(character, wisMod, 'Medicine'))} Medicine`,
-			nature: `${formatModifier(getSkillModifier(character, intMod, 'Nature'))} Nature`,
-			perception: `${formatModifier(getSkillModifier(character, wisMod, 'Perception'))} Perception`,
-			performance: `${formatModifier(getSkillModifier(character, chaMod, 'Performance'))} Performance`,
-			persuasion: `${formatModifier(getSkillModifier(character, chaMod, 'Persuasion'))} Persuasion`,
-			religion: `${formatModifier(getSkillModifier(character, intMod, 'Religion'))} Religion`,
-			sleightOfHand: `${formatModifier(getSkillModifier(character, dexMod, 'Sleight of Hand'))} Sleight of Hand`,
-			stealth: `${formatModifier(getSkillModifier(character, dexMod, 'Stealth'))} Stealth`,
-			survival: `${formatModifier(getSkillModifier(character, wisMod, 'Survival'))} Survival`
+			acrobatics: `${formatModifier(getSkillModifier(character, dexMod, 'Acrobatics'))}`,
+			animalHandling: `${formatModifier(getSkillModifier(character, wisMod, 'Animal Handling'))}`,
+			arcana: `${formatModifier(getSkillModifier(character, intMod, 'Arcana'))}`,
+			athletics: `${formatModifier(getSkillModifier(character, strMod, 'Athletics'))}`,
+			deception: `${formatModifier(getSkillModifier(character, chaMod, 'Deception'))}`,
+			history: `${formatModifier(getSkillModifier(character, intMod, 'History'))}`,
+			insight: `${formatModifier(getSkillModifier(character, wisMod, 'Insight'))}`,
+			intimidation: `${formatModifier(getSkillModifier(character, chaMod, 'Intimidation'))}`,
+			investigation: `${formatModifier(getSkillModifier(character, intMod, 'Investigation'))}`,
+			medicine: `${formatModifier(getSkillModifier(character, wisMod, 'Medicine'))}`,
+			nature: `${formatModifier(getSkillModifier(character, intMod, 'Nature'))}`,
+			perception: `${formatModifier(getSkillModifier(character, wisMod, 'Perception'))}`,
+			performance: `${formatModifier(getSkillModifier(character, chaMod, 'Performance'))}`,
+			persuasion: `${formatModifier(getSkillModifier(character, chaMod, 'Persuasion'))}`,
+			religion: `${formatModifier(getSkillModifier(character, intMod, 'Religion'))}`,
+			sleightOfHand: `${formatModifier(getSkillModifier(character, dexMod, 'Sleight of Hand'))}`,
+			stealth: `${formatModifier(getSkillModifier(character, dexMod, 'Stealth'))}`,
+			survival: `${formatModifier(getSkillModifier(character, wisMod, 'Survival'))}`
 		},
 		
 		passivePerception: String(10 + getSkillModifier(character, wisMod, 'Perception')),
@@ -1153,16 +1175,19 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 		
 		// Page 1 - Attacks
 		attacks: calculateAttacks(character, strMod, dexMod),
+
+		// Take list of spell names (character.spells), look up the spell details, and build a Spell[]
+		spells: buildSpells(character),
 		
 		// Page 1 - Equipment & Features
 		equipment: formatEquipment(character.inventory || []),
 		proficienciesAndLanguages: formatProficienciesAndLanguages(character),
 		featuresAndTraits: (() => {
-			console.log('=== FEATURES DEBUG - Character Data Mapper ===');
-			console.log('Character features array:', character.features);
-			console.log('Character class:', character.class);
-			console.log('Character race:', character.race);
-			console.log('Character subclass:', character.subclass);
+			//console.log('=== FEATURES DEBUG - Character Data Mapper ===');
+			//console.log('Character features array:', character.features);
+			//console.log('Character class:', character.class);
+			//console.log('Character race:', character.race);
+			//console.log('Character subclass:', character.subclass);
 			
 			// Use new overflow system
 			// Height: 595pt, lineHeight: 10pt -> 59.5 max lines
@@ -1175,9 +1200,9 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 				{ width: 165, fontSize: 8 } // Page 1 text area config
 			);
 			
-			console.log('Overflow stats:', result.stats);
-			console.log('Has overflow:', result.hasOverflow);
-			console.log('=== END FEATURES DEBUG ===');
+			//console.log('Overflow stats:', result.stats);
+			//console.log('Has overflow:', result.hasOverflow);
+			//console.log('=== END FEATURES DEBUG ===');
 			
 			// Store page 2 text in temporary variable for now
 			// We'll access it below in the page 2 section
@@ -1203,14 +1228,17 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 		// Page 2 - Additional Content
 		additionalFeatures: '', // Could add spell list here
 		featuresAndTraitsContinued: characterSheetData_featuresPage2,
+		
+		// Vestigial: This was passing along a formatted list of spells.
+		// 			  I believe this approach (including rich text tags) is not compatible with the new form-fill method of PDF generation
 		// Spells with overflow handling
-		...(() => {
-			const spellResult = formatSpells(character);
-			return {
-				spellsAndCantrips: spellResult.column1Text,
-				spellsAndCantripsContinued: spellResult.column2Text
-			};
-		})(),
+		// ...(() => {
+		// 	const spellResult = formatSpells(character);
+		// 	return {
+		// 		spellsAndCantrips: spellResult.column1Text,
+		// 		spellsAndCantripsContinued: spellResult.column2Text
+		// 	};
+		// })(),
 		treasureAndNotes: ''
 	};
 }

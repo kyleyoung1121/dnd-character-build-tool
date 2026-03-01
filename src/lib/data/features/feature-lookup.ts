@@ -322,27 +322,27 @@ function serializeFeatureDescription(
  */
 function findFeatureInList(featureName: string, features: FeaturePrompt[]): FeaturePrompt | null {
 	const normalizedSearchName = featureName.trim().toLowerCase();
-	console.log(`    findFeatureInList: searching for "${normalizedSearchName}" in ${features.length} features`);
+	//console.log(`    findFeatureInList: searching for "${normalizedSearchName}" in ${features.length} features`);
 	
 	for (const feature of features) {
 		// Check if this feature matches
 		const normalizedFeatureName = feature.name.trim().toLowerCase();
-		console.log(`      Checking feature: "${normalizedFeatureName}"`);
+		//console.log(`      Checking feature: "${normalizedFeatureName}"`);
 		if (normalizedFeatureName === normalizedSearchName) {
-			console.log(`      MATCH FOUND: ${feature.name}`);
+			//console.log(`      MATCH FOUND: ${feature.name}`);
 			return feature;
 		}
 		
 		// Search in nested prompts if this feature has options
 		if (feature.featureOptions?.options) {
-			console.log(`      Feature has ${feature.featureOptions.options.length} options, searching nested prompts`);
+			//console.log(`      Feature has ${feature.featureOptions.options.length} options, searching nested prompts`);
 			for (const option of feature.featureOptions.options) {
 				// Handle complex options with nested prompts
 				if (typeof option !== 'string' && option.nestedPrompts) {
-					console.log(`        Searching in option "${option.name}" with ${option.nestedPrompts.length} nested prompts`);
+					//console.log(`        Searching in option "${option.name}" with ${option.nestedPrompts.length} nested prompts`);
 					const found = findFeatureInList(featureName, option.nestedPrompts);
 					if (found) {
-						console.log(`        NESTED MATCH FOUND: ${found.name}`);
+						//console.log(`        NESTED MATCH FOUND: ${found.name}`);
 						return found;
 					}
 				}
@@ -451,18 +451,18 @@ export function lookupFeature(
 	speciesName?: string,
 	backgroundName?: string
 ): FeaturePrompt | null {
-	console.log(`=== lookupFeature called ===`);
-	console.log(`Feature name: "${featureName}"`);
-	console.log(`Class: ${className}, Species: ${speciesName}, Background: ${backgroundName}`);
+	//console.log(`=== lookupFeature called ===`);
+	//console.log(`Feature name: "${featureName}"`);
+	//console.log(`Class: ${className}, Species: ${speciesName}, Background: ${backgroundName}`);
 	// Try class first if provided
 	if (className) {
-		console.log(`  Searching in class: ${className}`);
+		//console.log(`  Searching in class: ${className}`);
 		const feature = findFeatureInClass(className, featureName);
 		if (feature) {
-			console.log(`  Found feature in class: ${feature.name}`);
+			//console.log(`  Found feature in class: ${feature.name}`);
 			return feature;
 		}
-		console.log(`  Feature not found in class`);
+		//console.log(`  Feature not found in class`);
 	}
 	
 	// Try species if provided

@@ -154,14 +154,14 @@
 		});
 
 	function handleBeastSelect(beast: Beast) {
-		console.log('🐾 SELECT: Beast selected:', beast.name);
+		//console.log('🐾 SELECT: Beast selected:', beast.name);
 		
 		// Check if this beast is already selected
 		if (selectedBeasts.has(beast.name)) {
-			console.log('🐾 SELECT: Deselecting beast:', beast.name);
+			//console.log('🐾 SELECT: Deselecting beast:', beast.name);
 			selectedBeasts.delete(beast.name);
 		} else if (selectedBeasts.size < maxSelections) {
-			console.log('🐾 SELECT: Adding beast:', beast.name);
+			//console.log('🐾 SELECT: Adding beast:', beast.name);
 			// Add the beast if we are able to (under the selection limit)
 			const char = $character_store;
 			selectedBeasts.set(beast.name, {
@@ -172,14 +172,14 @@
 				charSubrace: char.subrace || ''
 			});
 		} else {
-			console.log('🐾 SELECT: Max capacity reached, cannot select more');
+			//console.log('🐾 SELECT: Max capacity reached, cannot select more');
 		}
 		
 		// Trigger reactivity
 		selectedBeasts = selectedBeasts;
 		
 		// Persist selections
-		console.log('🐾 SELECT: Current selectedBeasts:', Array.from(selectedBeasts.keys()));
+		//console.log('🐾 SELECT: Current selectedBeasts:', Array.from(selectedBeasts.keys()));
 		persistBeastSelections();
 		// If at max capacity and trying to select a new beast, button will be disabled so this won't be called
 	}
@@ -203,21 +203,21 @@
 	// Restore beast selections from character store
 	function restoreBeastSelectionsFromStore() {
 		const char = $character_store;
-		console.log('🐾 RESTORE: Character store provenance:', char._provenance);
-		console.log('🐾 RESTORE: Current character beasts:', char.beasts);
+		//console.log('🐾 RESTORE: Character store provenance:', char._provenance);
+		//console.log('🐾 RESTORE: Current character beasts:', char.beasts);
 		if (!char._provenance) {
-			console.log('🐾 RESTORE: No provenance found');
+			//console.log('🐾 RESTORE: No provenance found');
 			return;
 		}
 
 		const scopeId = 'beast_selections'; // Match spells tab pattern
 		const provenanceData = char._provenance[scopeId];
-		console.log('🐾 RESTORE: Looking for scope "' + scopeId + '":', provenanceData);
+		//console.log('🐾 RESTORE: Looking for scope "' + scopeId + '":', provenanceData);
 
 		if (provenanceData) {
 			// Try to get metadata first (new format)
 			const metadata = (provenanceData as any)._metadata;
-			console.log('🐾 RESTORE: Found metadata:', metadata);
+			//console.log('🐾 RESTORE: Found metadata:', metadata);
 			
 			if (metadata && Array.isArray(metadata)) {
 				// New format: use stored metadata
@@ -233,16 +233,16 @@
 						});
 					}
 				});
-				console.log('🐾 RESTORE: Restored selectedBeasts (new format):', Array.from(selectedBeasts.keys()));
+				//console.log('🐾 RESTORE: Restored selectedBeasts (new format):', Array.from(selectedBeasts.keys()));
 				return;
 			}
 			
 			// Fallback to old format
 			const actualData = (provenanceData as any)._set || provenanceData;
-			console.log('🐾 RESTORE: Actual data:', actualData);
+			//console.log('🐾 RESTORE: Actual data:', actualData);
 
 			if (actualData.beasts && Array.isArray(actualData.beasts)) {
-				console.log('🐾 RESTORE: Found beasts array:', actualData.beasts);
+				//console.log('🐾 RESTORE: Found beasts array:', actualData.beasts);
 				// Handle both old string format and new object format
 				selectedBeasts = new Map();
 				actualData.beasts.forEach((item: any) => {
@@ -257,10 +257,10 @@
 						});
 					}
 				});
-				console.log('🐾 RESTORE: Restored selectedBeasts (old format):', Array.from(selectedBeasts.keys()));
+				//console.log('🐾 RESTORE: Restored selectedBeasts (old format):', Array.from(selectedBeasts.keys()));
 			}
 		} else {
-			console.log('🐾 RESTORE: No provenance data found for scope "' + scopeId + '"');
+			//console.log('🐾 RESTORE: No provenance data found for scope "' + scopeId + '"');
 		}
 	}
 
@@ -277,7 +277,7 @@
 			beasts: beastSelectionsWithMetadata // Store full objects with metadata
 		};
 		
-		console.log('💾 SAVE: Persisting beast selections:', beastSelections);
+		//console.log('💾 SAVE: Persisting beast selections:', beastSelections);
 		
 		// Apply the beast selections to character.beasts
 		applyChoice(scopeId, beastSelections);
@@ -289,7 +289,7 @@
 			(char._provenance[scopeId] as any)._metadata = beastSelectionsWithMetadata;
 		}
 		
-		console.log('💾 SAVE: Persisted successfully');
+		//console.log('💾 SAVE: Persisted successfully');
 	}
 
 	// Note: Cleanup is now handled globally by the beast_cleanup service

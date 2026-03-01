@@ -58,16 +58,16 @@ export function initializeEquipmentCleanup() {
 	if (isInitialized) return;
 	isInitialized = true;
 
-	console.log('[Equipment Cleanup] Service initialized');
+	//console.log('[Equipment Cleanup] Service initialized');
 
 	// Subscribe to character store changes
 	character_store.subscribe((character) => {
 		const currentProficiencies = character.proficiencies || [];
-		console.log('[Equipment Cleanup] Store update, proficiencies:', currentProficiencies);
+		//console.log('[Equipment Cleanup] Store update, proficiencies:', currentProficiencies);
 
 		// Skip first run - just capture initial state
 		if (previousProficiencies.length === 0 && currentProficiencies.length > 0) {
-			console.log('[Equipment Cleanup] Capturing initial proficiencies:', currentProficiencies);
+			//console.log('[Equipment Cleanup] Capturing initial proficiencies:', currentProficiencies);
 			previousProficiencies = [...currentProficiencies];
 			return;
 		}
@@ -79,23 +79,23 @@ export function initializeEquipmentCleanup() {
 
 		// Clear any pending debounce timer
 		if (debounceTimer) {
-			console.log('[Equipment Cleanup] Clearing previous debounce timer');
+			//console.log('[Equipment Cleanup] Clearing previous debounce timer');
 			clearTimeout(debounceTimer);
 		}
 
 		// Debounce the cleanup check to handle temporary proficiency removal
 		// during subclass changes (e.g., Tempest -> War both have same proficiencies,
 		// but they're removed then re-added during the swap)
-		console.log(`[Equipment Cleanup] Starting ${DEBOUNCE_DELAY}ms debounce timer`);
+		//console.log(`[Equipment Cleanup] Starting ${DEBOUNCE_DELAY}ms debounce timer`);
 		debounceTimer = setTimeout(() => {
-			console.log('[Equipment Cleanup] Debounce timer fired');
+			//console.log('[Equipment Cleanup] Debounce timer fired');
 			// Get the latest proficiencies after debounce period
 			const latestProficiencies = character.proficiencies || [];
 
-			console.log('[Equipment Cleanup] Debounce complete, checking proficiencies:', {
-				previous: previousProficiencies,
-				latest: latestProficiencies
-			});
+			//console.log('[Equipment Cleanup] Debounce complete, checking proficiencies:', {
+			// 	previous: previousProficiencies,
+			// 	latest: latestProficiencies
+			// });
 
 			// Calculate which proficiencies were LOST (comparing to previous stable state)
 			const lostProficiencies = previousProficiencies.filter(
@@ -105,12 +105,12 @@ export function initializeEquipmentCleanup() {
 			// If no proficiencies were lost, no cleanup needed
 			// (Gaining proficiencies or keeping same proficiencies doesn't invalidate equipment)
 			if (lostProficiencies.length === 0) {
-				console.log('[Equipment Cleanup] No proficiencies lost after debounce, no cleanup needed');
+				//console.log('[Equipment Cleanup] No proficiencies lost after debounce, no cleanup needed');
 				previousProficiencies = [...latestProficiencies];
 				return;
 			}
 
-			console.log('[Equipment Cleanup] Proficiencies LOST after debounce:', lostProficiencies);
+			//console.log('[Equipment Cleanup] Proficiencies LOST after debounce:', lostProficiencies);
 
 			// Only remove equipment that REQUIRES the lost proficiencies
 			const removedEquipment = cleanupEquipmentRequiringLostProficiencies(
@@ -147,19 +147,19 @@ function cleanupEquipmentRequiringLostProficiencies(
 	const removedEquipment: string[] = [];
 
 	if (!character._provenance) {
-		console.log('[Equipment Cleanup] No provenance data found');
+		//console.log('[Equipment Cleanup] No provenance data found');
 		return removedEquipment;
 	}
 
 	const className = character.class;
 	if (!className) {
-		console.log('[Equipment Cleanup] No class found');
+		//console.log('[Equipment Cleanup] No class found');
 		return removedEquipment;
 	}
 
 	const classData = classLookup[className];
 	if (!classData?.startingEquipment?.choices) {
-		console.log('[Equipment Cleanup] No equipment data for class:', className);
+		//console.log('[Equipment Cleanup] No equipment data for class:', className);
 		return removedEquipment;
 	}
 
@@ -207,9 +207,9 @@ function cleanupEquipmentRequiringLostProficiencies(
 
 		if (requiresLostProficiency) {
 			// Equipment requires a proficiency we just lost, clear the selection
-			console.log(
-				`[Equipment Cleanup] Removing equipment choice ${choiceIndex}: ${selectedOption.label} - requires lost proficiency from: ${selectedOption.requires.join(', ')}`
-			);
+			//console.log(
+			// 	`[Equipment Cleanup] Removing equipment choice ${choiceIndex}: ${selectedOption.label} - requires lost proficiency from: ${selectedOption.requires.join(', ')}`
+			// );
 
 			// Add to removed list
 			removedEquipment.push(selectedOption.label);
@@ -222,9 +222,9 @@ function cleanupEquipmentRequiringLostProficiencies(
 			};
 			applyChoice(scopeId, clearedState);
 		} else {
-			console.log(
-				`[Equipment Cleanup] Keeping equipment choice ${choiceIndex}: ${selectedOption.label} - still have all required proficiencies`
-			);
+			//console.log(
+			// 	`[Equipment Cleanup] Keeping equipment choice ${choiceIndex}: ${selectedOption.label} - still have all required proficiencies`
+			// );
 		}
 	});
 

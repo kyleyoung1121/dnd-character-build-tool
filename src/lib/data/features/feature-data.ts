@@ -179,30 +179,30 @@ function serializeFeatureDescription(description: FeatureDescription, character?
 					
 					// Replace dynamic placeholders with character-specific values
 					if (character) {
-						console.log(`[PLACEHOLDER] Processing text block:`, text.substring(0, 50));
-						console.log(`[PLACEHOLDER] Character dragonborn properties:`, {
-							dragonbornElement: character.dragonbornElement,
-							dragonbornBreathShape: character.dragonbornBreathShape
-						});
+						//console.log(`[PLACEHOLDER] Processing text block:`, text.substring(0, 50));
+						//console.log(`[PLACEHOLDER] Character dragonborn properties:`, {
+						// 	dragonbornElement: character.dragonbornElement,
+						// 	dragonbornBreathShape: character.dragonbornBreathShape
+						// });
 						
 						// Dragonborn element placeholder
 						if (text.includes('{{element}}')) {
-							console.log(`[PLACEHOLDER] Found {{element}} placeholder`);
+							//console.log(`[PLACEHOLDER] Found {{element}} placeholder`);
 							if (character.dragonbornElement) {
-								console.log(`[PLACEHOLDER] Replacing with:`, character.dragonbornElement);
+								//console.log(`[PLACEHOLDER] Replacing with:`, character.dragonbornElement);
 								text = text.replace(/\{\{element\}\}/g, character.dragonbornElement.toLowerCase());
 							} else {
-								console.log(`[PLACEHOLDER] dragonbornElement is not set on character`);
+								//console.log(`[PLACEHOLDER] dragonbornElement is not set on character`);
 							}
 						}
 						// Dragonborn breath shape placeholder
 						if (text.includes('{{shape}}')) {
-							console.log(`[PLACEHOLDER] Found {{shape}} placeholder`);
+							//console.log(`[PLACEHOLDER] Found {{shape}} placeholder`);
 							if (character.dragonbornBreathShape) {
-								console.log(`[PLACEHOLDER] Replacing with:`, character.dragonbornBreathShape);
+								//console.log(`[PLACEHOLDER] Replacing with:`, character.dragonbornBreathShape);
 								text = text.replace(/\{\{shape\}\}/g, character.dragonbornBreathShape.toLowerCase());
 							} else {
-								console.log(`[PLACEHOLDER] dragonbornBreathShape is not set on character`);
+								//console.log(`[PLACEHOLDER] dragonbornBreathShape is not set on character`);
 							}
 						}
 					}
@@ -247,32 +247,32 @@ function serializeFeatureDescription(description: FeatureDescription, character?
 				case 'computed-replacement': {
 					// Try to compute the value
 					const value = allValuesAvailable(block.whenAvailable, character);
-					console.log(`[computed-replacement] Evaluating block:`, {
-						whenAvailable: block.whenAvailable,
-						computedValue: value,
-						hasCharacter: !!character,
-						characterAbilities: character ? {
-							STR: character.strength,
-							DEX: character.dexterity,
-							CON: character.constitution,
-							INT: character.intelligence,
-							WIS: character.wisdom,
-							CHA: character.charisma
-						} : null
-					});
+					// console.log(`[computed-replacement] Evaluating block:`, {
+					// 	whenAvailable: block.whenAvailable,
+					// 	computedValue: value,
+					// 	hasCharacter: !!character,
+					// 	characterAbilities: character ? {
+					// 		STR: character.strength,
+					// 		DEX: character.dexterity,
+					// 		CON: character.constitution,
+					// 		INT: character.intelligence,
+					// 		WIS: character.wisdom,
+					// 		CHA: character.charisma
+					// 	} : null
+					// });
 
 					if (value !== null) {
 						// Use singular template if value is 1 and singular template exists
 						if (value === 1 && block.singularTemplate) {
-							console.log(`[computed-replacement] Using singular template`);
+							//console.log(`[computed-replacement] Using singular template`);
 							return block.singularTemplate;
 						}
 						// Otherwise use replacement template
-						console.log(`[computed-replacement] Using replacement template with value:`, value);
+						//console.log(`[computed-replacement] Using replacement template with value:`, value);
 						return block.replacementTemplate.replace('{value}', String(value));
 					} else {
 						// Fall back to fallback text
-						console.log(`[computed-replacement] Using fallback text:`, block.fallbackText);
+						//console.log(`[computed-replacement] Using fallback text:`, block.fallbackText);
 						return block.fallbackText;
 					}
 				}
@@ -304,14 +304,14 @@ export function getFeatureData(
 	featureName: string,
 	character?: Character
 ): FeatureData | null {
-	console.log(`    getFeatureData called for: "${featureName}"`);
+	//console.log(`    getFeatureData called for: "${featureName}"`);
 	const className = character?.class;
 	// Prioritize subrace (e.g., "Rock Gnome") over base race (e.g., "Gnome")
 	// SPECIES_MAP contains subspecies names like "Rock Gnome", "Hill Dwarf", etc.
 	const raceName = character?.subrace || character?.race;
 	const backgroundName = character?.background;
 	
-	console.log(`      Context: class=${className}, race=${raceName}, background=${backgroundName}`);
+	//console.log(`      Context: class=${className}, race=${raceName}, background=${backgroundName}`);
 
 	const feature = lookupFeature(
 		featureName,
@@ -319,7 +319,7 @@ export function getFeatureData(
 		raceName,
 		backgroundName
 	);
-	console.log(`      Lookup result for "${featureName}":`, feature ? 'Found' : 'Not found');
+	//console.log(`      Lookup result for "${featureName}":`, feature ? 'Found' : 'Not found');
 
 	if (!feature) {
 		return null;
@@ -367,16 +367,16 @@ export function hasFeatureData(featureName: string, character?: Character): bool
  * @param character - Character object to provide context for lookup
  */
 export function formatFeatureForPDF(featureName: string, character?: Character): string {
-	console.log(`  formatFeatureForPDF called for: "${featureName}"`);
+	//console.log(`  formatFeatureForPDF called for: "${featureName}"`);
 	const featureData = getFeatureData(featureName, character);
 	
 	if (!featureData) {
-		console.log(`    No feature data found for "${featureName}", using bullet point`);
+		//console.log(`    No feature data found for "${featureName}", using bullet point`);
 		// If feature not found, just show the name with bullet
 		return `• ${featureName}`;
 	}
 	
-	console.log(`    Feature data found for "${featureName}":`, featureData.name);
+	//console.log(`    Feature data found for "${featureName}":`, featureData.name);
 	// Format: [[BOLD:Name]]. Description
 	// Name is marked for bold rendering, followed by period and description on same line
 	return `[[BOLD:${featureData.name}]]. ${featureData.description}`;
@@ -441,31 +441,31 @@ export function formatFeaturesForPDF(
 	character?: Character,
 	importanceFilter?: 'important' | 'minor' | 'all'
 ): string {
-	console.log('=== formatFeaturesForPDF called ===');
-	console.log('Features array input:', featureNames);
-	console.log('Character context:', {
-		class: character?.class,
-		race: character?.race,
-		subclass: character?.subclass,
-		background: character?.background
-	});
-	console.log('Importance filter:', importanceFilter || 'all');
+	//console.log('=== formatFeaturesForPDF called ===');
+	//console.log('Features array input:', featureNames);
+	//console.log('Character context:', {
+	// 	class: character?.class,
+	// 	race: character?.race,
+	// 	subclass: character?.subclass,
+	// 	background: character?.background
+	// });
+	//console.log('Importance filter:', importanceFilter || 'all');
 	
 	if (!featureNames || featureNames.length === 0) {
-		console.log('No features found, returning default message');
+		//console.log('No features found, returning default message');
 		return 'No features or traits.';
 	}
 	
 	// First pass: Filter out blacklisted features
 	const nonBlacklistedFeatures = featureNames.filter(name => {
 		if (FEATURE_BLACKLIST.includes(name)) {
-			console.log(`  Blacklisted feature removed: "${name}"`);
+			//console.log(`  Blacklisted feature removed: "${name}"`);
 			return false;
 		}
 		return true;
 	});
 	
-	console.log(`Blacklist filtering: ${featureNames.length} -> ${nonBlacklistedFeatures.length} features`);
+	//console.log(`Blacklist filtering: ${featureNames.length} -> ${nonBlacklistedFeatures.length} features`);
 	
 	// Second pass: Filter features based on importance level
 	const filteredFeatures = nonBlacklistedFeatures.filter(name => {
@@ -476,13 +476,13 @@ export function formatFeaturesForPDF(
 		
 		// Filter out 'invisible' features always
 		if (importance === 'invisible') {
-			console.log(`  Filtering out invisible feature: "${name}"`);
+			//console.log(`  Filtering out invisible feature: "${name}"`);
 			return false;
 		}
 		
 		// If filtering for 'important' only, exclude 'minor' features
 		if (importanceFilter === 'important' && importance === 'minor') {
-			console.log(`  Filtering out minor feature: "${name}"`);
+			//console.log(`  Filtering out minor feature: "${name}"`);
 			return false;
 		}
 		
@@ -494,7 +494,7 @@ export function formatFeaturesForPDF(
 		return true;
 	});
 	
-	console.log(`Importance filtering: ${nonBlacklistedFeatures.length} -> ${filteredFeatures.length} features`);
+	//console.log(`Importance filtering: ${nonBlacklistedFeatures.length} -> ${filteredFeatures.length} features`);
 	
 	if (filteredFeatures.length === 0) {
 		return 'No features or traits.';
@@ -502,11 +502,11 @@ export function formatFeaturesForPDF(
 	
 	const result = filteredFeatures
 		.map((name, index) => {
-			console.log(`Processing feature ${index}: "${name}"`);
+			//console.log(`Processing feature ${index}: "${name}"`);
 			
 			// Check if there's a custom description in the dictionary first
 			if (FEATURE_DESCRIPTION_DICTIONARY[name]) {
-				console.log(`  Using custom dictionary description for: "${name}"`);
+				//console.log(`  Using custom dictionary description for: "${name}"`);
 				// Dictionary entries should already be formatted with [[BOLD:Name]]. Description pattern
 				// but we need to add the bold marker for the main feature name
 				return `[[BOLD:${name}]]. ${FEATURE_DESCRIPTION_DICTIONARY[name]}`;
@@ -514,13 +514,13 @@ export function formatFeaturesForPDF(
 			
 			// Otherwise, use normal lookup
 			const formatted = formatFeatureForPDF(name, character);
-			console.log(`  Formatted result:`, formatted);
+			//console.log(`  Formatted result:`, formatted);
 			return formatted;
 		})
 		.join('\n\n'); // Double newline creates space between features
 	
-	console.log('Final formatted features result:', result);
-	console.log('=== END formatFeaturesForPDF ===');
+	//console.log('Final formatted features result:', result);
+	//console.log('=== END formatFeaturesForPDF ===');
 	return result;
 }
 

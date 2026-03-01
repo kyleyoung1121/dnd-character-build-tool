@@ -7,33 +7,33 @@ import { character_store } from '../stores/character_store';
 export function debugProvenance() {
 	const char = get(character_store);
 
-	console.log('=== CHARACTER STORE DEBUG ===');
-	console.log('Skills array:', char.skills);
-	console.log('Provenance data:', char._provenance);
+	//console.log('=== CHARACTER STORE DEBUG ===');
+	//console.log('Skills array:', char.skills);
+	//console.log('Provenance data:', char._provenance);
 
 	if (char._provenance) {
-		console.log('\n=== PROVENANCE ANALYSIS ===');
+		//console.log('\n=== PROVENANCE ANALYSIS ===');
 		for (const [scopeId, prov] of Object.entries(char._provenance)) {
-			console.log(`\nScope: ${scopeId}`);
+			//console.log(`\nScope: ${scopeId}`);
 
 			// Handle both old and new provenance formats
 			if ('_set' in prov && prov._set) {
-				console.log('  _set:', prov._set);
+				//console.log('  _set:', prov._set);
 				if (prov._set.skills) {
-					console.log(`  → Added skills: [${prov._set.skills.join(', ')}]`);
+					//console.log(`  → Added skills: [${prov._set.skills.join(', ')}]`);
 				}
 			} else {
 				// Old flat format
-				console.log('  Flat format:', prov);
+				//console.log('  Flat format:', prov);
 				if (prov.skills) {
-					console.log(`  → Added skills: [${prov.skills.join(', ')}]`);
+					//console.log(`  → Added skills: [${prov.skills.join(', ')}]`);
 				}
 			}
 		}
 	}
 
 	// Analyze skill sources with detailed instance counting
-	console.log('\n=== SKILL SOURCE ANALYSIS ===');
+	//console.log('\n=== SKILL SOURCE ANALYSIS ===');
 	const skillContributions: Record<string, Record<string, number>> = {}; // skill -> {scopeId -> count}
 
 	if (char._provenance) {
@@ -54,21 +54,21 @@ export function debugProvenance() {
 		const sources = Object.keys(contributions);
 		const totalExpected = Object.values(contributions).reduce((sum, count) => sum + count, 0);
 
-		console.log(`${skill}:`);
+		//console.log(`${skill}:`);
 		for (const [scopeId, count] of Object.entries(contributions)) {
-			console.log(`  → ${scopeId}: ${count} instance(s)`);
+			//console.log(`  → ${scopeId}: ${count} instance(s)`);
 		}
 
 		// Count occurrences in actual skills array
 		const actualCount = char.skills.filter((s) => s === skill).length;
 
-		console.log(`  📊 Expected: ${totalExpected}, Actual: ${actualCount}`);
+		//console.log(`  📊 Expected: ${totalExpected}, Actual: ${actualCount}`);
 		if (actualCount !== totalExpected) {
-			console.log(
-				`  ⚠️  MISMATCH: Expected ${totalExpected}, found ${actualCount} in skills array`
-			);
+			//console.log(
+			// 	`  ⚠️  MISMATCH: Expected ${totalExpected}, found ${actualCount} in skills array`
+			// );
 		} else {
-			console.log(`  ✅ CORRECT: Instance count matches expectations`);
+			//console.log(`  ✅ CORRECT: Instance count matches expectations`);
 		}
 	}
 
@@ -78,10 +78,10 @@ export function debugProvenance() {
 		skillCounts[skill] = (skillCounts[skill] || 0) + 1;
 	}
 
-	console.log('\n=== DUPLICATE DETECTION ===');
+	//console.log('\n=== DUPLICATE DETECTION ===');
 	for (const [skill, count] of Object.entries(skillCounts)) {
 		if (count > 1) {
-			console.log(`🔴 DUPLICATE: ${skill} appears ${count} times`);
+			//console.log(`🔴 DUPLICATE: ${skill} appears ${count} times`);
 		}
 	}
 
@@ -111,7 +111,7 @@ export function startProvenanceMonitoring() {
 		const duplicates = Object.entries(skillCounts).filter(([_, count]) => count > 1);
 
 		if (duplicates.length > 0) {
-			console.log('🚨 DUPLICATES DETECTED - Running debug analysis...');
+			//console.log('🚨 DUPLICATES DETECTED - Running debug analysis...');
 			debugProvenance();
 		}
 

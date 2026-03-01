@@ -138,9 +138,9 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 			featureSelections = {};
 			expandedFeatures = new Set();
 
-			console.log('\n=== CONFIRM ADD CLASS ===');
-			console.log(`Class: ${selectedClassData.name}`);
-			console.log(`Total features in classFeatures array: ${selectedClassData.classFeatures?.length || 0}`);
+			//console.log('\n=== CONFIRM ADD CLASS ===');
+			//console.log(`Class: ${selectedClassData.name}`);
+			//console.log(`Total features in classFeatures array: ${selectedClassData.classFeatures?.length || 0}`);
 
 			applyChoice(`class:${selectedClassData.name}`, {
 				class: selectedClassData.name
@@ -150,13 +150,13 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 			let skippedCount = 0;
 
 			for (const feature of selectedClassData.classFeatures || []) {
-				console.log(`\nFeature: "${feature.name}"`);
-				console.log(`  Has featureOptions: ${!!feature.featureOptions}`);
-				console.log(`  Effects count: ${feature.effects?.length || 0}`);
+				//console.log(`\nFeature: "${feature.name}"`);
+				//console.log(`  Has featureOptions: ${!!feature.featureOptions}`);
+				//console.log(`  Effects count: ${feature.effects?.length || 0}`);
 
 				// Skip features with options; those will be applied later
 				if (feature.featureOptions) {
-					console.log(`  -> SKIPPED (has featureOptions)`);
+					//console.log(`  -> SKIPPED (has featureOptions)`);
 					skippedCount++;
 					continue;
 				}
@@ -172,7 +172,7 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 					const target = effect.target;
 					const value = effect.value;
 
-					console.log(`  Effect: ${effect.action} on "${target}" = "${value}"`);
+					//console.log(`  Effect: ${effect.action} on "${target}" = "${value}"`);
 
 					switch (effect.action) {
 						case 'add': {
@@ -195,14 +195,14 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 					}
 				}
 
-				console.log(`  Calling applyChoice with scopeId="${scopeId}", update=`, update, ', modify=', modify);
+				//console.log(`  Calling applyChoice with scopeId="${scopeId}", update=`, update, ', modify=', modify);
 				applyChoice(scopeId, update, modify);
 				processedCount++;
-				console.log(`  -> PROCESSED`);
+				//console.log(`  -> PROCESSED`);
 			}
 
-			console.log(`\nSummary: Processed ${processedCount} features, skipped ${skippedCount} features`);
-			console.log('=========================\n');
+			//console.log(`\nSummary: Processed ${processedCount} features, skipped ${skippedCount} features`);
+			//console.log('=========================\n');
 
 			bumpVersion();
 		}

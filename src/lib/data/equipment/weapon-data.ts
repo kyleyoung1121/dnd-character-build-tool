@@ -23,7 +23,7 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '1d4',
 		damageType: 'bludgeoning',
 		attackAbility: 'STR',
-		properties: ['light'],
+		properties: ['Light'],
 		category: 'simple',
 		type: 'melee'
 	},
@@ -32,7 +32,7 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '1d4',
 		damageType: 'piercing',
 		attackAbility: 'EITHER',
-		properties: ['finesse', 'light', 'thrown'],
+		properties: ['Finesse', 'Light', 'Thrown (20/60ft)'],
 		category: 'simple',
 		type: 'melee'
 	},
@@ -41,7 +41,7 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '1d8',
 		damageType: 'bludgeoning',
 		attackAbility: 'STR',
-		properties: ['two-handed'],
+		properties: ['Two-Handed'],
 		category: 'simple',
 		type: 'melee'
 	},
@@ -50,7 +50,7 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '1d6',
 		damageType: 'slashing',
 		attackAbility: 'STR',
-		properties: ['light', 'thrown'],
+		properties: ['Light', 'Thrown (20/60ft)'],
 		category: 'simple',
 		type: 'melee'
 	},
@@ -59,7 +59,7 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '1d6',
 		damageType: 'piercing',
 		attackAbility: 'STR',
-		properties: ['thrown'],
+		properties: ['Thrown (30/120ft)'],
 		category: 'simple',
 		type: 'melee'
 	},
@@ -68,7 +68,7 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '1d4',
 		damageType: 'bludgeoning',
 		attackAbility: 'STR',
-		properties: ['light', 'thrown'],
+		properties: ['Light', 'Thrown (20/60ft)'],
 		category: 'simple',
 		type: 'melee'
 	},
@@ -86,7 +86,7 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '1d6',
 		damageType: 'bludgeoning',
 		attackAbility: 'STR',
-		properties: ['versatile (1d8)'],
+		properties: ['Versatile (1d8)'],
 		category: 'simple',
 		type: 'melee'
 	},
@@ -95,7 +95,7 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '1d4',
 		damageType: 'slashing',
 		attackAbility: 'STR',
-		properties: ['light'],
+		properties: ['Light'],
 		category: 'simple',
 		type: 'melee'
 	},
@@ -104,18 +104,18 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '1d6',
 		damageType: 'piercing',
 		attackAbility: 'STR',
-		properties: ['thrown', 'versatile (1d8)'],
+		properties: ['Thrown (20/60ft)', 'Versatile (1d8)'],
 		category: 'simple',
 		type: 'melee'
 	},
 
 	// Simple Ranged Weapons
 	'Light crossbow': {
-		name: 'Light crossbow',
+		name: 'Light Crossbow',
 		damage: '1d8',
 		damageType: 'piercing',
 		attackAbility: 'DEX',
-		properties: ['ammunition', 'loading', 'two-handed'],
+		properties: ['Range (80/320ft)', 'Loading', 'Two-Handed'],
 		category: 'simple',
 		type: 'ranged'
 	},
@@ -124,7 +124,7 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '1d4',
 		damageType: 'piercing',
 		attackAbility: 'EITHER',
-		properties: ['finesse', 'thrown'],
+		properties: ['Finesse', 'Thrown (20/60ft)'],
 		category: 'simple',
 		type: 'ranged'
 	},
@@ -133,7 +133,7 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '1d6',
 		damageType: 'piercing',
 		attackAbility: 'DEX',
-		properties: ['ammunition', 'two-handed'],
+		properties: ['Range (80/320ft)', 'Two-Handed'],
 		category: 'simple',
 		type: 'ranged'
 	},
@@ -142,7 +142,7 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '1d4',
 		damageType: 'bludgeoning',
 		attackAbility: 'DEX',
-		properties: ['ammunition'],
+		properties: ['Range (30/120ft)'],
 		category: 'simple',
 		type: 'ranged'
 	},
@@ -153,7 +153,7 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '1d8',
 		damageType: 'slashing',
 		attackAbility: 'STR',
-		properties: ['versatile (1d10)'],
+		properties: ['Versatile (1d10)'],
 		category: 'martial',
 		type: 'melee'
 	},
@@ -171,7 +171,7 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '1d10',
 		damageType: 'slashing',
 		attackAbility: 'STR',
-		properties: ['heavy', 'reach', 'two-handed'],
+		properties: ['Heavy', 'Reach', 'Two-Handed'],
 		category: 'martial',
 		type: 'melee'
 	},
@@ -180,7 +180,7 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '1d12',
 		damageType: 'slashing',
 		attackAbility: 'STR',
-		properties: ['heavy', 'two-handed'],
+		properties: ['Heavy', 'Two-Handed'],
 		category: 'martial',
 		type: 'melee'
 	},
@@ -189,7 +189,7 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '2d6',
 		damageType: 'slashing',
 		attackAbility: 'STR',
-		properties: ['heavy', 'two-handed'],
+		properties: ['Heavy', 'Two-Handed'],
 		category: 'martial',
 		type: 'melee'
 	},
@@ -198,16 +198,17 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '1d10',
 		damageType: 'slashing',
 		attackAbility: 'STR',
-		properties: ['heavy', 'reach', 'two-handed'],
+		properties: ['Heavy', 'Reach', 'Two-Handed'],
 		category: 'martial',
 		type: 'melee'
 	},
+	// Consider removing lance
 	'Lance': {
 		name: 'Lance',
 		damage: '1d12',
 		damageType: 'piercing',
 		attackAbility: 'STR',
-		properties: ['reach', 'special'],
+		properties: ['Two-Handed', 'Reach (Special)'],
 		category: 'martial',
 		type: 'melee'
 	},
@@ -216,7 +217,7 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '1d8',
 		damageType: 'slashing',
 		attackAbility: 'STR',
-		properties: ['versatile (1d10)'],
+		properties: ['Versatile (1d10)'],
 		category: 'martial',
 		type: 'melee'
 	},
@@ -225,7 +226,7 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '2d6',
 		damageType: 'bludgeoning',
 		attackAbility: 'STR',
-		properties: ['heavy', 'two-handed'],
+		properties: ['Heavy', 'Two-Handed'],
 		category: 'martial',
 		type: 'melee'
 	},
@@ -243,7 +244,7 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '1d10',
 		damageType: 'piercing',
 		attackAbility: 'STR',
-		properties: ['heavy', 'reach', 'two-handed'],
+		properties: ['Heavy', 'Reach', 'Two-Handed'],
 		category: 'martial',
 		type: 'melee'
 	},
@@ -252,7 +253,7 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '1d8',
 		damageType: 'piercing',
 		attackAbility: 'EITHER',
-		properties: ['finesse'],
+		properties: ['Finesse'],
 		category: 'martial',
 		type: 'melee'
 	},
@@ -261,7 +262,7 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '1d6',
 		damageType: 'slashing',
 		attackAbility: 'EITHER',
-		properties: ['finesse', 'light'],
+		properties: ['Finesse', 'Light'],
 		category: 'martial',
 		type: 'melee'
 	},
@@ -270,7 +271,7 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '1d6',
 		damageType: 'piercing',
 		attackAbility: 'EITHER',
-		properties: ['finesse', 'light'],
+		properties: ['Finesse', 'Light'],
 		category: 'martial',
 		type: 'melee'
 	},
@@ -279,7 +280,7 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '1d6',
 		damageType: 'piercing',
 		attackAbility: 'STR',
-		properties: ['thrown', 'versatile (1d8)'],
+		properties: ['Thrown (20/60ft)', 'Versatile (1d8)'],
 		category: 'martial',
 		type: 'melee'
 	},
@@ -297,7 +298,7 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '1d8',
 		damageType: 'bludgeoning',
 		attackAbility: 'STR',
-		properties: ['versatile (1d10)'],
+		properties: ['Versatile (1d10)'],
 		category: 'martial',
 		type: 'melee'
 	},
@@ -306,7 +307,7 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '1d4',
 		damageType: 'slashing',
 		attackAbility: 'EITHER',
-		properties: ['finesse', 'reach'],
+		properties: ['Finesse', 'Reach'],
 		category: 'martial',
 		type: 'melee'
 	},
@@ -317,25 +318,25 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '1',
 		damageType: 'piercing',
 		attackAbility: 'DEX',
-		properties: ['ammunition', 'loading'],
+		properties: ['Range (25/100ft)', 'Loading'],
 		category: 'martial',
 		type: 'ranged'
 	},
 	'Hand crossbow': {
-		name: 'Hand crossbow',
+		name: 'Hand Crossbow',
 		damage: '1d6',
 		damageType: 'piercing',
 		attackAbility: 'DEX',
-		properties: ['ammunition', 'light', 'loading'],
+		properties: ['Range (30/120ft)', 'Light', 'Loading'],
 		category: 'martial',
 		type: 'ranged'
 	},
 	'Heavy crossbow': {
-		name: 'Heavy crossbow',
+		name: 'Heavy Crossbow',
 		damage: '1d10',
 		damageType: 'piercing',
 		attackAbility: 'DEX',
-		properties: ['ammunition', 'heavy', 'loading', 'two-handed'],
+		properties: ['Range (100/400ft)', 'Heavy', 'Loading', 'Two-Handed'],
 		category: 'martial',
 		type: 'ranged'
 	},
@@ -344,7 +345,7 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '1d8',
 		damageType: 'piercing',
 		attackAbility: 'DEX',
-		properties: ['ammunition', 'heavy', 'two-handed'],
+		properties: ['Range (150/600ft)', 'Heavy', 'Two-Handed'],
 		category: 'martial',
 		type: 'ranged'
 	},
@@ -353,7 +354,7 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '0',
 		damageType: 'special',
 		attackAbility: 'DEX',
-		properties: ['special', 'thrown'],
+		properties: ['Thrown (5/15ft)', 'Restrain (DC 10)'],
 		category: 'martial',
 		type: 'ranged'
 	}

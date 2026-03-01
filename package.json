@@ -32,8 +32,11 @@
 		"vite": "^7.1.12"
 	},
 	"dependencies": {
+		"@pdf-lib/fontkit": "^1.1.1",
 		"@sveltejs/kit": "^1.30.3",
+		"fs": "^0.0.1-security",
 		"html2pdf.js": "^0.12.1",
+		"path": "^0.12.7",
 		"pdf-lib": "^1.17.1",
 		"vite": "^4.5.3"
 	}

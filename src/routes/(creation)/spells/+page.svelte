@@ -362,6 +362,7 @@
 	let activeTab = ''; // Current active tab ID
 
 	function toggleSpell(spellName: string, chooseable: boolean, spell?: any) {
+		
 		if (!chooseable) return; // Can't toggle non-chooseable spells
 
 		// Check if we can add more spells before allowing selection
@@ -416,13 +417,27 @@
 			name,
 			...metadata
 		}));
-		
+
 		const spellSelections = {
 			spells: spellSelectionsWithMetadata // Store full objects with metadata
 		};
+
+
+		let spellSelectionsArraySimple: string[] = Array.from(selectedSpells.keys())
+
+		const spellSelectionsSimple = {
+			spells: spellSelectionsArraySimple
+		};
 		
 		// Apply the spell selections to character.spells
-		applyChoice(scopeId, spellSelections);
+		
+		// TODO: figure out what this was supposed to do
+		// it seems like we are taking our spell selection metadata and trying to force it into spells.
+		// but... isn't spells just string[] ? I dont think we can put this metadata there.
+
+		// Update: I have made a 'simple' version of the spell selections that just applies the list of spell names, no metadata.
+
+		applyChoice(scopeId, spellSelectionsSimple);
 		
 		// Also store metadata in provenance for restoration
 		// Update the provenance to include metadata
@@ -519,8 +534,7 @@
 					spell.chooseable &&
 					selectedSpells.has(spell.name) &&
 					(spell.source === 'class' ||
-						(spell.source === 'subclass' && !spell.sourceName.includes(' - '))) &&
-					spell.source !== 'feature'
+						(spell.source === 'subclass' && !spell.sourceName.includes(' - ')))
 			).length;
 			return selectedCount < limits.cantrips;
 		} else if (limits.isSharedLimits && (spellLevel === 1 || spellLevel === 2)) {
@@ -534,16 +548,14 @@
 					spell.chooseable &&
 					selectedSpells.has(spell.name) &&
 					(spell.source === 'class' ||
-						(spell.source === 'subclass' && !spell.sourceName.includes(' - '))) &&
-					spell.source !== 'feature'
+						(spell.source === 'subclass' && !spell.sourceName.includes(' - ')))
 			).length;
 			const selectedLevel2Count = availableLevel2.filter(
 				(spell) =>
 					spell.chooseable &&
 					selectedSpells.has(spell.name) &&
 					(spell.source === 'class' ||
-						(spell.source === 'subclass' && !spell.sourceName.includes(' - '))) &&
-					spell.source !== 'feature'
+						(spell.source === 'subclass' && !spell.sourceName.includes(' - ')))
 			).length;
 			const totalSelectedLeveled = selectedLevel1Count + selectedLevel2Count;
 			return totalSelectedLeveled < limits.sharedLeveled;
@@ -557,8 +569,7 @@
 					spell.chooseable &&
 					selectedSpells.has(spell.name) &&
 					(spell.source === 'class' ||
-						(spell.source === 'subclass' && !spell.sourceName.includes(' - '))) &&
-					spell.source !== 'feature'
+						(spell.source === 'subclass' && !spell.sourceName.includes(' - ')))
 			).length;
 
 			switch (spellLevel) {
@@ -1848,7 +1859,6 @@
 														alt={tag} 
 														title={tag}
 														class="tag-icon"
-														on:error={(e) => e.currentTarget.style.display = 'none'}
 													/>
 												{/each}
 											</span>

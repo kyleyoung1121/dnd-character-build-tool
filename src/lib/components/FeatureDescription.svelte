@@ -32,7 +32,7 @@
 	// --- Character snapshot ---
 	let character: Character | null = null;
 	const unsubscribe = character_store.subscribe((c) => {
-		console.log('[complex_desc] Character updated in FeatureDescription:', c.charisma);
+		//console.log('[complex_desc] Character updated in FeatureDescription:', c.charisma);
         character = c;
 	});
 
@@ -46,10 +46,10 @@
 	}
 
 	function resolveComputedValue(value: ComputedValue): number | null {
-        console.log('[complex_desc] Resolving:', value);
+        //console.log('[complex_desc] Resolving:', value);
 
         if (!character) {
-            console.log('[complex_desc] No character');
+            //console.log('[complex_desc] No character');
             return null;
         }
 
@@ -67,7 +67,7 @@
 
 			case 'derived': {
                 let result = evaluateFormula(value.formula);
-				console.log('[complex_desc] Derived result:', result);
+				//console.log('[complex_desc] Derived result:', result);
                 return result
 			}
 

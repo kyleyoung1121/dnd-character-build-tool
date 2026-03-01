@@ -15,9 +15,9 @@ export function applyChoice(
 	changes: Partial<Character> = {},
 	mods?: Record<string, number>
 ) {
-	console.log(`[applyChoice] Called with scopeId: ${scopeId}`);
-	console.log(`[applyChoice] Changes:`, changes);
-	console.log(`[applyChoice] Mods:`, mods);
+	//console.log(`[applyChoice] Called with scopeId: ${scopeId}`);
+	//console.log(`[applyChoice] Changes:`, changes);
+	//console.log(`[applyChoice] Mods:`, mods);
 	
 	character_store.update((char) => {
 		// If this scope already applied something, revert it first (fresh apply)

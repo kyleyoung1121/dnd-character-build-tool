@@ -26,13 +26,13 @@
 
 	// Handle feature option selection
 	function handleSelectOption(feature: FeaturePrompt, index: number, selectedOption: string, parentFeatureName?: string | null, parentIndex?: number | null) {
-		console.log(`[HANDLE_SELECT] Called with:`, {
-			feature: feature.name,
-			index,
-			selectedOption,
-			parentFeatureName,
-			parentIndex
-		});
+		// console.log(`[HANDLE_SELECT] Called with:`, {
+		// 	feature: feature.name,
+		// 	index,
+		// 	selectedOption,
+		// 	parentFeatureName,
+		// 	parentIndex
+		// });
 		if (!selectedOption) return;
 
 		const normalizedChoice = selectedOption;
@@ -75,9 +75,9 @@
 					key.startsWith(prevScopeId + ':')
 				);
 				
-				console.log(`[CLEANUP] Looking for nested scopes under: ${prevScopeId}`);
-			console.log(`[CLEANUP] All provenance keys:`, Object.keys(state._provenance));
-			console.log(`[CLEANUP] Found scopes to revert:`, scopesToRevert);
+			//console.log(`[CLEANUP] Looking for nested scopes under: ${prevScopeId}`);
+			//console.log(`[CLEANUP] All provenance keys:`, Object.keys(state._provenance));
+			//console.log(`[CLEANUP] Found scopes to revert:`, scopesToRevert);
 				
 				for (const scopeKey of scopesToRevert) {
 					revertChanges(state, scopeKey);
@@ -100,14 +100,14 @@
 			: `feature:${feature.name}:${index}`;
 		
 		// DEBUG: Log scopeId generation
-		console.log(`[SCOPEID] Saving selection:`, {
-			feature: feature.name,
-			parent: parentFeatureName || 'none',
-			parentIndex: parentIndex !== null && parentIndex !== undefined ? parentIndex : 'none',
-			scopeId,
-			index,
-			selectedOption
-		});
+		// //console.log(`[SCOPEID] Saving selection:`, {
+		// 	feature: feature.name,
+		// 	parent: parentFeatureName || 'none',
+		// 	parentIndex: parentIndex !== null && parentIndex !== undefined ? parentIndex : 'none',
+		// 	scopeId,
+		// 	index,
+		// 	selectedOption
+		// });
 
 		// Handle reverting any static nested effects that were tied to the previous choice
 		// IMPORTANT: Do this BEFORE applying new effects to avoid smart removal incorrectly
@@ -123,7 +123,7 @@
 						const prevNestedScopeId = parentFeatureName && parentIndex !== null && parentIndex !== undefined
 							? `feature:${parentFeatureName}:${parentIndex}:${feature.name}:${index}:${nested.name}:${nestedIdx}`
 							: `feature:${feature.name}:${index}:${nested.name}:${nestedIdx}`;
-						console.log(`[CLEANUP] Reverting nested feature with options: ${prevNestedScopeId}`);
+						//console.log(`[CLEANUP] Reverting nested feature with options: ${prevNestedScopeId}`);
 						applyChoice(prevNestedScopeId, {});
 					}
 				} else {
@@ -153,7 +153,7 @@
 		}
 
 		// Apply the new choice effects (applyChoice handles reverting previous effects automatically)
-		console.log(`[BEFORE_APPLY] About to call applyFeatureEffects for "${feature.name}" with choice "${normalizedChoice}"`);
+		//console.log(`[BEFORE_APPLY] About to call applyFeatureEffects for "${feature.name}" with choice "${normalizedChoice}"`);
 		applyFeatureEffects(feature, normalizedChoice, scopeId, index, parentFeatureName, parentIndex);
 
 		// Force conflict detection to trigger immediately for reactive UI updates
@@ -191,10 +191,10 @@
 		parentFeatureName?: string | null,
 		parentIndex?: number | null
 	) {
-		console.log(`[APPLY_EFFECTS] Called for feature "${feature.name}" with choice "${choice}"`);
-		console.log(`[APPLY_EFFECTS] Feature has featureOptions:`, !!feature.featureOptions);
-		console.log(`[APPLY_EFFECTS] Parent feature:`, parentFeatureName || 'none');
-		console.log(`[APPLY_EFFECTS] Full feature object:`, feature);
+		//console.log(`[APPLY_EFFECTS] Called for feature "${feature.name}" with choice "${choice}"`);
+		//console.log(`[APPLY_EFFECTS] Feature has featureOptions:`, !!feature.featureOptions);
+		//console.log(`[APPLY_EFFECTS] Parent feature:`, parentFeatureName || 'none');
+		//console.log(`[APPLY_EFFECTS] Full feature object:`, feature);
 		
 		// Prepare containers for ONLY the effects that depend on this choice
 		const update: Record<string, any> = {};
@@ -273,13 +273,13 @@
 
 		// Apply newly revealed static nested features (no user input) for THIS choice
 		const newlyRevealed = getNestedPrompts(feature, [choice]) || [];
-		console.log(`[NESTED] Found ${newlyRevealed.length} nested prompts for choice "${choice}" on feature "${feature.name}"`);
+		//console.log(`[NESTED] Found ${newlyRevealed.length} nested prompts for choice "${choice}" on feature "${feature.name}"`);
 		for (const nested of newlyRevealed) {
-			console.log(`[NESTED] Processing nested feature: "${nested.name}", hasOptions: ${!!nested.featureOptions}`);
-			console.log(`[NESTED] Nested effects:`, nested.effects);
+			//console.log(`[NESTED] Processing nested feature: "${nested.name}", hasOptions: ${!!nested.featureOptions}`);
+			//console.log(`[NESTED] Nested effects:`, nested.effects);
 			// Skip nested prompts that have their own options; those will be handled by user interaction later
 			if (nested.featureOptions) {
-				console.log(`[NESTED] Skipping "${nested.name}" because it has featureOptions`);
+				//console.log(`[NESTED] Skipping "${nested.name}" because it has featureOptions`);
 				continue;
 			}
 
@@ -323,8 +323,8 @@
 				}
 			}
 
-			console.log(`[NESTED] Applying choice for "${nested.name}" with scopeId: ${nestedScopeId}`);
-			console.log(`[NESTED] Update:`, nestedUpdate, 'Modify:', nestedModify);
+			//console.log(`[NESTED] Applying choice for "${nested.name}" with scopeId: ${nestedScopeId}`);
+			//console.log(`[NESTED] Update:`, nestedUpdate, 'Modify:', nestedModify);
 			applyChoice(nestedScopeId, nestedUpdate, nestedModify);
 		}
 
@@ -332,14 +332,14 @@
 		// This handles cases like Warlock invocations where the option (e.g., "Beguiling Influence")
 		// has its own nestedPrompts array with effects that need to be applied
 		if (feature.featureOptions) {
-			console.log(`[OPTION_NESTED] Checking for nested prompts in selected option: "${choice}"`);
+			//console.log(`[OPTION_NESTED] Checking for nested prompts in selected option: "${choice}"`);
 			const selectedOption = feature.featureOptions.options.find(opt => opt.name === choice);
-			console.log(`[OPTION_NESTED] Selected option:`, selectedOption);
+			//console.log(`[OPTION_NESTED] Selected option:`, selectedOption);
 			if (selectedOption?.nestedPrompts) {
-				console.log(`[OPTION_NESTED] Found ${selectedOption.nestedPrompts.length} nested prompts in option "${choice}"`);
+				//console.log(`[OPTION_NESTED] Found ${selectedOption.nestedPrompts.length} nested prompts in option "${choice}"`);
 				for (const optionNested of selectedOption.nestedPrompts) {
-					console.log(`[OPTION_NESTED] Processing option nested: "${optionNested.name}"`);
-					console.log(`[OPTION_NESTED] Effects:`, optionNested.effects);
+					//console.log(`[OPTION_NESTED] Processing option nested: "${optionNested.name}"`);
+					//console.log(`[OPTION_NESTED] Effects:`, optionNested.effects);
 					const optionNestedScopeId = parentFeatureName && parentIndex !== null && parentIndex !== undefined
 						? `feature:${parentFeatureName}:${parentIndex}:${feature.name}:${index}:${optionNested.name}`
 						: `feature:${feature.name}:${index}:${optionNested.name}`;
@@ -379,12 +379,12 @@
 						}
 					}
 
-					console.log(`[OPTION_NESTED] Applying choice for "${optionNested.name}" with scopeId: ${optionNestedScopeId}`);
-					console.log(`[OPTION_NESTED] Update:`, optionNestedUpdate, 'Modify:', optionNestedModify);
+					//console.log(`[OPTION_NESTED] Applying choice for "${optionNested.name}" with scopeId: ${optionNestedScopeId}`);
+					//console.log(`[OPTION_NESTED] Update:`, optionNestedUpdate, 'Modify:', optionNestedModify);
 					applyChoice(optionNestedScopeId, optionNestedUpdate, optionNestedModify);
 				}
 			} else {
-				console.log(`[OPTION_NESTED] No nested prompts found in selected option "${choice}"`);
+				//console.log(`[OPTION_NESTED] No nested prompts found in selected option "${choice}"`);
 			}
 		}
 	}

@@ -24,7 +24,7 @@ export function initializeSpellCleanup() {
 	if (isInitialized) return;
 	isInitialized = true;
 
-	console.log('[Spell Cleanup] Service initialized');
+	//console.log('[Spell Cleanup] Service initialized');
 
 	// Subscribe to character store changes
 	character_store.subscribe((character) => {
@@ -48,14 +48,14 @@ export function initializeSpellCleanup() {
 
 		// Skip first run - just capture initial state
 		if (previousClass === null) {
-			console.log('[Spell Cleanup] Capturing initial state:', {
-				class: currentClass,
-				subclass: currentSubclass,
-				race: currentRace,
-				subrace: currentSubrace,
-				pactBoon: currentPactBoon,
-				features: currentFeatures.length
-			});
+			//console.log('[Spell Cleanup] Capturing initial state:', {
+			// 	class: currentClass,
+			// 	subclass: currentSubclass,
+			// 	race: currentRace,
+			// 	subrace: currentSubrace,
+			// 	pactBoon: currentPactBoon,
+			// 	features: currentFeatures.length
+			// });
 			previousClass = currentClass;
 			previousSubclass = currentSubclass;
 			previousRace = currentRace;
@@ -78,16 +78,16 @@ export function initializeSpellCleanup() {
 			return;
 		}
 
-		console.log('[Spell Cleanup] Change detected:', {
-			classChanged,
-			subclassChanged,
-			raceChanged,
-			subraceChanged,
-			pactBoonChanged,
-			featuresChanged,
-			from: { class: previousClass, subclass: previousSubclass, race: previousRace, subrace: previousSubrace, pactBoon: previousPactBoon },
-			to: { class: currentClass, subclass: currentSubclass, race: currentRace, subrace: currentSubrace, pactBoon: currentPactBoon }
-		});
+		//console.log('[Spell Cleanup] Change detected:', {
+		// 	classChanged,
+		// 	subclassChanged,
+		// 	raceChanged,
+		// 	subraceChanged,
+		// 	pactBoonChanged,
+		// 	featuresChanged,
+		// 	from: { class: previousClass, subclass: previousSubclass, race: previousRace, subrace: previousSubrace, pactBoon: previousPactBoon },
+		// 	to: { class: currentClass, subclass: currentSubclass, race: currentRace, subrace: currentSubrace, pactBoon: currentPactBoon }
+		// });
 
 		// Update tracked values BEFORE cleanup so we have the old values for comparison
 		const oldClass = previousClass || '';
@@ -189,19 +189,19 @@ function cleanupInvalidSpells(
 	const provenanceData = character._provenance?.[scopeId];
 
 	if (!provenanceData) {
-		console.log('[Spell Cleanup] No spell selections found');
+		//console.log('[Spell Cleanup] No spell selections found');
 		return { patronSpells: [], pactBoonSpells: [], featureSpells: [], otherSpells: [] }; // No spells selected
 	}
 
 	const actualData = (provenanceData as any)._set || provenanceData;
 	if (!actualData.spells || !Array.isArray(actualData.spells)) {
-		console.log('[Spell Cleanup] No spells array found');
+		//console.log('[Spell Cleanup] No spells array found');
 		return { patronSpells: [], pactBoonSpells: [], featureSpells: [], otherSpells: [] };
 	}
 
-	console.log('[Spell Cleanup] Found', actualData.spells.length, 'spells to check');
-	console.log('[Spell Cleanup] Current changes:', changes);
-	console.log('[Spell Cleanup] Spells before filter:', JSON.stringify(actualData.spells, null, 2));
+	//console.log('[Spell Cleanup] Found', actualData.spells.length, 'spells to check');
+	//console.log('[Spell Cleanup] Current changes:', changes);
+	//console.log('[Spell Cleanup] Spells before filter:', JSON.stringify(actualData.spells, null, 2));
 
 	// Track removed spells by type
 	const removedPatronSpells: string[] = [];
@@ -217,13 +217,13 @@ function cleanupInvalidSpells(
 		// Handle different formats
 		if (typeof item === 'string') {
 			// Legacy format - can't determine validity, remove it to be safe
-			console.log('[Spell Cleanup] Removing legacy format spell:', item);
+			//console.log('[Spell Cleanup] Removing legacy format spell:', item);
 			removedOtherSpells.push(item);
 			return false;
 		}
 
 		if (!item || !item.name) {
-			console.log('[Spell Cleanup] Removing invalid spell item:', item);
+			//console.log('[Spell Cleanup] Removing invalid spell item:', item);
 			if (item?.name) removedOtherSpells.push(item.name);
 			return false;
 		}
@@ -234,9 +234,9 @@ function cleanupInvalidSpells(
 		// Check if this is a patron spell that's no longer valid due to patron change
 		if (changes.oldClass === 'Warlock' && changes.newClass === 'Warlock' && changes.oldSubclass !== changes.newSubclass) {
 			if (oldPatronSpells.includes(item.name)) {
-				console.log(
-					`[Spell Cleanup] Removing ${item.name} - patron changed: needed "${changes.oldSubclass}", have "${changes.newSubclass}"`
-				);
+				//console.log(
+				// 	`[Spell Cleanup] Removing ${item.name} - patron changed: needed "${changes.oldSubclass}", have "${changes.newSubclass}"`
+				// );
 				removedPatronSpells.push(item.name);
 				return false;
 			}
@@ -247,9 +247,9 @@ function cleanupInvalidSpells(
 			const selectedFrom = metadata.tabSource;
 			// Check if this spell was selected from the old pact boon tab
 			if (selectedFrom && selectedFrom.includes(changes.oldPactBoon)) {
-				console.log(
-					`[Spell Cleanup] Removing ${item.name} - pact boon changed: needed "${changes.oldPactBoon}", have "${changes.newPactBoon}"`
-				);
+				//console.log(
+				// 	`[Spell Cleanup] Removing ${item.name} - pact boon changed: needed "${changes.oldPactBoon}", have "${changes.newPactBoon}"`
+				// );
 				removedPactBoonSpells.push(item.name);
 				return false;
 			}
@@ -282,9 +282,9 @@ function cleanupInvalidSpells(
 			});
 
 			if (wasGrantedByFeature && !isStillGrantedByFeature) {
-				console.log(
-					`[Spell Cleanup] Removing ${item.name} - feature granting spell was removed`
-				);
+				//console.log(
+				// 	`[Spell Cleanup] Removing ${item.name} - feature granting spell was removed`
+				// );
 				removedFeatureSpells.push(item.name);
 				return false;
 			}
@@ -305,9 +305,9 @@ function cleanupInvalidSpells(
 		// For class spells: only check class
 		if (isClassSpell) {
 				if (metadata.charClass && metadata.charClass !== changes.newClass) {
-				console.log(
-					`[Spell Cleanup] Removing ${item.name} - class changed: needed "${metadata.charClass}", have "${changes.newClass}"`
-				);
+				//console.log(
+				// 	`[Spell Cleanup] Removing ${item.name} - class changed: needed "${metadata.charClass}", have "${changes.newClass}"`
+				// );
 				removedOtherSpells.push(item.name);
 				return false;
 			}
@@ -316,16 +316,16 @@ function cleanupInvalidSpells(
 		// For subclass spells: check both class and subclass
 		else if (isSubclassSpell) {
 			if (metadata.charClass && metadata.charClass !== changes.newClass) {
-				console.log(
-					`[Spell Cleanup] Removing ${item.name} - class changed (subclass spell): needed "${metadata.charClass}", have "${changes.newClass}"`
-				);
+				//console.log(
+				// 	`[Spell Cleanup] Removing ${item.name} - class changed (subclass spell): needed "${metadata.charClass}", have "${changes.newClass}"`
+				// );
 				removedOtherSpells.push(item.name);
 				return false;
 			}
 			if (metadata.charSubclass && metadata.charSubclass !== changes.newSubclass) {
-				console.log(
-					`[Spell Cleanup] Removing ${item.name} - subclass changed: needed "${metadata.charSubclass}", have "${changes.newSubclass}"`
-				);
+				//console.log(
+				// 	`[Spell Cleanup] Removing ${item.name} - subclass changed: needed "${metadata.charSubclass}", have "${changes.newSubclass}"`
+				// );
 				removedOtherSpells.push(item.name);
 				return false;
 			}
@@ -334,16 +334,16 @@ function cleanupInvalidSpells(
 		// For race spells: check race and subrace
 		else if (isRaceSpell) {
 			if (metadata.charRace && metadata.charRace !== changes.newRace) {
-				console.log(
-					`[Spell Cleanup] Removing ${item.name} - race changed: needed "${metadata.charRace}", have "${changes.newRace}"`
-				);
+				//console.log(
+				// 	`[Spell Cleanup] Removing ${item.name} - race changed: needed "${metadata.charRace}", have "${changes.newRace}"`
+				// );
 				removedOtherSpells.push(item.name);
 				return false;
 			}
 			if (metadata.charSubrace && metadata.charSubrace !== changes.newSubrace) {
-				console.log(
-					`[Spell Cleanup] Removing ${item.name} - subrace changed: needed "${metadata.charSubrace}", have "${changes.newSubrace}"`
-				);
+				//console.log(
+				// 	`[Spell Cleanup] Removing ${item.name} - subrace changed: needed "${metadata.charSubrace}", have "${changes.newSubrace}"`
+				// );
 				removedOtherSpells.push(item.name);
 				return false;
 			}
@@ -352,29 +352,29 @@ function cleanupInvalidSpells(
 		// For unknown/legacy sources, be conservative and only remove if class changed
 		else {
 			if (metadata.charClass && metadata.charClass !== changes.newClass) {
-				console.log(
-					`[Spell Cleanup] Removing ${item.name} - class changed (unknown source): needed "${metadata.charClass}", have "${changes.newClass}"`
-				);
+				//console.log(
+				// 	`[Spell Cleanup] Removing ${item.name} - class changed (unknown source): needed "${metadata.charClass}", have "${changes.newClass}"`
+				// );
 				removedOtherSpells.push(item.name);
 				return false;
 			}
 		}
 
-		console.log(`[Spell Cleanup] Keeping ${item.name} - still valid`);
+		//console.log(`[Spell Cleanup] Keeping ${item.name} - still valid`);
 		return true; // Keep - still valid
 	});
 
 	// If any spells were removed, update the store
 	if (validSpells.length !== actualData.spells.length) {
-		console.log(
-			`[Spell Cleanup] Updating spells: ${actualData.spells.length} -> ${validSpells.length} (removed ${actualData.spells.length - validSpells.length})`
-		);
+		//console.log(
+		// 	`[Spell Cleanup] Updating spells: ${actualData.spells.length} -> ${validSpells.length} (removed ${actualData.spells.length - validSpells.length})`
+		// );
 		const updatedSelections = {
 			spells: validSpells
 		};
 		applyChoice(scopeId, updatedSelections);
 	} else {
-		console.log('[Spell Cleanup] No spells removed');
+		//console.log('[Spell Cleanup] No spells removed');
 	}
 
 	return { patronSpells: removedPatronSpells, pactBoonSpells: removedPactBoonSpells, featureSpells: removedFeatureSpells, otherSpells: removedOtherSpells };

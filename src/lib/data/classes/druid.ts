@@ -353,7 +353,6 @@ const druidCirclePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'druid.circle_of_the_land_mountain',
-						importance: 'invisible',
 						importance: 'minor',
 						effects: [{ target: 'features', action: 'add', value: 'Natural Recovery' }]
 					}

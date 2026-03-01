@@ -340,7 +340,14 @@ export const PAGE_2_FIELDS = {
  * PDF Configuration
  */
 export const PDF_CONFIG = {
-	templatePath: '/pdf-templates/dnd-character-sheet-blank.pdf',
+	templatePaths: [
+		//'/pdf-templates/dnd-character-sheet-blank.pdf'
+		'/pdf-templates/page_one.pdf', // first page
+		'/pdf-templates/page_two.pdf', // full box (second page)
+	],
+	fontPaths: [
+		'/pdf-templates/fonts/fonnts.com-Modesto-Text-Light.otf'
+	],
 	pageWidth: 612,  // US Letter width in points
 	pageHeight: 792, // US Letter height in points
 	defaultFontSize: 10,

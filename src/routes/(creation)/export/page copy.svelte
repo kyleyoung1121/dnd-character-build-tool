@@ -51,7 +51,7 @@
 	}
 
 	function handleDummy(action: string) {
-		alert(`${action} clicked`);
+		//alert(`${action} clicked`);
 	}
 
 	// Helper function to calculate ability modifier

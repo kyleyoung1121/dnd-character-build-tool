@@ -111,19 +111,19 @@ export function splitFeaturesByPage(
 	for (const feature of features) {
 		const featureLines = feature.estimatedLines;
 		
-		console.log(`[splitFeaturesByPage] Evaluating: "${feature.name}"`);
-		console.log(`  Importance: ${feature.importance}, Source: ${feature.source}`);
-		console.log(`  Estimated lines: ${featureLines}`);
-		console.log(`  Current lines used: ${currentLines} / ${maxLinesPage1}`);
-		console.log(`  Space needed: ${currentLines + featureLines} / ${maxLinesPage1}`);
+		//console.log(`[splitFeaturesByPage] Evaluating: "${feature.name}"`);
+		//console.log(`  Importance: ${feature.importance}, Source: ${feature.source}`);
+		//console.log(`  Estimated lines: ${featureLines}`);
+		//console.log(`  Current lines used: ${currentLines} / ${maxLinesPage1}`);
+		//console.log(`  Space needed: ${currentLines + featureLines} / ${maxLinesPage1}`);
 		
 		// Check if this feature fits on page 1
 		if (currentLines + featureLines <= maxLinesPage1) {
-			console.log(`  ✓ FITS on page 1`);
+			//console.log(`  ✓ FITS on page 1`);
 			page1Features.push(feature.formattedText);
 			currentLines += featureLines;
 		} else {
-			console.log(`  ✗ OVERFLOW to page 2 (would exceed by ${(currentLines + featureLines) - maxLinesPage1} lines)`);
+			//console.log(`  ✗ OVERFLOW to page 2 (would exceed by ${(currentLines + featureLines) - maxLinesPage1} lines)`);
 			// Feature doesn't fit - goes to page 2
 			// Don't add it to page 1 even partially (no half-cut features)
 			page2Features.push(feature.formattedText);
@@ -166,8 +166,8 @@ export function prepareFeaturesWithOverflow(
 		page2Count: number;
 	};
 } {
-	console.log('=== prepareFeaturesWithOverflow ===');
-	console.log('Input features:', featureNames);
+	//console.log('=== prepareFeaturesWithOverflow ===');
+	//console.log('Input features:', featureNames);
 	
 	if (!featureNames || featureNames.length === 0) {
 		return {
@@ -199,7 +199,7 @@ export function prepareFeaturesWithOverflow(
 		// Skip invisible features
 		const importance = featureData.importance || 'important';
 		if (importance === 'invisible') {
-			console.log(`Skipping invisible feature: ${name}`);
+			//console.log(`Skipping invisible feature: ${name}`);
 			continue;
 		}
 		
@@ -213,10 +213,10 @@ export function prepareFeaturesWithOverflow(
 			textAreaConfig.fontSize
 		);
 		
-		console.log(`[prepareFeaturesWithOverflow] Feature: "${name}"`);
-		console.log(`  Importance: ${importance}, Source: ${featureData.source}`);
-		console.log(`  Formatted text length: ${formattedText.length} chars`);
-		console.log(`  Estimated lines: ${estimatedLines}`);
+		//console.log(`[prepareFeaturesWithOverflow] Feature: "${name}"`);
+		//console.log(`  Importance: ${importance}, Source: ${featureData.source}`);
+		//console.log(`  Formatted text length: ${formattedText.length} chars`);
+		//console.log(`  Estimated lines: ${estimatedLines}`);
 		
 		featureEntries.push({
 			name,
@@ -233,17 +233,17 @@ export function prepareFeaturesWithOverflow(
 		}
 	}
 	
-	console.log(`Feature entries created: ${featureEntries.length}`);
-	console.log(`  Important: ${importantCount}, Minor: ${minorCount}`);
+	//console.log(`Feature entries created: ${featureEntries.length}`);
+	//console.log(`  Important: ${importantCount}, Minor: ${minorCount}`);
 	
 	// Sort by priority
 	const sortedFeatures = sortFeaturesByPriority(featureEntries);
-	console.log('Features sorted by priority');
+	//console.log('Features sorted by priority');
 	
 	// Split between pages
 	const split = splitFeaturesByPage(sortedFeatures, maxLinesPage1);
 	
-	console.log(`Split result: Page 1: ${split.page1Count}, Page 2: ${split.page2Count}`);
+	//console.log(`Split result: Page 1: ${split.page1Count}, Page 2: ${split.page2Count}`);
 	
 	return {
 		page1Text: split.page1Features.join('\n\n'),

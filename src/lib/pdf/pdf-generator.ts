@@ -838,7 +838,7 @@ async function fillPageOneNew(
 			let paladinBASpells = ['Shield of Faith', "Hunter's Mark", 'Compelled Duel', 'Divine Favor', 'Searing Smite', 'Thunderous Smite', 'Wrathful Smite'];
 
 			for (let i = 0; i < paladinBASpells.length; i++) {
-				if (data.features.filter(feature => {return feature == paladinBASpells[i]}).length) {
+				if (data.spells.filter(spell => {return spell.name == paladinBASpells[i]}).length) {
 					core_bonus_actions.push(paladinBASpells[i]);
 				}
 			}
@@ -855,13 +855,13 @@ async function fillPageOneNew(
 			let rangerBASpells = ['Hail of Thorns', "Hunter's Mark"];
 
 			for (let i = 0; i < rangerBASpells.length; i++) {
-				if (data.features.filter(feature => {return feature == rangerBASpells[i]}).length) {
+				if (data.spells.filter(spell => {return spell.name == rangerBASpells[i]}).length) {
 					core_bonus_actions.push(rangerBASpells[i]);
 				}
 			}
 
 			// Add any of these feature actions that the player has
-			let rangerFeatureOther = ['Giant Killer', 'Horde Breaker'];
+			let rangerFeatureOther = ['Giant Killer', 'Horde Breaker', 'Colossus Slayer'];
 			for (let i = 0; i < rangerFeatureOther.length; i++) {
 				if (data.features.filter(feature => {return feature == rangerFeatureOther[i]}).length) {
 					core_other.push(rangerFeatureOther[i]);
@@ -876,12 +876,27 @@ async function fillPageOneNew(
 			core_bonus_actions.push('Hide');
 
 			if (data.classAndLevel.includes('Thief')) {
-				core_bonus_actions.push('Sleight of Hand');
-				core_bonus_actions.push('Disarm/Unlock');
+				core_bonus_actions.push('Fast Hands');
 			}
 			if (data.classAndLevel.includes('Arcane Trickster')) {
 				core_actions.push('Spellcasting');
 			}
+
+			// Add any of these spells that the player has
+			let rogueBASpells = ['Expeditious Retreat'];
+			let rogueOtherSpells = ['Feather Fall', 'Shield'];
+			
+			for (let i = 0; i < rogueBASpells.length; i++) {
+				if (data.spells.filter(spell => {return spell.name == rogueBASpells[i]}).length) {
+					core_bonus_actions.push(rogueBASpells[i]);
+				}
+			}
+			for (let i = 0; i < rogueOtherSpells.length; i++) {
+				if (data.spells.filter(spell => {return spell.name == rogueOtherSpells[i]}).length) {
+					core_other.push(rogueOtherSpells[i]);
+				}
+			}
+			break;
 			break;
 		
 		case 'Sorcerer':
@@ -932,11 +947,11 @@ async function fillPageOneNew(
 				core_actions.push('Fey Presence');
 			}
 
-			if (data.classAndLevel.includes('Chain')) {
+			if (data.features.includes('Pact of the Chain')) {
 				core_actions.push('Familiar Attack');
 			}
 
-			if (data.classAndLevel.includes('Blade')) {
+			if (data.features.includes('Pact of the Blade')) {
 				core_actions.push('Create Pact Weapon');
 			}
 
@@ -994,7 +1009,7 @@ async function fillPageOneNew(
 			core_actions.push('Breath Weapon')
 			break;
 		case 'Dark Elf (Elf)':
-			core_actions.push('')
+			core_actions.push('Drow Magic')
 			break;
 		case 'Rock Gnome (Gnome)':
 			core_other.push('Tinker')

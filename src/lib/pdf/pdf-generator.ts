@@ -667,7 +667,13 @@ async function fillPageOneNew(
 	let str = JSON.stringify(data.features, null, 4); // (Optional) beautiful indented output.
 	console.log(str); // Logs output to dev tools console.
 
-	switch(data.classAndLevel.trim()) {
+	let class_cleaned = data.classAndLevel.trim()
+	if (class_cleaned.includes(' ')) {
+		class_cleaned = class_cleaned.substring(0, class_cleaned.indexOf(' '));
+	}
+	//console.log('class_cleaned: ' + class_cleaned.trim());
+
+	switch(class_cleaned.trim()) {
 		// Barbarian mostly does Attack & Rage, but has some subclass adds
 		case 'Barbarian':
 			core_actions.push('Attack');
@@ -688,13 +694,13 @@ async function fillPageOneNew(
 			core_actions.push('Spellcasting');
 			core_actions.push('Attack');
 			core_bonus_actions.push('Bardic Inspiration');
-			
-			if (data.spells.filter(spell => {return spell.name == 'Healing Word'})) {
+
+			if (data.spells.filter(spell => {return spell.name == 'Healing Word'}).length) {
 				core_bonus_actions.push('Healing Word');
 			}
 
 			if (data.features.includes('Cutting Words')) {
-				core_bonus_actions.push('Cutting Words');
+				core_other.push('Cutting Words');
 			}
 			break;
 			
@@ -712,46 +718,301 @@ async function fillPageOneNew(
 				core_bonus_actions.push('War Priest Attack');
 			}
 
-			
+			// Add any of these bonus action spells that the player has
+			let clericBASpells = ['Healing Word', 'Sanctuary', 'Divine Favor', 'Shield of Faith', 'Magic Weapon', 'Spiritual Weapon']
 
+			for (let i = 0; i < clericBASpells.length; i++) {
+				if (data.spells.filter(spell => {return spell.name == clericBASpells[i]}).length) {
+					core_bonus_actions.push(clericBASpells[i]);
+				}
+			}
+
+			if (data.features.includes('Warding Flare')) {
+				core_other.push('Warding Flare');
+			}
+
+			if (data.features.includes('Wrath of the Storm')) {
+				core_other.push('Wrath of the Storm');
+			}
 			break;
 
+		// Druid has several BA spells & their wildshape that might be an action / bonus action
 		case 'Druid':
-			
+			let isCircleOfMoon = data.classAndLevel.includes('Moon')
+			core_actions.push('Spellcasting');
+			if (!isCircleOfMoon) {core_actions.push('Wildshape');}
+			core_actions.push('Attack');
+
+			if (isCircleOfMoon) {
+				core_bonus_actions.push('Wildshape');
+				core_bonus_actions.push('Wildshape Heal');
+			}
+
+			// Add any of these bonus action spells that the player has
+			let druidBASpells = ['Shillelagh', 'Healing Word', 'Misty Step', 'Flame Blade', 'Expeditious Retreat']
+
+			for (let i = 0; i < druidBASpells.length; i++) {
+				if (data.spells.filter(spell => {return spell.name == druidBASpells[i]}).length) {
+					core_bonus_actions.push(druidBASpells[i]);
+				}
+			}
 			break;
 
 		case 'Fighter':
-			
+			core_actions.push('Attack');
+			core_bonus_actions.push('Second Wind');
+			core_other.push('Action Surge');
+
+			if (data.classAndLevel.includes('Eldritch Knight')) {
+				core_actions.push('Spellcasting');
+				core_bonus_actions.push('Summon Weapon');
+			}
+
+			// Add any of these feature actions that the player has
+			let fighterFeatureActions = ['Disarming Attack', 'Goading Attack', 'Lunging Attack', 'Maneuvering Attack', 'Menacing Attack', 'Precision Attack', 'Pushing Attack', 'Sweeping Attack', 'Trip Attack', 'Distracting Strike', "Commander's Strike"];
+			let fighterFeatureBonusActions = ['Feinting Attack', 'Rally'];
+			let fighterFeatureOther = ['Protection Fighting Style', 'Parry', 'Evasive Footwork', 'Riposte'];
+
+			for (let i = 0; i < fighterFeatureActions.length; i++) {
+				if (data.features.filter(feature => {return feature == fighterFeatureActions[i]}).length) {
+					core_actions.push(fighterFeatureActions[i]);
+				}
+			}
+			for (let i = 0; i < fighterFeatureBonusActions.length; i++) {
+				if (data.features.filter(feature => {return feature == fighterFeatureBonusActions[i]}).length) {
+					core_bonus_actions.push(fighterFeatureBonusActions[i]);
+				}
+			}
+			for (let i = 0; i < fighterFeatureOther.length; i++) {
+				if (data.features.filter(feature => {return feature == fighterFeatureOther[i]}).length) {
+					core_other.push(fighterFeatureOther[i]);
+				}
+			}
 			break;
 			
 		case 'Monk':
-			
+			core_actions.push('Attack');
+			core_bonus_actions.push('Unarmed Strike');
+			core_bonus_actions.push('Flurry of Blows');
+			core_bonus_actions.push('Patient Defense');
+			core_bonus_actions.push('Step of the Wind');
+			core_other.push('Deflect Missiles');
+
+			if (data.classAndLevel.includes('Shadow')) {
+				core_actions.push('Shadow Arts');
+			}
+
+			if (data.classAndLevel.includes('Four Elements')) {
+				core_actions.push('Elemental Attunement');
+				core_actions.push('Elemental Disciplines');
+			}
 			break;
 		
 		case 'Paladin':
-			
+			core_actions.push('Attack');
+			core_actions.push('Spellcasting');
+			core_other.push('Smite');
+
+			// Add any of these feature actions that the player has
+			let paladinFeatureActions = ['Sacred Weapon', "Nature's Wrath", 'Abjure Enemy', 'Turn the Unholy', 'Turn the Faithless'];
+			let paladinFeatureBonusActions = ['Vow of Enmity'];
+			let paladinFeatureOther = ['Protection Fighting Style'];
+
+			for (let i = 0; i < paladinFeatureActions.length; i++) {
+				if (data.features.filter(feature => {return feature == paladinFeatureActions[i]}).length) {
+					core_actions.push(paladinFeatureActions[i]);
+				}
+			}
+			for (let i = 0; i < paladinFeatureBonusActions.length; i++) {
+				if (data.features.filter(feature => {return feature == paladinFeatureBonusActions[i]}).length) {
+					core_bonus_actions.push(paladinFeatureBonusActions[i]);
+				}
+			}
+			for (let i = 0; i < paladinFeatureOther.length; i++) {
+				if (data.features.filter(feature => {return feature == paladinFeatureOther[i]}).length) {
+					core_other.push(paladinFeatureOther[i]);
+				}
+			}
+
+			// Add any of these bonus action spells that the player has
+			let paladinBASpells = ['Shield of Faith', "Hunter's Mark", 'Compelled Duel', 'Divine Favor', 'Searing Smite', 'Thunderous Smite', 'Wrathful Smite'];
+
+			for (let i = 0; i < paladinBASpells.length; i++) {
+				if (data.features.filter(feature => {return feature == paladinBASpells[i]}).length) {
+					core_bonus_actions.push(paladinBASpells[i]);
+				}
+			}
 			break;
 
 		case 'Ranger':
+			core_actions.push('Attack', 'Spellcasting', 'Primeval Awareness');
 			
+			if (data.classAndLevel.includes('Beast Master')) {
+				core_actions.push('Beast Action');
+			}
+			
+			// Add any of these bonus action spells that the player has
+			let rangerBASpells = ['Hail of Thorns', "Hunter's Mark"];
+
+			for (let i = 0; i < rangerBASpells.length; i++) {
+				if (data.features.filter(feature => {return feature == rangerBASpells[i]}).length) {
+					core_bonus_actions.push(rangerBASpells[i]);
+				}
+			}
+
+			// Add any of these feature actions that the player has
+			let rangerFeatureOther = ['Giant Killer', 'Horde Breaker'];
+			for (let i = 0; i < rangerFeatureOther.length; i++) {
+				if (data.features.filter(feature => {return feature == rangerFeatureOther[i]}).length) {
+					core_other.push(rangerFeatureOther[i]);
+				}
+			}
 			break;
 			
 		case 'Rogue':
-			
+			core_actions.push('Sneak Attack');
+			core_bonus_actions.push('Dash');
+			core_bonus_actions.push('Disengage');
+			core_bonus_actions.push('Hide');
+
+			if (data.classAndLevel.includes('Thief')) {
+				core_bonus_actions.push('Sleight of Hand');
+				core_bonus_actions.push('Disarm/Unlock');
+			}
+			if (data.classAndLevel.includes('Arcane Trickster')) {
+				core_actions.push('Spellcasting');
+			}
 			break;
 		
 		case 'Sorcerer':
+			core_actions.push('Spellcasting');
+			core_actions.push('Attack');
+
+			// Add any of these feature actions that the player has
+			let sorcererFeatureBonusActions = ['Quickened Spell'];
+			let sorcererFeatureOther = ['Careful Spell', 'Distant Spell', 'Empowered Spell', 'Extended Spell', 'Heightened Spell', 'Subtle Spell', 'Twinned Spell'];
+
+			for (let i = 0; i < sorcererFeatureBonusActions.length; i++) {
+				if (data.features.filter(feature => {return feature == sorcererFeatureBonusActions[i]}).length) {
+					core_bonus_actions.push(sorcererFeatureBonusActions[i]);
+				}
+			}
+			for (let i = 0; i < sorcererFeatureOther.length; i++) {
+				if (data.features.filter(feature => {return feature == sorcererFeatureOther[i]}).length) {
+					core_other.push(sorcererFeatureOther[i]);
+				}
+			}
+
+			if (data.features.includes('Tides of Chaos')) {
+				core_other.push('Tides of Chaos');
+			}
 			
+			// Add any of these spells that the player has
+			let sorcererBASpells = ['Expeditious Retreat', 'Misty Step'];
+			let sorcererOtherSpells = ['Feather Fall', 'Shield'];
+			
+			for (let i = 0; i < sorcererBASpells.length; i++) {
+				if (data.spells.filter(spell => {return spell.name == sorcererBASpells[i]}).length) {
+					core_bonus_actions.push(sorcererBASpells[i]);
+				}
+			}
+			for (let i = 0; i < sorcererOtherSpells.length; i++) {
+				if (data.spells.filter(spell => {return spell.name == sorcererOtherSpells[i]}).length) {
+					core_other.push(sorcererOtherSpells[i]);
+				}
+			}
+
 			break;
 
 		case 'Warlock':
+			core_actions.push('Spellcasting');
+			core_actions.push('Attack');
+
+			if (data.features.includes('Fey Presence')) {
+				core_actions.push('Fey Presence');
+			}
+
+			if (data.classAndLevel.includes('Chain')) {
+				core_actions.push('Familiar Attack');
+			}
+
+			if (data.classAndLevel.includes('Blade')) {
+				core_actions.push('Create Pact Weapon');
+			}
+
+			// Add any of these spells that the player has
+			let warlockBASpells = ['Shillelagh', 'Expeditious Retreat', 'Hex', 'Misty Step'];
+			let warlockOtherSpells = ['Hellish Rebuke'];
 			
+			for (let i = 0; i < warlockBASpells.length; i++) {
+				if (data.spells.filter(spell => {return spell.name == warlockBASpells[i]}).length) {
+					core_bonus_actions.push(warlockBASpells[i]);
+				}
+			}
+			for (let i = 0; i < warlockOtherSpells.length; i++) {
+				if (data.spells.filter(spell => {return spell.name == warlockOtherSpells[i]}).length) {
+					core_other.push(warlockOtherSpells[i]);
+				}
+			}
 			break;
 			
 		case 'Wizard':
+			core_actions.push('Spellcasting');
+			core_actions.push('Attack');
+
+			if (data.features.includes('Minor Conjuration')) {
+				core_actions.push('Minor Conjuration');
+			}
+
+			if (data.features.includes('Hypnotic Gaze')) {
+				core_actions.push('Hypnotic Gaze');
+			}
+
+			if (data.features.includes('Portent')) {
+				core_other.push('Portent');
+			}
+
+			// Add any of these spells that the player has
+			let wizardBASpells = ['Expeditious Retreat', 'Misty Step'];
+			let wizardOtherSpells = ['Feather Fall', 'Shield'];
 			
+			for (let i = 0; i < wizardBASpells.length; i++) {
+				if (data.spells.filter(spell => {return spell.name == wizardBASpells[i]}).length) {
+					core_bonus_actions.push(wizardBASpells[i]);
+				}
+			}
+			for (let i = 0; i < wizardOtherSpells.length; i++) {
+				if (data.spells.filter(spell => {return spell.name == wizardOtherSpells[i]}).length) {
+					core_other.push(wizardOtherSpells[i]);
+				}
+			}
 			break;
 	}
+
+	switch(data.species.trim()) {
+		case 'Dragonborn':
+			core_actions.push('Breath Weapon')
+			break;
+		case 'Dark Elf (Elf)':
+			core_actions.push('')
+			break;
+		case 'Rock Gnome (Gnome)':
+			core_other.push('Tinker')
+			break;
+		case 'Tiefling':
+			if (!core_other.includes('Hellish Rebuke')) {
+				core_other.push('Hellish Rebuke')
+			}
+			break;
+	}
+
+	let core_actions_string = core_actions.join(",\n");
+	let core_bonus_actions_string = core_bonus_actions.join(",\n");
+	let core_reactions_string = core_other.join(",\n");
+
+	fillFormField(form, 'core_actions', core_actions_string);
+	fillFormField(form, 'core_bonus_actions', core_bonus_actions_string);
+	fillFormField(form, 'core_reactions', core_reactions_string);
 
 	form.flatten()
 }

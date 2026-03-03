@@ -11,6 +11,7 @@ import fontkit from '@pdf-lib/fontkit';
 import type { CharacterSheetData } from './character-data-mapper';
 import type { FieldConfig, TextAreaConfig } from './character-sheet-config';
 import type { Spell } from '$lib/data/spells';
+import { druid } from '$lib/data/classes/druid';
 
 /**
  * Load the blank PDF template from static folder
@@ -718,15 +719,6 @@ async function fillPageOneNew(
 				core_bonus_actions.push('War Priest Attack');
 			}
 
-			// Add any of these bonus action spells that the player has
-			let clericBASpells = ['Healing Word', 'Sanctuary', 'Divine Favor', 'Shield of Faith', 'Magic Weapon', 'Spiritual Weapon']
-
-			for (let i = 0; i < clericBASpells.length; i++) {
-				if (data.spells.filter(spell => {return spell.name == clericBASpells[i]}).length) {
-					core_bonus_actions.push(clericBASpells[i]);
-				}
-			}
-
 			if (data.features.includes('Warding Flare')) {
 				core_other.push('Warding Flare');
 			}
@@ -734,6 +726,30 @@ async function fillPageOneNew(
 			if (data.features.includes('Wrath of the Storm')) {
 				core_other.push('Wrath of the Storm');
 			}
+
+			if (data.classAndLevel.includes('Life')) {
+				core_bonus_actions.push('Spiritual Weapon');
+			}
+
+			if (data.classAndLevel.includes('War')) {
+				core_bonus_actions.push('Divine Favor');
+				core_bonus_actions.push('Shield of Faith');
+				core_bonus_actions.push('Magic Weapon');
+				core_bonus_actions.push('Spiritual Weapon');
+			}
+
+			// Add any of these bonus action spells that the player has but havent been added yet
+			let clericBASpells = ['Healing Word', 'Sanctuary', 'Divine Favor', 'Shield of Faith', 'Magic Weapon', 'Spiritual Weapon']
+
+			for (let i = 0; i < clericBASpells.length; i++) {
+				if (data.spells.filter(spell => {return spell.name == clericBASpells[i]}).length) {
+					// Avoid duplicate entries, dont add spell if it already exists
+					if (!core_bonus_actions.includes(clericBASpells[i])) {
+						core_bonus_actions.push(clericBASpells[i]);
+					}	
+				}
+			}
+
 			break;
 
 		// Druid has several BA spells & their wildshape that might be an action / bonus action
@@ -748,12 +764,18 @@ async function fillPageOneNew(
 				core_bonus_actions.push('Wildshape Heal');
 			}
 
+			if (data.classAndLevel.includes('Coast')) {
+				core_bonus_actions.push('Misty Step');
+			}
+			
 			// Add any of these bonus action spells that the player has
 			let druidBASpells = ['Shillelagh', 'Healing Word', 'Misty Step', 'Flame Blade', 'Expeditious Retreat']
 
 			for (let i = 0; i < druidBASpells.length; i++) {
 				if (data.spells.filter(spell => {return spell.name == druidBASpells[i]}).length) {
-					core_bonus_actions.push(druidBASpells[i]);
+					if (!core_bonus_actions.includes(druidBASpells[i])) {
+						core_bonus_actions.push(druidBASpells[i]);
+					}
 				}
 			}
 			break;
@@ -834,12 +856,26 @@ async function fillPageOneNew(
 				}
 			}
 
+			if (data.classAndLevel.includes('Devotion')) {
+				core_bonus_actions.push('Sanctuary');
+			}
+
+			if (data.classAndLevel.includes('Ancients')) {
+				core_bonus_actions.push('Ensnaring Strike');
+			}
+
+			if (data.classAndLevel.includes('Vengeance')) {
+				core_bonus_actions.push("Hunter's Mark");
+			}
+
 			// Add any of these bonus action spells that the player has
 			let paladinBASpells = ['Shield of Faith', "Hunter's Mark", 'Compelled Duel', 'Divine Favor', 'Searing Smite', 'Thunderous Smite', 'Wrathful Smite'];
 
 			for (let i = 0; i < paladinBASpells.length; i++) {
 				if (data.spells.filter(spell => {return spell.name == paladinBASpells[i]}).length) {
-					core_bonus_actions.push(paladinBASpells[i]);
+					if (!core_bonus_actions.includes(paladinBASpells[i])) {
+						core_bonus_actions.push(paladinBASpells[i]);
+					}
 				}
 			}
 			break;
@@ -897,7 +933,6 @@ async function fillPageOneNew(
 				}
 			}
 			break;
-			break;
 		
 		case 'Sorcerer':
 			core_actions.push('Spellcasting');
@@ -953,6 +988,13 @@ async function fillPageOneNew(
 
 			if (data.features.includes('Pact of the Blade')) {
 				core_actions.push('Create Pact Weapon');
+			}
+
+			let warlockInvocationActions = ['Armor of Shadows', 'Beast Speech', 'Detect Magic', 'Fiendish Vigor', 'Gaze of Two Minds', 'Disguise Self', 'Misty Visions', 'Thief of Five Fates']
+			for (let i = 0; i < warlockInvocationActions.length; i++) {
+				if (data.features.filter(feature => {return feature == warlockInvocationActions[i]}).length) {
+					core_actions.push(warlockInvocationActions[i]);
+				}
 			}
 
 			// Add any of these spells that the player has

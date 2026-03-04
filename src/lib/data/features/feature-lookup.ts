@@ -404,9 +404,9 @@ export function cleanDescription(description: string): string {
 	
 	// Convert <strong> and <b> tags to PDF bold markers
 	result = result.replace(/<strong>(.*?)<\/strong>/gi, (match, p1) => {
-		return `[[BOLD:${p1}]]`;
+		return `${p1.toUpperCase()}`;
 	});
-	result = result.replace(/<b>(.*?)<\/b>/gi, '[[BOLD:$1]]');
+	result = result.replace(/<b>(.*?)<\/b>/gi, '[[DEBUG_THREE:$1]]');
 	
 	// Convert <i> and <em> tags to PDF italic markers
 	result = result.replace(/<i>(.*?)<\/i>/gi, '[[ITALIC:$1]]');

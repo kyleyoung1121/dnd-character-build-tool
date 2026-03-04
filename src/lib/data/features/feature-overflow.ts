@@ -35,7 +35,7 @@ export function estimateFeatureLines(
 	avgCharWidth: number = 4.8 // Calibrated for Helvetica 8pt based on "Damage Resistance. You have resistance to" = ~42 chars
 ): number {
 	// Remove the [[BOLD:...]] markers for counting
-	const cleanText = formattedText.replace(/\[\[BOLD:([^\]]+)\]\]/g, '$1');
+	const cleanText = formattedText.replace(/\[\[DEBUG_FIVE:([^\]]+)\]\]/g, '$1');
 	
 	// Split by newlines (explicit line breaks in description)
 	const lines = cleanText.split('\n');

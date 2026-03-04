@@ -379,7 +379,7 @@ export function formatFeatureForPDF(featureName: string, character?: Character):
 	//console.log(`    Feature data found for "${featureName}":`, featureData.name);
 	// Format: [[BOLD:Name]]. Description
 	// Name is marked for bold rendering, followed by period and description on same line
-	return `[[BOLD:${featureData.name}]]. ${featureData.description}`;
+	return `[${featureData.name.toUpperCase()}].\n${featureData.description}`;
 }
 
 /**
@@ -502,19 +502,16 @@ export function formatFeaturesForPDF(
 	
 	const result = filteredFeatures
 		.map((name, index) => {
-			//console.log(`Processing feature ${index}: "${name}"`);
 			
 			// Check if there's a custom description in the dictionary first
 			if (FEATURE_DESCRIPTION_DICTIONARY[name]) {
-				//console.log(`  Using custom dictionary description for: "${name}"`);
-				// Dictionary entries should already be formatted with [[BOLD:Name]]. Description pattern
-				// but we need to add the bold marker for the main feature name
-				return `[[BOLD:${name}]]. ${FEATURE_DESCRIPTION_DICTIONARY[name]}`;
+				// DEBUG_ONE: how should these special cases be formatted? Just like normal features?
+				// this is used for Flurry of blows, patient defense, and step of the wind.
+				return `[${name.toUpperCase()}].\n${FEATURE_DESCRIPTION_DICTIONARY[name]}`;
 			}
 			
 			// Otherwise, use normal lookup
 			const formatted = formatFeatureForPDF(name, character);
-			//console.log(`  Formatted result:`, formatted);
 			return formatted;
 		})
 		.join('\n\n'); // Double newline creates space between features

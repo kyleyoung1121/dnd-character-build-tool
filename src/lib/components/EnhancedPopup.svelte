@@ -57,7 +57,7 @@
 						<div class="artwork-placeholder">
 							<div class="placeholder-content">
 								<p class="placeholder-text">
-									Professional artwork of<br>
+									Artwork of<br>
 									<strong>{itemName || title}</strong><br>
 									goes here
 								</p>

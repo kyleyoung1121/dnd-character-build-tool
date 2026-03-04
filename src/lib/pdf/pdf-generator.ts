@@ -11,6 +11,7 @@ import fontkit from '@pdf-lib/fontkit';
 import type { CharacterSheetData } from './character-data-mapper';
 import type { FieldConfig, TextAreaConfig } from './character-sheet-config';
 import type { Spell } from '$lib/data/spells';
+import { formatFeatureForPDF, formatFeaturesForPDF } from '$lib/data/features/feature-data';
 import { druid } from '$lib/data/classes/druid';
 
 /**
@@ -547,8 +548,8 @@ async function fillPageOneNew(
 	if (data.spells) {
 		
 		// JSON DEBUGGING
-		let str = JSON.stringify(data, null, 4); // Indented output.
-		console.log(str); // Logs output to dev tools console.
+		// let str = JSON.stringify(data, null, 4); // Indented output.
+		// console.log(str); // Logs output to dev tools console.
 
 		let damageCantrips: Spell[];
 		damageCantrips = data.spells.filter(spell => {
@@ -665,8 +666,8 @@ async function fillPageOneNew(
 	// TODO: based on class, subclass, species, and selected spells,
 	//		 populate the arrays with recommended actions, bonus actions, and other (reactions & more)
 	
-	let str = JSON.stringify(data.features, null, 4); // (Optional) beautiful indented output.
-	console.log(str); // Logs output to dev tools console.
+	// let str = JSON.stringify(data.features, null, 4); // (Optional) beautiful indented output.
+	// console.log(str); // Logs output to dev tools console.
 
 	let class_cleaned = data.classAndLevel.trim()
 	if (class_cleaned.includes(' ')) {
@@ -1074,7 +1075,8 @@ async function fillPageOneNew(
 	form.flatten()
 }
 
-async function fillPageTwoNew(
+
+async function fillPageFeatures(
 	page: any,
 	data: CharacterSheetData,
 	font: any,
@@ -1083,10 +1085,60 @@ async function fillPageTwoNew(
 ) {
 	const form = page.getForm()
 
-	//console.log('data dump: ' + data.spells)
-	// let str = JSON.stringify(data, null, 4); // (Optional) beautiful indented output.
-	// console.log(str); // Logs output to dev tools console.
-	// alert(str); // Displays output using window.alert()
+	const charactersPerRow = 64;
+	const maxLinesPerColumn = 65;
+
+	let featureContent = formatFeaturesForPDF(data.features, data.characterReference, 'all');
+
+	let columnOneContent = '';
+	let columnTwoContent = '';
+
+	//console.log(JSON.stringify(featureContent))
+
+	let lineCount = 0;
+	// Track to see when column one is used up. This helps avoid parsing each feature chunk after, since they must go in column two.
+	let outOfSpace = false;
+
+	// Iterate through feature chunks (entire features separated by a blank line)
+	let featureChunks = featureContent.split('\n\n');
+	for (let i = 0; i < featureChunks.length; i++) {
+		// If we have already filled column one, we can just assume everything else goes in column two.
+		if (outOfSpace) {
+			columnTwoContent += featureChunks[i] + '\n\n';
+			continue;
+		}
+		
+		// Otherwise, lets track how many lines of text this next feature will use up in column one.
+		let featureLineUsage = 0;
+
+		// Iterate through each text run within this feature.
+		// a text run is any length of text that ends in a newline.
+		// if there are no newlines (or considering the final run before the next feature), .split still captures this as the only (or final) element
+		let textRuns = featureChunks[i].split('\n');
+		for (let j = 0; j < textRuns.length; j++) {
+			// Consider if this run of text takes up more than just the one line we know the newline eats
+			// we subtract one from the length because the ending \n symbol counts against us.
+			featureLineUsage += Math.floor((textRuns[j].length - 1) / charactersPerRow) + 1;
+			//console.log('featureLineUsage now reads: ' + featureLineUsage);
+		}
+
+		// If there is room enough, add this feature chunk to the column.
+		if (lineCount + featureLineUsage + 1 <= maxLinesPerColumn) {
+			lineCount += featureLineUsage + 1;
+			columnOneContent += featureChunks[i] + '\n\n';
+		} 
+		// Otherwise, column one is filled and we need to move this feature to column two.
+		else {
+			outOfSpace = true;
+			columnTwoContent += featureChunks[i] + '\n\n';
+		}
+	}
+
+	console.log('after distribution, lineCount ~ ' + lineCount);
+
+	fillFormField(form, 'page_title', 'Features');
+	fillFormField(form, 'column_one', columnOneContent);
+	fillFormField(form, 'column_two', columnTwoContent);
 
 	form.flatten()
 }
@@ -1132,7 +1184,7 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 		
 		// Fill pages with data
 		await fillPageOneNew(pageOneDoc, data, pageOneFonts[3], pageOneFonts[1], pageOneFonts[2]);
-		await fillPageTwoNew(pageTwoDoc, data, pageTwoFonts[3], pageTwoFonts[1], pageTwoFonts[2]);
+		await fillPageFeatures(pageTwoDoc, data, pageTwoFonts[3], pageTwoFonts[1], pageTwoFonts[2]);
 		
 		let freshPdfDoc = await PDFDocument.create()
 

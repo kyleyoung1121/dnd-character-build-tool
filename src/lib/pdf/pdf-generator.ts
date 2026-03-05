@@ -797,9 +797,43 @@ async function fillEquipmentPage(
 ) {
 	const form = page.getForm()
 
-	fillFormField(form, 'page_title_top', 'Equipment', 12, TextAlignment.Center);
-	fillFormField(form, 'column_one_top', '');
-	fillFormField(form, 'column_two_top', '');
+	console.log(data.equipment);
+	let packTextRaw = '';
+	let packTextFormatted = '';
+	let remainingText = '';
+
+	// Check for any packs, which we will display separately. Assume packs always come first.
+	if (data.equipment.includes('pack') && data.equipment.includes('(includes:') && data.equipment.includes(')')) {
+		packTextRaw = data.equipment.substring(0, data.equipment.indexOf(')')+1);
+		remainingText = data.equipment.substring(data.equipment.indexOf(')')+1);
+
+		// Pack Name: all text, up to the string 'pack'
+		packTextFormatted += packTextRaw.substring(0, packTextRaw.indexOf('pack')+4) + ':\n';
+		
+		// Pack Contents: starts after 'includes:' and ends before the final ')'
+		let packContents = packTextRaw.substring(packTextRaw.indexOf('includes: ')+10, packTextRaw.length-1).split(', ');
+
+		// Format each pack item, adding bullet point, and capitalizing the first character
+		for (let i = 0; i < packContents.length; i++) {
+			packTextFormatted += '•  ' + packContents[i].charAt(0).toUpperCase() + packContents[i].slice(1) + '\n';
+		}
+		
+		// For all other equipement add a bullet point and new line to each item
+		if (remainingText[0] == '\n') {
+			remainingText = remainingText.substring(1);
+			remainingText = '•  ' + remainingText.replace(/\n/g, '\n•  ');
+		}
+	}
+
+	if (packTextFormatted) {
+		fillFormField(form, 'page_title_top', 'Equipment', 12, TextAlignment.Center);
+		fillFormField(form, 'column_one_top', packTextFormatted, 12);
+		fillFormField(form, 'column_two_top', remainingText, 12);
+	} else {
+		fillFormField(form, 'page_title_top', 'Equipment', 12, TextAlignment.Center);
+		fillFormField(form, 'column_one_top', data.equipment, 12);
+		fillFormField(form, 'column_two_top', '', 12);
+	}
 
 	// Character Notes is left blank for the player to fill in after printing
 	fillFormField(form, 'page_title_bottom', 'Character Notes', 12, TextAlignment.Center);

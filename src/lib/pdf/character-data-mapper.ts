@@ -590,6 +590,9 @@ function formatEquipment(inventory: string[]): string {
 	for (let i = 0; i < inventory.length; i++) {
 		if (processed.has(i)) continue;
 		
+		console.log('inventory debug:');
+		console.log(inventory);
+
 		const item = inventory[i];
 		const itemLower = item.toLowerCase();
 		
@@ -663,33 +666,36 @@ function formatEquipment(inventory: string[]): string {
 	// Build organized output with smart grouping
 	const lines: string[] = [];
 	
+	// Equipment Packs (each on its own line - they're long)
+	if (packs.length > 0) {
+		lines.push(...packs);
+	}
+
 	// Armor & Shields (combined on one line)
 	const defensiveGear: string[] = [...armor, ...shields];
 	if (defensiveGear.length > 0) {
-		lines.push(defensiveGear.join(', '));
+		lines.push(defensiveGear.join('\n'));
 	}
 	
 	// Tools & Instruments (combined on one line)
 	const proficiencyItems: string[] = [...tools, ...instruments];
 	if (proficiencyItems.length > 0) {
-		lines.push(proficiencyItems.join(', '));
-	}
-	
-	// Equipment Packs (each on its own line - they're long)
-	if (packs.length > 0) {
-		lines.push(...packs);
+		lines.push(proficiencyItems.join('\n'));
 	}
 	
 	// Consumables (grouped on one line)
 	if (consumables.length > 0) {
-		lines.push(consumables.join(', '));
+		lines.push(consumables.join('\n'));
 	}
 	
 	// Misc items (grouped on one line)
 	if (misc.length > 0) {
-		lines.push(misc.join(', '));
+		lines.push(misc.join('\n'));
 	}
 	
+	console.log('lines debug');
+	console.log(lines);
+
 	return lines.join('\n');
 }
 

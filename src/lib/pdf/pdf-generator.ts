@@ -516,7 +516,7 @@ async function fillPageOneNew(
 	data.attacks.forEach((attack, index) => {
 		if (index < PAGE_1_FIELDS.attacks.length) {
 			attacks_names.push(attack.name);
-			attacks_to_hit.push('d20 ' + attack.bonus);
+			attacks_to_hit.push('d20 ' + attack.bonus.substring(0,1) + ' ' + attack.bonus.substring(1));
 			attacks_damage.push(attack.damage);
 			
 			let build_attacks_notes = "";
@@ -628,7 +628,7 @@ async function fillPageOneNew(
 			let cantripTags = damageCantrips[i].tags
 			// Spell Attack cantrips: format like 'd20 + 5'
 			if (cantripTags && cantripTags.includes('SpellAttack')) {
-				attacks_to_hit_string += 'd20 ' + spellAttackBonusSigned + '\n';
+				attacks_to_hit_string += 'd20 ' + spellAttackBonusSigned.substring(0,1) + ' ' + spellAttackBonusSigned.substring(1) + '\n';
 			// Spell Save cantrips: format like 'DC 12'
 			} else if (cantripTags && cantripTags.includes('SpellSave')) {
 				attacks_to_hit_string += 'DC ' + spellSaveDC + '\n';

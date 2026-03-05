@@ -341,9 +341,9 @@ export const PAGE_2_FIELDS = {
  */
 export const PDF_CONFIG = {
 	templatePaths: [
-		//'/pdf-templates/dnd-character-sheet-blank.pdf'
 		'/pdf-templates/page_one.pdf', // first page
-		'/pdf-templates/page_two.pdf', // full box (second page)
+		'/pdf-templates/page_two.pdf', // full box ( features & spells both use this )
+		'/pdf-templates/page_three.pdf', // two rows
 	],
 	fontPaths: [
 		'/pdf-templates/fonts/fonnts.com-Modesto-Text-Light.otf'

@@ -46,390 +46,6 @@ async function loadFontBuffer(fontNumber: number): Promise<ArrayBuffer> {
 	return arrayBuffer
 }
 
-function fillField(
-	page: any,
-	field_name: string,
-	value: any,
-	config: FieldConfig,
-	font: any,
-) {
-	const fontSize = config.fontSize || PDF_CONFIG.defaultFontSize;
-	const color = rgb(
-		PDF_CONFIG.defaultColor.r,
-		PDF_CONFIG.defaultColor.g,
-		PDF_CONFIG.defaultColor.b
-	);
-
-	
-
-}
-
-/**
- * Draw text at specified position on a PDF page
- */
-function drawText(
-	page: any,
-	text: string,
-	config: FieldConfig,
-	font: any
-) {
-	const fontSize = config.fontSize || PDF_CONFIG.defaultFontSize;
-	const color = rgb(
-		PDF_CONFIG.defaultColor.r,
-		PDF_CONFIG.defaultColor.g,
-		PDF_CONFIG.defaultColor.b
-	);
-	
-	// Handle alignment
-	let x = config.x;
-	if (config.align === 'center' && config.maxWidth) {
-		const textWidth = font.widthOfTextAtSize(text, fontSize);
-		x = config.x - textWidth / 2;
-	} else if (config.align === 'right' && config.maxWidth) {
-		const textWidth = font.widthOfTextAtSize(text, fontSize);
-		x = config.x - textWidth;
-	}
-	
-	page.drawText(text, {
-		x,
-		y: config.y,
-		size: fontSize,
-		font,
-		color,
-		maxWidth: config.maxWidth
-	});
-}
-
-/**
- * Draw skill text with ability abbreviation in gray
- * Example: "+5 Acrobatics" in black, then "(DEX)" in gray
- */
-function drawSkillWithAbility(
-	page: any,
-	skillText: string,
-	abilityAbbr: string,
-	config: FieldConfig,
-	font: any
-) {
-	const fontSize = config.fontSize || PDF_CONFIG.defaultFontSize;
-	const blackColor = rgb(
-		PDF_CONFIG.defaultColor.r,
-		PDF_CONFIG.defaultColor.g,
-		PDF_CONFIG.defaultColor.b
-	);
-	const grayColor = rgb(0.5, 0.5, 0.5); // Medium gray
-	
-	// Draw main skill text in black
-	page.drawText(skillText, {
-		x: config.x,
-		y: config.y,
-		size: fontSize,
-		font,
-		color: blackColor
-	});
-	
-	// Calculate position for ability abbreviation
-	const skillWidth = font.widthOfTextAtSize(skillText, fontSize);
-	const spaceWidth = font.widthOfTextAtSize(' ', fontSize);
-	
-	// Draw ability abbreviation in gray, slightly smaller
-	const abilityFontSize = fontSize * 0.85; // 85% of normal size
-	page.drawText(`(${abilityAbbr})`, {
-		x: config.x + skillWidth + spaceWidth,
-		y: config.y,
-		size: abilityFontSize,
-		font,
-		color: grayColor
-	});
-}
-
-/**
- * Parse text with bold and italic markers and return segments with font info
- * [[BOLD:text]] becomes [{text: 'text', bold: true, italic: false}]
- * [[ITALIC:text]] becomes [{text: 'text', bold: false, italic: true}]
- */
-function parseTextWithStyle(text: string): Array<{text: string; bold: boolean; italic: boolean; largeBold?: boolean}> {
-	const segments: Array<{text: string; bold: boolean; italic: boolean; largeBold?: boolean}> = [];
-	const regex = /\[\[(BOLD|ITALIC|LARGEBOLD):([^\]]+)\]\]/g;
-	let lastIndex = 0;
-	let match;
-	
-	while ((match = regex.exec(text)) !== null) {
-		// Add text before the marker
-		if (match.index > lastIndex) {
-			segments.push({
-				text: text.substring(lastIndex, match.index),
-				bold: false,
-				italic: false
-			});
-		}
-		// Add the styled text
-		const styleType = match[1];
-		const styleText = match[2];
-		segments.push({
-			text: styleText,
-			bold: styleType === 'BOLD' || styleType === 'LARGEBOLD',
-			italic: styleType === 'ITALIC',
-			largeBold: styleType === 'LARGEBOLD'
-		});
-		lastIndex = regex.lastIndex;
-	}
-	
-	// Add remaining text
-	if (lastIndex < text.length) {
-		segments.push({
-			text: text.substring(lastIndex),
-			bold: false,
-			italic: false
-		});
-	}
-	
-	return segments;
-}
-
-/**
- * Draw multi-line text in a text area with support for bold and italic text
- */
-function drawTextArea(
-	page: any,
-	text: string,
-	config: TextAreaConfig,
-	font: any,
-	boldFont: any,
-	italicFont: any
-) {
-	const fontSize = config.fontSize || PDF_CONFIG.defaultFontSize;
-	const lineHeight = config.lineHeight || fontSize * 1.2;
-	const color = rgb(
-		PDF_CONFIG.defaultColor.r,
-		PDF_CONFIG.defaultColor.g,
-		PDF_CONFIG.defaultColor.b
-	);
-	
-	// Convert <br> tags to newlines and split text into lines
-	const processedText = text.replace(/<br>/gi, '\n');
-	const lines = processedText.split('\n');
-	let currentY = config.y + config.height - lineHeight;
-	
-	for (const line of lines) {
-		if (currentY < config.y) break; // Stop if we run out of space
-		
-		// Parse line for style markers
-		const segments = parseTextWithStyle(line);
-		
-		// Process each segment and wrap words
-		let currentX = config.x;
-		
-		for (const segment of segments) {
-			// Choose the appropriate font
-			let segmentFont = font;
-			let segmentFontSize = fontSize;
-			
-			if (segment.largeBold) {
-				segmentFont = boldFont;
-				segmentFontSize = fontSize + 2; // Make spell names 2 points larger (10pt instead of 8pt)
-			} else if (segment.bold) {
-				segmentFont = boldFont;
-			} else if (segment.italic) {
-				segmentFont = italicFont;
-			}
-			
-			const words = segment.text.split(' ');
-			
-			for (let i = 0; i < words.length; i++) {
-				const word = words[i];
-				const wordWidth = segmentFont.widthOfTextAtSize(word, segmentFontSize);
-				const spaceWidth = segmentFont.widthOfTextAtSize(' ', segmentFontSize);
-				
-				// Check if word fits on current line
-				if (currentX + wordWidth > config.x + config.width && currentX > config.x) {
-					// Move to next line
-					currentY -= lineHeight;
-					currentX = config.x;
-					if (currentY < config.y) return; // Out of space
-				}
-				
-				// Draw the word
-				page.drawText(word, {
-					x: currentX,
-					y: currentY,
-					size: segmentFontSize,
-					font: segmentFont,
-					color
-				});
-				
-				// Move x position for next word
-				currentX += wordWidth;
-				if (i < words.length - 1) {
-					currentX += spaceWidth; // Add space between words
-				}
-			}
-		}
-		
-		// Move to next line after processing all segments
-		currentY -= lineHeight;
-	}
-}
-
-// /**
-//  * Fill Page 1 with character data
-//  */
-// async function fillPage1(
-// 	page: any,
-// 	data: CharacterSheetData,
-// 	font: any,
-// 	boldFont: any,
-// 	italicFont: any
-// ) {
-// 	// Header
-// 	drawText(page, data.characterName, PAGE_1_FIELDS.characterName, font);
-// 	drawText(page, data.classAndLevel, PAGE_1_FIELDS.classAndLevel, font);
-// 	drawText(page, data.background, PAGE_1_FIELDS.background, font);
-// 	drawText(page, data.species, PAGE_1_FIELDS.species, font);
-// 	drawText(page, data.alignment, PAGE_1_FIELDS.alignment, font);
-// 	// Removed: experiencePoints and proficiencyBonus
-// 	// drawText(page, data.experiencePoints, PAGE_1_FIELDS.experiencePoints, font);
-// 	// drawText(page, data.proficiencyBonus, PAGE_1_FIELDS.proficiencyBonus, font);
-	
-// 	// Ability Scores
-// 	const abilities = PAGE_1_FIELDS.abilityScores;
-// 	drawText(page, data.abilityScores.strength.score, abilities.strength.score, font);
-// 	drawText(page, data.abilityScores.strength.modifier, abilities.strength.modifier, font);
-// 	drawText(page, data.abilityScores.dexterity.score, abilities.dexterity.score, font);
-// 	drawText(page, data.abilityScores.dexterity.modifier, abilities.dexterity.modifier, font);
-// 	drawText(page, data.abilityScores.constitution.score, abilities.constitution.score, font);
-// 	drawText(page, data.abilityScores.constitution.modifier, abilities.constitution.modifier, font);
-// 	drawText(page, data.abilityScores.intelligence.score, abilities.intelligence.score, font);
-// 	drawText(page, data.abilityScores.intelligence.modifier, abilities.intelligence.modifier, font);
-// 	drawText(page, data.abilityScores.wisdom.score, abilities.wisdom.score, font);
-// 	drawText(page, data.abilityScores.wisdom.modifier, abilities.wisdom.modifier, font);
-// 	drawText(page, data.abilityScores.charisma.score, abilities.charisma.score, font);
-// 	drawText(page, data.abilityScores.charisma.modifier, abilities.charisma.modifier, font);
-	
-// 	// Saving Throws
-// 	const saves = PAGE_1_FIELDS.savingThrows;
-// 	drawText(page, data.savingThrows.strength, saves.strength, font);
-// 	drawText(page, data.savingThrows.dexterity, saves.dexterity, font);
-// 	drawText(page, data.savingThrows.constitution, saves.constitution, font);
-// 	drawText(page, data.savingThrows.intelligence, saves.intelligence, font);
-// 	drawText(page, data.savingThrows.wisdom, saves.wisdom, font);
-// 	drawText(page, data.savingThrows.charisma, saves.charisma, font);
-	
-// 	// Skills with ability abbreviations
-// 	const skillsConfig = PAGE_1_FIELDS.skills;
-// 	const skillAbilities: Record<string, string> = {
-// 		acrobatics: 'DEX',
-// 		animalHandling: 'WIS',
-// 		arcana: 'INT',
-// 		athletics: 'STR',
-// 		deception: 'CHA',
-// 		history: 'INT',
-// 		insight: 'WIS',
-// 		intimidation: 'CHA',
-// 		investigation: 'INT',
-// 		medicine: 'WIS',
-// 		nature: 'INT',
-// 		perception: 'WIS',
-// 		performance: 'CHA',
-// 		persuasion: 'CHA',
-// 		religion: 'INT',
-// 		sleightOfHand: 'DEX',
-// 		stealth: 'DEX',
-// 		survival: 'WIS'
-// 	};
-
-// 	(Object.keys(skillsConfig) as Array<keyof typeof skillsConfig>).forEach(key => {
-// 		const skillValue = data.skills[key];
-// 		if (skillValue) {
-// 			drawSkillWithAbility(page, skillValue, skillAbilities[key], skillsConfig[key], font);
-// 		}
-// 	});
-	
-// 	// Removed: passivePerception
-// 	// drawText(page, data.passivePerception, PAGE_1_FIELDS.passivePerception, font);
-	
-// 	// Combat Stats
-// 	drawText(page, data.armorClass, PAGE_1_FIELDS.armorClass, font);
-// 	drawText(page, data.initiative, PAGE_1_FIELDS.initiative, font);
-// 	drawText(page, data.speed, PAGE_1_FIELDS.speed, font);
-// 	drawText(page, data.hitPointMaximum, PAGE_1_FIELDS.hitPointMaximum, font);
-// 	drawText(page, data.currentHitPoints, PAGE_1_FIELDS.currentHitPoints, font);
-// 	drawText(page, data.temporaryHitPoints, PAGE_1_FIELDS.temporaryHitPoints, font);
-// 	// Removed: hitDice
-// 	// drawText(page, data.hitDice, PAGE_1_FIELDS.hitDice, font);
-	
-// 	// Attacks
-// 	data.attacks.forEach((attack, index) => {
-// 		if (index < PAGE_1_FIELDS.attacks.length) {
-// 			const attackConfig = PAGE_1_FIELDS.attacks[index];
-// 			drawText(page, attack.name, attackConfig.name, font);
-// 			drawText(page, attack.bonus, attackConfig.bonus, font);
-// 			drawText(page, attack.damage, attackConfig.damage, font);
-// 		}
-// 	});
-	
-// 	// Equipment & Features
-// 	drawTextArea(page, data.equipment, PAGE_1_FIELDS.equipment, font, boldFont, italicFont);
-// 	drawTextArea(page, data.proficienciesAndLanguages, PAGE_1_FIELDS.proficienciesAndLanguages, font, boldFont, italicFont);
-// 	drawTextArea(page, data.featuresAndTraitsBuilt, PAGE_1_FIELDS.featuresAndTraits, font, boldFont, italicFont);
-// }
-
-// /**
-//  * Fill Page 2 with character data
-//  */
-// async function fillPage2(
-// 	page: any,
-// 	data: CharacterSheetData,
-// 	font: any,
-// 	boldFont: any,
-// 	italicFont: any
-// ) {
-// 	// Character Name
-// 	drawText(page, data.characterName, PAGE_2_FIELDS.characterName, font);
-	
-// 	// Character Description
-// 	if (data.age) drawText(page, data.age, PAGE_2_FIELDS.age, font);
-// 	if (data.height) drawText(page, data.height, PAGE_2_FIELDS.height, font);
-// 	if (data.weight) drawText(page, data.weight, PAGE_2_FIELDS.weight, font);
-// 	if (data.eyes) drawText(page, data.eyes, PAGE_2_FIELDS.eyes, font);
-// 	if (data.skin) drawText(page, data.skin, PAGE_2_FIELDS.skin, font);
-// 	if (data.hair) drawText(page, data.hair, PAGE_2_FIELDS.hair, font);
-	
-// 	// Backstory
-// 	if (data.personalityTraits) {
-// 		drawTextArea(page, data.personalityTraits, PAGE_2_FIELDS.personalityTraits, font, boldFont, italicFont);
-// 	}
-// 	if (data.ideals) {
-// 		drawTextArea(page, data.ideals, PAGE_2_FIELDS.ideals, font, boldFont, italicFont);
-// 	}
-// 	if (data.bonds) {
-// 		drawTextArea(page, data.bonds, PAGE_2_FIELDS.bonds, font, boldFont, italicFont);
-// 	}
-// 	if (data.flaws) {
-// 		drawTextArea(page, data.flaws, PAGE_2_FIELDS.flaws, font, boldFont, italicFont);
-// 	}
-	
-// 	// Additional Content
-// 	// Features & Traits (continued from page 1)
-// 	if (data.featuresAndTraitsContinued) {
-// 		drawTextArea(page, data.featuresAndTraitsContinued, PAGE_2_FIELDS.featuresAndTraitsContinued, font, boldFont, italicFont);
-// 	}
-// 	if (data.additionalFeatures) {
-// 		drawTextArea(page, data.additionalFeatures, PAGE_2_FIELDS.additionalFeatures, font, boldFont, italicFont);
-// 	}
-// 	// // Spells & Cantrips (middle column)
-// 	// if (data.spellsAndCantrips) {
-// 	// 	drawTextArea(page, data.spellsAndCantrips, PAGE_2_FIELDS.spellsAndCantrips, font, boldFont, italicFont);
-// 	// }
-// 	// // Spells & Cantrips Continued (rightmost column - for overflow)
-// 	// if (data.spellsAndCantripsContinued) {
-// 	// 	drawTextArea(page, data.spellsAndCantripsContinued, PAGE_2_FIELDS.spellsAndCantripsContinued, font, boldFont, italicFont);
-// 	// }
-// 	if (data.treasureAndNotes) {
-// 		drawTextArea(page, data.treasureAndNotes, PAGE_2_FIELDS.treasureAndNotes, font, boldFont, italicFont);
-// 	}
-// }
-
 function fillFormField(form: any, fieldName: string, value: string, fontSize?: number, textAlignment?: TextAlignment) {
 	form.getTextField(fieldName).setText(value);
 	if (fontSize) {
@@ -440,7 +56,7 @@ function fillFormField(form: any, fieldName: string, value: string, fontSize?: n
 	}
 }
 
-async function fillPageOneNew(
+async function fillFrontPage(
 	page: any,
 	data: CharacterSheetData,
 	font: any,
@@ -590,10 +206,6 @@ async function fillPageOneNew(
 
 	// TODO: go through all damage cantrips and add to the appropriate array
 	if (data.spells) {
-		
-		// JSON DEBUGGING
-		// let str = JSON.stringify(data, null, 4); // Indented output.
-		// console.log(str); // Logs output to dev tools console.
 
 		let damageCantrips: Spell[];
 		damageCantrips = data.spells.filter(spell => {
@@ -707,17 +319,10 @@ async function fillPageOneNew(
 	let core_bonus_actions: string[] = []
 	let core_other: string[] = []
 
-	// TODO: based on class, subclass, species, and selected spells,
-	//		 populate the arrays with recommended actions, bonus actions, and other (reactions & more)
-	
-	// let str = JSON.stringify(data.features, null, 4); // (Optional) beautiful indented output.
-	// console.log(str); // Logs output to dev tools console.
-
 	let class_cleaned = data.classAndLevel.trim()
 	if (class_cleaned.includes(' ')) {
 		class_cleaned = class_cleaned.substring(0, class_cleaned.indexOf(' '));
 	}
-	//console.log('class_cleaned: ' + class_cleaned.trim());
 
 	switch(class_cleaned.trim()) {
 		// Barbarian mostly does Attack & Rage, but has some subclass adds
@@ -1120,7 +725,7 @@ async function fillPageOneNew(
 }
 
 
-async function fillPageFeatures(
+async function fillFeaturesPage(
 	page: any,
 	data: CharacterSheetData,
 	font: any,
@@ -1136,8 +741,6 @@ async function fillPageFeatures(
 
 	let columnOneContent = '';
 	let columnTwoContent = '';
-
-	//console.log(JSON.stringify(featureContent))
 
 	let lineCount = 0;
 	// Track to see when column one is used up. This helps avoid parsing each feature chunk after, since they must go in column two.
@@ -1163,7 +766,6 @@ async function fillPageFeatures(
 			// Consider if this run of text takes up more than just the one line we know the newline eats
 			// we subtract one from the length because the ending \n symbol counts against us.
 			featureLineUsage += Math.floor((textRuns[j].length - 1) / charactersPerRow) + 1;
-			//console.log('featureLineUsage now reads: ' + featureLineUsage);
 		}
 
 		// If there is room enough, add this feature chunk to the column. (+1 to account for the blank space we want to add after)
@@ -1178,9 +780,7 @@ async function fillPageFeatures(
 		}
 	}
 
-	console.log('after distribution, lineCount ~ ' + lineCount);
-
-	fillFormField(form, 'page_title', 'Features');
+	fillFormField(form, 'page_title', 'Features', 12, TextAlignment.Center);
 	fillFormField(form, 'column_one', columnOneContent);
 	fillFormField(form, 'column_two', columnTwoContent);
 
@@ -1188,7 +788,29 @@ async function fillPageFeatures(
 }
 
 
-async function fillPageSpells(
+async function fillEquipmentPage(
+	page: any,
+	data: CharacterSheetData,
+	font: any,
+	boldFont: any,
+	italicFont: any
+) {
+	const form = page.getForm()
+
+	fillFormField(form, 'page_title_top', 'Equipment', 12, TextAlignment.Center);
+	fillFormField(form, 'column_one_top', '');
+	fillFormField(form, 'column_two_top', '');
+
+	// Character Notes is left blank for the player to fill in after printing
+	fillFormField(form, 'page_title_bottom', 'Character Notes', 12, TextAlignment.Center);
+	fillFormField(form, 'column_one_bottom', '');
+	fillFormField(form, 'column_two_bottom', '');
+
+	form.flatten()
+}
+
+
+async function fillSpellsPage(
 	page: any,
 	data: CharacterSheetData,
 	font: any,
@@ -1207,9 +829,6 @@ async function fillPageSpells(
 
 	let columnOneContent = '\n'.repeat(whitespaceLines);
 	let columnTwoContent = '\n'.repeat(whitespaceLines);
-
-	console.log('Spell Info Debugging')
-	console.log(JSON.stringify(spellsContent))
 
 	let lineCount = 0;
 	// Track to see when column one is used up. This helps avoid parsing each spell chunk after, since they must go in column two.
@@ -1235,7 +854,6 @@ async function fillPageSpells(
 			// Consider if this run of text takes up more than just the one line we know the newline eats
 			// we subtract one from the length because the ending \n symbol counts against us.
 			spellLineUsage += Math.floor((textRuns[j].length - 1) / charactersPerRow) + 1;
-			//console.log('spellLineUsage now reads: ' + spellLineUsage);
 		}
 
 		// If there is room enough, add this spell chunk to the column. (+1 to account for the blank space we want to add after)
@@ -1250,9 +868,7 @@ async function fillPageSpells(
 		}
 	}
 
-	console.log('after distribution, lineCount ~ ' + lineCount);
-
-	fillFormField(form, 'page_title', 'Spells');
+	fillFormField(form, 'page_title', 'Spells', 12, TextAlignment.Center);
 	fillFormField(form, 'column_one', columnOneContent);
 	fillFormField(form, 'column_two', columnTwoContent);
 
@@ -1267,63 +883,77 @@ async function fillPageSpells(
 export async function generateCharacterSheet(data: CharacterSheetData): Promise<string> {
 	try {
 		// Load templates
-		const pageOneDoc = await loadTemplate(0);
-		const pageTwoDoc = await loadTemplate(1);
-		const pageThreeDoc = await loadTemplate(1);
+		const frontPageDoc = await loadTemplate(0);
+		const featuresPageDoc = await loadTemplate(1);
+		const equipmentPageDoc = await loadTemplate(2);
+		const spellsPageDoc = await loadTemplate(1);
 
 		const fontOneBuffer = await loadFontBuffer(0);
 		//const fontTwoBuffer = await loadFontBuffer(1);
 
-		pageOneDoc.registerFontkit(fontkit);
-		let pageOneFonts: PDFFont[] = [
-			await pageOneDoc.embedFont(StandardFonts.Helvetica),
-			await pageOneDoc.embedFont(StandardFonts.HelveticaBold),
-			await pageOneDoc.embedFont(StandardFonts.HelveticaOblique),
-			await pageOneDoc.embedFont(fontOneBuffer),
+		frontPageDoc.registerFontkit(fontkit);
+		let frontPageFonts: PDFFont[] = [
+			await frontPageDoc.embedFont(StandardFonts.Helvetica),
+			await frontPageDoc.embedFont(StandardFonts.HelveticaBold),
+			await frontPageDoc.embedFont(StandardFonts.HelveticaOblique),
+			await frontPageDoc.embedFont(fontOneBuffer),
 			// Consider adding other custom font (#2 and onwards)
 		]
 
-		pageTwoDoc.registerFontkit(fontkit);
-		let pageTwoFonts: PDFFont[] = [
-			await pageTwoDoc.embedFont(StandardFonts.Helvetica),
-			await pageTwoDoc.embedFont(StandardFonts.HelveticaBold),
-			await pageTwoDoc.embedFont(StandardFonts.HelveticaOblique),
-			await pageTwoDoc.embedFont(fontOneBuffer),
+		featuresPageDoc.registerFontkit(fontkit);
+		let featuresPageFonts: PDFFont[] = [
+			await featuresPageDoc.embedFont(StandardFonts.Helvetica),
+			await featuresPageDoc.embedFont(StandardFonts.HelveticaBold),
+			await featuresPageDoc.embedFont(StandardFonts.HelveticaOblique),
+			await featuresPageDoc.embedFont(fontOneBuffer),
 			// Consider adding other custom font (#2 and onwards)
 		]
 
-		pageThreeDoc.registerFontkit(fontkit);
-		let pageThreeFonts: PDFFont[] = [
-			await pageThreeDoc.embedFont(StandardFonts.Helvetica),
-			await pageThreeDoc.embedFont(StandardFonts.HelveticaBold),
-			await pageThreeDoc.embedFont(StandardFonts.HelveticaOblique),
-			await pageThreeDoc.embedFont(fontOneBuffer),
+		equipmentPageDoc.registerFontkit(fontkit);
+		let equipmentPageFonts: PDFFont[] = [
+			await equipmentPageDoc.embedFont(StandardFonts.Helvetica),
+			await equipmentPageDoc.embedFont(StandardFonts.HelveticaBold),
+			await equipmentPageDoc.embedFont(StandardFonts.HelveticaOblique),
+			await equipmentPageDoc.embedFont(fontOneBuffer),
+			// Consider adding other custom font (#2 and onwards)
+		]
+
+		spellsPageDoc.registerFontkit(fontkit);
+		let spellsPageFonts: PDFFont[] = [
+			await spellsPageDoc.embedFont(StandardFonts.Helvetica),
+			await spellsPageDoc.embedFont(StandardFonts.HelveticaBold),
+			await spellsPageDoc.embedFont(StandardFonts.HelveticaOblique),
+			await spellsPageDoc.embedFont(fontOneBuffer),
 			// Consider adding other custom font (#2 and onwards)
 		]
 			
 		// Check that we have the expected template docs
-		if (!pageOneDoc || !pageTwoDoc || !pageThreeDoc) {
+		if (!frontPageDoc || !featuresPageDoc || !equipmentPageDoc || !spellsPageDoc) {
 			throw new Error('Missing PDF Template');
 		}
 		
-		const page_one = pageOneDoc.getPages()[0];
-		const page_two = pageTwoDoc.getPages()[0];
-		const page_three = pageTwoDoc.getPages()[0];
+		const frontPage = frontPageDoc.getPages()[0];
+		const featuresPage = featuresPageDoc.getPages()[0];
+		const equipmentPage = equipmentPageDoc.getPages()[0];
+		const spellsPage = spellsPageDoc.getPages()[0];
 		
 		// Fill pages with data
-		await fillPageOneNew(pageOneDoc, data, pageOneFonts[3], pageOneFonts[1], pageOneFonts[2]);
-		await fillPageFeatures(pageTwoDoc, data, pageTwoFonts[3], pageTwoFonts[1], pageTwoFonts[2]);
-		await fillPageSpells(pageThreeDoc, data, pageTwoFonts[3], pageTwoFonts[1], pageTwoFonts[2]);
+		await fillFrontPage(frontPageDoc, data, frontPageFonts[3], frontPageFonts[1], frontPageFonts[2]);
+		await fillFeaturesPage(featuresPageDoc, data, featuresPageFonts[3], featuresPageFonts[1], featuresPageFonts[2]);
+		await fillEquipmentPage(equipmentPageDoc, data, featuresPageFonts[3], featuresPageFonts[1], featuresPageFonts[2]);
+		await fillSpellsPage(spellsPageDoc, data, spellsPageFonts[3], spellsPageFonts[1], spellsPageFonts[2]);
 		
 		let freshPdfDoc = await PDFDocument.create()
 
-		const [firstPageCopy] = await freshPdfDoc.copyPages(pageOneDoc, [0])
-		const [secondPageCopy] = await freshPdfDoc.copyPages(pageTwoDoc, [0])
-		const [thridPageCopy] = await freshPdfDoc.copyPages(pageThreeDoc, [0])
+		const [frontPageCopy] = await freshPdfDoc.copyPages(frontPageDoc, [0])
+		const [featuresPageCopy] = await freshPdfDoc.copyPages(featuresPageDoc, [0])
+		const [equipmentPageCopy] = await freshPdfDoc.copyPages(equipmentPageDoc, [0])
+		const [spellsPageCopy] = await freshPdfDoc.copyPages(spellsPageDoc, [0])
 
-		freshPdfDoc.addPage(firstPageCopy)
-		freshPdfDoc.addPage(secondPageCopy)
-		freshPdfDoc.addPage(thridPageCopy)
+		freshPdfDoc.addPage(frontPageCopy)
+		freshPdfDoc.addPage(featuresPageCopy)
+		freshPdfDoc.addPage(equipmentPageCopy)
+		freshPdfDoc.addPage(spellsPageCopy)
 
 		const pdfBytes = await freshPdfDoc.save();
 

@@ -1018,7 +1018,7 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 	// Format species (with subrace if applicable)
 	const species = character.race
 		? character.subrace
-			? `${character.subrace} (${character.race})`
+			? `${character.subrace}`
 			: character.race
 		: '';
 	

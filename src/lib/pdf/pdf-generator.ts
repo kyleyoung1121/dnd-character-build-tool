@@ -5,7 +5,7 @@
  * at the positions defined in character-sheet-config.ts
  */
 
-import { PDFDocument, rgb, StandardFonts, PDFForm, PDFFont, numberToString } from 'pdf-lib';
+import { PDFDocument, rgb, StandardFonts, PDFForm, PDFFont, numberToString, TextAlignment } from 'pdf-lib';
 import { PAGE_1_FIELDS, PAGE_2_FIELDS, PDF_CONFIG } from './character-sheet-config';
 import fontkit from '@pdf-lib/fontkit';
 import type { CharacterSheetData } from './character-data-mapper';
@@ -430,8 +430,14 @@ function drawTextArea(
 // 	}
 // }
 
-function fillFormField(form: any, fieldName: string, value: string) {
-	form.getTextField(fieldName).setText(value)
+function fillFormField(form: any, fieldName: string, value: string, fontSize?: number, textAlignment?: TextAlignment) {
+	form.getTextField(fieldName).setText(value);
+	if (fontSize) {
+		form.getTextField(fieldName).setFontSize(fontSize);
+	}
+	if (textAlignment) {
+		form.getTextField(fieldName).setAlignment(textAlignment);
+	}
 }
 
 async function fillPageOneNew(
@@ -446,10 +452,47 @@ async function fillPageOneNew(
 	
 	// - - - - -
 	// Info Box
-	fillFormField(form, 'class_info', data.classAndLevel);
-	fillFormField(form, 'background_info', data.background);
+	let classTextSize = 12;
+	if (data.classAndLevel) {
+		// Druid: for brevity, only list the keyword of the circle (ie Druid (Underdark)) 
+		if (data.classAndLevel.includes('Circle')) {
+			let newClassText = 'Druid ';
+			let keyword = '';
+
+			let classSplice = data.classAndLevel.split(' ').filter(text => text);
+
+			// Grab just the last bit of the subclass, ignoring paranthesis.
+			keyword = classSplice[classSplice.length - 1];
+			keyword = keyword.replace(/\(/g, "");
+			keyword = keyword.replace(/\)/g, "");
+
+			fillFormField(form, 'class_info', newClassText + `(${keyword})`, classTextSize);
+		} 
+		// Wizard: for brevity, only list the keyword of the school (ie Wizard (Transmutation))
+		else if (data.classAndLevel.includes('School')) {
+			let newClassText = 'Wizard ';
+			let keyword = '';
+
+			let classSplice = data.classAndLevel.split(' ').filter(text => text);
+
+			// Grab just the last bit of the subclass, ignoring paranthesis.
+			keyword = classSplice[classSplice.length - 1];
+			keyword = keyword.replace(/\(/g, "");
+			keyword = keyword.replace(/\)/g, "");
+			
+			fillFormField(form, 'class_info', newClassText + `(${keyword})`, classTextSize);
+		} 
+		// All other classes: list class & subclass as-is
+		else {
+			fillFormField(form, 'class_info', data.classAndLevel, classTextSize);
+		}
+
+		
+	}
+	
+	fillFormField(form, 'background_info', data.background, 12);
 	//fillFormField(form, 'player_info', 'value');
-	fillFormField(form, 'species_info', data.species);
+	fillFormField(form, 'species_info', data.species, 12);
 	//fillFormField(form, 'alignment_info', 'value');
 	//fillFormField(form, 'character_name', 'value');
 
@@ -478,33 +521,33 @@ async function fillPageOneNew(
 
 	// - - - - -
 	// Saving Throws
-	fillFormField(form, 'str_save', data.savingThrows.strength);
-	fillFormField(form, 'dex_save', data.savingThrows.dexterity);
-	fillFormField(form, 'con_save', data.savingThrows.constitution);
-	fillFormField(form, 'int_save', data.savingThrows.intelligence);
-	fillFormField(form, 'wis_save', data.savingThrows.wisdom);
-	fillFormField(form, 'cha_save', data.savingThrows.charisma);
+	fillFormField(form, 'str_save', data.savingThrows.strength, 13, TextAlignment.Right);
+	fillFormField(form, 'dex_save', data.savingThrows.dexterity, 13, TextAlignment.Right);
+	fillFormField(form, 'con_save', data.savingThrows.constitution, 13, TextAlignment.Right);
+	fillFormField(form, 'int_save', data.savingThrows.intelligence, 13, TextAlignment.Right);
+	fillFormField(form, 'wis_save', data.savingThrows.wisdom, 13, TextAlignment.Right);
+	fillFormField(form, 'cha_save', data.savingThrows.charisma, 13, TextAlignment.Right);
 
 	// - - - - -
 	// Skills
-	fillFormField(form, 'acrobatics', data.skills['acrobatics']);
-	fillFormField(form, 'animal_handling', data.skills['animalHandling']);
-	fillFormField(form, 'arcana', data.skills['arcana']);
-	fillFormField(form, 'athletics', data.skills['athletics']);
-	fillFormField(form, 'deception', data.skills['deception']);
-	fillFormField(form, 'history', data.skills['history']);
-	fillFormField(form, 'insight', data.skills['insight']);
-	fillFormField(form, 'intimidation', data.skills['intimidation']);
-	fillFormField(form, 'investigation', data.skills['investigation']);
-	fillFormField(form, 'medicine', data.skills['medicine']);
-	fillFormField(form, 'nature', data.skills['nature']);
-	fillFormField(form, 'perception', data.skills['perception']);
-	fillFormField(form, 'performance', data.skills['performance']);
-	fillFormField(form, 'persuasion', data.skills['persuasion']);
-	fillFormField(form, 'religion', data.skills['religion']);
-	fillFormField(form, 'sleight_of_hand', data.skills['sleightOfHand']);
-	fillFormField(form, 'stealth', data.skills['stealth']);
-	fillFormField(form, 'survival', data.skills['survival']);
+	fillFormField(form, 'acrobatics', data.skills['acrobatics'], 13, TextAlignment.Right);
+	fillFormField(form, 'animal_handling', data.skills['animalHandling'], 13, TextAlignment.Right);
+	fillFormField(form, 'arcana', data.skills['arcana'], 13, TextAlignment.Right);
+	fillFormField(form, 'athletics', data.skills['athletics'], 13, TextAlignment.Right);
+	fillFormField(form, 'deception', data.skills['deception'], 13, TextAlignment.Right);
+	fillFormField(form, 'history', data.skills['history'], 13, TextAlignment.Right);
+	fillFormField(form, 'insight', data.skills['insight'], 13, TextAlignment.Right);
+	fillFormField(form, 'intimidation', data.skills['intimidation'], 13, TextAlignment.Right);
+	fillFormField(form, 'investigation', data.skills['investigation'], 13, TextAlignment.Right);
+	fillFormField(form, 'medicine', data.skills['medicine'], 13, TextAlignment.Right);
+	fillFormField(form, 'nature', data.skills['nature'], 13, TextAlignment.Right);
+	fillFormField(form, 'perception', data.skills['perception'], 13, TextAlignment.Right);
+	fillFormField(form, 'performance', data.skills['performance'], 13, TextAlignment.Right);
+	fillFormField(form, 'persuasion', data.skills['persuasion'], 13, TextAlignment.Right);
+	fillFormField(form, 'religion', data.skills['religion'], 13, TextAlignment.Right);
+	fillFormField(form, 'sleight_of_hand', data.skills['sleightOfHand'], 13, TextAlignment.Right);
+	fillFormField(form, 'stealth', data.skills['stealth'], 13, TextAlignment.Right);
+	fillFormField(form, 'survival', data.skills['survival'], 13, TextAlignment.Right);
 
 	// - - - - -
 	// Attacks & Spellcasting
@@ -653,10 +696,10 @@ async function fillPageOneNew(
 		}
 	}
 
-	fillFormField(form, 'attacks_names', attacks_names_string);
-	fillFormField(form, 'attacks_to_hit', attacks_to_hit_string);
-	fillFormField(form, 'attacks_damage', attacks_damage_string);
-	fillFormField(form, 'attacks_notes', attacks_notes_string);
+	fillFormField(form, 'attacks_names', attacks_names_string, 10.5);
+	fillFormField(form, 'attacks_to_hit', attacks_to_hit_string, 10.5);
+	fillFormField(form, 'attacks_damage', attacks_damage_string, 10.5);
+	fillFormField(form, 'attacks_notes', attacks_notes_string, 10.5);
 	
 	// - - - - -
 	// Core Actions
@@ -1069,9 +1112,9 @@ async function fillPageOneNew(
 	let core_bonus_actions_string = core_bonus_actions.join(",\n");
 	let core_reactions_string = core_other.join(",\n");
 
-	fillFormField(form, 'core_actions', core_actions_string);
-	fillFormField(form, 'core_bonus_actions', core_bonus_actions_string);
-	fillFormField(form, 'core_reactions', core_reactions_string);
+	fillFormField(form, 'core_actions', core_actions_string, 10.5);
+	fillFormField(form, 'core_bonus_actions', core_bonus_actions_string, 10.5);
+	fillFormField(form, 'core_reactions', core_reactions_string, 10.5);
 
 	form.flatten()
 }

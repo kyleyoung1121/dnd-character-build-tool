@@ -9,6 +9,7 @@ import { PDFDocument, rgb, StandardFonts, PDFForm, PDFFont, numberToString } fro
 import { PAGE_1_FIELDS, PAGE_2_FIELDS, PDF_CONFIG } from './character-sheet-config';
 import fontkit from '@pdf-lib/fontkit';
 import type { CharacterSheetData } from './character-data-mapper';
+import { formatSpells } from './character-data-mapper';
 import type { FieldConfig, TextAreaConfig } from './character-sheet-config';
 import type { Spell } from '$lib/data/spells';
 import { formatFeatureForPDF, formatFeaturesForPDF } from '$lib/data/features/feature-data';
@@ -1122,7 +1123,7 @@ async function fillPageFeatures(
 			//console.log('featureLineUsage now reads: ' + featureLineUsage);
 		}
 
-		// If there is room enough, add this feature chunk to the column.
+		// If there is room enough, add this feature chunk to the column. (+1 to account for the blank space we want to add after)
 		if (lineCount + featureLineUsage + 1 <= maxLinesPerColumn) {
 			lineCount += featureLineUsage + 1;
 			columnOneContent += featureChunks[i] + '\n\n';
@@ -1143,6 +1144,79 @@ async function fillPageFeatures(
 	form.flatten()
 }
 
+
+async function fillPageSpells(
+	page: any,
+	data: CharacterSheetData,
+	font: any,
+	boldFont: any,
+	italicFont: any
+) {
+	const form = page.getForm()
+
+	const charactersPerRow = 64;
+	let maxLinesPerColumn = 65;
+	// For spells, we want to leave room for Spell Save, Spell Attack, and Spell Slots. So, both columns should have a couple leading lines of whitespace
+	const whitespaceLines = 4;
+	maxLinesPerColumn -= whitespaceLines;
+
+	let spellsContent = formatSpells(data.characterReference);
+
+	let columnOneContent = '\n'.repeat(whitespaceLines);
+	let columnTwoContent = '\n'.repeat(whitespaceLines);
+
+	console.log('Spell Info Debugging')
+	console.log(JSON.stringify(spellsContent))
+
+	let lineCount = 0;
+	// Track to see when column one is used up. This helps avoid parsing each spell chunk after, since they must go in column two.
+	let outOfSpace = false;
+
+	// Iterate through feature chunks (entire spells separated by a blank line)
+	let spellChunks = spellsContent.split('\n\n');
+	for (let i = 0; i < spellChunks.length; i++) {
+		// If we have already filled column one, we can just assume everything else goes in column two.
+		if (outOfSpace) {
+			columnTwoContent += spellChunks[i] + '\n\n';
+			continue;
+		}
+		
+		// Otherwise, lets track how many lines of text this next spell will use up in column one.
+		let spellLineUsage = 0;
+
+		// Iterate through each text run within this feature.
+		// a text run is any length of text that ends in a newline.
+		// if there are no newlines (or considering the final run before the next feature), .split still captures this as the only (or final) element
+		let textRuns = spellChunks[i].split('\n');
+		for (let j = 0; j < textRuns.length; j++) {
+			// Consider if this run of text takes up more than just the one line we know the newline eats
+			// we subtract one from the length because the ending \n symbol counts against us.
+			spellLineUsage += Math.floor((textRuns[j].length - 1) / charactersPerRow) + 1;
+			//console.log('spellLineUsage now reads: ' + spellLineUsage);
+		}
+
+		// If there is room enough, add this spell chunk to the column. (+1 to account for the blank space we want to add after)
+		if (lineCount + spellLineUsage + 1 <= maxLinesPerColumn) {
+			lineCount += spellLineUsage + 1;
+			columnOneContent += spellChunks[i] + '\n\n';
+		} 
+		// Otherwise, column one is filled and we need to move this spell to column two.
+		else {
+			outOfSpace = true;
+			columnTwoContent += spellChunks[i] + '\n\n';
+		}
+	}
+
+	console.log('after distribution, lineCount ~ ' + lineCount);
+
+	fillFormField(form, 'page_title', 'Spells');
+	fillFormField(form, 'column_one', columnOneContent);
+	fillFormField(form, 'column_two', columnTwoContent);
+
+	form.flatten()
+}
+
+
 /**
  * Generate filled PDF from character data
  * Returns a data URL that can be used in iframe/embed or downloaded
@@ -1152,6 +1226,7 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 		// Load templates
 		const pageOneDoc = await loadTemplate(0);
 		const pageTwoDoc = await loadTemplate(1);
+		const pageThreeDoc = await loadTemplate(1);
 
 		const fontOneBuffer = await loadFontBuffer(0);
 		//const fontTwoBuffer = await loadFontBuffer(1);
@@ -1173,26 +1248,39 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 			await pageTwoDoc.embedFont(fontOneBuffer),
 			// Consider adding other custom font (#2 and onwards)
 		]
+
+		pageThreeDoc.registerFontkit(fontkit);
+		let pageThreeFonts: PDFFont[] = [
+			await pageThreeDoc.embedFont(StandardFonts.Helvetica),
+			await pageThreeDoc.embedFont(StandardFonts.HelveticaBold),
+			await pageThreeDoc.embedFont(StandardFonts.HelveticaOblique),
+			await pageThreeDoc.embedFont(fontOneBuffer),
+			// Consider adding other custom font (#2 and onwards)
+		]
 			
 		// Check that we have the expected template docs
-		if (!pageOneDoc || !pageTwoDoc) {
+		if (!pageOneDoc || !pageTwoDoc || !pageThreeDoc) {
 			throw new Error('Missing PDF Template');
 		}
 		
 		const page_one = pageOneDoc.getPages()[0];
 		const page_two = pageTwoDoc.getPages()[0];
+		const page_three = pageTwoDoc.getPages()[0];
 		
 		// Fill pages with data
 		await fillPageOneNew(pageOneDoc, data, pageOneFonts[3], pageOneFonts[1], pageOneFonts[2]);
 		await fillPageFeatures(pageTwoDoc, data, pageTwoFonts[3], pageTwoFonts[1], pageTwoFonts[2]);
+		await fillPageSpells(pageThreeDoc, data, pageTwoFonts[3], pageTwoFonts[1], pageTwoFonts[2]);
 		
 		let freshPdfDoc = await PDFDocument.create()
 
 		const [firstPageCopy] = await freshPdfDoc.copyPages(pageOneDoc, [0])
 		const [secondPageCopy] = await freshPdfDoc.copyPages(pageTwoDoc, [0])
+		const [thridPageCopy] = await freshPdfDoc.copyPages(pageThreeDoc, [0])
 
 		freshPdfDoc.addPage(firstPageCopy)
 		freshPdfDoc.addPage(secondPageCopy)
+		freshPdfDoc.addPage(thridPageCopy)
 
 		const pdfBytes = await freshPdfDoc.save();
 

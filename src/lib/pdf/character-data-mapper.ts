@@ -893,20 +893,9 @@ function estimateSpellLines(spell: Spell, maxWidth: number, fontSize: number): n
  * Separates cantrips from leveled spells
  * Handles overflow to second column
  */
-function formatSpells(
-	character: Character,
-	maxLinesColumn1: number = 63 // 630pt height / 10pt lineHeight
-): {
-	column1Text: string;
-	column2Text: string;
-	hasOverflow: boolean;
-} {
+export function formatSpells(character: Character): string {
 	if (!character.spells || character.spells.length === 0) {
-		return {
-			column1Text: '',
-			column2Text: '',
-			hasOverflow: false
-		};
+		return '';
 	}
 	
 	// Extract spell names (handle both string and object format)
@@ -920,11 +909,7 @@ function formatSpells(
 	}).filter(name => name !== '');
 	
 	if (spellNames.length === 0) {
-		return {
-			column1Text: '',
-			column2Text: '',
-			hasOverflow: false
-		};
+		return '';
 	}
 	
 	// Look up spell data for each spell
@@ -938,54 +923,33 @@ function formatSpells(
 	const leveledSpells = spellData.filter(s => s.spell && s.spell.level > 0);
 	
 	// Build all spell lines first, tracking which lines belong to which spell
-	const allSpellLines: Array<{ lines: string[]; estimatedLines: number }> = [];
-	let totalEstimatedLines = 0;
+	let allSpellsText: string = '';
 	
 	// Format cantrips
 	if (cantrips.length > 0) {
-		const headerLines = ['=== CANTRIPS ===', ''];
-		allSpellLines.push({ lines: headerLines, estimatedLines: 2 });
-		totalEstimatedLines += 2;
+		allSpellsText += '=== CANTRIPS ===\n\n';
 		
 		for (const { name, spell } of cantrips) {
-			const spellLines: string[] = [];
 			
 			if (!spell) {
-				spellLines.push(`[[LARGEBOLD:${name}]]`);
-				spellLines.push('(Description not found)');
-				spellLines.push('');
-				const estimated = 3;
-				allSpellLines.push({ lines: spellLines, estimatedLines: estimated });
-				totalEstimatedLines += estimated;
+				allSpellsText += `[${name.toUpperCase()}]\n`;
+				allSpellsText += '(Description not found)\n';
 				continue;
 			}
 			
-			// Format: [[LARGEBOLD:Spell Name]] (larger font)
-			spellLines.push(`[[LARGEBOLD:${spell.name}]]`);
+			allSpellsText += `[${spell.name.toUpperCase()}]\n`;
 			
 			// Add casting details
-			spellLines.push(`${spell.castingTime} | ${spell.range} | ${spell.duration}`);
+			allSpellsText += `${spell.castingTime} | ${spell.range} | ${spell.duration}\n`;
 			
 			// Add description
-			spellLines.push(spell.description);
-			spellLines.push('');
-			
-			const estimated = estimateSpellLines(spell, 170, 8);
-			allSpellLines.push({ lines: spellLines, estimatedLines: estimated });
-			totalEstimatedLines += estimated;
+			allSpellsText += spell.description + '\n\n';
 		}
 	}
 	
 	// Format leveled spells
 	if (leveledSpells.length > 0) {
-		const headerLines: string[] = [];
-		if (cantrips.length > 0) {
-			headerLines.push(''); // Extra space between sections
-		}
-		headerLines.push('=== SPELLS ===');
-		headerLines.push('');
-		allSpellLines.push({ lines: headerLines, estimatedLines: headerLines.length });
-		totalEstimatedLines += headerLines.length;
+		allSpellsText += '=== SPELLS ===\n\n';
 		
 		// Group spells by level
 		const spellsByLevel: Record<number, Array<{ name: string; spell: Spell }>> = {};
@@ -1007,64 +971,28 @@ function formatSpells(
 			
 			// Add level header
 			const levelText = level === 1 ? '1st Level' : level === 2 ? '2nd Level' : `${level}th Level`;
-			const levelHeaderLines = [`--- ${levelText} ---`, ''];
-			allSpellLines.push({ lines: levelHeaderLines, estimatedLines: 2 });
-			totalEstimatedLines += 2;
+			allSpellsText += `--- ${levelText} ---\n`;
 			
 			for (const { name, spell } of spellsAtLevel) {
-				const spellLines: string[] = [];
 				
 				if (!spell) {
-					spellLines.push(`[[LARGEBOLD:${name}]]`);
-					spellLines.push('(Description not found)');
-					spellLines.push('');
-					const estimated = 3;
-					allSpellLines.push({ lines: spellLines, estimatedLines: estimated });
-					totalEstimatedLines += estimated;
+					allSpellsText += `[${name.toUpperCase()}]\n`;
+					allSpellsText += '(Description not found)\n'; 
 					continue;
 				}
 				
-				// Format: [[LARGEBOLD:Spell Name]] (larger font)
-				spellLines.push(`[[LARGEBOLD:${spell.name}]]`);
+				allSpellsText += `[${spell.name.toUpperCase()}]\n`;
 				
 				// Add casting details
-				spellLines.push(`${spell.castingTime} | ${spell.range} | ${spell.duration}`);
+				allSpellsText += `${spell.castingTime} | ${spell.range} | ${spell.duration}\n`;
 				
 				// Add description
-				spellLines.push(spell.description);
-				spellLines.push('');
-				
-				const estimated = estimateSpellLines(spell, 170, 8);
-				allSpellLines.push({ lines: spellLines, estimatedLines: estimated });
-				totalEstimatedLines += estimated;
+				allSpellsText += spell.description + '\n\n';
 			}
 		}
 	}
 	
-	// Now split between columns
-	const column1Lines: string[] = [];
-	const column2Lines: string[] = [];
-	let currentLines = 0;
-	let hasOverflow = false;
-	
-	for (const spellBlock of allSpellLines) {
-		// Check if this spell block fits in column 1
-		if (currentLines + spellBlock.estimatedLines <= maxLinesColumn1) {
-			// Fits in column 1
-			column1Lines.push(...spellBlock.lines);
-			currentLines += spellBlock.estimatedLines;
-		} else {
-			// Overflow to column 2
-			hasOverflow = true;
-			column2Lines.push(...spellBlock.lines);
-		}
-	}
-	
-	return {
-		column1Text: column1Lines.join('\n'),
-		column2Text: column2Lines.length > 0 ? column2Lines.join('\n') : '',
-		hasOverflow
-	};
+	return allSpellsText;
 }
 
 /**

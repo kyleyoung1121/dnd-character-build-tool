@@ -933,17 +933,17 @@ export function formatSpells(character: Character): string {
 	
 	// Format cantrips
 	if (cantrips.length > 0) {
-		allSpellsText += '=== CANTRIPS ===\n\n';
+		allSpellsText += '--- Cantrips ---\n';
 		
 		for (const { name, spell } of cantrips) {
 			
 			if (!spell) {
-				allSpellsText += `[${name.toUpperCase()}]\n`;
+				allSpellsText += `<bold:>${name.toUpperCase()}\n`;
 				allSpellsText += '(Description not found)\n';
 				continue;
 			}
 			
-			allSpellsText += `[${spell.name.toUpperCase()}]\n`;
+			allSpellsText += `<bold>${spell.name.toUpperCase()}\n`;
 			
 			// Add casting details
 			allSpellsText += `${spell.castingTime} | ${spell.range} | ${spell.duration}\n`;
@@ -955,7 +955,6 @@ export function formatSpells(character: Character): string {
 	
 	// Format leveled spells
 	if (leveledSpells.length > 0) {
-		allSpellsText += '=== SPELLS ===\n\n';
 		
 		// Group spells by level
 		const spellsByLevel: Record<number, Array<{ name: string; spell: Spell }>> = {};
@@ -982,15 +981,15 @@ export function formatSpells(character: Character): string {
 			for (const { name, spell } of spellsAtLevel) {
 				
 				if (!spell) {
-					allSpellsText += `[${name.toUpperCase()}]\n`;
+					allSpellsText += `<bold:>${name.toUpperCase()}\n`;
 					allSpellsText += '(Description not found)\n'; 
 					continue;
 				}
 				
-				allSpellsText += `[${spell.name.toUpperCase()}]\n`;
+				allSpellsText += `<bold:>${spell.name.toUpperCase()}\n`;
 				
 				// Add casting details
-				allSpellsText += `${spell.castingTime} | ${spell.range} | ${spell.duration}\n`;
+				allSpellsText += `<bold:>( ${spell.castingTime}  |  ${spell.range}  |  ${spell.duration} )\n`;
 				
 				// Add description
 				allSpellsText += spell.description + '\n\n';

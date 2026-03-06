@@ -367,19 +367,16 @@ export function hasFeatureData(featureName: string, character?: Character): bool
  * @param character - Character object to provide context for lookup
  */
 export function formatFeatureForPDF(featureName: string, character?: Character): string {
-	//console.log(`  formatFeatureForPDF called for: "${featureName}"`);
 	const featureData = getFeatureData(featureName, character);
 	
 	if (!featureData) {
-		//console.log(`    No feature data found for "${featureName}", using bullet point`);
 		// If feature not found, just show the name with bullet
 		return `• ${featureName}`;
 	}
 	
-	//console.log(`    Feature data found for "${featureName}":`, featureData.name);
-	// Format: [[BOLD:Name]]. Description
-	// Name is marked for bold rendering, followed by period and description on same line
-	return `[${featureData.name.toUpperCase()}].\n${featureData.description}`;
+	// Name is marked for bold rendering, followed by period. Anything on this first line will be bolded
+	// 			so we are starting the description on the next line down.
+	return `<bold:>${featureData.name.toUpperCase()}.\n${featureData.description}`;
 }
 
 /**
@@ -507,7 +504,7 @@ export function formatFeaturesForPDF(
 			if (FEATURE_DESCRIPTION_DICTIONARY[name]) {
 				// DEBUG_ONE: how should these special cases be formatted? Just like normal features?
 				// this is used for Flurry of blows, patient defense, and step of the wind.
-				return `[${name.toUpperCase()}].\n${FEATURE_DESCRIPTION_DICTIONARY[name]}`;
+				return `<bold:>${name.toUpperCase()}.\n${FEATURE_DESCRIPTION_DICTIONARY[name]}`;
 			}
 			
 			// Otherwise, use normal lookup

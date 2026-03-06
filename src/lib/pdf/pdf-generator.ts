@@ -5,7 +5,7 @@
  * at the positions defined in character-sheet-config.ts
  */
 
-import { PDFDocument, rgb, StandardFonts, PDFForm, PDFFont, numberToString, TextAlignment } from 'pdf-lib';
+import { PDFDocument, rgb, StandardFonts, PDFForm, PDFFont, numberToString, TextAlignment, newlineChars } from 'pdf-lib';
 import { PAGE_1_FIELDS, PAGE_2_FIELDS, PDF_CONFIG } from './character-sheet-config';
 import fontkit from '@pdf-lib/fontkit';
 import type { CharacterSheetData } from './character-data-mapper';
@@ -725,6 +725,40 @@ async function fillFrontPage(
 }
 
 
+function chunk(input: string, chunkSize: number) {
+	let re = new RegExp(String.raw`([\S\s]{1,${chunkSize}})`, "g");
+	return input.match(re)
+}
+
+function processLayeredColumns(input: string, charactersPerRow: number) {
+	let linesUsed = 0;
+	let newLineSplit = input.split('\n');
+
+	let boldLayer = "";
+	let plainLayer = "";
+	
+	for (let i = 0; i < newLineSplit.length; i++) {
+		let charLimitSplit = chunk(newLineSplit[i] + '\n', charactersPerRow);
+		if (!charLimitSplit) {continue;}
+		for (let j = 0; j < charLimitSplit.length; j++) {
+			if (charLimitSplit[j].includes('<bold:>')) {
+				boldLayer += charLimitSplit[j].substring(7);
+				plainLayer += '\n';
+				linesUsed++;
+			} else {
+				boldLayer += '\n';
+				plainLayer += charLimitSplit[j];
+				linesUsed++;
+			}
+		}
+	}
+
+	return {
+		'plainLayer': plainLayer, 'boldLayer': boldLayer, 'linesUsed': linesUsed,
+	};
+}
+
+
 async function fillFeaturesPage(
 	page: any,
 	data: CharacterSheetData,
@@ -734,55 +768,45 @@ async function fillFeaturesPage(
 ) {
 	const form = page.getForm()
 
-	const charactersPerRow = 64;
+	const charactersPerRow = 62;
 	const maxLinesPerColumn = 65;
 
 	let featureContent = formatFeaturesForPDF(data.features, data.characterReference, 'all');
 
 	let columnOneContent = '';
+	let columnOneBoldContent = '';
 	let columnTwoContent = '';
+	let columnTwoBoldContent = '';
 
 	let lineCount = 0;
-	// Track to see when column one is used up. This helps avoid parsing each feature chunk after, since they must go in column two.
-	let outOfSpace = false;
 
 	// Iterate through feature chunks (entire features separated by a blank line)
 	let featureChunks = featureContent.split('\n\n');
-	for (let i = 0; i < featureChunks.length; i++) {
-		// If we have already filled column one, we can just assume everything else goes in column two.
-		if (outOfSpace) {
-			columnTwoContent += featureChunks[i] + '\n\n';
-			continue;
-		}
-		
-		// Otherwise, lets track how many lines of text this next feature will use up in column one.
-		let featureLineUsage = 0;
+	for (let i = 0; i < featureChunks.length; i++) {	
+		const layeredColumnsProcessed = processLayeredColumns(featureChunks[i] + '\n\n', charactersPerRow);
 
-		// Iterate through each text run within this feature.
-		// a text run is any length of text that ends in a newline.
-		// if there are no newlines (or considering the final run before the next feature), .split still captures this as the only (or final) element
-		let textRuns = featureChunks[i].split('\n');
-		for (let j = 0; j < textRuns.length; j++) {
-			// Consider if this run of text takes up more than just the one line we know the newline eats
-			// we subtract one from the length because the ending \n symbol counts against us.
-			featureLineUsage += Math.floor((textRuns[j].length - 1) / charactersPerRow) + 1;
+		if (lineCount + layeredColumnsProcessed.linesUsed <= maxLinesPerColumn) {
+			lineCount += layeredColumnsProcessed.linesUsed;
+			columnOneContent += layeredColumnsProcessed.plainLayer;
+			columnOneBoldContent += layeredColumnsProcessed.boldLayer;
 		}
 
-		// If there is room enough, add this feature chunk to the column. (+1 to account for the blank space we want to add after)
-		if (lineCount + featureLineUsage + 1 <= maxLinesPerColumn) {
-			lineCount += featureLineUsage + 1;
-			columnOneContent += featureChunks[i] + '\n\n';
-		} 
-		// Otherwise, column one is filled and we need to move this feature to column two.
 		else {
-			outOfSpace = true;
-			columnTwoContent += featureChunks[i] + '\n\n';
+			lineCount += layeredColumnsProcessed.linesUsed;
+			columnTwoContent += layeredColumnsProcessed.plainLayer;
+			columnTwoBoldContent += layeredColumnsProcessed.boldLayer;
 		}
 	}
 
 	fillFormField(form, 'page_title', 'Features', 12, TextAlignment.Center);
 	fillFormField(form, 'column_one', columnOneContent);
 	fillFormField(form, 'column_two', columnTwoContent);
+
+	
+	fillFormField(form, 'column_one_back', columnOneBoldContent);
+	form.getTextField('column_one_back').updateAppearances(boldFont);
+	fillFormField(form, 'column_two_back', columnTwoBoldContent);
+	form.getTextField('column_two_back').updateAppearances(boldFont);
 
 	form.flatten()
 }
@@ -862,49 +886,41 @@ async function fillSpellsPage(
 	let spellsContent = formatSpells(data.characterReference);
 
 	let columnOneContent = '\n'.repeat(whitespaceLines);
+	let columnOneBoldContent = '\n'.repeat(whitespaceLines);
 	let columnTwoContent = '\n'.repeat(whitespaceLines);
-
+	let columnTwoBoldContent = '\n'.repeat(whitespaceLines);
+	
 	let lineCount = 0;
-	// Track to see when column one is used up. This helps avoid parsing each spell chunk after, since they must go in column two.
-	let outOfSpace = false;
 
-	// Iterate through feature chunks (entire spells separated by a blank line)
-	let spellChunks = spellsContent.split('\n\n');
-	for (let i = 0; i < spellChunks.length; i++) {
-		// If we have already filled column one, we can just assume everything else goes in column two.
-		if (outOfSpace) {
-			columnTwoContent += spellChunks[i] + '\n\n';
-			continue;
-		}
-		
-		// Otherwise, lets track how many lines of text this next spell will use up in column one.
-		let spellLineUsage = 0;
+	// Iterate through feature chunks (entire features separated by a blank line)
+	let spellsChunks = spellsContent.split('\n\n');
+	for (let i = 0; i < spellsChunks.length; i++) {	
+		const layeredColumnsProcessed = processLayeredColumns(spellsChunks[i] + '\n\n', charactersPerRow);
 
-		// Iterate through each text run within this feature.
-		// a text run is any length of text that ends in a newline.
-		// if there are no newlines (or considering the final run before the next feature), .split still captures this as the only (or final) element
-		let textRuns = spellChunks[i].split('\n');
-		for (let j = 0; j < textRuns.length; j++) {
-			// Consider if this run of text takes up more than just the one line we know the newline eats
-			// we subtract one from the length because the ending \n symbol counts against us.
-			spellLineUsage += Math.floor((textRuns[j].length - 1) / charactersPerRow) + 1;
+		if (lineCount + layeredColumnsProcessed.linesUsed <= maxLinesPerColumn) {
+			lineCount += layeredColumnsProcessed.linesUsed;
+			columnOneContent += layeredColumnsProcessed.plainLayer;
+			columnOneBoldContent += layeredColumnsProcessed.boldLayer;
 		}
 
-		// If there is room enough, add this spell chunk to the column. (+1 to account for the blank space we want to add after)
-		if (lineCount + spellLineUsage + 1 <= maxLinesPerColumn) {
-			lineCount += spellLineUsage + 1;
-			columnOneContent += spellChunks[i] + '\n\n';
-		} 
-		// Otherwise, column one is filled and we need to move this spell to column two.
 		else {
-			outOfSpace = true;
-			columnTwoContent += spellChunks[i] + '\n\n';
+			lineCount += layeredColumnsProcessed.linesUsed;
+			columnTwoContent += layeredColumnsProcessed.plainLayer;
+			columnTwoBoldContent += layeredColumnsProcessed.boldLayer;
 		}
 	}
 
-	fillFormField(form, 'page_title', 'Spells', 12, TextAlignment.Center);
+	fillFormField(form, 'page_title', 'Spells', 14, TextAlignment.Center);
+	form.getTextField('page_title').updateAppearances(boldFont);
+	
 	fillFormField(form, 'column_one', columnOneContent);
 	fillFormField(form, 'column_two', columnTwoContent);
+
+	
+	fillFormField(form, 'column_one_back', columnOneBoldContent);
+	form.getTextField('column_one_back').updateAppearances(boldFont);
+	fillFormField(form, 'column_two_back', columnTwoBoldContent);
+	form.getTextField('column_two_back').updateAppearances(boldFont);
 
 	form.flatten()
 }

@@ -590,8 +590,8 @@ function formatEquipment(inventory: string[]): string {
 	for (let i = 0; i < inventory.length; i++) {
 		if (processed.has(i)) continue;
 		
-		console.log('inventory debug:');
-		console.log(inventory);
+		// console.log('inventory debug:');
+		// console.log(inventory);
 
 		const item = inventory[i];
 		const itemLower = item.toLowerCase();
@@ -693,8 +693,8 @@ function formatEquipment(inventory: string[]): string {
 		lines.push(misc.join('\n'));
 	}
 	
-	console.log('lines debug');
-	console.log(lines);
+	// console.log('lines debug');
+	// console.log(lines);
 
 	return lines.join('\n');
 }
@@ -943,10 +943,21 @@ export function formatSpells(character: Character): string {
 				continue;
 			}
 			
-			allSpellsText += `<bold>${spell.name.toUpperCase()}\n`;
+			allSpellsText += `<bold:>${spell.name.toUpperCase()}\n`;
 			
+			let durationText: string;
+
+			// Format Concentration to be more concise.
+			if (spell && spell.duration && spell.duration.includes('Concentration')) {
+				let durationIndex = spell.duration.indexOf('up to ') + 6;
+				let durationSubstring = spell.duration.substring(durationIndex);
+				durationText = `Concentration - ${durationSubstring}`
+			} else {
+				durationText = spell.duration;
+			}
+
 			// Add casting details
-			allSpellsText += `${spell.castingTime} | ${spell.range} | ${spell.duration}\n`;
+			allSpellsText += `<bold:>( ${spell.castingTime} | ${spell.range} | ${durationText} )\n`;
 			
 			// Add description
 			allSpellsText += spell.description + '\n\n';
@@ -988,8 +999,19 @@ export function formatSpells(character: Character): string {
 				
 				allSpellsText += `<bold:>${spell.name.toUpperCase()}\n`;
 				
+				let durationText: string;
+
+				// Format Concentration to be more concise.
+				if (spell && spell.duration && spell.duration.includes('Concentration')) {
+					let durationIndex = spell.duration.indexOf('up to ') + 6;
+					let durationSubstring = spell.duration.substring(durationIndex);
+					durationText = `Concentration - ${durationSubstring}`
+				} else {
+					durationText = spell.duration;
+				}
+
 				// Add casting details
-				allSpellsText += `<bold:>( ${spell.castingTime}  |  ${spell.range}  |  ${spell.duration} )\n`;
+				allSpellsText += `<bold:>( ${spell.castingTime}  |  ${spell.range}  |  ${durationText} )\n`;
 				
 				// Add description
 				allSpellsText += spell.description + '\n\n';

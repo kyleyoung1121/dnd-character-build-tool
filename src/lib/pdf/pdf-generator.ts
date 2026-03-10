@@ -5,7 +5,7 @@
  * at the positions defined in character-sheet-config.ts
  */
 
-import { PDFDocument, rgb, StandardFonts, PDFForm, PDFFont, numberToString, TextAlignment, newlineChars } from 'pdf-lib';
+import { PDFDocument, rgb, StandardFonts, PDFForm, PDFFont, numberToString, TextAlignment, newlineChars, componentsToColor } from 'pdf-lib';
 import { PAGE_1_FIELDS, PAGE_2_FIELDS, PDF_CONFIG } from './character-sheet-config';
 import fontkit from '@pdf-lib/fontkit';
 import type { CharacterSheetData } from './character-data-mapper';
@@ -730,7 +730,69 @@ function chunk(input: string, chunkSize: number) {
 	return input.match(re)
 }
 
+// Get chunks of up to X characters. Each chunk should roll any cut-off words to the next chunk.
+function chunkLinesWordBumped(input: string, chunkSizeMax: number) {
+	let chunks: string[] = [];
+	let startIndex = 0;
+	let endIndex = 0;
+
+	function chunksPush(input: string) {
+		chunks.push(input.trim());
+	}
+
+	// Loop until we are done processing
+	while (endIndex != input.length-1) {
+
+		// Progress X characters forward, but do not go out of bounds
+		endIndex += chunkSizeMax;
+
+		// If we reach the end of this string right away, we can capture the rest in one chunk now
+		if (endIndex > input.length-1) {
+			endIndex = input.length-1
+			chunksPush(input.substring(startIndex, endIndex+1));
+			break;
+		}
+
+		// If the character after this chunk is a space, we are good. Add this chunk.
+		if (input[endIndex] == ' ') {
+			chunksPush(input.substring(startIndex, endIndex));
+			startIndex = endIndex;
+		}
+
+		// Otherwise, we are likely cutting some word in half.
+		else {
+			// Back track endIndex until we find a space or until we have backtracked all of the way to startIndex
+			while (endIndex > startIndex && !(input[endIndex] == ' ')) {
+				endIndex--;
+			}
+			// If we failed to find a space, we are forced to cut this very long word.
+			if (endIndex == startIndex) {
+				endIndex += chunkSizeMax;
+				chunksPush(input.substring(startIndex, endIndex));
+				startIndex = endIndex;
+			
+			// Otherwise, we found a space! We can add everything up to and including that space into this chunk
+			} else {
+				// in this state, endIndex is pointing at the final character of this chunk, when usually, it is pointing one after.
+				endIndex += 1
+				if (endIndex > input.length-1) {endIndex = input.length-1}
+				chunksPush(input.substring(startIndex, endIndex));
+				startIndex = endIndex;
+			}
+		}
+	}
+
+	console.log('chunks: [length, chunkText]');
+	for (let i = 0; i < chunks.length; i++) {
+		console.log(chunks[i].length, chunks[i]);
+	}
+
+	return chunks;
+}
+
 function processLayeredColumns(input: string, charactersPerRow: number) {
+	//console.log(JSON.stringify(input));
+	
 	let linesUsed = 0;
 	let newLineSplit = input.split('\n');
 
@@ -738,17 +800,26 @@ function processLayeredColumns(input: string, charactersPerRow: number) {
 	let plainLayer = "";
 	
 	for (let i = 0; i < newLineSplit.length; i++) {
-		let charLimitSplit = chunk(newLineSplit[i] + '\n', charactersPerRow);
+		console.log('-------------\nStep 2:');
+		console.log('newLineSplit[i], charactersPerRow: ' + newLineSplit[i] + ' ' + charactersPerRow);
+		let charLimitSplit = chunkLinesWordBumped(newLineSplit[i], charactersPerRow);``
 		if (!charLimitSplit) {continue;}
 		for (let j = 0; j < charLimitSplit.length; j++) {
 			if (charLimitSplit[j].includes('<bold:>')) {
-				boldLayer += charLimitSplit[j].substring(7);
+				boldLayer += charLimitSplit[j].substring(7) + '\n';
 				plainLayer += '\n';
 				linesUsed++;
+				// console.log('----------');
+				// console.log('boldLayer += ' + charLimitSplit[j].substring(7) + ' + newline');
+				// console.log('plainLayer += ' + 'newline');
+				
 			} else {
 				boldLayer += '\n';
-				plainLayer += charLimitSplit[j];
+				plainLayer += charLimitSplit[j] + '\n';
 				linesUsed++;
+				// console.log('----------');
+				// console.log('boldLayer += ' + 'newline');
+				// console.log('plainLayer += ' + charLimitSplit[j] + ' + newline');
 			}
 		}
 	}
@@ -768,7 +839,7 @@ async function fillFeaturesPage(
 ) {
 	const form = page.getForm()
 
-	const charactersPerRow = 62;
+	const charactersPerRow = 58;
 	const maxLinesPerColumn = 65;
 
 	let featureContent = formatFeaturesForPDF(data.features, data.characterReference, 'all');
@@ -783,6 +854,8 @@ async function fillFeaturesPage(
 	// Iterate through feature chunks (entire features separated by a blank line)
 	let featureChunks = featureContent.split('\n\n');
 	for (let i = 0; i < featureChunks.length; i++) {	
+		console.log('--------------\nStep 1:');
+		console.log(JSON.stringify(featureChunks[i] + '\n\n'));
 		const layeredColumnsProcessed = processLayeredColumns(featureChunks[i] + '\n\n', charactersPerRow);
 
 		if (lineCount + layeredColumnsProcessed.linesUsed <= maxLinesPerColumn) {
@@ -798,14 +871,16 @@ async function fillFeaturesPage(
 		}
 	}
 
+	let fontSize = 10;
+
 	fillFormField(form, 'page_title', 'Features', 12, TextAlignment.Center);
-	fillFormField(form, 'column_one', columnOneContent);
-	fillFormField(form, 'column_two', columnTwoContent);
+	fillFormField(form, 'column_one', columnOneContent, fontSize);
+	fillFormField(form, 'column_two', columnTwoContent, fontSize);
 
 	
-	fillFormField(form, 'column_one_back', columnOneBoldContent);
+	fillFormField(form, 'column_one_back', columnOneBoldContent, fontSize);
 	form.getTextField('column_one_back').updateAppearances(boldFont);
-	fillFormField(form, 'column_two_back', columnTwoBoldContent);
+	fillFormField(form, 'column_two_back', columnTwoBoldContent, fontSize);
 	form.getTextField('column_two_back').updateAppearances(boldFont);
 
 	form.flatten()
@@ -821,7 +896,6 @@ async function fillEquipmentPage(
 ) {
 	const form = page.getForm()
 
-	console.log(data.equipment);
 	let packTextRaw = '';
 	let packTextFormatted = '';
 	let remainingText = '';
@@ -877,10 +951,10 @@ async function fillSpellsPage(
 ) {
 	const form = page.getForm()
 
-	const charactersPerRow = 64;
+	const charactersPerRow = 58;
 	let maxLinesPerColumn = 65;
 	// For spells, we want to leave room for Spell Save, Spell Attack, and Spell Slots. So, both columns should have a couple leading lines of whitespace
-	const whitespaceLines = 4;
+	const whitespaceLines = 0;
 	maxLinesPerColumn -= whitespaceLines;
 
 	let spellsContent = formatSpells(data.characterReference);
@@ -895,7 +969,15 @@ async function fillSpellsPage(
 	// Iterate through feature chunks (entire features separated by a blank line)
 	let spellsChunks = spellsContent.split('\n\n');
 	for (let i = 0; i < spellsChunks.length; i++) {	
-		const layeredColumnsProcessed = processLayeredColumns(spellsChunks[i] + '\n\n', charactersPerRow);
+		let spellChunk: string;
+		if (i != spellsChunks.length - 1) {
+			spellChunk = spellsChunks[i] + '\n\n';
+		} else {
+			spellChunk = spellsChunks[i];
+		}
+		
+
+		const layeredColumnsProcessed = processLayeredColumns(spellChunk, charactersPerRow);
 
 		if (lineCount + layeredColumnsProcessed.linesUsed <= maxLinesPerColumn) {
 			lineCount += layeredColumnsProcessed.linesUsed;
@@ -910,16 +992,18 @@ async function fillSpellsPage(
 		}
 	}
 
+	let fontSize = 10;
+
 	fillFormField(form, 'page_title', 'Spells', 14, TextAlignment.Center);
 	form.getTextField('page_title').updateAppearances(boldFont);
 	
-	fillFormField(form, 'column_one', columnOneContent);
-	fillFormField(form, 'column_two', columnTwoContent);
+	fillFormField(form, 'column_one', columnOneContent, fontSize);
+	fillFormField(form, 'column_two', columnTwoContent, fontSize);
 
 	
-	fillFormField(form, 'column_one_back', columnOneBoldContent);
+	fillFormField(form, 'column_one_back', columnOneBoldContent, fontSize);
 	form.getTextField('column_one_back').updateAppearances(boldFont);
-	fillFormField(form, 'column_two_back', columnTwoBoldContent);
+	fillFormField(form, 'column_two_back', columnTwoBoldContent, fontSize);
 	form.getTextField('column_two_back').updateAppearances(boldFont);
 
 	form.flatten()

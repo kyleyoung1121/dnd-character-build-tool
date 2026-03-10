@@ -499,7 +499,7 @@ export const firstLevel: Spell[] = [
 		level: 1,
 		school: 'Conjuration',
 		castingTime: '1 action',
-		range: 'Self (10-foot radius)',
+		range: '10-foot radius',
 		components: ['V', 'S'],
 		duration: 'Instantaneous',
 		description:
@@ -544,7 +544,7 @@ export const firstLevel: Spell[] = [
 		level: 1,
 		school: 'Evocation',
 		castingTime: '1 action',
-		range: 'Self (15-foot cone)',
+		range: '15-foot cone',
 		components: ['V', 'S'],
 		duration: 'Instantaneous',
 		description:
@@ -589,7 +589,7 @@ export const firstLevel: Spell[] = [
 		level: 1,
 		school: 'Illusion',
 		castingTime: '1 action',
-		range: 'Self (15-foot cone)',
+		range: '15-foot cone',
 		components: ['V', 'S', 'M'],
 		duration: '1 round',
 		description:
@@ -1284,7 +1284,7 @@ export const firstLevel: Spell[] = [
 		level: 1,
 		school: 'Evocation',
 		castingTime: '1 action',
-		range: 'Self (15-foot cube)',
+		range: 'Self',
 		components: ['V', 'S'],
 		duration: 'Instantaneous',
 		description:
@@ -1696,7 +1696,7 @@ export const secondLevel: Spell[] = [
 		level: 2,
 		school: 'Evocation',
 		castingTime: '1 action',
-		range: 'Self (60-foot line)',
+		range: '60-foot line',
 		components: ['V', 'S', 'M'],
 		duration: 'Concentration, up to 1 minute',
 		description:

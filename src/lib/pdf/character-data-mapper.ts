@@ -951,7 +951,7 @@ export function formatSpells(character: Character): string {
 			if (spell && spell.duration && spell.duration.includes('Concentration')) {
 				let durationIndex = spell.duration.indexOf('up to ') + 6;
 				let durationSubstring = spell.duration.substring(durationIndex);
-				durationText = `Concentration - ${durationSubstring}`
+				durationText = `Concentration: ${durationSubstring}`
 			} else {
 				durationText = spell.duration;
 			}
@@ -1005,7 +1005,7 @@ export function formatSpells(character: Character): string {
 				if (spell && spell.duration && spell.duration.includes('Concentration')) {
 					let durationIndex = spell.duration.indexOf('up to ') + 6;
 					let durationSubstring = spell.duration.substring(durationIndex);
-					durationText = `Concentration - ${durationSubstring}`
+					durationText = `Concentration: ${durationSubstring}`
 				} else {
 					durationText = spell.duration;
 				}

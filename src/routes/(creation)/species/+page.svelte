@@ -22,7 +22,7 @@
 	import type { FeaturePrompt } from '$lib/data/types/Features';
 	import { isFeatureIncomplete, effectNeedsChoice } from '$lib/components/feature-card-utils';
 	import FeatureDescription from '$lib/components/FeatureDescription.svelte';
-import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
+	// import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 
 	import { applyChoice, revertChanges } from '$lib/stores/character_store_helpers';
 	import { get } from 'svelte/store';
@@ -346,7 +346,10 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 		bumpVersion();
 	}
 
-	function confirmAddSpecies() {
+	function confirmAddSpecies(speciesInfo: SpeciesData) {
+		
+		selectedSpecies = speciesInfo;
+		
 		if (selectedSpecies) {
 			// IMPORTANT: If we already have a selected species, clean it up first
 			if (selectedSpeciesData) {
@@ -654,7 +657,7 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 									{#each speciesInfo.subraces as subrace}
 										<button
 											class="race-card subrace-card"
-											on:click={() => (selectedSpecies = subrace)}
+											on:click={() => (confirmAddSpecies(subrace))}
 										>
 											<div class="card-left">
 												<img src={subrace.image} alt={`${subrace.name} icon`} />
@@ -674,7 +677,7 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 					{:else}
 						<!-- Single race container -->
 						<div class="parent-race-container">
-							<button class="race-card" on:click={() => (selectedSpecies = speciesInfo)}>
+							<button class="race-card" on:click={() => (confirmAddSpecies(speciesInfo))}>
 								<div class="card-left">
 									<img src={speciesInfo.image} alt={`${speciesInfo.name} icon`} />
 									<span>{speciesInfo.name}</span>
@@ -714,7 +717,7 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 									{#each speciesInfo.subraces as subrace}
 										<button
 											class="race-card subrace-card"
-											on:click={() => (selectedSpecies = subrace)}
+											on:click={() => (confirmAddSpecies(subrace))}
 										>
 											<div class="card-left">
 												<img src={subrace.image} alt={`${subrace.name} icon`} />
@@ -734,7 +737,7 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 					{:else}
 						<!-- Single race container -->
 						<div class="parent-race-container">
-							<button class="race-card" on:click={() => (selectedSpecies = speciesInfo)}>
+							<button class="race-card" on:click={() => (confirmAddSpecies(speciesInfo))}>
 								<div class="card-left">
 									<img src={speciesInfo.image} alt={`${speciesInfo.name} icon`} />
 									<span>{speciesInfo.name}</span>
@@ -774,7 +777,7 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 									{#each speciesInfo.subraces as subrace}
 										<button
 											class="race-card subrace-card"
-											on:click={() => (selectedSpecies = subrace)}
+											on:click={() => (confirmAddSpecies(subrace))}
 										>
 											<div class="card-left">
 												<img src={subrace.image} alt={`${subrace.name} icon`} />
@@ -794,7 +797,7 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 					{:else}
 						<!-- Single race container -->
 						<div class="parent-race-container">
-							<button class="race-card" on:click={() => (selectedSpecies = speciesInfo)}>
+							<button class="race-card" on:click={() => (confirmAddSpecies(speciesInfo))}>
 								<div class="card-left">
 									<img src={speciesInfo.image} alt={`${speciesInfo.name} icon`} />
 									<span>{speciesInfo.name}</span>
@@ -817,7 +820,7 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 
 	{#if selectedSpecies}
 		<!-- Enhanced Popup Preview -->
-		<EnhancedPopup
+		<!-- <EnhancedPopup
 			title="Add {selectedSpecies.name} to Character"
 			itemName={selectedSpecies.name}
 			isOpen={selectedSpecies !== null}
@@ -828,7 +831,7 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 			cultureNotes={selectedSpecies.cultureNotes}
 			imagePath={selectedSpecies.popupImage || selectedSpecies.image}
 			imageAlt={`${selectedSpecies.name} artwork`}
-		/>
+		/> -->
 	{/if}
 
 	{#if selectedSpeciesData}

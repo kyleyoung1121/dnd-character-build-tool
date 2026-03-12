@@ -15,7 +15,7 @@
 	import { applyChoice, revertChanges } from '$lib/stores/character_store_helpers';
 	import { get } from 'svelte/store';
 	import { character_store } from '$lib/stores/character_store';
-import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
+	//import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 
 	// Class-to-backgrounds mapping for simple view
 	const classBackgroundsMap: Record<string, string[]> = {
@@ -115,7 +115,9 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 		bumpVersion();
 	}
 
-	function confirmAddBackground() {
+	function confirmAddBackground(backgroundInfo: BackgroundData) {
+		selectedBackground = backgroundInfo;
+		
 		if (selectedBackground) {
 			selectedBackgroundData = selectedBackground;
 			selectedBackground = null;
@@ -594,7 +596,7 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 							</div>
 							<button 
 								class="select-background-button" 
-								on:click={() => (selectedBackground = backgroundInfo)}
+								on:click={() => (confirmAddBackground(backgroundInfo))}
 							>
 								Select {backgroundInfo.name}
 							</button>
@@ -607,7 +609,8 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 			<!-- Complex view with all options (original grid) -->
 			<div class="background-cards">
 				{#each displayedBackgrounds as backgroundInfo}
-					<button class="background-card" on:click={() => (selectedBackground = backgroundInfo)}>
+					<!-- Updated to skip the popup confirmation. Go straight to adding the selected choice -->
+					<button class="background-card" on:click={() => (confirmAddBackground(backgroundInfo))}>
 						<div class="card-left">
 							<img src={backgroundInfo.image} alt={`${backgroundInfo.name} icon`} />
 							<span>{backgroundInfo.name}</span>
@@ -621,7 +624,7 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 
 	{#if selectedBackground}
 		<!-- Enhanced Popup Preview -->
-		<EnhancedPopup
+		<!-- <EnhancedPopup
 			title="Add {selectedBackground.name} Background"
 			itemName={selectedBackground.name}
 			isOpen={selectedBackground !== null}
@@ -633,7 +636,7 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 			imagePath={selectedBackground.popupImage || selectedBackground.image}
 			imageAlt={`${selectedBackground.name} artwork`}
 
-		/>
+		/> -->
 	{/if}
 
 	{#if selectedBackgroundData}

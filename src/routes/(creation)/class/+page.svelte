@@ -24,7 +24,7 @@
 	import { applyChoice, revertChanges } from '$lib/stores/character_store_helpers';
 	import { get } from 'svelte/store';
 	import { character_store } from '$lib/stores/character_store';
-import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
+	// import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 
 	const classes: ClassData[] = [
 		barbarian,
@@ -131,7 +131,9 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 		bumpVersion();
 	}
 
-	function confirmAddClass() {
+	function confirmAddClass(classInfo: ClassData) {
+		selectedClass = classInfo;
+		
 		if (selectedClass) {
 			selectedClassData = selectedClass;
 			selectedClass = null;
@@ -619,7 +621,7 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 	{#if !selectedClassData}
 		<div class="class-cards">
 			{#each classes as classInfo}
-				<button class="class-card" on:click={() => (selectedClass = classInfo)}>
+				<button class="class-card" on:click={() => (confirmAddClass(classInfo))}>
 					<div class="card-left">
 						<img src={classInfo.image} alt={`${classInfo.name} icon`} />
 						<span>{classInfo.name}</span>
@@ -638,7 +640,7 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 
 	{#if selectedClass}
 		<!-- Enhanced Popup Preview -->
-		<EnhancedPopup
+		<!-- <EnhancedPopup
 			title="Add {selectedClass.name} to Character"
 			itemName={selectedClass.name}
 			isOpen={selectedClass !== null}
@@ -650,7 +652,7 @@ import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 			imagePath={selectedClass.popupImage || selectedClass.image}
 			imageAlt={`${selectedClass.name} artwork`}
 
-		/>
+		/> -->
 	{/if}
 
 	{#if selectedClassData}

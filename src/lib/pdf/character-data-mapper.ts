@@ -933,17 +933,17 @@ export function formatSpells(character: Character): string {
 	
 	// Format cantrips
 	if (cantrips.length > 0) {
-		allSpellsText += '--- Cantrips ---\n';
+		//allSpellsText += '--- Cantrips ---\n';
 		
 		for (const { name, spell } of cantrips) {
 			
 			if (!spell) {
-				allSpellsText += `<bold:>${name.toUpperCase()}\n`;
+				allSpellsText += `<bold:>${name.toUpperCase()}  -  Cantrip\n`;
 				allSpellsText += '(Description not found)\n';
 				continue;
 			}
 			
-			allSpellsText += `<bold:>${spell.name.toUpperCase()}\n`;
+			allSpellsText += `<bold:>${spell.name.toUpperCase()}  -  Cantrip\n`;
 			
 			let durationText: string;
 
@@ -957,7 +957,7 @@ export function formatSpells(character: Character): string {
 			}
 
 			// Add casting details
-			allSpellsText += `<bold:>( ${spell.castingTime} | ${spell.range} | ${durationText} )\n`;
+			allSpellsText += `<bold:>( ${spell.castingTime} | ${spell.range.replace('feet', 'ft.')} | ${durationText} )\n`;
 			
 			// Add description
 			allSpellsText += spell.description + '\n\n';
@@ -987,17 +987,17 @@ export function formatSpells(character: Character): string {
 			
 			// Add level header
 			const levelText = level === 1 ? '1st Level' : level === 2 ? '2nd Level' : `${level}th Level`;
-			allSpellsText += `--- ${levelText} ---\n`;
+			//allSpellsText += `--- ${levelText} ---\n`;
 			
 			for (const { name, spell } of spellsAtLevel) {
 				
 				if (!spell) {
-					allSpellsText += `<bold:>${name.toUpperCase()}\n`;
+					allSpellsText += `<bold:>${name.toUpperCase()}  -  ${levelText}\n`;
 					allSpellsText += '(Description not found)\n'; 
 					continue;
 				}
 				
-				allSpellsText += `<bold:>${spell.name.toUpperCase()}\n`;
+				allSpellsText += `<bold:>${spell.name.toUpperCase()}  -  ${levelText}\n`;
 				
 				let durationText: string;
 
@@ -1011,10 +1011,14 @@ export function formatSpells(character: Character): string {
 				}
 
 				// Add casting details
-				allSpellsText += `<bold:>( ${spell.castingTime}  |  ${spell.range}  |  ${durationText} )\n`;
+				allSpellsText += `<bold:>( ${spell.castingTime}  |  ${spell.range.replace('feet', 'ft.')}  |  ${durationText} )\n`;
 				
 				// Add description
-				allSpellsText += spell.description + '\n\n';
+				allSpellsText += spell.description;
+				if (spell.higherLevel) {
+					allSpellsText += '\n' + spell.higherLevel;
+				}
+				allSpellsText += '\n\n';
 			}
 		}
 	}

@@ -157,18 +157,7 @@ export const guildArtisan: BackgroundData = {
 					{ type: 'text', text: 'You start with artisan\'s tools, letter of introduction from your guild, traveler\'s clothes, and 15 gp.' },
 				]
 			},
-			source: 'background:Guild Artisan',
-			effects: [
-				{
-					target: 'inventory',
-					action: 'add',
-					value: [
-						'Letter of introduction from your guild',
-						"Traveler's clothes",
-						'Belt pouch with 15 gp'
-					]
-				}
-			]
+			source: 'background:Guild Artisan'
 		},
 		{
 			name: 'Guild Membership',

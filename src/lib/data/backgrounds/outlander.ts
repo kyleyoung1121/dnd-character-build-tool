@@ -122,14 +122,7 @@ export const outlander: BackgroundData = {
 					{ type: 'text', text: 'You start with a staff, hunting trap, traveler\'s clothes, and 10 gp.' },
 				]
 			},
-			source: 'background:Outlander',
-			effects: [
-				{
-					target: 'inventory',
-					action: 'add',
-					value: ['Staff', 'Hunting trap', "Traveler's clothes", 'Belt pouch with 10 gp']
-				}
-			]
+			source: 'background:Outlander'
 		},
 		{
 			name: 'Wanderer',

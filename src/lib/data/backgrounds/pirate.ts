@@ -14,7 +14,7 @@ export const pirate: BackgroundData = {
 		"Navigator's tools",
 		'Belaying pin (club)',
 		'Silk rope (50 feet)',
-		'Lucky charm such as a rabbit foot or small stone with a hole in the center',
+		'Lucky charm',
 		'Common clothes',
 		'Belt pouch with 10 gp'
 	],
@@ -23,7 +23,7 @@ export const pirate: BackgroundData = {
 			"Navigator's tools",
 			'Belaying pin (club)',
 			'Silk rope (50 feet)',
-			'Lucky charm such as a rabbit foot or small stone with a hole in the center',
+			'Lucky charm',
 			'Common clothes',
 			'Belt pouch with 10 gp'
 		],
@@ -75,20 +75,7 @@ export const pirate: BackgroundData = {
 					{ type: 'text', text: 'You start with a belaying pin (club), silk rope, lucky charm, common clothes, and 10 gp.' },
 				]
 			},
-			source: 'background:Pirate',
-			effects: [
-				{
-					target: 'inventory',
-					action: 'add',
-					value: [
-						'Belaying pin (club)',
-						'Silk rope (50 feet)',
-						'Lucky charm such as a rabbit foot or small stone with a hole in the center',
-						'Common clothes',
-						'Belt pouch with 10 gp'
-					]
-				}
-			]
+			source: 'background:Pirate'
 		},
 		{
 			name: 'Bad Reputation',

@@ -74,18 +74,7 @@ export const charlatan: BackgroundData = {
 					{ type: 'text', text: 'You start with forgery kit, gaming set, fine clothes, signet ring, and 15 gp.' },
 				]
 			},
-			source: 'background:Charlatan',
-			effects: [
-				{
-					target: 'inventory',
-					action: 'add',
-					value: [
-						'Fine clothes',
-						'Signet ring of imaginary person',
-						'Belt pouch with 15 gp'
-					]
-				}
-			]
+			source: 'background:Charlatan'
 		},
 		{
 			name: 'False Identity',

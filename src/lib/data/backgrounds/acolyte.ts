@@ -22,6 +22,17 @@ export const acolyte: BackgroundData = {
 		'Common clothes',
 		'Belt pouch with 15 gp'
 	],
+	startingEquipment: {
+		fixed: [
+			'Holy symbol (gift from your temple)',
+			'Prayer book or prayer wheel',
+			'5 sticks of incense',
+			'Vestments',
+			'Common clothes',
+			'Belt pouch with 15 gp'
+		],
+		choices: []
+	},
 	feature: 'Shelter of the Faithful',
 	featureDescription:
 		'As an acolyte, you command respect from worshipers of your faith. You can perform ceremonies for your deity. You and your companions can expect free healing and care at temples, shrines, or other established presences of your faith (though you must provide components for spells). Those who share your religion will support you at a modest lifestyle.',
@@ -90,21 +101,7 @@ export const acolyte: BackgroundData = {
 					{ type: 'text', text: 'You start with holy symbol, prayer book, incense, vestments, common clothes, and 15 gp.' },
 				]
 			},
-			source: 'background:Acolyte',
-			effects: [
-				{
-					target: 'inventory',
-					action: 'add',
-					value: [
-						'Holy symbol (gift from your temple)',
-						'Prayer book or prayer wheel',
-						'5 sticks of incense',
-						'Vestments',
-						'Common clothes',
-						'Belt pouch with 15 gp'
-					]
-				}
-			]
+			source: 'background:Acolyte'
 		},
 		{
 			name: 'Shelter of the Faithful',

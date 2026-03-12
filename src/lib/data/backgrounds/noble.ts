@@ -110,14 +110,7 @@ export const noble: BackgroundData = {
 					{ type: 'text', text: 'You start with fine clothes, signet ring, scroll of pedigree, and 25 gp.' },
 				]
 			},
-			source: 'background:Noble',
-			effects: [
-				{
-					target: 'inventory',
-					action: 'add',
-					value: ['Fine clothes', 'Signet ring', 'Scroll of pedigree', 'Purse with 25 gp']
-				}
-			]
+			source: 'background:Noble'
 		},
 		{
 			name: 'Position of Privilege',

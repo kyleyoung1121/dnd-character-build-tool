@@ -17,6 +17,17 @@ export const sage: BackgroundData = {
 		'Common clothes',
 		'Belt pouch with 10 gp'
 	],
+	startingEquipment: {
+		fixed: [
+			'Bottle of black ink',
+			'Quill',
+			'Small knife',
+			'Letter from dead colleague',
+			'Common clothes',
+			'Belt pouch with 10 gp'
+		],
+		choices: []
+	},
 	feature: 'Researcher',
 	featureDescription:
 		'When you attempt to learn or recall a piece of lore, if you do not know that information, you often know where and from whom you can obtain it. Usually, this information comes from a library, scriptorium, university, or a sage or other learned person or creature.',
@@ -85,21 +96,7 @@ export const sage: BackgroundData = {
 					{ type: 'text', text: 'You start with ink, quill, small knife, letter from dead colleague, common clothes, and 10 gp.' },
 				]
 			},
-			source: 'background:Sage',
-			effects: [
-				{
-					target: 'inventory',
-					action: 'add',
-					value: [
-						'Bottle of black ink',
-						'Quill',
-						'Small knife',
-						'Letter from dead colleague',
-						'Common clothes',
-						'Belt pouch with 10 gp'
-					]
-				}
-			]
+			source: 'background:Sage'
 		},
 		{
 			name: 'Researcher',

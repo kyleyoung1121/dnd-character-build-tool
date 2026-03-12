@@ -77,20 +77,7 @@ export const soldier: BackgroundData = {
 					{ type: 'text', text: 'You start with insignia of rank, trophy from fallen enemy, deck of cards, common clothes, and 10 gp.' },
 				]
 			},
-			source: 'background:Soldier',
-			effects: [
-				{
-					target: 'inventory',
-					action: 'add',
-					value: [
-						'Insignia of rank',
-						'Trophy from fallen enemy',
-						'Deck of cards',
-						'Common clothes',
-						'Belt pouch with 10 gp'
-					]
-				}
-			]
+			source: 'background:Soldier'
 		},
 		{
 			name: 'Military Rank',

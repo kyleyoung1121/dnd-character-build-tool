@@ -103,18 +103,7 @@ export const entertainer: BackgroundData = {
 					{ type: 'text', text: 'You start with a musical instrument, favor of an admirer, costume, and 15 gp.' },
 				]
 			},
-			source: 'background:Entertainer',
-			effects: [
-				{
-					target: 'inventory',
-					action: 'add',
-					value: [
-						'Favor of an admirer (letter, trinket, etc)',
-						'Costume',
-						'Belt pouch with 15 gp'
-					]
-				}
-			]
+			source: 'background:Entertainer'
 		},
 		{
 			name: 'By Popular Demand',

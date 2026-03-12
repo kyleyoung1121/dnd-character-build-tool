@@ -559,6 +559,10 @@ function buildSpells(character: Character): Spell[] {
  * - Organizes equipment in logical groups
  */
 function formatEquipment(inventory: string[]): string {
+	// Lets try just returning the inventory as is, rather than sorting each thing by its type.
+	return inventory.join('\n');
+
+
 	// Equipment categorization
 	const armor: string[] = [];
 	const shields: string[] = [];
@@ -693,8 +697,8 @@ function formatEquipment(inventory: string[]): string {
 		lines.push(misc.join('\n'));
 	}
 	
-	// console.log('lines debug');
-	// console.log(lines);
+	console.log('lines debug');
+	console.log(lines);
 
 	return lines.join('\n');
 }

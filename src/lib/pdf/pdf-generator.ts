@@ -928,8 +928,15 @@ async function fillEquipmentPage(
 		fillFormField(form, 'column_one_top', packTextFormatted, 12);
 		fillFormField(form, 'column_two_top', remainingText, 12);
 	} else {
+
+		let equipmentSplit = data.equipment.split('\n')
+		let equipmentSplitBulleted: string[] = []
+		for (let i = 0; i < equipmentSplit.length; i++) {
+			equipmentSplitBulleted.push('•  ' + equipmentSplit[i]);
+		}
+
 		fillFormField(form, 'page_title_top', 'Equipment', 12, TextAlignment.Center);
-		fillFormField(form, 'column_one_top', data.equipment, 12);
+		fillFormField(form, 'column_one_top', equipmentSplitBulleted.join('\n'), 12);
 		fillFormField(form, 'column_two_top', '', 12);
 	}
 

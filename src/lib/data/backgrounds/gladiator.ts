@@ -79,18 +79,7 @@ export const gladiator: BackgroundData = {
 					{ type: 'text', text: 'You start with an unusual weapon, favor of an admirer, costume, and 15 gp.' },
 				]
 			},
-			source: 'background:Gladiator',
-			effects: [
-				{
-					target: 'inventory',
-					action: 'add',
-					value: [
-						'Favor of an admirer (letter, trinket, etc)',
-						'Costume',
-						'Belt pouch with 15 gp'
-					]
-				}
-			]
+			source: 'background:Gladiator'
 		},
 		{
 			name: 'By Popular Demand',

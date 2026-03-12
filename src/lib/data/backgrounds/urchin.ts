@@ -75,21 +75,7 @@ export const urchin: BackgroundData = {
 					{ type: 'text', text: 'You start with a small knife, city map, pet mouse, token from parents, common clothes, and 10 gp.' },
 				]
 			},
-			source: 'background:Urchin',
-			effects: [
-				{
-					target: 'inventory',
-					action: 'add',
-					value: [
-						'Small knife',
-						'Map of the city you grew up in',
-						'Pet mouse',
-						'Token to remember your parents by',
-						'Common clothes',
-						'Belt pouch with 10 gp'
-					]
-				}
-			]
+			source: 'background:Urchin'
 		},
 		{
 			name: 'City Secrets',

@@ -111,14 +111,7 @@ export const knight: BackgroundData = {
 					{ type: 'text', text: 'You start with a signet ring, scroll of pedigree, fine clothes, and 25 gp.' },
 				]
 			},
-			source: 'background:Knight',
-			effects: [
-				{
-					target: 'inventory',
-					action: 'add',
-					value: ['Signet ring', 'Scroll of pedigree', 'Fine clothes', 'Belt pouch with 25 gp']
-				}
-			]
+			source: 'background:Knight'
 		},
 		{
 			name: 'Retainers',

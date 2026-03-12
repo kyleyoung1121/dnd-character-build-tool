@@ -70,13 +70,6 @@ export const criminal: BackgroundData = {
 				]
 			},
 			source: 'background:Criminal',
-			effects: [
-				{
-					target: 'inventory',
-					action: 'add',
-					value: ['Crowbar', 'Dark common clothes with hood', 'Belt pouch with 15 gp']
-				}
-			]
 		},
 		{
 			name: 'Criminal Contact',

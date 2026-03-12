@@ -113,14 +113,7 @@ export const folkHero: BackgroundData = {
 					{ type: 'text', text: 'You start with artisan\'s tools, shovel, iron pot, common clothes, and 10 gp.' },
 				]
 			},
-			source: 'background:Folk Hero',
-			effects: [
-				{
-					target: 'inventory',
-					action: 'add',
-					value: ['Shovel', 'Iron pot', 'Common clothes', 'Belt pouch with 10 gp']
-				}
-			]
+			source: 'background:Folk Hero'
 		},
 		{
 			name: 'Rustic Hospitality',

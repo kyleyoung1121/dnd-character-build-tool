@@ -250,8 +250,9 @@
 					}
 				});
 			}
+		}
 	}
-
+			
 	// Persist beast selections to character store
 	function persistBeastSelections() {
 		const scopeId = 'beast_selections'; // Match spells tab pattern

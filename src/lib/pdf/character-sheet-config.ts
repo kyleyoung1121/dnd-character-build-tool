@@ -343,7 +343,7 @@ export const PDF_CONFIG = {
 
 	templatePaths: new Map([
 		['Front Page', '/pdf-templates/page_one.pdf'],
-		['Features Page', '/pdf-templates/page_two.pdf'],
+		['Two Column Page', '/pdf-templates/page_two.pdf'],
 		['Equipment Page', '/pdf-templates/page_three.pdf'],
 		
 		['Spells Basic', '/pdf-templates/spells_basic.pdf'],

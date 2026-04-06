@@ -24,7 +24,7 @@ import { detectSpellLimitViolations } from '$lib/stores/conflict_detection';
 
 async function loadTemplate(templateKey: string): Promise<PDFDocument> {	
 	if (!PDF_CONFIG.templatePaths.has(templateKey)) {
-		throw new Error(`PDF template number out of range`);
+		throw new Error(`PDF template not found`);
 	}
 
 	let response: any;
@@ -238,68 +238,21 @@ async function fillFrontPage(
 			// Cantrip name
 			attacks_names_string += damageCantrips[i].name + '\n';
 
-			// TODO: To Hit / DC 
-			// First, figure out what class we are and what ability score we are looking for
-			const castingAbilities = new Map([
-				// barbarian is included just for completeness. If they have spells that use a casting modifier, they probably got it from a species. 
-				//			 I set the default to be intelligence, since most species that give magic use that. The only significant exception is Drow, but this is a quick solution.
-				["Barbarian", "intelligence"],
-				["Bard", "charisma"],
-				["Cleric", "wisdom"],
-				["Druid", "wisdom"],
-				// Eld Knight
-				["Fighter", "intelligence"],
-				// Ki-based disciplines
-				["Monk", "wisdom"],
-				["Paladin", "charisma"],
-				["Ranger", "wisdom"],
-				// Trickster
-				["Rogue", "intelligence"],
-				["Sorcerer", "charisma"],
-				["Warlock", "charisma"],
-				["Wizard", "intelligence"],
-			]);
+			let spellStats = findSpellStats(data);
 
-			let relevantCastingAbility = castingAbilities.get(data.classAndLevel.trim())
-			let castingAbilityScore: string
+			let spellAttack = (await spellStats).spellAttack;
+			let spellSave = (await spellStats).spellSave;
 
-			switch(relevantCastingAbility) {
-				case 'intelligence':
-					castingAbilityScore = data.abilityScores.intelligence.score;
-					break;
-				case 'wisdom':
-					castingAbilityScore = data.abilityScores.wisdom.score;
-					break;
-				case 'charisma':
-					castingAbilityScore = data.abilityScores.charisma.score;
-					break;
-				default:
-					castingAbilityScore = data.abilityScores.intelligence.score;
-					break;
-				}
-
-			// Once a score is fetched, find the modifier (doing it this way so we dont have to deal with the already signed mod value)
-			let castingAbilityMod = Math.floor((Number(castingAbilityScore) - 10) / 2);
-			
-			// Compute Spell Save & Spell Attack
-			let spellSaveDC = 10 + castingAbilityMod;
-			let spellAttackBonus = 2 + castingAbilityMod;
-
-			// After the math is complete, we can finally add a '+' if needed. 
-			let spellAttackBonusSigned: string;
-			if (spellAttackBonus > 0) {
-				spellAttackBonusSigned = '+' + spellAttackBonus;
-			} else {
-				spellAttackBonusSigned = '' + spellAttackBonus;
-			}
+			if (!spellAttack) {spellAttack = '+0'}
+			if (!spellSave) {spellSave = '12'}
 
 			let cantripTags = damageCantrips[i].tags
 			// Spell Attack cantrips: format like 'd20 + 5'
 			if (cantripTags && cantripTags.includes('SpellAttack')) {
-				attacks_to_hit_string += 'd20 ' + spellAttackBonusSigned.substring(0,1) + ' ' + spellAttackBonusSigned.substring(1) + '\n';
+				attacks_to_hit_string += 'd20 ' + spellAttack.substring(0,1) + ' ' + spellAttack.substring(1) + '\n';
 			// Spell Save cantrips: format like 'DC 12'
 			} else if (cantripTags && cantripTags.includes('SpellSave')) {
-				attacks_to_hit_string += 'DC ' + spellSaveDC + '\n';
+				attacks_to_hit_string += 'DC ' + spellSave + '\n';
 			// If something goes wrong, still increment our newline spacing
 			} else {
 				attacks_to_hit_string += '\n';
@@ -970,6 +923,7 @@ async function findSpellStats(data: CharacterSheetData): Promise<{
 	let spellAbilityMod = undefined;
 
 	switch (characterReference.class) {
+		// CHARISMA based
 		case 'Bard':
 		case 'Paladin':
 		case 'Sorcerer':
@@ -979,23 +933,89 @@ async function findSpellStats(data: CharacterSheetData): Promise<{
 			}
 			break;
 		
+		// WISDOM based
 		case 'Cleric':
 		case 'Druid':
-		case 'Monk':
 		case 'Ranger':
-		case 'Barbarian':
 			if (characterReference.wisdom) {
 				spellAbilityMod = Math.floor(((characterReference.wisdom - 10) / 2))
 			}
 			break;
+		
+		// WISDOM based (must be Way of Shadow or Four Elements)
+		case 'Monk':
+			if (characterReference.subclass && ['Way of Shadow', 'Way of the Four Elements'].includes(characterReference.subclass)) {
+				if (characterReference.wisdom) {
+					spellAbilityMod = Math.floor(((characterReference.wisdom - 10) / 2))
+				}
+			}
+			break;
+		
+		// WISDOM based (must be Totem Warrior)
+		// TODO: Consider having totem warrior have no casting ability
+		case 'Barbarian':
+			if (characterReference.subclass == 'Totem Warrior') {
+				if (characterReference.wisdom) {
+					spellAbilityMod = Math.floor(((characterReference.wisdom - 10) / 2))
+				}
+			}
+			break;
 
-		case 'Fighter':
-		case 'Rogue':
+		// INTELLIGENCE based
 		case 'Wizard':
 			if (characterReference.intelligence) {
 				spellAbilityMod = Math.floor(((characterReference.intelligence - 10) / 2))
 			}
 			break;
+		
+		// INTELLIGENCE based (Must be Eldritch Knight)
+		case 'Fighter':
+			if (characterReference.subclass == 'Eldritch Knight') {
+				if (characterReference.intelligence) {
+					spellAbilityMod = Math.floor(((characterReference.intelligence - 10) / 2))
+				}
+			}
+			break;
+		
+		// INTELLIGENCE based (Must be Arcane Trickster)
+		case 'Rogue':
+			if (characterReference.subclass == 'Arcane Trickster') {
+				if (characterReference.intelligence) {
+					spellAbilityMod = Math.floor(((characterReference.intelligence - 10) / 2))
+				}
+			}
+			break;
+	}
+
+	// If no primary source for spellcasting is found, also check the character's species
+	if (!spellAbilityMod) {
+		switch (characterReference.race) {
+			case 'High Elf':
+				if (characterReference.intelligence) {
+					spellAbilityMod = Math.floor(((characterReference.intelligence - 10) / 2))
+				}
+				break;
+
+			case 'Dark Elf':
+				if (characterReference.charisma) {
+					spellAbilityMod = Math.floor(((characterReference.charisma - 10) / 2))
+				}
+				break;
+
+			case 'Forest Gnome':
+				if (characterReference.intelligence) {
+					spellAbilityMod = Math.floor(((characterReference.intelligence - 10) / 2))
+				}
+				break;
+
+			case 'Tiefling':
+				if (characterReference.charisma) {
+					spellAbilityMod = Math.floor(((characterReference.charisma - 10) / 2))
+				}
+				break;
+
+
+		}
 	}
 
 	if (!spellAbilityMod) {
@@ -1112,16 +1132,16 @@ async function fillSpellsPage(
 
 	let spellStats = findSpellStats(data);
 
-	let spell_attack = (await spellStats).spellAttack;
-	let spell_save_dc = (await spellStats).spellSave;
+	let spellAttack = (await spellStats).spellAttack;
+	let spellSave = (await spellStats).spellSave;
 
-	let fontSize = 10;
+	let fontSize = 6;
 
 	// Format page 1
 	if (form1) {
-		if (spell_attack && spell_save_dc) {
-			fillFormField(form1, 'spell_attack', spell_attack);
-			fillFormField(form1, 'spell_save_dc', spell_save_dc);
+		if (spellAttack && spellSave) {
+			fillFormField(form1, 'spell_attack', spellAttack);
+			fillFormField(form1, 'spell_save_dc', spellSave);
 		}
 		
 		fillFormField(form1, 'column_one_top', columnOneContent, fontSize);
@@ -1138,9 +1158,9 @@ async function fillSpellsPage(
 
 	// Format page 2
 	if (form2) {
-		if (spell_attack && spell_save_dc) {
-			fillFormField(form2, 'spell_attack', spell_attack);
-			fillFormField(form2, 'spell_save_dc', spell_save_dc);
+		if (spellAttack && spellSave) {
+			fillFormField(form2, 'spell_attack', spellAttack);
+			fillFormField(form2, 'spell_save_dc', spellSave);
 		}
 		
 		fillFormField(form2, 'column_one_top', columnThreeContent, fontSize);
@@ -1166,8 +1186,10 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 	try {
 		// Load templates
 		const frontPageDoc = await loadTemplate('Front Page');
-		const featuresPageDoc = await loadTemplate('Features Page');
+		const featuresPageDoc = await loadTemplate('Two Column Page');
 		const equipmentPageDoc = await loadTemplate('Equipment Page');
+
+		const beastsPageDoc = await loadTemplate('Two Column Page');
 
 		const spellsBasicPageDoc = await loadTemplate('Spells Basic');
 		const spellsPageTwoDoc = await loadTemplate('Spells Basic');
@@ -1186,6 +1208,7 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 			frontPageDoc,
 			featuresPageDoc,
 			equipmentPageDoc,
+			beastsPageDoc,
 			spellsBasicPageDoc,
 			spellsPageTwoDoc,
 			spellsFullCasterPageDoc,
@@ -1196,9 +1219,8 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 			spellsMonkPageDoc,
 		]
 
-		//let templateFonts: PDFFont[][] = [];
+		// Register and store fonts for each page
 		let templateFonts = new Map
-
 		for (let i = 0; i < templates.length; i++) {
 			if (!templates[i]) {
 				throw new Error('Missing PDF Template: ' + i);
@@ -1213,12 +1235,17 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 				await templates[i].embedFont(fontOneBuffer),
 				// Consider adding other custom font (#2 and onwards)
 			]
+			// Save the fonts to a Map, where the key is the pageDoc (PDFDocument)
 			templateFonts.set(templates[i], pageFonts)
 		}
 		
+		// Grab a reference to each first page (each array only has one page anyways)
+		// TODO: Consider removing. Currently unused
 		const frontPage = frontPageDoc.getPages()[0];
 		const featuresPage = featuresPageDoc.getPages()[0];
 		const equipmentPage = equipmentPageDoc.getPages()[0];
+
+		const beastsPage = beastsPageDoc.getPages()[0];
 		
 		const spellsBasicPage = spellsBasicPageDoc.getPages()[0];
 		const spellsFullCasterPage = spellsFullCasterPageDoc.getPages()[0];
@@ -1229,20 +1256,37 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 		const spellsMonkPage = spellsMonkPageDoc.getPages()[0];
 
 		
+		// Start filling pages with data
+		let freshPdfDoc = await PDFDocument.create()
 
-		// Fill pages with data
-		// TODO: Check if its okay to pass in font from first page to all pages for simplicity
+		// The first three pages will be the same across all characters
 		await fillFrontPage(frontPageDoc, data, templateFonts.get(frontPageDoc)[3], templateFonts.get(frontPageDoc)[1], templateFonts.get(frontPageDoc)[2]);
 		await fillFeaturesPage(featuresPageDoc, data, templateFonts.get(featuresPageDoc)[3], templateFonts.get(featuresPageDoc)[1], templateFonts.get(featuresPageDoc)[2]);
 		await fillEquipmentPage(equipmentPageDoc, data, templateFonts.get(equipmentPageDoc)[3], templateFonts.get(equipmentPageDoc)[1], templateFonts.get(equipmentPageDoc)[2]);
 		
-		let spellsPageOneDoc: PDFDocument | undefined;
+		const [frontPageCopy] = await freshPdfDoc.copyPages(frontPageDoc, [0])
+		const [featuresPageCopy] = await freshPdfDoc.copyPages(featuresPageDoc, [0])
+		const [equipmentPageCopy] = await freshPdfDoc.copyPages(equipmentPageDoc, [0])
 
-		const char = get(character_store);
+		freshPdfDoc.addPage(frontPageCopy)
+		freshPdfDoc.addPage(featuresPageCopy)
+		freshPdfDoc.addPage(equipmentPageCopy)
+
+
+		// For other export pages, we may need to check the character's details to see what pages will be added
+		const char = data.characterReference;
 		let selectedClass = char.class;
 		let selectedSubClass = char.subclass;
 		let selectedSpecies = char.race;
+		let selectedSubSpecies = char.subrace;
 
+
+		// Check beast usage
+
+
+
+		// Check spell usage, and ID which spell page one to use for this character
+		let spellsPageOneDoc: PDFDocument | undefined;
 		switch (selectedClass) {
 			case 'Bard':
 			case 'Cleric':
@@ -1279,46 +1323,44 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 				break;
 
 			default: 
-				if (selectedSubClass == 'Totem Warrior' || selectedSpecies == 'High Elf') {
+				if ((selectedSubClass == 'Totem Warrior') || 
+				['High Elf', 'Dark Elf', 'Forest Gnome', 'Tiefling'].includes(selectedSpecies) ||
+				(selectedSubSpecies && ['High Elf', 'Dark Elf', 'Forest Gnome', 'Tiefling'].includes(selectedSubSpecies))
+			) {
 					spellsPageOneDoc = spellsBasicPageDoc;
+				} else {
+					console.log('Flag! spellsPageOneDoc: ', spellsPageOneDoc);
+					console.log('selectedSpecies: ', selectedSpecies);
+					console.log('char.subrace: ', char.subrace);
 				}
-				spellsPageOneDoc = undefined;
 				break;
 		}
 
-		let needsTwoSpellPages = await fillSpellsPage(data, [
-			{
-				page: spellsPageOneDoc,
-				font: templateFonts.get(spellsPageOneDoc)[3],
-				boldFont: templateFonts.get(spellsPageOneDoc)[1],
-				italicFont: templateFonts.get(spellsPageOneDoc)[2]
-			},
-			{
-				page: spellsPageTwoDoc,
-				font: templateFonts.get(spellsPageTwoDoc)[3],
-				boldFont: templateFonts.get(spellsPageTwoDoc)[1],
-				italicFont: templateFonts.get(spellsPageTwoDoc)[2]
-			},
-		]);
-		
-		let freshPdfDoc = await PDFDocument.create()
-
-		const [frontPageCopy] = await freshPdfDoc.copyPages(frontPageDoc, [0])
-		const [featuresPageCopy] = await freshPdfDoc.copyPages(featuresPageDoc, [0])
-		const [equipmentPageCopy] = await freshPdfDoc.copyPages(equipmentPageDoc, [0])
-		
-
-		freshPdfDoc.addPage(frontPageCopy)
-		freshPdfDoc.addPage(featuresPageCopy)
-		freshPdfDoc.addPage(equipmentPageCopy)
-
-		// If spells are used, also attach a spell page
+		// If spells are indeed used, also attach the spell page(s)
 		if (spellsPageOneDoc) {
+
+			// fill out the spell page(s)
+			// fillSpellsPage() returns a boolean, telling us if two pages were used
+			let needsTwoSpellPages = await fillSpellsPage(data, [
+				{
+					page: spellsPageOneDoc,
+					font: templateFonts.get(spellsPageOneDoc)[3],
+					boldFont: templateFonts.get(spellsPageOneDoc)[1],
+					italicFont: templateFonts.get(spellsPageOneDoc)[2]
+				},
+				{
+					page: spellsPageTwoDoc,
+					font: templateFonts.get(spellsPageTwoDoc)[3],
+					boldFont: templateFonts.get(spellsPageTwoDoc)[1],
+					italicFont: templateFonts.get(spellsPageTwoDoc)[2]
+				},
+			]);
+
 			// Add page 1
 			const [spellsPageOneCopy] = await freshPdfDoc.copyPages(spellsPageOneDoc, [0])
 			freshPdfDoc.addPage(spellsPageOneCopy)
 
-			// Add page 2, if two pages are needed
+			// Add page 2, if two pages were needed
 			if (needsTwoSpellPages) {
 				const [spellsPageTwoCopy] = await freshPdfDoc.copyPages(spellsPageTwoDoc, [0])
 				freshPdfDoc.addPage(spellsPageTwoCopy)

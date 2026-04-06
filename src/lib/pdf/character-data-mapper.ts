@@ -1109,7 +1109,7 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 		// Page 1 - Skills (ability abbreviations drawn separately in gray)
 		skills: {
 			acrobatics: `${formatModifier(getSkillModifier(character, dexMod, 'Acrobatics'))}`,
-			animalHandling: `${formatModifier(getSkillModifier(character, wisMod, 'Animal Handling'))}`,
+			animal_handling: `${formatModifier(getSkillModifier(character, wisMod, 'Animal Handling'))}`,
 			arcana: `${formatModifier(getSkillModifier(character, intMod, 'Arcana'))}`,
 			athletics: `${formatModifier(getSkillModifier(character, strMod, 'Athletics'))}`,
 			deception: `${formatModifier(getSkillModifier(character, chaMod, 'Deception'))}`,
@@ -1123,7 +1123,7 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 			performance: `${formatModifier(getSkillModifier(character, chaMod, 'Performance'))}`,
 			persuasion: `${formatModifier(getSkillModifier(character, chaMod, 'Persuasion'))}`,
 			religion: `${formatModifier(getSkillModifier(character, intMod, 'Religion'))}`,
-			sleightOfHand: `${formatModifier(getSkillModifier(character, dexMod, 'Sleight of Hand'))}`,
+			sleight_of_hand: `${formatModifier(getSkillModifier(character, dexMod, 'Sleight of Hand'))}`,
 			stealth: `${formatModifier(getSkillModifier(character, dexMod, 'Stealth'))}`,
 			survival: `${formatModifier(getSkillModifier(character, wisMod, 'Survival'))}`
 		},

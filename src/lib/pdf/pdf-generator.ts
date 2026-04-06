@@ -5,26 +5,33 @@
  * at the positions defined in character-sheet-config.ts
  */
 
-import { PDFDocument, rgb, StandardFonts, PDFForm, PDFFont, numberToString, TextAlignment, newlineChars, componentsToColor } from 'pdf-lib';
+import { PDFDocument, rgb, StandardFonts, PDFForm, PDFFont, numberToString, TextAlignment, newlineChars, componentsToColor, PDFPage } from 'pdf-lib';
 import { PAGE_1_FIELDS, PAGE_2_FIELDS, PDF_CONFIG } from './character-sheet-config';
 import fontkit from '@pdf-lib/fontkit';
 import type { CharacterSheetData } from './character-data-mapper';
 import { formatSpells } from './character-data-mapper';
 import type { FieldConfig, TextAreaConfig } from './character-sheet-config';
-import type { Spell } from '$lib/data/spells';
+import { spells, type Spell } from '$lib/data/spells';
 import { formatFeatureForPDF, formatFeaturesForPDF } from '$lib/data/features/feature-data';
 import { druid } from '$lib/data/classes/druid';
+import { get } from 'svelte/store';
+import { character_store } from '$lib/stores/character_store';
+import { detectSpellLimitViolations } from '$lib/stores/conflict_detection';
 
 /**
  * Load the blank PDF template from static folder
  */
 
-async function loadTemplate(templateNumber: number): Promise<PDFDocument> {	
-	if (templateNumber < 0 || templateNumber > PDF_CONFIG.templatePaths.length - 1) {
+async function loadTemplate(templateKey: string): Promise<PDFDocument> {	
+	if (!PDF_CONFIG.templatePaths.has(templateKey)) {
 		throw new Error(`PDF template number out of range`);
 	}
 
-	const response = await fetch(PDF_CONFIG.templatePaths[templateNumber]);
+	let response: any;
+	let templatePath = PDF_CONFIG.templatePaths.get(templateKey)
+	if (templatePath) {
+		response = await fetch(templatePath);
+	}
 	if (!response.ok) {
 		throw new Error(`Failed to load PDF template: ${response.statusText}`);
 	}
@@ -146,24 +153,30 @@ async function fillFrontPage(
 
 	// - - - - -
 	// Skills
-	fillFormField(form, 'acrobatics', data.skills['acrobatics'], 13, TextAlignment.Right);
-	fillFormField(form, 'animal_handling', data.skills['animalHandling'], 13, TextAlignment.Right);
-	fillFormField(form, 'arcana', data.skills['arcana'], 13, TextAlignment.Right);
-	fillFormField(form, 'athletics', data.skills['athletics'], 13, TextAlignment.Right);
-	fillFormField(form, 'deception', data.skills['deception'], 13, TextAlignment.Right);
-	fillFormField(form, 'history', data.skills['history'], 13, TextAlignment.Right);
-	fillFormField(form, 'insight', data.skills['insight'], 13, TextAlignment.Right);
-	fillFormField(form, 'intimidation', data.skills['intimidation'], 13, TextAlignment.Right);
-	fillFormField(form, 'investigation', data.skills['investigation'], 13, TextAlignment.Right);
-	fillFormField(form, 'medicine', data.skills['medicine'], 13, TextAlignment.Right);
-	fillFormField(form, 'nature', data.skills['nature'], 13, TextAlignment.Right);
-	fillFormField(form, 'perception', data.skills['perception'], 13, TextAlignment.Right);
-	fillFormField(form, 'performance', data.skills['performance'], 13, TextAlignment.Right);
-	fillFormField(form, 'persuasion', data.skills['persuasion'], 13, TextAlignment.Right);
-	fillFormField(form, 'religion', data.skills['religion'], 13, TextAlignment.Right);
-	fillFormField(form, 'sleight_of_hand', data.skills['sleightOfHand'], 13, TextAlignment.Right);
-	fillFormField(form, 'stealth', data.skills['stealth'], 13, TextAlignment.Right);
-	fillFormField(form, 'survival', data.skills['survival'], 13, TextAlignment.Right);
+	let skills = [
+		'acrobatics',
+		'animal_handling',
+		'arcana',
+		'athletics',
+		'deception',
+		'history',
+		'insight',
+		'intimidation',
+		'investigation',
+		'medicine',
+		'nature',
+		'perception',
+		'performance',
+		'persuasion',
+		'religion',
+		'sleight_of_hand',
+		'stealth',
+		'survival',
+	]
+
+	for (let i = 0; i < skills.length; i++) {
+		fillFormField(form, skills[i], data.skills[skills[i]], 13, TextAlignment.Right);
+	}
 
 	// - - - - -
 	// Attacks & Spellcasting
@@ -949,17 +962,82 @@ async function fillEquipmentPage(
 }
 
 
+async function findSpellStats(data: CharacterSheetData): Promise<{
+	spellAttack: string | undefined; 
+	spellSave: string | undefined;
+}> {
+	const characterReference = data.characterReference
+	let spellAbilityMod = undefined;
+
+	switch (characterReference.class) {
+		case 'Bard':
+		case 'Paladin':
+		case 'Sorcerer':
+		case 'Warlock':
+			if (characterReference.charisma) {
+				spellAbilityMod = Math.floor(((characterReference.charisma - 10) / 2))
+			}
+			break;
+		
+		case 'Cleric':
+		case 'Druid':
+		case 'Monk':
+		case 'Ranger':
+		case 'Barbarian':
+			if (characterReference.wisdom) {
+				spellAbilityMod = Math.floor(((characterReference.wisdom - 10) / 2))
+			}
+			break;
+
+		case 'Fighter':
+		case 'Rogue':
+		case 'Wizard':
+			if (characterReference.intelligence) {
+				spellAbilityMod = Math.floor(((characterReference.intelligence - 10) / 2))
+			}
+			break;
+	}
+
+	if (!spellAbilityMod) {
+		return {
+			spellAttack: undefined,
+			spellSave: undefined,
+		}
+	}
+
+	// If the mod is positive, we need to manually add a plus
+	let spellAttackString = spellAbilityMod >= 0 ? '+' : '';
+	spellAttackString += String(spellAbilityMod)
+
+	let spellSaveString = String(10 + spellAbilityMod)
+	
+	return {
+		spellAttack: spellAttackString,
+		spellSave: spellSaveString,
+	}
+}
+
+
 async function fillSpellsPage(
-	page: any,
+	pages: any[],
 	data: CharacterSheetData,
 	font: any,
 	boldFont: any,
 	italicFont: any
-) {
-	const form = page.getForm()
+): Promise<boolean> {
+	
+	let form1;
+	let form2;
+	
+	if (pages[0]) {
+		form1 = pages[0].getForm()
+	}
+	if (pages[1]) {
+		form2 = pages[1].getForm()
+	}
 
-	const charactersPerRow = 58;
-	let maxLinesPerColumn = 65;
+	const charactersPerRow = 50;
+	let maxLinesPerColumn = 60;
 	// For spells, we want to leave room for Spell Save, Spell Attack, and Spell Slots. So, both columns should have a couple leading lines of whitespace
 	const whitespaceLines = 0;
 	maxLinesPerColumn -= whitespaceLines;
@@ -968,11 +1046,19 @@ async function fillSpellsPage(
 
 	let columnOneContent = '\n'.repeat(whitespaceLines);
 	let columnOneBoldContent = '\n'.repeat(whitespaceLines);
+
 	let columnTwoContent = '\n'.repeat(whitespaceLines);
 	let columnTwoBoldContent = '\n'.repeat(whitespaceLines);
 	
+	let columnThreeContent = '\n'.repeat(whitespaceLines);
+	let columnThreeBoldContent = '\n'.repeat(whitespaceLines);
+	
+	let columnFourContent = '\n'.repeat(whitespaceLines);
+	let columnFourBoldContent = '\n'.repeat(whitespaceLines);
+	
 	let lineCount = 0;
-
+	let pageTwoUsed = false;
+	
 	// Iterate through feature chunks (entire features separated by a blank line)
 	let spellsChunks = spellsContent.split('\n\n');
 	for (let i = 0; i < spellsChunks.length; i++) {	
@@ -983,37 +1069,90 @@ async function fillSpellsPage(
 			spellChunk = spellsChunks[i];
 		}
 		
-
 		const layeredColumnsProcessed = processLayeredColumns(spellChunk, charactersPerRow);
 
-		if (lineCount + layeredColumnsProcessed.linesUsed <= maxLinesPerColumn) {
-			lineCount += layeredColumnsProcessed.linesUsed;
-			columnOneContent += layeredColumnsProcessed.plainLayer;
-			columnOneBoldContent += layeredColumnsProcessed.boldLayer;
-		}
+		// TODO: figure out which column we are adding to
+		// 	 	 divide by length
+		console.log('layeredColumnsProcessed: ', layeredColumnsProcessed);
+		console.log('lineCount: ', lineCount);
+		console.log('layeredColumnsProcessed.linesUsed: ', layeredColumnsProcessed.linesUsed);
+		console.log('maxLinesPerColumn: ', maxLinesPerColumn);
+		
+		let column_destination = Math.floor((lineCount + layeredColumnsProcessed.linesUsed) / maxLinesPerColumn) + 1;
+		console.log('column_destination: ', column_destination);
 
-		else {
-			lineCount += layeredColumnsProcessed.linesUsed;
-			columnTwoContent += layeredColumnsProcessed.plainLayer;
-			columnTwoBoldContent += layeredColumnsProcessed.boldLayer;
+		// Handle overflow, pushing content to next column when there isnt any more room.
+		switch (column_destination) {
+			case 1:
+				lineCount += layeredColumnsProcessed.linesUsed;
+				columnOneContent += layeredColumnsProcessed.plainLayer;
+				columnOneBoldContent += layeredColumnsProcessed.boldLayer;
+				break;
+			case 2:
+				lineCount += layeredColumnsProcessed.linesUsed;
+				columnTwoContent += layeredColumnsProcessed.plainLayer;
+				columnTwoBoldContent += layeredColumnsProcessed.boldLayer;
+				break;
+			case 3:
+				lineCount += layeredColumnsProcessed.linesUsed;
+				columnThreeContent += layeredColumnsProcessed.plainLayer;
+				columnThreeBoldContent += layeredColumnsProcessed.boldLayer;
+				pageTwoUsed = true;
+				break;
+			case 4:
+				lineCount += layeredColumnsProcessed.linesUsed;
+				columnFourContent += layeredColumnsProcessed.plainLayer;
+				columnFourBoldContent += layeredColumnsProcessed.boldLayer;
+				pageTwoUsed = true;
+				break;		
 		}
 	}
 
+	let spellStats = findSpellStats(data);
+
+	let spell_attack = (await spellStats).spellAttack;
+	let spell_save_dc = (await spellStats).spellSave;
+
 	let fontSize = 10;
 
-	fillFormField(form, 'page_title', 'Spells', 14, TextAlignment.Center);
-	form.getTextField('page_title').updateAppearances(boldFont);
-	
-	fillFormField(form, 'column_one', columnOneContent, fontSize);
-	fillFormField(form, 'column_two', columnTwoContent, fontSize);
+	// Format page 1
+	if (form1) {
+		if (spell_attack && spell_save_dc) {
+			fillFormField(form1, 'spell_attack', spell_attack);
+			fillFormField(form1, 'spell_save_dc', spell_save_dc);
+		}
+		
+		fillFormField(form1, 'column_one_top', columnOneContent, fontSize);
+		fillFormField(form1, 'column_two_top', columnTwoContent, fontSize);
 
-	
-	fillFormField(form, 'column_one_back', columnOneBoldContent, fontSize);
-	form.getTextField('column_one_back').updateAppearances(boldFont);
-	fillFormField(form, 'column_two_back', columnTwoBoldContent, fontSize);
-	form.getTextField('column_two_back').updateAppearances(boldFont);
+		fillFormField(form1, 'column_one_bottom', columnOneBoldContent, fontSize);
+		form1.getTextField('column_one_bottom').updateAppearances(boldFont);
+		fillFormField(form1, 'column_two_bottom', columnTwoBoldContent, fontSize);
+		form1.getTextField('column_two_bottom').updateAppearances(boldFont);
 
-	form.flatten()
+		form1.flatten()
+	}
+	
+
+	// Format page 2
+	if (form2) {
+		if (spell_attack && spell_save_dc) {
+			fillFormField(form2, 'spell_attack', spell_attack);
+			fillFormField(form2, 'spell_save_dc', spell_save_dc);
+		}
+		
+		fillFormField(form2, 'column_one_top', columnThreeContent, fontSize);
+		fillFormField(form2, 'column_two_top', columnFourContent, fontSize);
+
+		fillFormField(form2, 'column_one_bottom', columnThreeBoldContent, fontSize);
+		form2.getTextField('column_one_bottom').updateAppearances(boldFont);
+		fillFormField(form2, 'column_two_bottom', columnFourBoldContent, fontSize);
+		form2.getTextField('column_two_bottom').updateAppearances(boldFont);
+
+		form2.flatten()
+	}
+
+	return pageTwoUsed;
 }
 
 
@@ -1024,77 +1163,152 @@ async function fillSpellsPage(
 export async function generateCharacterSheet(data: CharacterSheetData): Promise<string> {
 	try {
 		// Load templates
-		const frontPageDoc = await loadTemplate(0);
-		const featuresPageDoc = await loadTemplate(1);
-		const equipmentPageDoc = await loadTemplate(2);
-		const spellsPageDoc = await loadTemplate(1);
+		const frontPageDoc = await loadTemplate('Front Page');
+		const featuresPageDoc = await loadTemplate('Features Page');
+		const equipmentPageDoc = await loadTemplate('Equipment Page');
 
+		const spellsBasicPageDoc = await loadTemplate('Spells Basic');
+		const spellsPageTwoDoc = await loadTemplate('Spells Basic');
+		const spellsFullCasterPageDoc = await loadTemplate('Spells Full Caster');
+		const spellsHalfCasterPageDoc = await loadTemplate('Spells Half Caster');
+		const spellsThirdCasterPageDoc = await loadTemplate('Spells Third Caster');
+		const spellsSorcererPageDoc = await loadTemplate('Spells Sorcerer');
+		const spellsWarlockPageDoc = await loadTemplate('Spells Warlock');
+		const spellsMonkPageDoc = await loadTemplate('Spells Monk');
+
+		// Custom Fonts
 		const fontOneBuffer = await loadFontBuffer(0);
 		//const fontTwoBuffer = await loadFontBuffer(1);
 
-		frontPageDoc.registerFontkit(fontkit);
-		let frontPageFonts: PDFFont[] = [
-			await frontPageDoc.embedFont(StandardFonts.Helvetica),
-			await frontPageDoc.embedFont(StandardFonts.HelveticaBold),
-			await frontPageDoc.embedFont(StandardFonts.HelveticaOblique),
-			await frontPageDoc.embedFont(fontOneBuffer),
-			// Consider adding other custom font (#2 and onwards)
+		const templates = [
+			frontPageDoc,
+			featuresPageDoc,
+			equipmentPageDoc,
+			spellsBasicPageDoc,
+			spellsPageTwoDoc,
+			spellsFullCasterPageDoc,
+			spellsHalfCasterPageDoc,
+			spellsThirdCasterPageDoc,
+			spellsSorcererPageDoc,
+			spellsWarlockPageDoc,
+			spellsMonkPageDoc,
 		]
 
-		featuresPageDoc.registerFontkit(fontkit);
-		let featuresPageFonts: PDFFont[] = [
-			await featuresPageDoc.embedFont(StandardFonts.Helvetica),
-			await featuresPageDoc.embedFont(StandardFonts.HelveticaBold),
-			await featuresPageDoc.embedFont(StandardFonts.HelveticaOblique),
-			await featuresPageDoc.embedFont(fontOneBuffer),
-			// Consider adding other custom font (#2 and onwards)
-		]
+		let templateFonts: PDFFont[][] = [];
 
-		equipmentPageDoc.registerFontkit(fontkit);
-		let equipmentPageFonts: PDFFont[] = [
-			await equipmentPageDoc.embedFont(StandardFonts.Helvetica),
-			await equipmentPageDoc.embedFont(StandardFonts.HelveticaBold),
-			await equipmentPageDoc.embedFont(StandardFonts.HelveticaOblique),
-			await equipmentPageDoc.embedFont(fontOneBuffer),
-			// Consider adding other custom font (#2 and onwards)
-		]
-
-		spellsPageDoc.registerFontkit(fontkit);
-		let spellsPageFonts: PDFFont[] = [
-			await spellsPageDoc.embedFont(StandardFonts.Helvetica),
-			await spellsPageDoc.embedFont(StandardFonts.HelveticaBold),
-			await spellsPageDoc.embedFont(StandardFonts.HelveticaOblique),
-			await spellsPageDoc.embedFont(fontOneBuffer),
-			// Consider adding other custom font (#2 and onwards)
-		]
+		for (let i = 0; i < templates.length; i++) {
+			if (!templates[i]) {
+				throw new Error('Missing PDF Template: ' + i);
+			}
 			
-		// Check that we have the expected template docs
-		if (!frontPageDoc || !featuresPageDoc || !equipmentPageDoc || !spellsPageDoc) {
-			throw new Error('Missing PDF Template');
+			templates[i].registerFontkit(fontkit);
+			// We may need this information later, but currently the returned fonts are unused
+			let frontPageFonts: PDFFont[] = [
+				await templates[i].embedFont(StandardFonts.Helvetica),
+				await templates[i].embedFont(StandardFonts.HelveticaBold),
+				await templates[i].embedFont(StandardFonts.HelveticaOblique),
+				await templates[i].embedFont(fontOneBuffer),
+				// Consider adding other custom font (#2 and onwards)
+			]
+			templateFonts[i] = frontPageFonts
 		}
 		
 		const frontPage = frontPageDoc.getPages()[0];
 		const featuresPage = featuresPageDoc.getPages()[0];
 		const equipmentPage = equipmentPageDoc.getPages()[0];
-		const spellsPage = spellsPageDoc.getPages()[0];
 		
+		const spellsBasicPage = spellsBasicPageDoc.getPages()[0];
+		const spellsFullCasterPage = spellsFullCasterPageDoc.getPages()[0];
+		const spellsHalfCasterPage = spellsHalfCasterPageDoc.getPages()[0];
+		const spellsThirdCasterPage = spellsThirdCasterPageDoc.getPages()[0];
+		const spellsSorcererPage = spellsSorcererPageDoc.getPages()[0];
+		const spellsWarlockPage = spellsWarlockPageDoc.getPages()[0];
+		const spellsMonkPage = spellsMonkPageDoc.getPages()[0];
+
+		
+
 		// Fill pages with data
-		await fillFrontPage(frontPageDoc, data, frontPageFonts[3], frontPageFonts[1], frontPageFonts[2]);
-		await fillFeaturesPage(featuresPageDoc, data, featuresPageFonts[3], featuresPageFonts[1], featuresPageFonts[2]);
-		await fillEquipmentPage(equipmentPageDoc, data, featuresPageFonts[3], featuresPageFonts[1], featuresPageFonts[2]);
-		await fillSpellsPage(spellsPageDoc, data, spellsPageFonts[3], spellsPageFonts[1], spellsPageFonts[2]);
+		// TODO: Check if its okay to pass in font from first page to all pages for simplicity
+		await fillFrontPage(frontPageDoc, data, templateFonts[0][3], templateFonts[0][1], templateFonts[0][2]);
+		await fillFeaturesPage(featuresPageDoc, data, templateFonts[0][3], templateFonts[0][1], templateFonts[0][2]);
+		await fillEquipmentPage(equipmentPageDoc, data, templateFonts[0][3], templateFonts[0][1], templateFonts[0][2]);
+		
+		let spellsPageOneDoc: PDFDocument | undefined;
+
+		const char = get(character_store);
+		let selectedClass = char.class;
+		let selectedSubClass = char.subclass;
+		let selectedSpecies = char.race;
+
+		switch (selectedClass) {
+			case 'Bard':
+			case 'Cleric':
+			case 'Druid':
+			case 'Wizard':
+				spellsPageOneDoc = spellsFullCasterPageDoc;
+				break;
+
+			case 'Paladin':
+			case 'Ranger':
+				spellsPageOneDoc = spellsHalfCasterPageDoc;
+				break;
+
+			case 'Fighter':
+			case 'Rogue':
+				// Go deeper and see if the right subclass is there
+				if (selectedSubClass == 'Eldritch Knight' || selectedSubClass == 'Arcane Trickster') {
+					spellsPageOneDoc = spellsThirdCasterPageDoc;
+				} else {
+					spellsPageOneDoc = undefined;
+				}
+				break;
+
+			case 'Warlock':
+				spellsPageOneDoc = spellsWarlockPageDoc;
+				break;
+
+			case 'Sorcerer':
+				spellsPageOneDoc = spellsSorcererPageDoc;
+				break;
+
+			case 'Monk':
+				spellsPageOneDoc = spellsMonkPageDoc;
+				break;
+
+			default: 
+				if (selectedSubClass == 'Totem Warrior' || selectedSpecies == 'High Elf') {
+					spellsPageOneDoc = spellsBasicPageDoc;
+				}
+				spellsPageOneDoc = undefined;
+				break;
+		}
+
+		let pageTwoUsed = await fillSpellsPage([spellsPageOneDoc, spellsPageTwoDoc], data, templateFonts[0][3], templateFonts[0][1], templateFonts[0][2]);
 		
 		let freshPdfDoc = await PDFDocument.create()
 
 		const [frontPageCopy] = await freshPdfDoc.copyPages(frontPageDoc, [0])
 		const [featuresPageCopy] = await freshPdfDoc.copyPages(featuresPageDoc, [0])
 		const [equipmentPageCopy] = await freshPdfDoc.copyPages(equipmentPageDoc, [0])
-		const [spellsPageCopy] = await freshPdfDoc.copyPages(spellsPageDoc, [0])
+		
 
 		freshPdfDoc.addPage(frontPageCopy)
 		freshPdfDoc.addPage(featuresPageCopy)
 		freshPdfDoc.addPage(equipmentPageCopy)
-		freshPdfDoc.addPage(spellsPageCopy)
+
+		// If spells are used, also attach a spell page
+		if (spellsPageOneDoc) {
+			// Add page 1
+			const [spellsPageOneCopy] = await freshPdfDoc.copyPages(spellsPageOneDoc, [0])
+			freshPdfDoc.addPage(spellsPageOneCopy)
+
+			// Add page 2, if two pages are needed
+			if (pageTwoUsed) {
+				const [spellsPageTwoCopy] = await freshPdfDoc.copyPages(spellsPageTwoDoc, [0])
+				freshPdfDoc.addPage(spellsPageTwoCopy)
+			}
+			
+		}
 
 		const pdfBytes = await freshPdfDoc.save();
 

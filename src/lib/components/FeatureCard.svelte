@@ -43,7 +43,7 @@
 
 		// Check if any conflicts involve scopes related to this feature
 		return $activeConflicts.conflicts.some((conflict) =>
-			conflict.sources.some((source) => source.includes(featureName))
+			conflict?.sources?.some((source) => source.includes(featureName))
 		);
 	}
 

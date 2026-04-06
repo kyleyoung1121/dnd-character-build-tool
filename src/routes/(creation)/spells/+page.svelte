@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { get } from 'svelte/store';
 	import { writable } from 'svelte/store';
+	import { detectSpellLimitViolations } from '$lib/stores/conflict_detection'
 	import ConflictWarning from '$lib/components/ConflictWarning.svelte';
 	import { character_store, hasSpellAccess } from '$lib/stores/character_store';
 	import { applyChoice } from '$lib/stores/character_store_helpers';
@@ -422,7 +423,6 @@
 			spells: spellSelectionsWithMetadata // Store full objects with metadata
 		};
 
-
 		let spellSelectionsArraySimple: string[] = Array.from(selectedSpells.keys())
 
 		const spellSelectionsSimple = {
@@ -445,6 +445,8 @@
 		if (char._provenance && char._provenance[scopeId]) {
 			(char._provenance[scopeId] as any)._metadata = spellSelectionsWithMetadata;
 		}
+
+		detectSpellLimitViolations(char);
 	}
 
 	// Restore spell selections from character store

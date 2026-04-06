@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 import { character_store, type Character } from './character_store';
-import { getSpellAccessForCharacter, getSpellsByLevel } from '$lib/data/spells';
+import { getSpellAccessForCharacter, getSpellsByLevel, spells } from '$lib/data/spells';
 
 export type ConflictType = 'skill' | 'proficiency' | 'language' | 'feature' | 'spell_limit';
 
@@ -141,18 +141,12 @@ export function detectConflicts(): {
 	};
 }
 
+
 /**
  * Detect spell limit violations
  */
-function detectSpellLimitViolations(character: Character): Conflict[] {
+export function detectSpellLimitViolations(character: Character): Conflict[] {
 	const conflicts: Conflict[] = [];
-
-	//console.log('[Spell Limit] Checking character:', {
-	// 	class: character.class,
-	// 	charisma: character.charisma,
-	// 	spells: character.spells,
-	// 	spellsLength: character.spells?.length
-	// });
 
 	// Only check if character has spells selected
 	if (!character.spells || !Array.isArray(character.spells) || character.spells.length === 0) {
@@ -160,72 +154,117 @@ function detectSpellLimitViolations(character: Character): Conflict[] {
 		return conflicts;
 	}
 
-	// Extract spell names and metadata from character.spells array
-	const spellsWithMetadata: Array<{ name: string; tabSource?: string }> = character.spells.map((spell) => {
-		if (typeof spell === 'string') {
-			return { name: spell };
-		} else if (typeof spell === 'object' && spell !== null && 'name' in spell) {
-			return {
-				name: (spell as any).name,
-				tabSource: (spell as any).tabSource
-			};
-		}
-		return { name: '' };
-	}).filter((spell) => spell.name !== '');
-
-	const selectedSpells = new Set(spellsWithMetadata.map(s => s.name));
-	//console.log('[Spell Limit] Selected spells:', Array.from(selectedSpells));
-
-	// Calculate current spell limits (mirroring the logic from spells page)
-	const spellLimits = calculateSpellLimits(character);
-	//console.log('[Spell Limit] Calculated limits:', spellLimits);
-
-	// Count selected spells by level
-	const spellCounts = countSelectedSpells(character, spellsWithMetadata);
-	//console.log('[Spell Limit] Spell counts:', spellCounts);
-
 	// Check for violations
 	const violations: SpellLimitViolation[] = [];
 
-	// Check cantrips
-	if (spellCounts.cantrips > spellLimits.cantrips) {
-		violations.push({
-			level: 'cantrips',
-			selected: spellCounts.cantrips,
-			limit: spellLimits.cantrips,
-			excess: spellCounts.cantrips - spellLimits.cantrips
-		});
-	}
+	// let metadata = (character._provenance?.spell_selections as any)._metadata
+	let metadata = character._provenance?.spell_selections._metadata;
 
-	// Check spell levels (considering shared vs separate limits)
-	if (spellLimits.isSharedLimits) {
-		const totalLeveled = spellCounts.level1 + spellCounts.level2;
-		if (totalLeveled > spellLimits.sharedLeveled) {
-			violations.push({
-				level: 'leveled',
-				selected: totalLeveled,
-				limit: spellLimits.sharedLeveled,
-				excess: totalLeveled - spellLimits.sharedLeveled
-			});
+	if (!metadata) {
+		// Calculate current spell limits (mirroring the logic from spells page)
+		const spellLimits = calculateSpellLimits(character, true);
+		console.log('[Spell Limit] Bulk Calculated limits:', spellLimits);
+		
+		// If we cant check each source individually (no metadata yet), lets at least check altogether counts
+		console.log('character.spells', character.spells);
+		let totalSpellLimit = 0;
+		if (spellLimits) {
+			totalSpellLimit += spellLimits.cantrips
+			if (spellLimits.isSharedLimits) {
+				totalSpellLimit += spellLimits.sharedLeveled
+			} else {
+				totalSpellLimit += spellLimits.level1
+				totalSpellLimit += spellLimits.level2
+			}
 		}
-	} else {
-		// Separate limits
-		if (spellCounts.level1 > spellLimits.level1) {
-			violations.push({
-				level: 'level1',
-				selected: spellCounts.level1,
-				limit: spellLimits.level1,
-				excess: spellCounts.level1 - spellLimits.level1
-			});
+		
+		// If something goes wrong, and no spell allotment is detected, quit early
+		if (totalSpellLimit == 0) {
+			return conflicts;	
 		}
 
-		if (spellCounts.level2 > spellLimits.level2) {
+		// If we are out of bounds, register a conflict
+		if (character.spells.length > totalSpellLimit) {
+			console.log('violations.push called for bulk');
 			violations.push({
-				level: 'level2',
-				selected: spellCounts.level2,
-				limit: spellLimits.level2,
-				excess: spellCounts.level2 - spellLimits.level2
+				level: 'all',
+				selected: character.spells.length,
+				limit: totalSpellLimit,
+				excess: character.spells.length - totalSpellLimit
 			});
+		}
+	} 
+	
+	// If metadata is available, check each source individually
+	else {
+		// Calculate current spell limits (mirroring the logic from spells page)
+		const spellLimits = calculateSpellLimits(character, false);
+		console.log('[Spell Limit] Meta Calculated limits:', spellLimits);
+		
+		const spellsWithMetadata: Array<{ name: string; tabSource?: string }> = metadata.map((spellObj) => {
+			if (spellObj.name && spellObj.tabSource) {
+				return {
+					name: spellObj.name,
+					tabSource: spellObj.tabSource, 
+				}
+			
+			} else {
+				return { name: '' };
+			}
+
+		}).filter((spell) => spell.name !== '');
+
+		const selectedSpells = new Set(spellsWithMetadata.map(s => s.name));
+		console.log('[Spell Limit] Selected spells:', Array.from(selectedSpells));
+
+		// Count selected spells by level
+		const spellCounts = countSelectedSpells(character, spellsWithMetadata);
+		console.log('[Spell Limit] Spell counts:', spellCounts);
+
+		// Check cantrips
+		if (spellCounts.cantrips > spellLimits.cantrips) {
+			console.log('violations.push called for cantrips');
+			violations.push({
+				level: 'cantrips',
+				selected: spellCounts.cantrips,
+				limit: spellLimits.cantrips,
+				excess: spellCounts.cantrips - spellLimits.cantrips
+			});
+		}
+
+		// Check spell levels (considering shared vs separate limits)
+		if (spellLimits.isSharedLimits) {
+			const totalLeveled = spellCounts.level1 + spellCounts.level2;
+			if (totalLeveled > spellLimits.sharedLeveled) {	
+				console.log('violations.push called for shared');
+				violations.push({
+					level: 'leveled',
+					selected: totalLeveled,
+					limit: spellLimits.sharedLeveled,
+					excess: totalLeveled - spellLimits.sharedLeveled
+				});
+			}
+		} else {
+			// Separate limits
+			if (spellCounts.level1 > spellLimits.level1) {
+				console.log('violations.push called for level1');
+				violations.push({
+					level: 'level1',
+					selected: spellCounts.level1,
+					limit: spellLimits.level1,
+					excess: spellCounts.level1 - spellLimits.level1
+				});
+			}
+
+			if (spellCounts.level2 > spellLimits.level2) {
+				console.log('violations.push called for level2');
+				violations.push({
+					level: 'level2',
+					selected: spellCounts.level2,
+					limit: spellLimits.level2,
+					excess: spellCounts.level2 - spellLimits.level2
+				});
+			}
 		}
 	}
 
@@ -254,7 +293,7 @@ function detectSpellLimitViolations(character: Character): Conflict[] {
 /**
  * Calculate spell limits for a character (mirroring spells page logic)
  */
-function calculateSpellLimits(character: Character) {
+function calculateSpellLimits(character: Character, bulk: boolean) {
 	const spellAccess = getSpellAccess(character);
 	const limits = {
 		cantrips: 0,
@@ -270,6 +309,7 @@ function calculateSpellLimits(character: Character) {
 			// Exclude subclass entries with extended names (like "Nature Domain - Druid Cantrip")
 			// as they are handled in separate tabs
 			const countsTowardLimits =
+				bulk || 
 				access.source === 'class' ||
 				(access.source === 'subclass' && !access.sourceName.includes(' - ')) ||
 				access.source === 'feature';
@@ -375,7 +415,7 @@ function countSelectedSpells(
 	for (const spell of spellsWithMetadata) {
 		const spellName = spell.name;
 		const tabSource = spell.tabSource || '';
-		//console.log(`[Spell Limit] Checking spell "${spellName}" with tabSource: "${tabSource}"`);
+		// console.log(`[Spell Limit] Checking spell "${spellName}" with tabSource: "${tabSource}"`);
 		
 		// Skip spells selected from Circle of Land tab
 		if (tabSource.includes('Circle of the Land')) {

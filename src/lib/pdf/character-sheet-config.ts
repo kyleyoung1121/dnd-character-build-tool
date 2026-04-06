@@ -340,11 +340,21 @@ export const PAGE_2_FIELDS = {
  * PDF Configuration
  */
 export const PDF_CONFIG = {
-	templatePaths: [
-		'/pdf-templates/page_one.pdf', // first page
-		'/pdf-templates/page_two.pdf', // full box ( features & spells both use this )
-		'/pdf-templates/page_three.pdf', // two rows
-	],
+
+	templatePaths: new Map([
+		['Front Page', '/pdf-templates/page_one.pdf'],
+		['Features Page', '/pdf-templates/page_two.pdf'],
+		['Equipment Page', '/pdf-templates/page_three.pdf'],
+		
+		['Spells Basic', '/pdf-templates/spells_basic.pdf'],
+		['Spells Full Caster', '/pdf-templates/spells_full_caster.pdf'],
+		['Spells Half Caster', '/pdf-templates/spells_half_caster.pdf'],
+		['Spells Third Caster', '/pdf-templates/spells_third_caster.pdf'],
+		['Spells Sorcerer', '/pdf-templates/spells_sorcerer.pdf'],
+		['Spells Warlock', '/pdf-templates/spells_warlock.pdf'],
+		['Spells Monk', '/pdf-templates/spells_monk.pdf'],
+	]),
+
 	fontPaths: [
 		'/pdf-templates/fonts/fonnts.com-Modesto-Text-Light.otf'
 	],

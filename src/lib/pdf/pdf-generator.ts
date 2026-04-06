@@ -1019,21 +1019,23 @@ async function findSpellStats(data: CharacterSheetData): Promise<{
 
 
 async function fillSpellsPage(
-	pages: any[],
 	data: CharacterSheetData,
-	font: any,
-	boldFont: any,
-	italicFont: any
+	pagesData: {
+		page: any,
+		font: any,
+		boldFont: any,
+		italicFont: any
+	}[]
 ): Promise<boolean> {
 	
 	let form1;
 	let form2;
 	
-	if (pages[0]) {
-		form1 = pages[0].getForm()
+	if (pagesData[0] && pagesData[0].page) {
+		form1 = pagesData[0].page.getForm()
 	}
-	if (pages[1]) {
-		form2 = pages[1].getForm()
+	if (pagesData[1] && pagesData[1].page) {
+		form2 = pagesData[1].page.getForm()
 	}
 
 	const charactersPerRow = 50;
@@ -1126,9 +1128,9 @@ async function fillSpellsPage(
 		fillFormField(form1, 'column_two_top', columnTwoContent, fontSize);
 
 		fillFormField(form1, 'column_one_bottom', columnOneBoldContent, fontSize);
-		form1.getTextField('column_one_bottom').updateAppearances(boldFont);
+		form1.getTextField('column_one_bottom').updateAppearances(pagesData[0].boldFont);
 		fillFormField(form1, 'column_two_bottom', columnTwoBoldContent, fontSize);
-		form1.getTextField('column_two_bottom').updateAppearances(boldFont);
+		form1.getTextField('column_two_bottom').updateAppearances(pagesData[0].boldFont);
 
 		form1.flatten()
 	}
@@ -1145,9 +1147,9 @@ async function fillSpellsPage(
 		fillFormField(form2, 'column_two_top', columnFourContent, fontSize);
 
 		fillFormField(form2, 'column_one_bottom', columnThreeBoldContent, fontSize);
-		form2.getTextField('column_one_bottom').updateAppearances(boldFont);
+		form2.getTextField('column_one_bottom').updateAppearances(pagesData[1].boldFont);
 		fillFormField(form2, 'column_two_bottom', columnFourBoldContent, fontSize);
-		form2.getTextField('column_two_bottom').updateAppearances(boldFont);
+		form2.getTextField('column_two_bottom').updateAppearances(pagesData[1].boldFont);
 
 		form2.flatten()
 	}
@@ -1194,7 +1196,8 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 			spellsMonkPageDoc,
 		]
 
-		let templateFonts: PDFFont[][] = [];
+		//let templateFonts: PDFFont[][] = [];
+		let templateFonts = new Map
 
 		for (let i = 0; i < templates.length; i++) {
 			if (!templates[i]) {
@@ -1203,14 +1206,14 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 			
 			templates[i].registerFontkit(fontkit);
 			// We may need this information later, but currently the returned fonts are unused
-			let frontPageFonts: PDFFont[] = [
+			let pageFonts: PDFFont[] = [
 				await templates[i].embedFont(StandardFonts.Helvetica),
 				await templates[i].embedFont(StandardFonts.HelveticaBold),
 				await templates[i].embedFont(StandardFonts.HelveticaOblique),
 				await templates[i].embedFont(fontOneBuffer),
 				// Consider adding other custom font (#2 and onwards)
 			]
-			templateFonts[i] = frontPageFonts
+			templateFonts.set(templates[i], pageFonts)
 		}
 		
 		const frontPage = frontPageDoc.getPages()[0];
@@ -1229,9 +1232,9 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 
 		// Fill pages with data
 		// TODO: Check if its okay to pass in font from first page to all pages for simplicity
-		await fillFrontPage(frontPageDoc, data, templateFonts[0][3], templateFonts[0][1], templateFonts[0][2]);
-		await fillFeaturesPage(featuresPageDoc, data, templateFonts[0][3], templateFonts[0][1], templateFonts[0][2]);
-		await fillEquipmentPage(equipmentPageDoc, data, templateFonts[0][3], templateFonts[0][1], templateFonts[0][2]);
+		await fillFrontPage(frontPageDoc, data, templateFonts.get(frontPageDoc)[3], templateFonts.get(frontPageDoc)[1], templateFonts.get(frontPageDoc)[2]);
+		await fillFeaturesPage(featuresPageDoc, data, templateFonts.get(featuresPageDoc)[3], templateFonts.get(featuresPageDoc)[1], templateFonts.get(featuresPageDoc)[2]);
+		await fillEquipmentPage(equipmentPageDoc, data, templateFonts.get(equipmentPageDoc)[3], templateFonts.get(equipmentPageDoc)[1], templateFonts.get(equipmentPageDoc)[2]);
 		
 		let spellsPageOneDoc: PDFDocument | undefined;
 
@@ -1283,7 +1286,20 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 				break;
 		}
 
-		let pageTwoUsed = await fillSpellsPage([spellsPageOneDoc, spellsPageTwoDoc], data, templateFonts[0][3], templateFonts[0][1], templateFonts[0][2]);
+		let needsTwoSpellPages = await fillSpellsPage(data, [
+			{
+				page: spellsPageOneDoc,
+				font: templateFonts.get(spellsPageOneDoc)[3],
+				boldFont: templateFonts.get(spellsPageOneDoc)[1],
+				italicFont: templateFonts.get(spellsPageOneDoc)[2]
+			},
+			{
+				page: spellsPageTwoDoc,
+				font: templateFonts.get(spellsPageTwoDoc)[3],
+				boldFont: templateFonts.get(spellsPageTwoDoc)[1],
+				italicFont: templateFonts.get(spellsPageTwoDoc)[2]
+			},
+		]);
 		
 		let freshPdfDoc = await PDFDocument.create()
 
@@ -1303,7 +1319,7 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 			freshPdfDoc.addPage(spellsPageOneCopy)
 
 			// Add page 2, if two pages are needed
-			if (pageTwoUsed) {
+			if (needsTwoSpellPages) {
 				const [spellsPageTwoCopy] = await freshPdfDoc.copyPages(spellsPageTwoDoc, [0])
 				freshPdfDoc.addPage(spellsPageTwoCopy)
 			}

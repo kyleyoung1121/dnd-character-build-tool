@@ -11,11 +11,12 @@ import fontkit from '@pdf-lib/fontkit';
 import type { CharacterSheetData } from './character-data-mapper';
 import { formatSpells } from './character-data-mapper';
 import type { FieldConfig, TextAreaConfig } from './character-sheet-config';
+import { beasts } from '$lib/data/beasts/index';
 import { spells, type Spell } from '$lib/data/spells';
 import { formatFeatureForPDF, formatFeaturesForPDF } from '$lib/data/features/feature-data';
 import { druid } from '$lib/data/classes/druid';
 import { get } from 'svelte/store';
-import { character_store } from '$lib/stores/character_store';
+import { character_store, hasBeastAccess, getBeastTabName } from '$lib/stores/character_store';
 import { detectSpellLimitViolations } from '$lib/stores/conflict_detection';
 
 /**
@@ -936,6 +937,164 @@ async function fillEquipmentPage(
 }
 
 
+// TODO: modify this copy of fillFeatures to work for beasts
+async function fillBeastsPage(
+	page: any,
+	data: CharacterSheetData,
+	font: any,
+	boldFont: any,
+	italicFont: any
+) {
+	const form = page.getForm()
+
+	const charactersPerRow = 56;
+	const maxLinesPerColumn = 65;
+
+	let beastTabName = getBeastTabName(data.characterReference);
+	fillFormField(form, 'page_title', beastTabName, 12, TextAlignment.Center);
+
+	let beastsContent = ''
+	
+	// If no beasts are selected, we can return early. But, still flatten the file!
+	if (!data.characterReference.beasts) {
+		form.flatten()
+		return;
+	}
+
+	console.log('data.characterReference.beasts: ', data.characterReference.beasts);
+
+	for (let i = 0; i < data.characterReference.beasts.length; i++) {
+		const beastName = data.characterReference.beasts[i].name;
+		console.log('beastName: ', beastName);
+		const beastFilteringResult = beasts.filter((beast) => beast.name == beastName);
+		console.log('beastFilteringResult: ', beastFilteringResult);
+		let beast;
+		if (beastFilteringResult) {
+			beast = beastFilteringResult[0]
+		} else {
+			continue;
+		}
+
+		if (!beast) {
+			console.log('beast is undefined, continuing on');
+			continue;
+		}
+		
+		console.log('beast:', beast);
+
+		let beastSpeed
+		if (beast) {
+			beastSpeed= Object.entries(beast.speed)
+			.map(([type, value]) => {
+				const typeLabel = type === 'walk' ? '' : type + ' ';
+				return `${typeLabel}${value} ft.`;
+			})
+			.join(', ');
+		}
+
+		function signedScore(score: number) {
+			const abilityMod = Math.floor((score-10)/2)
+			return abilityMod < 0 ? abilityMod : '+' + abilityMod;
+		}
+		
+		beastsContent += `<bold:>${beastName} (${beast.size} ${beast.type})\n` ;
+		beastsContent += `Armor Class: ${beast.armor_class}, Hit Points: ${beast.hit_points.average}\n`;
+		beastsContent += `Speed: ${beastSpeed}\n`;
+		beastsContent += `<bold:>STR ${signedScore(beast.ability_scores.STR)} (${beast.ability_scores.STR})  DEX ${signedScore(beast.ability_scores.DEX)} (${beast.ability_scores.DEX})  CON ${signedScore(beast.ability_scores.CON)} (${beast.ability_scores.CON})\n`;
+		
+		const skills = beast.proficiencies.filter((prof) => prof.name == 'Skills')[0]?.text
+		if (skills) {
+			beastsContent += `Skills: ${skills}\n`;
+		}
+		
+		const senses = beast.proficiencies.filter((prof) => prof.name == 'Senses')[0]?.text
+		if (senses) {
+			beastsContent += `Senses: ${senses}\n`;
+		}
+		
+		// Languages
+		// Druids cannot speak while wildshaped (unless their form can, which none of the Druid options have)
+		const isDruid = data.characterReference.class.includes('Druid');
+		const hasVoiceOfChainMaster = data.characterReference.features.includes('Voice of the Chain Master');
+		const beastLanguages = beast.proficiencies.filter((prof) => prof.name == 'Languages')[0]?.text
+
+		if (isDruid) {
+			beastsContent += `Languages: you cannot speak in this form\n`;
+		
+		// Warlocks: some familiars can speak. Voice of Chain Master also grants speaking through the familiar.
+		} else if (hasVoiceOfChainMaster && !beastLanguages) {
+			beastsContent += `Languages: you can speak through your familiar with your own voice\n`;
+		} else if (hasVoiceOfChainMaster && beastLanguages) {
+			beastsContent += `Languages: ${beastLanguages}. You may also speak through your familiar with your own voice\n`;
+		
+		// For all other circumstances, if the beast can speak, simply list its languages
+		} else if (beastLanguages) {
+			beastsContent += `Languages: ${beastLanguages}\n`
+		}
+
+		// List Abilities
+		if (beast.abilities) {
+			beastsContent += `<bold:>Abilties\n`;
+		}
+		for (let j = 0; j < beast.abilities.length; j++) {
+			if (beast.abilities[j]) {
+				beastsContent += `${beast.abilities[j].name}: ${beast.abilities[j].text}\n`
+			}
+		}
+		
+		// List Actions
+		if (beast.actions) {
+			beastsContent += `<bold:>Actions\n`;
+		}
+		for (let j = 0; j < beast.actions.length; j++) {
+			if (beast.actions[j]) {
+				beastsContent += `${beast.actions[j].name}: ${beast.actions[j].text}\n`
+			}
+		}
+
+		beastsContent += '\n'
+	}
+
+	let columnOneContent = '';
+	let columnOneBoldContent = '';
+	let columnTwoContent = '';
+	let columnTwoBoldContent = '';
+
+	let lineCount = 0;
+
+	// Iterate through beasts data chunks (entire beasts separated by a blank line)
+	let beastChunks = beastsContent.split('\n\n');
+	for (let i = 0; i < beastChunks.length; i++) {	
+		const layeredColumnsProcessed = processLayeredColumns(beastChunks[i] + '\n\n', charactersPerRow);
+
+		if (lineCount + layeredColumnsProcessed.linesUsed <= maxLinesPerColumn) {
+			lineCount += layeredColumnsProcessed.linesUsed;
+			columnOneContent += layeredColumnsProcessed.plainLayer;
+			columnOneBoldContent += layeredColumnsProcessed.boldLayer;
+		}
+
+		else {
+			lineCount += layeredColumnsProcessed.linesUsed;
+			columnTwoContent += layeredColumnsProcessed.plainLayer;
+			columnTwoBoldContent += layeredColumnsProcessed.boldLayer;
+		}
+	}
+
+	let fontSize = 10;
+
+	fillFormField(form, 'column_one', columnOneContent, fontSize);
+	fillFormField(form, 'column_two', columnTwoContent, fontSize);
+
+	
+	fillFormField(form, 'column_one_back', columnOneBoldContent, fontSize);
+	form.getTextField('column_one_back').updateAppearances(boldFont);
+	fillFormField(form, 'column_two_back', columnTwoBoldContent, fontSize);
+	form.getTextField('column_two_back').updateAppearances(boldFont);
+
+	form.flatten()
+}
+
+
 async function findSpellStats(data: CharacterSheetData): Promise<{
 	spellAttack: string | undefined; 
 	spellSave: string | undefined;
@@ -1303,7 +1462,12 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 
 
 		// Check beast usage
-
+		if (hasBeastAccess(char)) {
+			await fillBeastsPage(beastsPageDoc, data, templateFonts.get(beastsPageDoc)[3], templateFonts.get(beastsPageDoc)[1], templateFonts.get(beastsPageDoc)[2]);
+			const [beastsPageCopy] = await freshPdfDoc.copyPages(beastsPageDoc, [0])
+			freshPdfDoc.addPage(beastsPageCopy)
+		}
+		
 
 
 		// Check spell usage, and ID which spell page one to use for this character

@@ -1743,8 +1743,7 @@
 		<div class="no-spells">
 			<h2>🚫 No Spell Access</h2>
 			<p>
-				Your current class and race combination doesn't grant access to spells. Choose a
-				spellcasting class or subclass to unlock the Spells tab!
+				Your current class and race combination doesn't grant access to spells.
 			</p>
 		</div>
 	{:else}

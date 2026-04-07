@@ -154,14 +154,11 @@
 		});
 
 	function handleBeastSelect(beast: Beast) {
-		//console.log('🐾 SELECT: Beast selected:', beast.name);
 		
 		// Check if this beast is already selected
 		if (selectedBeasts.has(beast.name)) {
-			//console.log('🐾 SELECT: Deselecting beast:', beast.name);
 			selectedBeasts.delete(beast.name);
 		} else if (selectedBeasts.size < maxSelections) {
-			//console.log('🐾 SELECT: Adding beast:', beast.name);
 			// Add the beast if we are able to (under the selection limit)
 			const char = $character_store;
 			selectedBeasts.set(beast.name, {
@@ -171,15 +168,12 @@
 				charRace: char.race || '',
 				charSubrace: char.subrace || ''
 			});
-		} else {
-			//console.log('🐾 SELECT: Max capacity reached, cannot select more');
 		}
 		
 		// Trigger reactivity
 		selectedBeasts = selectedBeasts;
 		
 		// Persist selections
-		//console.log('🐾 SELECT: Current selectedBeasts:', Array.from(selectedBeasts.keys()));
 		persistBeastSelections();
 		// If at max capacity and trying to select a new beast, button will be disabled so this won't be called
 	}
@@ -425,9 +419,12 @@
 				{/if}
 			</div>
 		{:else}
-			<div class="placeholder">
-				<p>🐾 Beast and familiar selection not available for your current class 🐾</p>
-			</div>
+			<div class="no-beasts">
+			<h2>🚫 No Beast/Familiar Access</h2>
+			<p>
+				Beast and familiar selection not available for your current class
+			</p>
+		</div>
 		{/if}
 	</div>
 </div>
@@ -684,18 +681,19 @@
 		font-size: var(--font-size-md);
 	}
 
-	.placeholder {
+	.no-beasts {
+		background: linear-gradient(135deg, var(--color-neutral-100) 0%, var(--color-border) 100%);
+		border: 2px solid var(--color-neutral-300);
+		border-radius: var(--radius-lg);
+		padding: var(--spacing-12) var(--spacing-8);
 		text-align: center;
-		padding: var(--spacing-12);
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-		border-radius: var(--radius-md);
-		margin-top: var(--spacing-8);
+		margin: var(--spacing-8) auto;
+		max-width: 600px;
 	}
 
-	.placeholder p {
-		color: white;
-		font-size: var(--font-size-xl);
-		font-weight: var(--font-weight-semibold);
-		margin: 0;
+	.no-beasts h2 {
+		font-size: var(--font-size-2xl);
+		color: var(--color-text-muted);
+		margin-bottom: var(--spacing-4);
 	}
 </style>

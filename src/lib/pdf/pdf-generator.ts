@@ -2,7 +2,6 @@
  * PDF Generator Service
  * 
  * This service loads the blank PDF template and fills it with character data
- * at the positions defined in character-sheet-config.ts
  */
 
 import { PDFDocument, rgb, StandardFonts, PDFForm, PDFFont, numberToString, TextAlignment, newlineChars, componentsToColor, PDFPage } from 'pdf-lib';
@@ -961,13 +960,13 @@ async function fillBeastsPage(
 		return;
 	}
 
-	// console.log('data.characterReference.beasts: ', data.characterReference.beasts);
+	console.log('data.characterReference.beasts: ', data.characterReference.beasts);
 
 	for (let i = 0; i < data.characterReference.beasts.length; i++) {
 		const beastName = data.characterReference.beasts[i].name;
-		// console.log('beastName: ', beastName);
+		console.log('beastName: ', beastName);
 		const beastFilteringResult = beasts.filter((beast) => beast.name == beastName);
-		// console.log('beastFilteringResult: ', beastFilteringResult);
+		console.log('beastFilteringResult: ', beastFilteringResult);
 		let beast;
 		if (beastFilteringResult) {
 			beast = beastFilteringResult[0]
@@ -976,11 +975,11 @@ async function fillBeastsPage(
 		}
 
 		if (!beast) {
-			// console.log('beast is undefined, continuing on');
+			console.log('beast is undefined, continuing on');
 			continue;
 		}
 		
-		// console.log('beast:', beast);
+		console.log('beast:', beast);
 
 		let beastSpeed
 		if (beast) {
@@ -1054,6 +1053,8 @@ async function fillBeastsPage(
 
 		beastsContent += '\n'
 	}
+
+	console.log('beastsContent: ', beastsContent);
 
 	let columnOneContent = '';
 	let columnOneBoldContent = '';
@@ -1370,6 +1371,8 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 
 		const beastsPageDoc = await loadTemplate('Two Column Page');
 
+		console.log('loaded beastsPageDoc: ', beastsPageDoc);
+
 		const spellsBasicPageDoc = await loadTemplate('Spells Basic');
 		const spellsPageTwoDoc = await loadTemplate('Spells Basic');
 		const spellsFullCasterPageDoc = await loadTemplate('Spells Full Caster');
@@ -1461,9 +1464,12 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 
 
 		// Check beast usage
+		console.log('checking beast usage');
 		if (hasBeastAccess(char)) {
+			console.log('has beast usage, filling beasts page');
 			await fillBeastsPage(beastsPageDoc, data, templateFonts.get(beastsPageDoc)[3], templateFonts.get(beastsPageDoc)[1], templateFonts.get(beastsPageDoc)[2]);
 			const [beastsPageCopy] = await freshPdfDoc.copyPages(beastsPageDoc, [0])
+			console.log('adding beast page to fresh pdf doc');
 			freshPdfDoc.addPage(beastsPageCopy)
 		}
 		

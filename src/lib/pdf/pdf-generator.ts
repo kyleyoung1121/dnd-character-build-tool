@@ -1082,7 +1082,7 @@ async function fillSpellsPage(
 	const charactersPerRow = 50;
 	let maxLinesPerColumn = 60;
 	// For spells, we want to leave room for Spell Save, Spell Attack, and Spell Slots. So, both columns should have a couple leading lines of whitespace
-	const whitespaceLines = 0;
+	const whitespaceLines = 1;
 	maxLinesPerColumn -= whitespaceLines;
 
 	let spellsContent = formatSpells(data.characterReference);

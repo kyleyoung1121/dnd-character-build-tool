@@ -770,16 +770,16 @@ function chunkLinesWordBumped(input: string, chunkSizeMax: number) {
 		}
 	}
 
-	console.log('chunks: [length, chunkText]');
-	for (let i = 0; i < chunks.length; i++) {
-		console.log(chunks[i].length, chunks[i]);
-	}
+	// console.log('chunks: [length, chunkText]');
+	// for (let i = 0; i < chunks.length; i++) {
+	// console.log(chunks[i].length, chunks[i]);
+	// }
 
 	return chunks;
 }
 
 function processLayeredColumns(input: string, charactersPerRow: number) {
-	//console.log(JSON.stringify(input));
+	// console.log(JSON.stringify(input));
 	
 	let linesUsed = 0;
 	let newLineSplit = input.split('\n');
@@ -788,8 +788,8 @@ function processLayeredColumns(input: string, charactersPerRow: number) {
 	let plainLayer = "";
 	
 	for (let i = 0; i < newLineSplit.length; i++) {
-		console.log('-------------\nStep 2:');
-		console.log('newLineSplit[i], charactersPerRow: ' + newLineSplit[i] + ' ' + charactersPerRow);
+		// console.log('-------------\nStep 2:');
+		// console.log('newLineSplit[i], charactersPerRow: ' + newLineSplit[i] + ' ' + charactersPerRow);
 		let charLimitSplit = chunkLinesWordBumped(newLineSplit[i], charactersPerRow);``
 		if (!charLimitSplit) {continue;}
 		for (let j = 0; j < charLimitSplit.length; j++) {
@@ -842,8 +842,8 @@ async function fillFeaturesPage(
 	// Iterate through feature chunks (entire features separated by a blank line)
 	let featureChunks = featureContent.split('\n\n');
 	for (let i = 0; i < featureChunks.length; i++) {	
-		console.log('--------------\nStep 1:');
-		console.log(JSON.stringify(featureChunks[i] + '\n\n'));
+		// console.log('--------------\nStep 1:');
+		// console.log(JSON.stringify(featureChunks[i] + '\n\n'));
 		const layeredColumnsProcessed = processLayeredColumns(featureChunks[i] + '\n\n', charactersPerRow);
 
 		if (lineCount + layeredColumnsProcessed.linesUsed <= maxLinesPerColumn) {
@@ -961,13 +961,13 @@ async function fillBeastsPage(
 		return;
 	}
 
-	console.log('data.characterReference.beasts: ', data.characterReference.beasts);
+	// console.log('data.characterReference.beasts: ', data.characterReference.beasts);
 
 	for (let i = 0; i < data.characterReference.beasts.length; i++) {
 		const beastName = data.characterReference.beasts[i].name;
-		console.log('beastName: ', beastName);
+		// console.log('beastName: ', beastName);
 		const beastFilteringResult = beasts.filter((beast) => beast.name == beastName);
-		console.log('beastFilteringResult: ', beastFilteringResult);
+		// console.log('beastFilteringResult: ', beastFilteringResult);
 		let beast;
 		if (beastFilteringResult) {
 			beast = beastFilteringResult[0]
@@ -976,11 +976,11 @@ async function fillBeastsPage(
 		}
 
 		if (!beast) {
-			console.log('beast is undefined, continuing on');
+			// console.log('beast is undefined, continuing on');
 			continue;
 		}
 		
-		console.log('beast:', beast);
+		// console.log('beast:', beast);
 
 		let beastSpeed
 		if (beast) {
@@ -1273,15 +1273,14 @@ async function fillSpellsPage(
 		
 		const layeredColumnsProcessed = processLayeredColumns(spellChunk, charactersPerRow);
 
-		// TODO: figure out which column we are adding to
-		// 	 	 divide by length
-		console.log('layeredColumnsProcessed: ', layeredColumnsProcessed);
-		console.log('lineCount: ', lineCount);
-		console.log('layeredColumnsProcessed.linesUsed: ', layeredColumnsProcessed.linesUsed);
-		console.log('maxLinesPerColumn: ', maxLinesPerColumn);
+		// Figure out which column we are adding to (divide by length)
+		// console.log('layeredColumnsProcessed: ', layeredColumnsProcessed);
+		// console.log('lineCount: ', lineCount);
+		// console.log('layeredColumnsProcessed.linesUsed: ', layeredColumnsProcessed.linesUsed);
+		// console.log('maxLinesPerColumn: ', maxLinesPerColumn);
 		
 		let column_destination = Math.floor((lineCount + layeredColumnsProcessed.linesUsed) / maxLinesPerColumn) + 1;
-		console.log('column_destination: ', column_destination);
+		// console.log('column_destination: ', column_destination);
 
 		// Handle overflow, pushing content to next column when there isnt any more room.
 		switch (column_destination) {
@@ -1514,9 +1513,9 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 			) {
 					spellsPageOneDoc = spellsBasicPageDoc;
 				} else {
-					console.log('Flag! spellsPageOneDoc: ', spellsPageOneDoc);
-					console.log('selectedSpecies: ', selectedSpecies);
-					console.log('char.subrace: ', char.subrace);
+					// console.log('Flag! spellsPageOneDoc: ', spellsPageOneDoc);
+					// console.log('selectedSpecies: ', selectedSpecies);
+					// console.log('char.subrace: ', char.subrace);
 				}
 				break;
 		}

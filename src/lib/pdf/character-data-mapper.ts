@@ -697,8 +697,8 @@ function formatEquipment(inventory: string[]): string {
 		lines.push(misc.join('\n'));
 	}
 	
-	console.log('lines debug');
-	console.log(lines);
+	// console.log('lines debug');
+	// console.log(lines);
 
 	return lines.join('\n');
 }
@@ -966,7 +966,7 @@ export function formatSpells(character: Character): string {
 
 			// Add casting details
 			let spellRange = spell.range.replace('feet', 'ft.').replace('foot', 'ft.');
-			console.log('spellRange: ', spellRange);
+			// console.log('spellRange: ', spellRange);
 			allSpellsText += `<bold:>( ${spell.castingTime} | ${spellRange} | ${durationText} )\n`;
 			
 			// Add description

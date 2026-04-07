@@ -163,10 +163,10 @@ export function detectSpellLimitViolations(character: Character): Conflict[] {
 	if (!metadata) {
 		// Calculate current spell limits (mirroring the logic from spells page)
 		const spellLimits = calculateSpellLimits(character, true);
-		console.log('[Spell Limit] Bulk Calculated limits:', spellLimits);
+		//console.log('[Spell Limit] Bulk Calculated limits:', spellLimits);
 		
 		// If we cant check each source individually (no metadata yet), lets at least check altogether counts
-		console.log('character.spells', character.spells);
+		//console.log('character.spells', character.spells);
 		let totalSpellLimit = 0;
 		if (spellLimits) {
 			totalSpellLimit += spellLimits.cantrips
@@ -185,7 +185,7 @@ export function detectSpellLimitViolations(character: Character): Conflict[] {
 
 		// If we are out of bounds, register a conflict
 		if (character.spells.length > totalSpellLimit) {
-			console.log('violations.push called for bulk');
+			// console.log('violations.push called for bulk');
 			violations.push({
 				level: 'all',
 				selected: character.spells.length,
@@ -199,7 +199,7 @@ export function detectSpellLimitViolations(character: Character): Conflict[] {
 	else {
 		// Calculate current spell limits (mirroring the logic from spells page)
 		const spellLimits = calculateSpellLimits(character, false);
-		console.log('[Spell Limit] Meta Calculated limits:', spellLimits);
+		//console.log('[Spell Limit] Meta Calculated limits:', spellLimits);
 		
 		const spellsWithMetadata: Array<{ name: string; tabSource?: string }> = metadata.map((spellObj) => {
 			if (spellObj.name && spellObj.tabSource) {
@@ -215,15 +215,15 @@ export function detectSpellLimitViolations(character: Character): Conflict[] {
 		}).filter((spell) => spell.name !== '');
 
 		const selectedSpells = new Set(spellsWithMetadata.map(s => s.name));
-		console.log('[Spell Limit] Selected spells:', Array.from(selectedSpells));
+		//console.log('[Spell Limit] Selected spells:', Array.from(selectedSpells));
 
 		// Count selected spells by level
 		const spellCounts = countSelectedSpells(character, spellsWithMetadata);
-		console.log('[Spell Limit] Spell counts:', spellCounts);
+		//console.log('[Spell Limit] Spell counts:', spellCounts);
 
 		// Check cantrips
 		if (spellCounts.cantrips > spellLimits.cantrips) {
-			console.log('violations.push called for cantrips');
+			//console.log('violations.push called for cantrips');
 			violations.push({
 				level: 'cantrips',
 				selected: spellCounts.cantrips,
@@ -236,7 +236,7 @@ export function detectSpellLimitViolations(character: Character): Conflict[] {
 		if (spellLimits.isSharedLimits) {
 			const totalLeveled = spellCounts.level1 + spellCounts.level2;
 			if (totalLeveled > spellLimits.sharedLeveled) {	
-				console.log('violations.push called for shared');
+				//console.log('violations.push called for shared');
 				violations.push({
 					level: 'leveled',
 					selected: totalLeveled,
@@ -247,7 +247,7 @@ export function detectSpellLimitViolations(character: Character): Conflict[] {
 		} else {
 			// Separate limits
 			if (spellCounts.level1 > spellLimits.level1) {
-				console.log('violations.push called for level1');
+				//console.log('violations.push called for level1');
 				violations.push({
 					level: 'level1',
 					selected: spellCounts.level1,
@@ -257,7 +257,7 @@ export function detectSpellLimitViolations(character: Character): Conflict[] {
 			}
 
 			if (spellCounts.level2 > spellLimits.level2) {
-				console.log('violations.push called for level2');
+				//console.log('violations.push called for level2');
 				violations.push({
 					level: 'level2',
 					selected: spellCounts.level2,

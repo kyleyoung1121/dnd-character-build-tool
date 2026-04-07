@@ -192,8 +192,7 @@
 
 	{:else if block.type === 'computed-replacement'}
 		{@const value = allValuesAvailable(block.whenAvailable)}
-		{console.log('[complex_desc] Computed replacement value:', value)}
-        <p>
+		<p>
 			{@html value !== null
 				? (value === 1 && block.singularTemplate
 					? block.singularTemplate

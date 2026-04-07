@@ -101,7 +101,7 @@ export const cantrips: Spell[] = [
 		components: ['V', 'S', 'M'],
 		duration: 'Concentration, up to 1 minute',
 		description:
-			"You create up to four torch-sized lights within range, making them appear as torches, lanterns, or glowing orbs that hover in the air for the duration. You can also combine the four lights into one glowing vaguely humanoid form of Medium size. Whichever form you choose, each light sheds dim light in a 10-foot radius. \nAs a bonus action on your turn, you can move the lights up to 60 feet to a new spot within range. A light must be within 20 feet of another light created by this spell, and a light winks out if it exceeds the spell's range.",
+			"You create up to four torch-sized lights within range, making them appear as torches, lanterns, or glowing orbs that hover in the air for the duration. You can also combine the four lights into one glowing vaguely humanoid form of Medium size. Whichever form you choose, each light sheds dim light in a 10 foot radius. \nAs a bonus action on your turn, you can move the lights up to 60 feet to a new spot within range. A light must be within 20 feet of another light created by this spell, and a light winks out if it exceeds the spell's range.",
 		classes: ['Bard', 'Sorcerer', 'Wizard'],
 		tags: ['Utility']
 	},
@@ -114,7 +114,7 @@ export const cantrips: Spell[] = [
 		components: ['V', 'S'],
 		duration: 'Instantaneous',
 		description:
-			'Whispering to the spirits of nature, you create one of the following effects within range:\n-You create a tiny, harmless sensory effect that predicts what the weather will be at your location for the next 24 hours. The effect might manifest as a golden orb for clear skies, a cloud for rain, falling snowflakes for snow, and so on. This effect persists for 1 round.\n-You instantly make a flower blossom, a seed pod open, or a leaf bud bloom.\n-You create an instantaneous, harmless sensory effect, such as falling leaves, a puff of wind, the sound of a small animal, or the faint odor of skunk. The effect must fit in a 5-foot cube.\n-You instantly light or snuff out a candle, a torch, or a small campfire.',
+			'Whispering to the spirits of nature, you create one of the following effects within range:\n-You create a tiny, harmless sensory effect that predicts what the weather will be at your location for the next 24 hours. The effect might manifest as a golden orb for clear skies, a cloud for rain, falling snowflakes for snow, and so on. This effect persists for 1 round.\n-You instantly make a flower blossom, a seed pod open, or a leaf bud bloom.\n-You create an instantaneous, harmless sensory effect, such as falling leaves, a puff of wind, the sound of a small animal, or the faint odor of skunk. The effect must fit in a 5 foot cube.\n-You instantly light or snuff out a candle, a torch, or a small campfire.',
 		classes: ['Druid'],
 		tags: ['Utility']
 	},
@@ -188,7 +188,7 @@ export const cantrips: Spell[] = [
 		components: ['V', 'M'],
 		duration: '1 hour',
 		description:
-			'You touch one object that is no larger than 10 feet in any dimension. Until the spell ends, the object sheds bright light in a 20-foot radius and dim light for an additional 20 feet. The light can be colored as you like. Completely covering the object with something opaque blocks the light. The spell ends if you cast it again or dismiss it as an action. \nIf you target an object held or worn by a hostile creature, that creature must succeed on a Dexterity saving throw to avoid the spell.',
+			'You touch one object that is no larger than 10 feet in any dimension. Until the spell ends, the object sheds bright light in a 20 foot radius and dim light for an additional 20 feet. The light can be colored as you like. Completely covering the object with something opaque blocks the light. The spell ends if you cast it again or dismiss it as an action. \nIf you target an object held or worn by a hostile creature, that creature must succeed on a Dexterity saving throw to avoid the spell.',
 		classes: ['Bard', 'Cleric', 'Sorcerer', 'Wizard'],
 		tags: ['Utility'],
 		isRareUse: true
@@ -242,7 +242,7 @@ export const cantrips: Spell[] = [
 		components: ['S', 'M'],
 		duration: '1 minute',
 		description:
-			"You create a sound or an image of an object within range that lasts for the duration. The illusion also ends if you dismiss it as an action or cast this spell again. \nIf you create a sound, its volume can range from a whisper to a scream. It can be your voice, someone else's voice, a lion's roar, a beating of drums, or any other sound you choose. The sound continues unabated throughout the duration, or you can make discrete sounds at different times before the spell ends. \nIf you create an image of an object--such as a chair, muddy footprints, or a small chest--it must be no larger than a 5-foot cube. The image can't create sound, light, smell, or any other sensory effect. Physical interaction with the image reveals it to be an illusion, because things can pass through it. \nIf a creature uses its action to examine the sound or image, the creature can determine that it is an illusion with a successful Intelligence (Investigation) check against your spell save DC. If a creature discerns the illusion for what it is, the illusion becomes faint to the creature.",
+			"You create a sound or an image of an object within range that lasts for the duration. The illusion also ends if you dismiss it as an action or cast this spell again. \nIf you create a sound, its volume can range from a whisper to a scream. It can be your voice, someone else's voice, a lion's roar, a beating of drums, or any other sound you choose. The sound continues unabated throughout the duration, or you can make discrete sounds at different times before the spell ends. \nIf you create an image of an object--such as a chair, muddy footprints, or a small chest--it must be no larger than a 5 foot cube. The image can't create sound, light, smell, or any other sensory effect. Physical interaction with the image reveals it to be an illusion, because things can pass through it. \nIf a creature uses its action to examine the sound or image, the creature can determine that it is an illusion with a successful Intelligence (Investigation) check against your spell save DC. If a creature discerns the illusion for what it is, the illusion becomes faint to the creature.",
 		classes: ['Bard', 'Sorcerer', 'Warlock', 'Wizard'],
 		tags: ['Utility']
 	},
@@ -285,7 +285,7 @@ export const cantrips: Spell[] = [
 		components: ['V', 'S'],
 		duration: '10 minutes',
 		description:
-			'A flickering flame appears in your hand. The flame remains there for the duration and harms neither you nor your equipment. The flame sheds bright light in a 10-foot radius and dim light for an additional 10 feet. The spell ends if you dismiss it as an action or if you cast it again.\nYou can also attack with the flame, although doing so ends the spell. When you cast this spell, or as an action on a later turn, you can hurl the flame at a creature within 30 feet of you. Make a ranged spell attack. On a hit, the target takes 1d8 fire damage.',
+			'A flickering flame appears in your hand. The flame remains there for the duration and harms neither you nor your equipment. The flame sheds bright light in a 10 foot radius and dim light for an additional 10 feet. The spell ends if you dismiss it as an action or if you cast it again.\nYou can also attack with the flame, although doing so ends the spell. When you cast this spell, or as an action on a later turn, you can hurl the flame at a creature within 30 feet of you. Make a ranged spell attack. On a hit, the target takes 1d8 fire damage.',
 		classes: ['Druid'],
 		tags: ['SpellAttack', 'Utility'],
 		quickReferenceStats: new Map([
@@ -457,7 +457,7 @@ export const firstLevel: Spell[] = [
 		components: ['V', 'S', 'M'],
 		duration: '8 hours',
 		description:
-			"You set an alarm against unwanted intrusion. Choose a door, a window, or an area within range that is no larger than a 20-foot cube. Until the spell ends, an alarm alerts you whenever a Tiny or larger creature touches or enters the warded area. When you cast the spell, you can designate creatures that won't set off the alarm. You also choose whether the alarm is mental or audible.\nA mental alarm alerts you with a ping in your mind if you are within 1 mile of the warded area. This ping awakens you if you are sleeping.\nAn audible alarm produces the sound of a hand bell for 10 seconds within 60 feet.",
+			"You set an alarm against unwanted intrusion. Choose a door, a window, or an area within range that is no larger than a 20 foot cube. Until the spell ends, an alarm alerts you whenever a Tiny or larger creature touches or enters the warded area. When you cast the spell, you can designate creatures that won't set off the alarm. You also choose whether the alarm is mental or audible.\nA mental alarm alerts you with a ping in your mind if you are within 1 mile of the warded area. This ping awakens you if you are sleeping.\nAn audible alarm produces the sound of a hand bell for 10 seconds within 60 feet.",
 		classes: ['Ranger', 'Wizard'],
 		ritual: true,
 		tags: ['Utility'],
@@ -499,7 +499,7 @@ export const firstLevel: Spell[] = [
 		level: 1,
 		school: 'Conjuration',
 		castingTime: '1 action',
-		range: '10-foot radius',
+		range: '10 foot radius',
 		components: ['V', 'S'],
 		duration: 'Instantaneous',
 		description:
@@ -544,11 +544,11 @@ export const firstLevel: Spell[] = [
 		level: 1,
 		school: 'Evocation',
 		castingTime: '1 action',
-		range: '15-foot cone',
+		range: '15 foot cone',
 		components: ['V', 'S'],
 		duration: 'Instantaneous',
 		description:
-			"As you hold your hands with thumbs touching and fingers spread, a thin sheet of flames shoots forth from your outstretched fingertips. Each creature in a 15-foot cone must make a Dexterity saving throw. A creature takes 3d6 fire damage on a failed save, or half as much damage on a successful one.\nThe fire ignites any flammable objects in the area that aren't being worn or carried.",
+			"As you hold your hands with thumbs touching and fingers spread, a thin sheet of flames shoots forth from your outstretched fingertips. Each creature in a 15 foot cone must make a Dexterity saving throw. A creature takes 3d6 fire damage on a failed save, or half as much damage on a successful one.\nThe fire ignites any flammable objects in the area that aren't being worn or carried.",
 		higherLevel:
 			'When you cast this spell using a 2nd level spell slot, the damage increases by 1d6.',
 		classes: ['Sorcerer', 'Wizard'],
@@ -589,11 +589,11 @@ export const firstLevel: Spell[] = [
 		level: 1,
 		school: 'Illusion',
 		castingTime: '1 action',
-		range: '15-foot cone',
+		range: '15 foot cone',
 		components: ['V', 'S', 'M'],
 		duration: '1 round',
 		description:
-			'A dazzling array of flashing, colored light springs from your hand. Roll 6d10; the total is how many hit points of creatures this spell can affect. Creatures in a 15-foot cone originating from you are affected in ascending order of their current hit points (ignoring unconscious creatures and creatures that can’t see).\nStarting with the creature that has the lowest current hit points, each creature affected by this spell is blinded until the end of your next turn. Subtract each creature’s hit points from the total before moving on to the creature with the next lowest hit points. A creature’s hit points must be equal to or less than the remaining total for that creature to be affected.',
+			'A dazzling array of flashing, colored light springs from your hand. Roll 6d10; the total is how many hit points of creatures this spell can affect. Creatures in a 15 foot cone originating from you are affected in ascending order of their current hit points (ignoring unconscious creatures and creatures that can’t see).\nStarting with the creature that has the lowest current hit points, each creature affected by this spell is blinded until the end of your next turn. Subtract each creature’s hit points from the total before moving on to the creature with the next lowest hit points. A creature’s hit points must be equal to or less than the remaining total for that creature to be affected.',
 		higherLevel:
 			'When you cast this spell using a 2nd level spell slot, roll an additional 2d10 blind-points.',
 		classes: ['Sorcerer', 'Wizard'],
@@ -651,7 +651,7 @@ export const firstLevel: Spell[] = [
 		components: ['V', 'S', 'M'],
 		duration: 'Instantaneous',
 		description:
-			'You either create or destroy water.\nCreate Water. You create up to 10 gallons of clean water within range in an open container. Alternatively, the water falls as rain in a 30-foot cube within range, extinguishing exposed flames in the area.\nDestroy Water. You destroy up to 10 gallons of water in an open container within range. Alternatively, you destroy fog in a 30-foot cube within range.',
+			'You either create or destroy water.\nCreate Water. You create up to 10 gallons of clean water within range in an open container. Alternatively, the water falls as rain in a 30 foot cube within range, extinguishing exposed flames in the area.\nDestroy Water. You destroy up to 10 gallons of water in an open container within range. Alternatively, you destroy fog in a 30 foot cube within range.',
 		higherLevel:
 			'When you cast this spell using a 2nd level spell slot, you create or destroy 10 additional gallons of water, or the size of the cube increases by 5 feet.',
 		classes: ['Cleric', 'Druid'],
@@ -781,7 +781,7 @@ export const firstLevel: Spell[] = [
 		components: ['V', 'S'],
 		duration: 'Concentration, up to 1 minute',
 		description:
-			'Grasping weeds and vines sprout from the ground in a 20-foot square starting from a point within range. For the duration, these plants turn the ground in the area into difficult terrain.\nA creature in the area when you cast the spell must succeed on a Strength saving throw or be restrained by the entangling plants until the spell ends. A creature restrained by the plants can use its action to make a Strength check against your spell save DC. On a success, it frees itself.\nWhen the spell ends, the conjured plants wilt away.',
+			'Grasping weeds and vines sprout from the ground in a 20 foot square starting from a point within range. For the duration, these plants turn the ground in the area into difficult terrain.\nA creature in the area when you cast the spell must succeed on a Strength saving throw or be restrained by the entangling plants until the spell ends. A creature restrained by the plants can use its action to make a Strength check against your spell save DC. On a success, it frees itself.\nWhen the spell ends, the conjured plants wilt away.',
 		classes: ['Druid'],
 		tags: ['SpellSave', 'AreaOfEffect', 'Debuff']
 	},
@@ -807,7 +807,7 @@ export const firstLevel: Spell[] = [
 		components: ['V'],
 		duration: 'Concentration, up to 1 minute',
 		description:
-			"Each object in a 20-foot cube within range is outlined in blue, green, or violet light (your choice). Any creature in the area when the spell is cast is also outlined in light if it fails a Dexterity saving throw. For the duration, objects and affected creatures shed dim light in a 10-foot radius.\nAny attack roll against an affected creature or object has advantage if the attacker can see it, and the affected creature or object can't benefit from being invisible.",
+			"Each object in a 20 foot cube within range is outlined in blue, green, or violet light (your choice). Any creature in the area when the spell is cast is also outlined in light if it fails a Dexterity saving throw. For the duration, objects and affected creatures shed dim light in a 10 foot radius.\nAny attack roll against an affected creature or object has advantage if the attacker can see it, and the affected creature or object can't benefit from being invisible.",
 		classes: ['Bard', 'Druid'],
 		tags: ['SpellSave', 'AreaOfEffect', 'Debuff']
 	},
@@ -863,7 +863,7 @@ export const firstLevel: Spell[] = [
 		components: ['V', 'S'],
 		duration: 'Concentration, up to 1 hour',
 		description:
-			'You create a 20-foot-radius sphere of fog centered on a point within range. The sphere spreads around corners, and its area is heavily obscured. It lasts for the duration or until a wind of moderate or greater speed (at least 10 miles per hour) disperses it.',
+			'You create a 20 foot-radius sphere of fog centered on a point within range. The sphere spreads around corners, and its area is heavily obscured. It lasts for the duration or until a wind of moderate or greater speed (at least 10 miles per hour) disperses it.',
 		higherLevel:
 			'When you cast this spell using a 2nd level spell slot, the radius of the fog increases by 20 feet.',
 		classes: ['Druid', 'Ranger', 'Sorcerer', 'Wizard'],
@@ -891,7 +891,7 @@ export const firstLevel: Spell[] = [
 		components: ['V', 'S', 'M'],
 		duration: '1 minute',
 		description:
-			'Slick grease covers the ground in a 10-foot square centered on a point within range and turns it into difficult terrain for the duration.\nWhen the grease appears, each creature standing in its area must succeed on a Dexterity saving throw or fall prone. A creature that enters the area or ends its turn there must also succeed on a Dexterity saving throw or fall prone.',
+			'Slick grease covers the ground in a 10 foot square centered on a point within range and turns it into difficult terrain for the duration.\nWhen the grease appears, each creature standing in its area must succeed on a Dexterity saving throw or fall prone. A creature that enters the area or ends its turn there must also succeed on a Dexterity saving throw or fall prone.',
 		classes: ['Druid', 'Wizard'],
 		tags: ['SpellSave', 'AreaOfEffect', 'Debuff']
 	},
@@ -1120,7 +1120,7 @@ export const firstLevel: Spell[] = [
 		components: ['V', 'S'],
 		duration: 'Instantaneous',
 		description:
-			'All nonmagical food and drink within a 5-foot-radius sphere centered on a point of your choice within range is purified and rendered free of poison and disease.',
+			'All nonmagical food and drink within a 5 foot-radius sphere centered on a point of your choice within range is purified and rendered free of poison and disease.',
 		classes: ['Cleric', 'Druid', 'Paladin'],
 		ritual: true,
 		tags: ['Utility'],
@@ -1204,7 +1204,7 @@ export const firstLevel: Spell[] = [
 		components: ['V', 'S', 'M'],
 		duration: 'Concentration, up to 10 minutes',
 		description:
-			"You create the image of an object, a creature, or some other visible phenomenon that is no larger than a 15-foot cube. The image appears at a spot within range and lasts for the duration. The image is purely visual; it isn't accompanied by sound, smell, or other sensory effects.\nYou can use your action to cause the image to move to any spot within range. As the image changes location, you can alter its appearance so that its movements appear natural for the image. For example, if you create an image of a creature and move it, you can alter the image so that it appears to be walking.\nPhysical interaction with the image reveals it to be an illusion, because things can pass through it. A creature that uses its action to examine the image can determine that it is an illusion with a successful Intelligence (Investigation) check against your spell save DC. If a creature discerns the illusion for what it is, the creature can see through the image.",
+			"You create the image of an object, a creature, or some other visible phenomenon that is no larger than a 15 foot cube. The image appears at a spot within range and lasts for the duration. The image is purely visual; it isn't accompanied by sound, smell, or other sensory effects.\nYou can use your action to cause the image to move to any spot within range. As the image changes location, you can alter its appearance so that its movements appear natural for the image. For example, if you create an image of a creature and move it, you can alter the image so that it appears to be walking.\nPhysical interaction with the image reveals it to be an illusion, because things can pass through it. A creature that uses its action to examine the image can determine that it is an illusion with a successful Intelligence (Investigation) check against your spell save DC. If a creature discerns the illusion for what it is, the creature can see through the image.",
 		classes: ['Bard', 'Sorcerer', 'Wizard'],
 		tags: ['Utility']
 	},
@@ -1260,7 +1260,7 @@ export const firstLevel: Spell[] = [
 		components: ['V', 'S', 'M'],
 		duration: '1 hour',
 		description:
-			'This spell creates a circular, horizontal plane of force, 3 feet in diameter and 1 inch thick, that floats 3 feet above the ground in an unoccupied space of your choice that you can see within range. The disk remains for the duration, and can hold up to 500 pounds. If more weight is placed on it, the spell ends, and everything on the disk falls to the ground.\nThe disk is immobile while you are within 20 feet of it. If you move more than 20 feet away from it, the disk follows you so that it remains within 20 feet of you. It can move across uneven terrain, up or down stairs, slopes and the like, but it can’t cross an elevation change of 10 feet or more. For example, the disk can’t move across a 10-foot-deep pit, nor could it leave such a pit if it was created at the bottom.\nIf you move more than 100 feet from the disk (typically because it can’t move around an obstacle to follow you), the spell ends.',
+			'This spell creates a circular, horizontal plane of force, 3 feet in diameter and 1 inch thick, that floats 3 feet above the ground in an unoccupied space of your choice that you can see within range. The disk remains for the duration, and can hold up to 500 pounds. If more weight is placed on it, the spell ends, and everything on the disk falls to the ground.\nThe disk is immobile while you are within 20 feet of it. If you move more than 20 feet away from it, the disk follows you so that it remains within 20 feet of you. It can move across uneven terrain, up or down stairs, slopes and the like, but it can’t cross an elevation change of 10 feet or more. For example, the disk can’t move across a 10 foot-deep pit, nor could it leave such a pit if it was created at the bottom.\nIf you move more than 100 feet from the disk (typically because it can’t move around an obstacle to follow you), the spell ends.',
 		classes: ['Wizard'],
 		ritual: true,
 		tags: ['Utility'],
@@ -1288,7 +1288,7 @@ export const firstLevel: Spell[] = [
 		components: ['V', 'S'],
 		duration: 'Instantaneous',
 		description:
-			"A wave of thunderous force sweeps out from you. Each creature in a 15-foot cube originating from you must make a Constitution saving throw. On a failed save, a creature takes 2d8 thunder damage and is pushed 10 feet away from you. On a successful save, the creature takes half as much damage and isn't pushed.\nIn addition, unsecured objects that are completely within the area of effect are automatically pushed 10 feet away from you by the spell's effect, and the spell emits a thunderous boom audible out to 300 feet.",
+			"A wave of thunderous force sweeps out from you. Each creature in a 15 foot cube originating from you must make a Constitution saving throw. On a failed save, a creature takes 2d8 thunder damage and is pushed 10 feet away from you. On a successful save, the creature takes half as much damage and isn't pushed.\nIn addition, unsecured objects that are completely within the area of effect are automatically pushed 10 feet away from you by the spell's effect, and the spell emits a thunderous boom audible out to 300 feet.",
 		higherLevel:
 			'When you cast this spell using a 2nd level spell slot, the damage increases by 1d8.',
 		classes: ['Bard', 'Druid', 'Sorcerer', 'Wizard'],
@@ -1473,7 +1473,7 @@ export const secondLevel: Spell[] = [
 		components: ['V'],
 		duration: 'Concentration, up to 1 minute',
 		description:
-			'The next time you hit a creature with a weapon attack before this spell ends, the weapon gleams with astral radiance as you strike. The attack deals an extra 2d6 radiant damage to the target, which becomes visible if it is invisible, and the target sheds dim light in a 5-foot radius and can’t become invisible until the spell ends. ',
+			'The next time you hit a creature with a weapon attack before this spell ends, the weapon gleams with astral radiance as you strike. The attack deals an extra 2d6 radiant damage to the target, which becomes visible if it is invisible, and the target sheds dim light in a 5 foot radius and can’t become invisible until the spell ends. ',
 		classes: ['Paladin'],
 		tags: ['Debuff']
 	},
@@ -1486,7 +1486,7 @@ export const secondLevel: Spell[] = [
 		components: ['V', 'S'],
 		duration: 'Concentration, up to 1 minute',
 		description:
-			'You attempt to suppress strong emotions in a group of people. Each humanoid in a 20-foot-radius sphere centered on a point you choose within range must make a Charisma saving throw; a creature can choose to fail this saving throw if it wishes. If a creature fails its saving throw, choose one of the following two effects.\nYou can suppress any effect causing a target to be charmed or frightened. When this spell ends, any suppressed effect resumes, provided that its duration has not expired in the meantime.\nAlternatively, you can make a target indifferent about creatures of your choice that it is hostile toward. This indifference ends if the target is attacked or harmed by a spell or if it witnesses any of its friends being harmed. When the spell ends, the creature becomes hostile again, unless the DM rules otherwise.',
+			'You attempt to suppress strong emotions in a group of people. Each humanoid in a 20 foot-radius sphere centered on a point you choose within range must make a Charisma saving throw; a creature can choose to fail this saving throw if it wishes. If a creature fails its saving throw, choose one of the following two effects.\nYou can suppress any effect causing a target to be charmed or frightened. When this spell ends, any suppressed effect resumes, provided that its duration has not expired in the meantime.\nAlternatively, you can make a target indifferent about creatures of your choice that it is hostile toward. This indifference ends if the target is attacked or harmed by a spell or if it witnesses any of its friends being harmed. When the spell ends, the creature becomes hostile again, unless the DM rules otherwise.',
 		classes: ['Bard', 'Cleric'],
 		tags: ['SpellSave', 'AreaOfEffect', 'Debuff', 'Utility']
 	},
@@ -1552,7 +1552,7 @@ export const secondLevel: Spell[] = [
 		components: ['V', 'M'],
 		duration: 'Concentration, up to 10 minutes',
 		description:
-			"Magical darkness spreads from a point you choose within range to fill a 15-foot-radius sphere for the duration. The darkness spreads around corners. A creature with darkvision can't see through this darkness, and nonmagical light can't illuminate it.\nIf the point you choose is on an object you are holding or one that isn't being worn or carried, the darkness emanates from the object and moves with it. Completely covering the source of the darkness with an opaque object, such as a bowl or a helm, blocks the darkness.\nIf any of this spell's area overlaps with an area of light created by a spell of 2nd level or lower, the spell that created the light is dispelled.",
+			"Magical darkness spreads from a point you choose within range to fill a 15 foot-radius sphere for the duration. The darkness spreads around corners. A creature with darkvision can't see through this darkness, and nonmagical light can't illuminate it.\nIf the point you choose is on an object you are holding or one that isn't being worn or carried, the darkness emanates from the object and moves with it. Completely covering the source of the darkness with an opaque object, such as a bowl or a helm, blocks the darkness.\nIf any of this spell's area overlaps with an area of light created by a spell of 2nd level or lower, the spell that created the light is dispelled.",
 		classes: ['Druid', 'Sorcerer', 'Warlock', 'Wizard'],
 		tags: ['AreaOfEffect', 'Debuff', 'Utility']
 	},
@@ -1659,7 +1659,7 @@ export const secondLevel: Spell[] = [
 		components: ['V', 'S', 'M'],
 		duration: 'Concentration, up to 10 minutes',
 		description:
-			'You evoke a fiery blade in your free hand. The blade is similar in size and shape to a scimitar, and it lasts for the duration. If you let go of the blade, it disappears, but you can evoke the blade again as a bonus action.\nYou can use your action to make a melee spell attack with the fiery blade. On a hit, the target takes 3d6 fire damage.\nThe flaming blade sheds bright light in a 10-foot radius and dim light for an additional 10 feet.',
+			'You evoke a fiery blade in your free hand. The blade is similar in size and shape to a scimitar, and it lasts for the duration. If you let go of the blade, it disappears, but you can evoke the blade again as a bonus action.\nYou can use your action to make a melee spell attack with the fiery blade. On a hit, the target takes 3d6 fire damage.\nThe flaming blade sheds bright light in a 10 foot radius and dim light for an additional 10 feet.',
 		classes: ['Druid'],
 		tags: ['SpellAttack']
 	},
@@ -1672,7 +1672,7 @@ export const secondLevel: Spell[] = [
 		components: ['V', 'S', 'M'],
 		duration: 'Concentration, up to 1 minute',
 		description:
-			"A 5-foot-diameter sphere of fire appears in an unoccupied space of your choice within range and lasts for the duration. Any creature that ends its turn within 5 feet of the sphere must make a Dexterity saving throw. The creature takes 2d6 fire damage on a failed save, or half as much damage on a successful one.\nAs a bonus action, you can move the sphere up to 30 feet. If you ram the sphere into a creature, that creature must make the saving throw against the sphere's damage, and the sphere stops moving this turn.\nWhen you move the sphere, you can direct it over barriers up to 5 feet tall and jump it across pits up to 10 feet wide. The sphere ignites flammable objects not being worn or carried, and it sheds bright light in a 20-foot radius and dim light for an additional 20 feet.",
+			"A 5 foot-diameter sphere of fire appears in an unoccupied space of your choice within range and lasts for the duration. Any creature that ends its turn within 5 feet of the sphere must make a Dexterity saving throw. The creature takes 2d6 fire damage on a failed save, or half as much damage on a successful one.\nAs a bonus action, you can move the sphere up to 30 feet. If you ram the sphere into a creature, that creature must make the saving throw against the sphere's damage, and the sphere stops moving this turn.\nWhen you move the sphere, you can direct it over barriers up to 5 feet tall and jump it across pits up to 10 feet wide. The sphere ignites flammable objects not being worn or carried, and it sheds bright light in a 20 foot radius and dim light for an additional 20 feet.",
 		classes: ['Druid', 'Wizard'],
 		tags: ['SpellSave']
 	},
@@ -1696,7 +1696,7 @@ export const secondLevel: Spell[] = [
 		level: 2,
 		school: 'Evocation',
 		castingTime: '1 action',
-		range: '60-foot line',
+		range: '60 foot line',
 		components: ['V', 'S', 'M'],
 		duration: 'Concentration, up to 1 minute',
 		description:
@@ -1890,7 +1890,7 @@ export const secondLevel: Spell[] = [
 		components: ['V', 'S', 'M'],
 		duration: 'Concentration, up to 1 minute',
 		description:
-			'A silvery beam of pale light shines down in a 5-foot-radius, 40-foot-high cylinder centered on a point within range. Until the spell ends, dim light fills the cylinder.\nWhen a creature enters the spell’s area for the first time on a turn or starts its turn there, it is engulfed in ghostly flames that cause searing pain, and it must make a Constitution saving throw. It takes 2d10 radiant damage on a failed save, or half as much damage on a successful one.\nA shapechanger makes its saving throw with disadvantage. If it fails, it also instantly reverts to its original form and can’t assume a different form until it leaves the spell’s light.\nOn each of your turns after you cast this spell, you can use an action to move the beam up to 60 feet in any direction.',
+			'A silvery beam of pale light shines down in a 5 foot-radius, 40 foot-high cylinder centered on a point within range. Until the spell ends, dim light fills the cylinder.\nWhen a creature enters the spell’s area for the first time on a turn or starts its turn there, it is engulfed in ghostly flames that cause searing pain, and it must make a Constitution saving throw. It takes 2d10 radiant damage on a failed save, or half as much damage on a successful one.\nA shapechanger makes its saving throw with disadvantage. If it fails, it also instantly reverts to its original form and can’t assume a different form until it leaves the spell’s light.\nOn each of your turns after you cast this spell, you can use an action to move the beam up to 60 feet in any direction.',
 		classes: ['Druid'],
 		tags: ['SpellSave', 'HalfOnSave', 'AreaOfEffect']
 	},
@@ -1930,7 +1930,7 @@ export const secondLevel: Spell[] = [
 		components: ['V', 'S', 'M'],
 		duration: 'Concentration, up to 1 minute',
 		description:
-			'You craft an illusion that takes root in the mind of a creature that you can see within range. The target must make an Intelligence saving throw. On a failed save, you create a phantasmal object, creature, or other visible phenomenon of your choice that is no larger than a 10-foot cube and that is perceivable only to the target for the duration. This spell has no effect on undead or constructs.\nThe phantasm includes sound, temperature, and other stimuli, also evident only to the creature.\nThe target can use its action to examine the phantasm with an Intelligence (Investigation) check against your spell save DC. If the check succeeds, the target realizes that the phantasm is an illusion, and the spell ends.\nWhile a target is affected by the spell, the target treats the phantasm as if it were real. The target rationalizes any illogical outcomes from interacting with the phantasm. For example, a target attempting to walk across a phantasmal bridge that spans a chasm falls once it steps onto the bridge. If the target survives the fall, it still believes that the bridge exists and comes up with some other explanation for its fall - it was pushed, it slipped, or a strong wind might have knocked it off.\nAn affected target is so convinced of the phantasm’s reality that it can even take damage from the illusion. A phantasm created to appear as a creature can attack the target. Similarly, a phantasm created to appear as fire, a pool of acid, or lava can burn the target. Each round on your turn, the phantasm can deal 1d6 psychic damage to the target if it is in the phantasm’s area or within 5 feet of the phantasm, provided that the illusion is of a creature or hazard that could logically deal damage, such as by attacking. The target perceives the damage as a type appropriate to the illusion.',
+			'You craft an illusion that takes root in the mind of a creature that you can see within range. The target must make an Intelligence saving throw. On a failed save, you create a phantasmal object, creature, or other visible phenomenon of your choice that is no larger than a 10 foot cube and that is perceivable only to the target for the duration. This spell has no effect on undead or constructs.\nThe phantasm includes sound, temperature, and other stimuli, also evident only to the creature.\nThe target can use its action to examine the phantasm with an Intelligence (Investigation) check against your spell save DC. If the check succeeds, the target realizes that the phantasm is an illusion, and the spell ends.\nWhile a target is affected by the spell, the target treats the phantasm as if it were real. The target rationalizes any illogical outcomes from interacting with the phantasm. For example, a target attempting to walk across a phantasmal bridge that spans a chasm falls once it steps onto the bridge. If the target survives the fall, it still believes that the bridge exists and comes up with some other explanation for its fall - it was pushed, it slipped, or a strong wind might have knocked it off.\nAn affected target is so convinced of the phantasm’s reality that it can even take damage from the illusion. A phantasm created to appear as a creature can attack the target. Similarly, a phantasm created to appear as fire, a pool of acid, or lava can burn the target. Each round on your turn, the phantasm can deal 1d6 psychic damage to the target if it is in the phantasm’s area or within 5 feet of the phantasm, provided that the illusion is of a creature or hazard that could logically deal damage, such as by attacking. The target perceives the damage as a type appropriate to the illusion.',
 		classes: ['Bard', 'Sorcerer', 'Wizard'],
 		tags: ['SpellSave', 'Debuff']
 	},
@@ -1984,7 +1984,7 @@ export const secondLevel: Spell[] = [
 		components: ['V', 'S', 'M'],
 		duration: '1 hour',
 		description:
-			"You touch a length of rope that is up to 60 feet long. One end of the rope then rises into the air until the whole rope hangs perpendicular to the ground. At the upper end of the rope, an invisible entrance opens to an extradimensional space that lasts until the spell ends.\nThe extradimensional space can be reached by climbing to the top of the rope. The space can hold as many as eight Medium or smaller creatures. The rope can be pulled into the space, making the rope disappear from view outside the space.\nAttacks and spells can't cross through the entrance into or out of the extradimensional space, but those inside can see out of it as if through a 3-foot-by-5- foot window centered on the rope.\nAnything inside the extradimensional space drops out when the spell ends.",
+			"You touch a length of rope that is up to 60 feet long. One end of the rope then rises into the air until the whole rope hangs perpendicular to the ground. At the upper end of the rope, an invisible entrance opens to an extradimensional space that lasts until the spell ends.\nThe extradimensional space can be reached by climbing to the top of the rope. The space can hold as many as eight Medium or smaller creatures. The rope can be pulled into the space, making the rope disappear from view outside the space.\nAttacks and spells can't cross through the entrance into or out of the extradimensional space, but those inside can see out of it as if through a 3 foot-by-5- foot window centered on the rope.\nAnything inside the extradimensional space drops out when the spell ends.",
 		classes: ['Wizard'],
 		tags: ['Utility']
 	},
@@ -2024,7 +2024,7 @@ export const secondLevel: Spell[] = [
 		components: ['V', 'S', 'M'],
 		duration: 'Instantaneous',
 		description:
-			"A sudden loud ringing noise, painfully intense, erupts from a point of your choice within range. Each creature in a 10-foot-radius sphere centered on that point must make a Constitution saving throw. A creature takes 3d8 thunder damage on a failed save, or half as much damage on a successful one. A creature made of inorganic material such as stone, crystal, or metal has disadvantage on this saving throw.\nA nonmagical object that isn't being worn or carried also takes the damage if it's in the spell's area.",
+			"A sudden loud ringing noise, painfully intense, erupts from a point of your choice within range. Each creature in a 10 foot-radius sphere centered on that point must make a Constitution saving throw. A creature takes 3d8 thunder damage on a failed save, or half as much damage on a successful one. A creature made of inorganic material such as stone, crystal, or metal has disadvantage on this saving throw.\nA nonmagical object that isn't being worn or carried also takes the damage if it's in the spell's area.",
 		classes: ['Bard', 'Sorcerer', 'Warlock', 'Wizard'],
 		tags: ['SpellSave', 'HalfOnSave', 'AreaOfEffect']
 	},
@@ -2037,7 +2037,7 @@ export const secondLevel: Spell[] = [
 		components: ['V', 'S'],
 		duration: 'Concentration, up to 10 minutes',
 		description:
-			'For the duration, no sound can be created within or pass through a 20-foot-radius sphere centered on a point you choose within range. Any creature or object entirely inside the sphere is immune to thunder damage, and creatures are deafened while entirely inside it. Casting a spell that includes a verbal component is impossible there.',
+			'For the duration, no sound can be created within or pass through a 20 foot-radius sphere centered on a point you choose within range. Any creature or object entirely inside the sphere is immune to thunder damage, and creatures are deafened while entirely inside it. Casting a spell that includes a verbal component is impossible there.',
 		classes: ['Bard', 'Cleric', 'Druid', 'Ranger'],
 		ritual: true,
 		tags: ['Utility', 'Debuff']
@@ -2065,7 +2065,7 @@ export const secondLevel: Spell[] = [
 		components: ['V', 'S', 'M'],
 		duration: 'Concentration, up to 10 minutes',
 		description:
-			"The ground in a 20-foot radius centered on a point within range twists and sprouts hard spikes and thorns. The area becomes difficult terrain for the duration. When a creature moves into or within the area, it takes 2d4 piercing damage for every 5 feet it travels.\nThe transformation of the ground is camouflaged to look natural. Any creature that can't see the area at the time the spell is cast must make a Wisdom (Perception) check against your spell save DC to recognize the terrain as hazardous before entering it.",
+			"The ground in a 20 foot radius centered on a point within range twists and sprouts hard spikes and thorns. The area becomes difficult terrain for the duration. When a creature moves into or within the area, it takes 2d4 piercing damage for every 5 feet it travels.\nThe transformation of the ground is camouflaged to look natural. Any creature that can't see the area at the time the spell is cast must make a Wisdom (Perception) check against your spell save DC to recognize the terrain as hazardous before entering it.",
 		classes: ['Druid', 'Ranger'],
 		tags: ['AreaOfEffect']
 	},
@@ -2117,7 +2117,7 @@ export const secondLevel: Spell[] = [
 		components: ['V', 'S', 'M'],
 		duration: 'Concentration, up to 1 hour',
 		description:
-			"You conjure a mass of thick, sticky webbing at a point of your choice within range. The webs fill a 20-foot cube from that point for the duration. The webs are difficult terrain and lightly obscure their area.\nIf the webs aren't anchored between two solid masses (such as walls or trees) or layered across a floor, wall, or ceiling, the conjured web collapses on itself, and the spell ends at the start of your next turn. Webs layered over a flat surface have a depth of 5 feet.\nEach creature that starts its turn in the webs or that enters them during its turn must make a Dexterity saving throw. On a failed save, the creature is restrained as long as it remains in the webs or until it breaks free.\nA creature restrained by the webs can use its action to make a Strength check against your spell save DC. If it succeeds, it is no longer restrained.\nThe webs are flammable. Any 5-foot cube of webs exposed to fire burns away in 1 round, dealing 2d4 fire damage to any creature that starts its turn in the fire.",
+			"You conjure a mass of thick, sticky webbing at a point of your choice within range. The webs fill a 20 foot cube from that point for the duration. The webs are difficult terrain and lightly obscure their area.\nIf the webs aren't anchored between two solid masses (such as walls or trees) or layered across a floor, wall, or ceiling, the conjured web collapses on itself, and the spell ends at the start of your next turn. Webs layered over a flat surface have a depth of 5 feet.\nEach creature that starts its turn in the webs or that enters them during its turn must make a Dexterity saving throw. On a failed save, the creature is restrained as long as it remains in the webs or until it breaks free.\nA creature restrained by the webs can use its action to make a Strength check against your spell save DC. If it succeeds, it is no longer restrained.\nThe webs are flammable. Any 5 foot cube of webs exposed to fire burns away in 1 round, dealing 2d4 fire damage to any creature that starts its turn in the fire.",
 		classes: ['Druid', 'Sorcerer', 'Wizard'],
 		tags: ['SpellSave', 'AreaOfEffect', 'Debuff']
 	},
@@ -2130,7 +2130,7 @@ export const secondLevel: Spell[] = [
 		components: ['V', 'S'],
 		duration: '10 minutes',
 		description:
-			"You create a magical zone that guards against deception in a 15-foot-radius sphere centered on a point of your choice within range. Until the spell ends, a creature that enters the spell's area for the first time on a turn or starts its turn there must make a Charisma saving throw. On a failed save, a creature can't speak a deliberate lie while in the radius. You know whether each creature succeeds or fails on its saving throw.\nAn affected creature is aware of the spell and can thus avoid answering questions to which it would normally respond with a lie. Such a creature can be evasive in its answers as long as it remains within the boundaries of the truth.",
+			"You create a magical zone that guards against deception in a 15 foot-radius sphere centered on a point of your choice within range. Until the spell ends, a creature that enters the spell's area for the first time on a turn or starts its turn there must make a Charisma saving throw. On a failed save, a creature can't speak a deliberate lie while in the radius. You know whether each creature succeeds or fails on its saving throw.\nAn affected creature is aware of the spell and can thus avoid answering questions to which it would normally respond with a lie. Such a creature can be evasive in its answers as long as it remains within the boundaries of the truth.",
 		classes: ['Bard', 'Cleric', 'Paladin'],
 		tags: ['SpellSave', 'AreaOfEffect', 'Debuff']
 	}

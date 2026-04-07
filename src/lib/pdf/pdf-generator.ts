@@ -207,12 +207,12 @@ async function fillFrontPage(
 	});
 
 	let attacks_names_string: string = "";
-	let attacks_to_hit_string: string = "";
+	let AttacksToHitString: string = "";
 	let attacks_damage_string: string = "";
 	let attacks_notes_string: string = "";
 	for (let i = 0; i < attacks_names.length; i++) {
 		attacks_names_string += attacks_names[i] + '\n';
-		attacks_to_hit_string += attacks_to_hit[i] + '\n';
+		AttacksToHitString += attacks_to_hit[i] + '\n';
 		attacks_damage_string += attacks_damage[i] + '\n';
 		attacks_notes_string += attacks_notes[i] + '\n';
 	}
@@ -229,7 +229,7 @@ async function fillFrontPage(
 
 		if (damageCantrips.length >= 1) {
 			attacks_names_string += '\n';
-			attacks_to_hit_string += '\n';
+			AttacksToHitString += '\n';
 			attacks_damage_string += '\n';
 			attacks_notes_string += '\n';
 		}
@@ -241,21 +241,37 @@ async function fillFrontPage(
 			let spellStats = findSpellStats(data);
 
 			let spellAttack = (await spellStats).spellAttack;
-			let spellSave = (await spellStats).spellSave;
+			let spellSaveDC = (await spellStats).spellSave;
 
 			if (!spellAttack) {spellAttack = '+0'}
-			if (!spellSave) {spellSave = '12'}
+			if (!spellSaveDC) {spellSaveDC = '12'}
 
 			let cantripTags = damageCantrips[i].tags
 			// Spell Attack cantrips: format like 'd20 + 5'
 			if (cantripTags && cantripTags.includes('SpellAttack')) {
-				attacks_to_hit_string += 'd20 ' + spellAttack.substring(0,1) + ' ' + spellAttack.substring(1) + '\n';
+				AttacksToHitString += 'd20 ' + spellAttack.substring(0,1) + ' ' + spellAttack.substring(1) + '\n';
 			// Spell Save cantrips: format like 'DC 12'
 			} else if (cantripTags && cantripTags.includes('SpellSave')) {
-				attacks_to_hit_string += 'DC ' + spellSave + '\n';
+				// TODO: Add spell save type (DC 10 WHAT? DC 10 WIS)
+				let saveType = '';
+				if (damageCantrips[i].description.toLowerCase().includes('strength')) {
+					saveType = ' STR';
+				} else if (damageCantrips[i].description.toLowerCase().includes('dexterity')) {
+					saveType = ' DEX';
+				} else if (damageCantrips[i].description.toLowerCase().includes('constitution')) {
+					saveType = ' CON';
+				} else if (damageCantrips[i].description.toLowerCase().includes('intelligence')) {
+					saveType = ' INT';
+				} else if (damageCantrips[i].description.toLowerCase().includes('wisdom')) {
+					saveType = ' WIS';
+				} else if (damageCantrips[i].description.toLowerCase().includes('charisma')) {
+					saveType = ' CHA';
+				} 
+
+				AttacksToHitString += 'DC ' + spellSaveDC + saveType + '\n';
 			// If something goes wrong, still increment our newline spacing
 			} else {
-				attacks_to_hit_string += '\n';
+				AttacksToHitString += '\n';
 			}
 
 			// Cantrip damage & type
@@ -275,7 +291,7 @@ async function fillFrontPage(
 	}
 
 	fillFormField(form, 'attacks_names', attacks_names_string, 10.5);
-	fillFormField(form, 'attacks_to_hit', attacks_to_hit_string, 10.5);
+	fillFormField(form, 'attacks_to_hit', AttacksToHitString, 10.5);
 	fillFormField(form, 'attacks_damage', attacks_damage_string, 10.5);
 	fillFormField(form, 'attacks_notes', attacks_notes_string, 10.5);
 	
@@ -712,6 +728,11 @@ function chunkLinesWordBumped(input: string, chunkSizeMax: number) {
 		// Progress X characters forward, but do not go out of bounds
 		endIndex += chunkSizeMax;
 
+		// Check for our bold tag, since it shouldnt count towards characters per line
+		if (input.substring(startIndex, endIndex+1).includes('<bold:>')) {
+			endIndex += 7;
+		}
+
 		// If we reach the end of this string right away, we can capture the rest in one chunk now
 		if (endIndex > input.length-1) {
 			endIndex = input.length-1
@@ -805,7 +826,7 @@ async function fillFeaturesPage(
 ) {
 	const form = page.getForm()
 
-	const charactersPerRow = 58;
+	const charactersPerRow = 56;
 	const maxLinesPerColumn = 65;
 
 	let featureContent = formatFeaturesForPDF(data.features, data.characterReference, 'all');
@@ -1027,7 +1048,7 @@ async function findSpellStats(data: CharacterSheetData): Promise<{
 
 	// If the mod is positive, we need to manually add a plus
 	let spellAttackString = spellAbilityMod >= 0 ? '+' : '';
-	spellAttackString += String(spellAbilityMod)
+	spellAttackString += String(spellAbilityMod + 2)
 
 	let spellSaveString = String(10 + spellAbilityMod)
 	
@@ -1135,7 +1156,7 @@ async function fillSpellsPage(
 	let spellAttack = (await spellStats).spellAttack;
 	let spellSave = (await spellStats).spellSave;
 
-	let fontSize = 6;
+	let fontSize = 4;
 
 	// Format page 1
 	if (form1) {

@@ -959,9 +959,15 @@ export function formatSpells(character: Character): string {
 			} else {
 				durationText = spell.duration;
 			}
+			durationText = durationText.replace('minutes', 'min.')
+			durationText = durationText.replace('minute', 'min.')
+			durationText = durationText.replace('hours', 'hr.')
+			durationText = durationText.replace('hour', 'hr.')
 
 			// Add casting details
-			allSpellsText += `<bold:>( ${spell.castingTime} | ${spell.range.replace('feet', 'ft.')} | ${durationText} )\n`;
+			let spellRange = spell.range.replace('feet', 'ft.').replace('foot', 'ft.');
+			console.log('spellRange: ', spellRange);
+			allSpellsText += `<bold:>( ${spell.castingTime} | ${spellRange} | ${durationText} )\n`;
 			
 			// Add description
 			allSpellsText += spell.description + '\n\n';
@@ -1013,9 +1019,14 @@ export function formatSpells(character: Character): string {
 				} else {
 					durationText = spell.duration;
 				}
+				durationText = durationText.replace('minutes', 'min.')
+				durationText = durationText.replace('minute', 'min.')
+				durationText = durationText.replace('hours', 'hr.')
+				durationText = durationText.replace('hour', 'hr.')
 
 				// Add casting details
-				allSpellsText += `<bold:>( ${spell.castingTime}  |  ${spell.range.replace('feet', 'ft.')}  |  ${durationText} )\n`;
+				let spellRange = spell.range.replace('feet', 'ft.').replace('foot', 'ft.');
+				allSpellsText += `<bold:>( ${spell.castingTime}  |  ${spellRange}  |  ${durationText} )\n`;
 				
 				// Add description
 				allSpellsText += spell.description;

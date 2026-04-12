@@ -143,6 +143,20 @@ export const dragonborn: SpeciesData = {
 		abilityScoreChoicePrompt,
 		draconicElementPrompt,
 		breathShapePrompt,
-		...speciesFeatures
+		...speciesFeatures,
+		{
+			name: 'Language',
+			id: 'dragonborn_languages',
+			description: {
+				blocks: [
+					{type: 'text', text: 'You can speak, read, and write Common and Draconic. Draconic is thought to be one of the oldest languages and is often used in the study of magic. The language sounds harsh to most other creatures and includes numerous hard consonants and sibilants.'}
+				]
+			},
+			source: 'dragonborn',
+			effects: [
+				{ target: 'languages', action: 'add', value: 'Common'},
+				{ target: 'languages', action: 'add', value: 'Draconic'},
+			]
+		}
 	]
 };

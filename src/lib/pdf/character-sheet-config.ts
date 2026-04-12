@@ -345,6 +345,7 @@ export const PDF_CONFIG = {
 		['Front Page', '/pdf-templates/page_one.pdf'],
 		['Two Column Page', '/pdf-templates/page_two.pdf'],
 		['Equipment Page', '/pdf-templates/page_three.pdf'],
+		['Equipment Languages Notes', '/pdf-templates/equipment-languages-notes.pdf'],
 		
 		['Spells Basic', '/pdf-templates/spells_basic.pdf'],
 		['Spells Full Caster', '/pdf-templates/spells_full_caster.pdf'],

@@ -22,8 +22,7 @@ import { rogue } from '$lib/data/classes/rogue';
 import { sorcerer } from '$lib/data/classes/sorcerer';
 import { warlock } from '$lib/data/classes/warlock';
 import { wizard } from '$lib/data/classes/wizard';
-import { spells, getSpellByName } from '$lib/data/spells';
-import type { Spell } from '$lib/data/spells';
+import { spells, getSpellByName, getSpellAccessForCharacter, type Spell } from '$lib/data/spells';
 
 export interface CharacterSheetData {
 	// Page 1 - Header
@@ -904,7 +903,23 @@ function estimateSpellLines(spell: Spell, maxWidth: number, fontSize: number): n
  * Handles overflow to second column
  */
 export function formatSpells(character: Character): string {
-	if (!character.spells || character.spells.length === 0) {
+	
+	// Check for any automatic spells
+	let spellAccess = getSpellAccessForCharacter(character)
+	let autoSpells: string[] = []
+
+	if (spellAccess) {
+		for (let i = 0; i < spellAccess.length; i++) {
+			if (!spellAccess[i].chooseable) {
+				autoSpells.push.apply(autoSpells, spellAccess[i].spells)
+				if (spellAccess[i].cantrips) {
+					autoSpells.push.apply(autoSpells, spellAccess[i].cantrips)
+				}
+			}
+		}
+	}
+
+	if (!character.spells || (character.spells.length === 0 && autoSpells.length === 0)) {
 		return '';
 	}
 	
@@ -918,6 +933,9 @@ export function formatSpells(character: Character): string {
 		return '';
 	}).filter(name => name !== '');
 	
+	spellNames.push.apply(spellNames, autoSpells)
+	spellNames.sort()
+
 	if (spellNames.length === 0) {
 		return '';
 	}

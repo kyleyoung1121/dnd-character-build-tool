@@ -102,6 +102,20 @@ export const rockGnome: SpeciesData = {
 				{ target: 'features', action: 'add', value: 'Tinker' },
 				{ target: 'proficiencies', action: 'add', value: "Tinker's tools" }
 			]
+		},
+		{
+			name: 'Languages',
+			id: 'rock_gnome_languages',
+			description: {
+				blocks: [
+					{type: 'text', text: 'You can speak, read, and write Common and Gnomish. The Gnomish language, which uses the Dwarvish script, is renowned for its technical treatises and its catalogs of knowledge about the natural world.'}
+				]
+			},
+			source: 'rock_gnome',
+			effects: [
+				{ target: 'languages', action: 'add', value: 'Common'},
+				{ target: 'languages', action: 'add', value: 'Gnomish'},
+			]
 		}
 	]
 };

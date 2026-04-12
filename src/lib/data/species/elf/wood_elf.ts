@@ -104,6 +104,20 @@ export const woodElf: SpeciesData = {
 			},
 			source: 'wood_elf',
 			effects: [{ target: 'features', action: 'add', value: 'Mask of the Wild' }]
+		},
+		{
+			name: 'Languages',
+			id: 'wood_elf_languages',
+			description: {
+				blocks: [
+					{type: 'text', text: 'You can speak, read, and write Common and Elvish. Elvish is fluid, with subtle intonations and intricate grammar. Elven literature is rich and varied, and their songs and poems are famous among other races. Many bards learn their language so they can add Elvish ballads to their repertoires.'}
+				]
+			},
+			source: 'wood_elf',
+			effects: [
+				{ target: 'languages', action: 'add', value: 'Common'},
+				{ target: 'languages', action: 'add', value: 'Elvish'},
+			]
 		}
 	]
 };

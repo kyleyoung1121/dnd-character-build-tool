@@ -94,6 +94,60 @@ export const highElf: SpeciesData = {
 			},
 			source: 'high_elf',
 			effects: []
-		}
+		},
+		{
+			name: 'Languages',
+			id: 'high_elf_languages',
+			description: {
+				blocks: [
+					{type: 'text', text: 'You can speak, read, and write Common and Elvish. Elvish is fluid, with subtle intonations and intricate grammar. Elven literature is rich and varied, and their songs and poems are famous among other races. Many bards learn their language so they can add Elvish ballads to their repertoires.'}
+				]
+			},
+			source: 'high_elf',
+			effects: [
+				{ target: 'languages', action: 'add', value: 'Common'},
+				{ target: 'languages', action: 'add', value: 'Elvish'},
+				
+			]
+		},
+		{
+			name: 'Extra Language',
+			id: 'high_elf_extra_language',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You can speak, read, and write one extra language of your choice.' },
+				]
+			},
+			source: 'high_elf',
+			featureOptions: {
+				placeholderText: 'Select 1 language',
+				options: [
+					'Common',
+					'Dwarvish',
+					'Elvish',
+					'Giant',
+					'Gnomish',
+					'Goblin',
+					'Halfling',
+					'Orc',
+					'Abyssal',
+					'Celestial',
+					'Draconic',
+					'Deep Speech',
+					'Infernal',
+					'Primordial',
+					'Sylvan',
+					'Undercommon'
+				],
+				numPicks: 1
+			},
+			effects: [
+				{
+					target: 'languages',
+					action: 'add',
+					value: '{userChoice}'
+				}
+			]
+		},
 	]
 };

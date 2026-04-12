@@ -94,6 +94,20 @@ export const forestGnome: SpeciesData = {
 			},
 			source: 'forest_gnome',
 			effects: [{ target: 'features', action: 'add', value: 'Speak with Small Beasts' }]
+		},
+		{
+			name: 'Languages',
+			id: 'forest_gnome_languages',
+			description: {
+				blocks: [
+					{type: 'text', text: 'You can speak, read, and write Common and Gnomish. The Gnomish language, which uses the Dwarvish script, is renowned for its technical treatises and its catalogs of knowledge about the natural world.'}
+				]
+			},
+			source: 'forest_gnome',
+			effects: [
+				{ target: 'languages', action: 'add', value: 'Common'},
+				{ target: 'languages', action: 'add', value: 'Gnomish'},
+			]
 		}
 	]
 };

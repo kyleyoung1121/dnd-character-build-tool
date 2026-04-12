@@ -37,5 +37,59 @@ export const human: SpeciesData = {
 	speed: '30 ft.',
 	size: 'Medium',
 	knownLanguages: ['Common', 'One extra language of your choice'],
-	speciesFeatures: [abilityScoreChoicePrompt]
+	speciesFeatures: [
+		abilityScoreChoicePrompt,
+		{
+			name: 'Language',
+			id: 'human_languages',
+			description: {
+				blocks: [
+					{type: 'text', text: 'You can speak, read, and write Common.'}
+				]
+			},
+			source: 'human',
+			effects: [
+				{ target: 'languages', action: 'add', value: 'Common'},
+			]
+		},
+		{
+			name: 'Extra Language',
+			id: 'human_extra_language',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You can speak, read, and write one extra language of your choice.' },
+				]
+			},
+			source: 'human',
+			featureOptions: {
+				placeholderText: 'Select 1 language',
+				options: [
+					'Common',
+					'Dwarvish',
+					'Elvish',
+					'Giant',
+					'Gnomish',
+					'Goblin',
+					'Halfling',
+					'Orc',
+					'Abyssal',
+					'Celestial',
+					'Draconic',
+					'Deep Speech',
+					'Infernal',
+					'Primordial',
+					'Sylvan',
+					'Undercommon'
+				],
+				numPicks: 1
+			},
+			effects: [
+				{
+					target: 'languages',
+					action: 'add',
+					value: '{userChoice}'
+				}
+			]
+		},
+	]
 };

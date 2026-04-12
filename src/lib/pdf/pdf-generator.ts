@@ -11,7 +11,7 @@ import type { CharacterSheetData } from './character-data-mapper';
 import { formatSpells } from './character-data-mapper';
 import type { FieldConfig, TextAreaConfig } from './character-sheet-config';
 import { beasts } from '$lib/data/beasts/index';
-import { spells, type Spell } from '$lib/data/spells';
+import { spells, getSpellAccessForCharacter, type Spell } from '$lib/data/spells';
 import { formatFeatureForPDF, formatFeaturesForPDF } from '$lib/data/features/feature-data';
 import { druid } from '$lib/data/classes/druid';
 import { get } from 'svelte/store';
@@ -911,9 +911,8 @@ async function fillEquipmentPage(
 	}
 
 	if (packTextFormatted) {
-		fillFormField(form, 'page_title_top', 'Equipment', 12, TextAlignment.Center);
-		fillFormField(form, 'column_one_top', packTextFormatted, 12);
-		fillFormField(form, 'column_two_top', remainingText, 12);
+		fillFormField(form, 'page_title_top_left', 'Equipment', 12, TextAlignment.Center);
+		fillFormField(form, 'top_left_text', packTextFormatted + '\n' + remainingText);
 	} else {
 
 		let equipmentSplit = data.equipment.split('\n')
@@ -922,15 +921,19 @@ async function fillEquipmentPage(
 			equipmentSplitBulleted.push('•  ' + equipmentSplit[i]);
 		}
 
-		fillFormField(form, 'page_title_top', 'Equipment', 12, TextAlignment.Center);
-		fillFormField(form, 'column_one_top', equipmentSplitBulleted.join('\n'), 12);
-		fillFormField(form, 'column_two_top', '', 12);
+		fillFormField(form, 'page_title_top_left', 'Equipment', 12, TextAlignment.Center);
+		fillFormField(form, 'top_left_text', equipmentSplitBulleted.join('\n'));
 	}
+
+	let languagesText = ''
+	for (let i = 0; i < data.characterReference.languages.length; i++) {
+		languagesText += '•  ' + data.characterReference.languages[i] + '\n';
+	}
+	fillFormField(form, 'top_right_text', languagesText);
+	fillFormField(form, 'page_title_top_right', 'Languages', 12, TextAlignment.Center);
 
 	// Character Notes is left blank for the player to fill in after printing
 	fillFormField(form, 'page_title_bottom', 'Character Notes', 12, TextAlignment.Center);
-	fillFormField(form, 'column_one_bottom', '');
-	fillFormField(form, 'column_two_bottom', '');
 
 	form.flatten()
 }
@@ -960,13 +963,9 @@ async function fillBeastsPage(
 		return;
 	}
 
-	console.log('data.characterReference.beasts: ', data.characterReference.beasts);
-
 	for (let i = 0; i < data.characterReference.beasts.length; i++) {
 		const beastName = data.characterReference.beasts[i].name;
-		console.log('beastName: ', beastName);
 		const beastFilteringResult = beasts.filter((beast) => beast.name == beastName);
-		console.log('beastFilteringResult: ', beastFilteringResult);
 		let beast;
 		if (beastFilteringResult) {
 			beast = beastFilteringResult[0]
@@ -975,11 +974,9 @@ async function fillBeastsPage(
 		}
 
 		if (!beast) {
-			console.log('beast is undefined, continuing on');
 			continue;
 		}
 		
-		console.log('beast:', beast);
 
 		let beastSpeed
 		if (beast) {
@@ -1053,8 +1050,6 @@ async function fillBeastsPage(
 
 		beastsContent += '\n'
 	}
-
-	console.log('beastsContent: ', beastsContent);
 
 	let columnOneContent = '';
 	let columnOneBoldContent = '';
@@ -1240,7 +1235,7 @@ async function fillSpellsPage(
 	}
 
 	const charactersPerRow = 50;
-	let maxLinesPerColumn = 60;
+	let maxLinesPerColumn = 45;
 	// For spells, we want to leave room for Spell Save, Spell Attack, and Spell Slots. So, both columns should have a couple leading lines of whitespace
 	const whitespaceLines = 1;
 	maxLinesPerColumn -= whitespaceLines;
@@ -1364,14 +1359,16 @@ async function fillSpellsPage(
  */
 export async function generateCharacterSheet(data: CharacterSheetData): Promise<string> {
 	try {
+		
+		console.log('character data: ', data.characterReference);
+		console.log('spell access?: ', getSpellAccessForCharacter(data.characterReference));
+
 		// Load templates
 		const frontPageDoc = await loadTemplate('Front Page');
 		const featuresPageDoc = await loadTemplate('Two Column Page');
-		const equipmentPageDoc = await loadTemplate('Equipment Page');
+		const equipmentPageDoc = await loadTemplate('Equipment Languages Notes');
 
 		const beastsPageDoc = await loadTemplate('Two Column Page');
-
-		console.log('loaded beastsPageDoc: ', beastsPageDoc);
 
 		const spellsBasicPageDoc = await loadTemplate('Spells Basic');
 		const spellsPageTwoDoc = await loadTemplate('Spells Basic');
@@ -1464,12 +1461,9 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 
 
 		// Check beast usage
-		console.log('checking beast usage');
 		if (hasBeastAccess(char)) {
-			console.log('has beast usage, filling beasts page');
 			await fillBeastsPage(beastsPageDoc, data, templateFonts.get(beastsPageDoc)[3], templateFonts.get(beastsPageDoc)[1], templateFonts.get(beastsPageDoc)[2]);
 			const [beastsPageCopy] = await freshPdfDoc.copyPages(beastsPageDoc, [0])
-			console.log('adding beast page to fresh pdf doc');
 			freshPdfDoc.addPage(beastsPageCopy)
 		}
 		

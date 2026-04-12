@@ -135,6 +135,20 @@ export const mountainDwarf: SpeciesData = {
 		combatTraining,
 		armorTraining,
 		toolProficiencyPrompt,
-		stonecunning
+		stonecunning,
+		{
+			name: 'Languages',
+			id: 'mountain_dwarf_languages',
+			description: {
+				blocks: [
+					{type: 'text', text: 'You can speak, read, and write Common and Dwarvish. Dwarvish is full of hard consonants and guttural sounds, and those characteristics spill over into whatever other language a dwarf might speak.'}
+				]
+			},
+			source: 'mountain_dwarf',
+			effects: [
+				{ target: 'languages', action: 'add', value: 'Common'},
+				{ target: 'languages', action: 'add', value: 'Dwarvish'},
+			]
+		}
 	]
 };

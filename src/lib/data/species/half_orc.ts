@@ -72,6 +72,20 @@ export const halfOrc: SpeciesData = {
 			},
 			source: 'half_orc',
 			effects: [{ target: 'features', action: 'add', value: 'Savage Attacks' }]
+		},
+		{
+			name: 'Language',
+			id: 'half_orc_languages',
+			description: {
+				blocks: [
+					{type: 'text', text: 'You can speak, read, and write Common and Orc. Orc is a harsh, grating language with hard consonants. It has no script of its own but is written in the Dwarvish script.'}
+				]
+			},
+			source: 'half_orc',
+			effects: [
+				{ target: 'languages', action: 'add', value: 'Common'},
+				{ target: 'languages', action: 'add', value: 'Orc'},
+			]
 		}
 	]
 };

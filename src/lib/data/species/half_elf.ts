@@ -110,6 +110,59 @@ export const halfElf: SpeciesData = {
 			source: 'half_elf',
 			effects: [{ target: 'features', action: 'add', value: 'Fey Ancestry' }]
 		},
-		skillVersatilityPrompt
+		skillVersatilityPrompt,
+		{
+			name: 'Language',
+			id: 'half_elf_languages',
+			description: {
+				blocks: [
+					{type: 'text', text: 'You can speak, read, and write Common and Elvish'}
+				]
+			},
+			source: 'half_elf',
+			effects: [
+				{ target: 'languages', action: 'add', value: 'Common'},
+				{ target: 'languages', action: 'add', value: 'Elvish'},
+			]
+		},
+		{
+			name: 'Extra Language',
+			id: 'half_elf_extra_language',
+			description: {
+				blocks: [
+					{ type: 'text', text: 'You can speak, read, and write one extra language of your choice.' },
+				]
+			},
+			source: 'half_elf',
+			featureOptions: {
+				placeholderText: 'Select 1 language',
+				options: [
+					'Common',
+					'Dwarvish',
+					'Elvish',
+					'Giant',
+					'Gnomish',
+					'Goblin',
+					'Halfling',
+					'Orc',
+					'Abyssal',
+					'Celestial',
+					'Draconic',
+					'Deep Speech',
+					'Infernal',
+					'Primordial',
+					'Sylvan',
+					'Undercommon'
+				],
+				numPicks: 1
+			},
+			effects: [
+				{
+					target: 'languages',
+					action: 'add',
+					value: '{userChoice}'
+				}
+			]
+		},
 	]
 };

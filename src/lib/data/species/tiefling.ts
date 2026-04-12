@@ -72,6 +72,20 @@ export const tiefling: SpeciesData = {
 			source: 'tiefling',
 			importance: 'minor',
 			effects: [{ target: 'features', action: 'add', value: 'Infernal Legacy' }]
+		},
+		{
+			name: 'Language',
+			id: 'tiefling_languages',
+			description: {
+				blocks: [
+					{type: 'text', text: 'You can speak, read, and write Common and Infernal.'}
+				]
+			},
+			source: 'tiefling',
+			effects: [
+				{ target: 'languages', action: 'add', value: 'Common'},
+				{ target: 'languages', action: 'add', value: 'Infernal'},
+			]
 		}
 	]
 };

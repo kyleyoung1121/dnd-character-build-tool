@@ -32,6 +32,9 @@ export type Character = {
 	speed: number | null;
 	size: string | null;
 
+	feats?: string[];
+	elementalAdeptElement?: string;
+	
 	// Optional fields that appear later in flow
 	subclass?: string;
 	subrace?: string;

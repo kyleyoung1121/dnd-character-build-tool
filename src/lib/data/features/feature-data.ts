@@ -179,31 +179,36 @@ function serializeFeatureDescription(description: FeatureDescription, character?
 					
 					// Replace dynamic placeholders with character-specific values
 					if (character) {
-						//console.log(`[PLACEHOLDER] Processing text block:`, text.substring(0, 50));
-						//console.log(`[PLACEHOLDER] Character dragonborn properties:`, {
-						// 	dragonbornElement: character.dragonbornElement,
-						// 	dragonbornBreathShape: character.dragonbornBreathShape
-						// });
 						
-						// Dragonborn element placeholder
-						if (text.includes('{{element}}')) {
-							//console.log(`[PLACEHOLDER] Found {{element}} placeholder`);
+						// Dragonborn - breath weapon element substitution
+						if (text.includes('A creature takes 2d6 damage on a failed save, and half as much damage on a successful one. You can use your breath weapon once per short or long rest.')) {
 							if (character.dragonbornElement) {
-								//console.log(`[PLACEHOLDER] Replacing with:`, character.dragonbornElement);
-								text = text.replace(/\{\{element\}\}/g, character.dragonbornElement.toLowerCase());
-							} else {
-								//console.log(`[PLACEHOLDER] dragonbornElement is not set on character`);
-							}
+								text = 'A creature takes 2d6 ' + character.dragonbornElement.toLowerCase() + ' damage on a failed save, and half as much damage on a successful one. You can use your breath weapon once per short or long rest.'
+							} 
 						}
-						// Dragonborn breath shape placeholder
-						if (text.includes('{{shape}}')) {
-							//console.log(`[PLACEHOLDER] Found {{shape}} placeholder`);
+
+						// Dragonborn - damage resistance element substitution
+						if (text.includes('You have elemental damage resistance based on your selected ancestry.')) {
+							if (character.dragonbornElement) {
+								text = 'You have resistance to ' + character.dragonbornElement.toLowerCase() + ' damage.'
+							} 
+						}
+
+						// Dragonborn - breath weapon shape substitution
+						if (text.includes('You can use your action to exhale destructive energy. Each creature within range must make a Dexterity saving throw. ')) {
 							if (character.dragonbornBreathShape) {
-								//console.log(`[PLACEHOLDER] Replacing with:`, character.dragonbornBreathShape);
-								text = text.replace(/\{\{shape\}\}/g, character.dragonbornBreathShape.toLowerCase());
-							} else {
-								//console.log(`[PLACEHOLDER] dragonbornBreathShape is not set on character`);
-							}
+								text = 'You can use your action to exhale destructive energy. Each creature within a ' + character.dragonbornBreathShape.toLowerCase() + ' must make a Dexterity saving throw. '
+							} 
+						}
+
+
+						// Elemental Adept - element substitution
+						if (text.includes('Spells you cast ignore resistance to that type. In addition, when your spells deal damage of that type, you may treat any 1 on a damage dice as a 2.')) {
+							if (character.elementalAdeptElement) {
+								let element: string = character.elementalAdeptElement
+								element = String(element).toLowerCase()
+								text = 'Spells you cast ignore resistance to ' + element + ' damage. In addition, when your spells deal ' + element + ' damage, you may treat any 1 on a damage dice as a 2.'
+							} 
 						}
 					}
 					

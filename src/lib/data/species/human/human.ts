@@ -40,24 +40,11 @@ export const human: SpeciesData = {
 	speciesFeatures: [
 		abilityScoreChoicePrompt,
 		{
-			name: 'Language',
-			id: 'human_languages',
-			description: {
-				blocks: [
-					{type: 'text', text: 'You can speak, read, and write Common.'}
-				]
-			},
-			source: 'human',
-			effects: [
-				{ target: 'languages', action: 'add', value: 'Common'},
-			]
-		},
-		{
-			name: 'Extra Language',
+			name: 'Languages',
 			id: 'human_extra_language',
 			description: {
 				blocks: [
-					{ type: 'text', text: 'You can speak, read, and write one extra language of your choice.' },
+					{ type: 'text', text: 'You can speak, read, and write common & one extra language of your choice.' },
 				]
 			},
 			source: 'human',
@@ -88,7 +75,8 @@ export const human: SpeciesData = {
 					target: 'languages',
 					action: 'add',
 					value: '{userChoice}'
-				}
+				},
+				{ target: 'languages', action: 'add', value: 'Common'},
 			]
 		},
 	]

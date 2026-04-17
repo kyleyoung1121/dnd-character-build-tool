@@ -82,7 +82,7 @@ const speciesFeatures: FeaturePrompt[] = [
 			blocks: [
 				{ 
 					type: 'text', 
-					text: 'You can use your action to exhale destructive energy. Each creature in a {{shape}} must make a Dexterity saving throw. '
+					text: 'You can use your action to exhale destructive energy. Each creature within range must make a Dexterity saving throw. '
 				},
 				{
 					type: 'computed-replacement',
@@ -97,7 +97,7 @@ const speciesFeatures: FeaturePrompt[] = [
 				},
 				{
 					type: 'text',
-					text: 'A creature takes 2d6 {{element}} damage on a failed save, and half as much damage on a successful one. You can use your breath weapon once per short or long rest.'
+					text: 'A creature takes 2d6 damage on a failed save, and half as much damage on a successful one. You can use your breath weapon once per short or long rest.'
 				}
 			]
 		},
@@ -115,7 +115,7 @@ const speciesFeatures: FeaturePrompt[] = [
 		id: 'dragonborn_damage_resistance',
 		description: {
 			blocks: [
-				{ type: 'text', text: 'You have resistance to {{element}} damage.' }
+				{ type: 'text', text: 'You have elemental damage resistance based on your selected ancestry.' }
 			]
 		},
 		source: 'dragonborn',

@@ -2588,9 +2588,23 @@ export const spellAccess: SpellAccess[] = [
 
 	// Monk Elemental Disciples (Way of Four Elements)
 	{
-		source: 'subclass',
-		sourceName: 'Way of the Four Elements',
-		spells: ['Burning Hands', 'Thunderwave'], // Example elemental disciplines that cast spells
+		source: 'feature',
+		sourceName: 'Fist of Four Thunders',
+		spells: ['Thunderwave'],
+		cantrips: [],
+		chooseable: false // Ki-based elemental disciplines
+	},
+	{
+		source: 'feature',
+		sourceName: 'Rush of Gale Spirits',
+		spells: ['Gust of Wind'],
+		cantrips: [],
+		chooseable: false // Ki-based elemental disciplines
+	},
+	{
+		source: 'feature',
+		sourceName: 'Sweeping Cinder Strike',
+		spells: ['Burning Hands'],
 		cantrips: [],
 		chooseable: false // Ki-based elemental disciplines
 	},

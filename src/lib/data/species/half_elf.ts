@@ -67,7 +67,7 @@ const skillVersatilityPrompt: FeaturePrompt = {
 	source: 'half_elf',
 	effects: [
 		{
-			target: 'proficiencies',
+			target: 'skills',
 			action: 'add',
 			value: '{userChoice}'
 		}

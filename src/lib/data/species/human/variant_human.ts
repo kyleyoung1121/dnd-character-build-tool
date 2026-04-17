@@ -62,7 +62,7 @@ const skillVersatilityPrompt: FeaturePrompt = {
 	source: 'variant_human',
 	effects: [
 		{
-			target: 'proficiencies',
+			target: 'skills',
 			action: 'add',
 			value: '{userChoice}'
 		}

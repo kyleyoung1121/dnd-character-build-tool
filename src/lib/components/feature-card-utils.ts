@@ -338,19 +338,19 @@ export function generateDynamicOptions(
  */
 export function effectNeedsChoice(effect: any): boolean {
 	// Check if target contains {userChoice}
-	if (typeof effect.target === 'string' && effect.target.includes('{userChoice}')) {
+	if (typeof effect.target === 'string' && effect.target.includes('{userChoice')) {
 		return true;
 	}
 	
 	// Check if value contains {userChoice} - handle both string and array forms
-	if (typeof effect.value === 'string' && effect.value.includes('{userChoice}')) {
+	if (typeof effect.value === 'string' && effect.value.includes('{userChoice')) {
 		return true;
 	}
 	
 	// Check arrays (e.g., value: ['{userChoice}'])
 	if (Array.isArray(effect.value)) {
 		for (const item of effect.value) {
-			if (typeof item === 'string' && item.includes('{userChoice}')) {
+			if (typeof item === 'string' && item.includes('{userChoice')) {
 				return true;
 			}
 		}

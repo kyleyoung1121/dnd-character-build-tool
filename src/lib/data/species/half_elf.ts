@@ -24,7 +24,7 @@ const abilityScoreChoicePrompt: FeaturePrompt = {
 			value: 2
 		},
 		{
-			target: '{userChoice}', // placeholder will resolve to e.g. "strength"
+			target: '{userChoice.toLowerCase()}', // placeholder will resolve to e.g. "strength"
 			action: 'modify',
 			value: 1
 		}

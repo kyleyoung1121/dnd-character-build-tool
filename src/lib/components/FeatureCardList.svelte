@@ -211,16 +211,17 @@
 					return s.map(item => replaceUC(item, isTarget));
 				}
 				if (typeof s !== 'string') return s;
-				let replaced = s.replace(/\{userChoice\}/g, choice);
+				let adjustedInput = s.replace(/\{userChoice\.toLowerCase\(\)\}/g, choice.toLowerCase());
+				adjustedInput = adjustedInput.replace(/\{userChoice\}/g, choice);
 				if (isTarget) {
 					// Don't transform targets that are already valid camelCase property names
 					// (e.g., dragonbornElement, dragonbornBreathShape)
 					// Only transform targets that look like feature names with spaces
-					if (replaced.includes(' ')) {
-						replaced = replaced.toLowerCase().replace(/\s+/g, '_');
+					if (adjustedInput.includes(' ')) {
+						adjustedInput = adjustedInput.toLowerCase().replace(/\s+/g, '_');
 					}
 				}
-				return replaced;
+				return adjustedInput;
 			};
 
 			const target = replaceUC(effect.target, true);

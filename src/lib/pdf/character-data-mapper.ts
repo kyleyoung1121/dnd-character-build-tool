@@ -517,18 +517,50 @@ function calculateAttacks(
 			// Flat damage weapons (like blowgun with damage "1")
 			// Evaluate the expression: base damage + ability modifier
 			const baseDamage = parseInt(weaponData.damage) || 0;
-			const totalDamage = baseDamage + abilityMod;
+			let totalDamage = baseDamage + abilityMod;
+
+			if (character.features.includes('Dueling Fighting Style')) {
+				if (weaponData.type == 'melee' && !weaponData.properties.includes('Two-Handed')) {
+					// If we are dealing with a one-handed (or versatile) melee weapon, Dueling applies.
+					totalDamage += 2;
+				}
+			}
+
 			damageWithModifier = `${totalDamage} ${weaponData.damageType}`;
 		} else {
 			// Normal dice-based weapons
-			damageWithModifier = `${weaponData.damage}${abilityMod !== 0 ? formatModifier(abilityMod) : ''} ${weaponData.damageType}`;
+			let extraDamageMod = 0
+			if (character.features.includes('Dueling Fighting Style')) {
+				if (weaponData.type == 'melee' && !weaponData.properties.includes('Two-Handed')) {
+					// If we are dealing with a one-handed (or versatile) melee weapon, Dueling applies.
+					extraDamageMod += 2;
+				}
+			}
+			damageWithModifier = `${weaponData.damage}${abilityMod !== 0 ? formatModifier(abilityMod + extraDamageMod) : ''} ${weaponData.damageType}`;
 		}
 		
+		// Check for Dueling
+		let weaponProperties = weaponData.properties.slice()
+		if (character.features.includes('Dueling Fighting Style')) {
+			if (weaponData.type == 'melee' && !weaponData.properties.includes('Two-Handed')) {
+				// If we are dealing with a one-handed (or versatile) melee weapon, Dueling applies.
+				for (let i = 0; i < weaponProperties.length; i++) {
+					if (weaponProperties[i]) {
+						if (weaponProperties[i].includes('Versatile')) {
+							weaponProperties[i] = weaponProperties[i].replace(')', '+2)')
+							console.log('Versatile sub triggered');
+						}
+					}
+				}
+			}
+		}
+		
+
 		attacks.push({
 			name: weaponData.name,
 			bonus: formatModifier(attackBonus),
 			damage: damageWithModifier.trim(),
-			properties: weaponData.properties,
+			properties: weaponProperties,
 		});
 	}
 	

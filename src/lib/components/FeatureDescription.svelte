@@ -174,8 +174,8 @@
 				const value = resolveComputedValue(hint.computed);
 				const hintText = value !== null
 					? hint.hintFormat.replace('{value}', String(value))
-					: hint.hintFormat.replace('{value}', '?');
-				
+					: ''
+
 				// Find position in current result (accounting for previous insertions)
 				const insertPosition = result.indexOf(hint.afterText, offset);
 				if (insertPosition !== -1) {

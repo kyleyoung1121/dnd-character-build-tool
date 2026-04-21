@@ -75,48 +75,13 @@ async function fillFrontPage(
 	
 	// - - - - -
 	// Info Box
-	let classTextSize = 12;
-	if (data.classAndLevel) {
-		// Druid: for brevity, only list the keyword of the circle (ie Druid (Underdark)) 
-		if (data.classAndLevel.includes('Circle')) {
-			let newClassText = 'Druid ';
-			let keyword = '';
 
-			let classSplice = data.classAndLevel.split(' ').filter(text => text);
-
-			// Grab just the last bit of the subclass, ignoring paranthesis.
-			keyword = classSplice[classSplice.length - 1];
-			keyword = keyword.replace(/\(/g, "");
-			keyword = keyword.replace(/\)/g, "");
-
-			fillFormField(form, 'class_info', newClassText + `(${keyword})`, classTextSize);
-		} 
-		// Wizard: for brevity, only list the keyword of the school (ie Wizard (Transmutation))
-		else if (data.classAndLevel.includes('School')) {
-			let newClassText = 'Wizard ';
-			let keyword = '';
-
-			let classSplice = data.classAndLevel.split(' ').filter(text => text);
-
-			// Grab just the last bit of the subclass, ignoring paranthesis.
-			keyword = classSplice[classSplice.length - 1];
-			keyword = keyword.replace(/\(/g, "");
-			keyword = keyword.replace(/\)/g, "");
-			
-			fillFormField(form, 'class_info', newClassText + `(${keyword})`, classTextSize);
-		} 
-		// All other classes: list class & subclass as-is
-		else {
-			fillFormField(form, 'class_info', data.classAndLevel, classTextSize);
-		}
-
-		
-	}
-	
-	fillFormField(form, 'background_info', data.background, 12);
-	//fillFormField(form, 'player_info', 'value');
+	// TODO: Rename these fields to match with the data we are actually placing here
+	fillFormField(form, 'class_info', data.class, 12);
+	fillFormField(form, 'background_info', data.subclass, 12); // subclass is placed into 'background_info'
 	fillFormField(form, 'species_info', data.species, 12);
-	//fillFormField(form, 'alignment_info', 'value');
+	fillFormField(form, 'alignment_info', data.background, 12); // background is placed into 'alignment_info'
+	//fillFormField(form, 'player_info', 'value');
 	//fillFormField(form, 'character_name', 'value');
 
 	// - - - - -
@@ -184,7 +149,7 @@ async function fillFrontPage(
 	let attacks_to_hit: string[] = [];
 	let attacks_damage: string[] = [];
 	let attacks_notes: string[] = [];
-	
+
 	data.attacks.forEach((attack, index) => {
 		if (index < PAGE_1_FIELDS.attacks.length) {
 			attacks_names.push(attack.name);
@@ -301,12 +266,7 @@ async function fillFrontPage(
 	let core_bonus_actions: string[] = []
 	let core_other: string[] = []
 
-	let class_cleaned = data.classAndLevel.trim()
-	if (class_cleaned.includes(' ')) {
-		class_cleaned = class_cleaned.substring(0, class_cleaned.indexOf(' '));
-	}
-
-	switch(class_cleaned.trim()) {
+	switch(data.class) {
 		// Barbarian mostly does Attack & Rage, but has some subclass adds
 		case 'Barbarian':
 			core_actions.push('Attack');
@@ -359,11 +319,11 @@ async function fillFrontPage(
 				core_other.push('Wrath of the Storm');
 			}
 
-			if (data.classAndLevel.includes('Life')) {
+			if (data.subclass?.includes('Life')) {
 				core_bonus_actions.push('Spiritual Weapon');
 			}
 
-			if (data.classAndLevel.includes('War')) {
+			if (data.subclass?.includes('War')) {
 				core_bonus_actions.push('Divine Favor');
 				core_bonus_actions.push('Shield of Faith');
 				core_bonus_actions.push('Magic Weapon');
@@ -386,7 +346,7 @@ async function fillFrontPage(
 
 		// Druid has several BA spells & their wildshape that might be an action / bonus action
 		case 'Druid':
-			let isCircleOfMoon = data.classAndLevel.includes('Moon')
+			let isCircleOfMoon = data.subclass?.includes('Moon')
 			core_actions.push('Spellcasting');
 			if (!isCircleOfMoon) {core_actions.push('Wildshape');}
 			core_actions.push('Attack');
@@ -396,7 +356,7 @@ async function fillFrontPage(
 				core_bonus_actions.push('Wildshape Heal');
 			}
 
-			if (data.classAndLevel.includes('Coast')) {
+			if (data.subclass?.includes('Coast')) {
 				core_bonus_actions.push('Misty Step');
 			}
 			
@@ -417,7 +377,7 @@ async function fillFrontPage(
 			core_bonus_actions.push('Second Wind');
 			core_other.push('Action Surge');
 
-			if (data.classAndLevel.includes('Eldritch Knight')) {
+			if (data.subclass?.includes('Eldritch Knight')) {
 				core_actions.push('Spellcasting');
 				core_bonus_actions.push('Summon Weapon');
 			}
@@ -452,11 +412,11 @@ async function fillFrontPage(
 			core_bonus_actions.push('Step of the Wind');
 			core_other.push('Deflect Missiles');
 
-			if (data.classAndLevel.includes('Shadow')) {
+			if (data.subclass?.includes('Shadow')) {
 				core_actions.push('Shadow Arts');
 			}
 
-			if (data.classAndLevel.includes('Four Elements')) {
+			if (data.subclass?.includes('Four Elements')) {
 				core_actions.push('Elemental Attunement');
 				core_actions.push('Elemental Disciplines');
 			}
@@ -488,15 +448,15 @@ async function fillFrontPage(
 				}
 			}
 
-			if (data.classAndLevel.includes('Devotion')) {
+			if (data.subclass?.includes('Devotion')) {
 				core_bonus_actions.push('Sanctuary');
 			}
 
-			if (data.classAndLevel.includes('Ancients')) {
+			if (data.subclass?.includes('Ancients')) {
 				core_bonus_actions.push('Ensnaring Strike');
 			}
 
-			if (data.classAndLevel.includes('Vengeance')) {
+			if (data.subclass?.includes('Vengeance')) {
 				core_bonus_actions.push("Hunter's Mark");
 			}
 
@@ -515,7 +475,7 @@ async function fillFrontPage(
 		case 'Ranger':
 			core_actions.push('Attack', 'Spellcasting', 'Primeval Awareness');
 			
-			if (data.classAndLevel.includes('Beast Master')) {
+			if (data.subclass?.includes('Beast Master')) {
 				core_actions.push('Beast Action');
 			}
 			
@@ -543,10 +503,10 @@ async function fillFrontPage(
 			core_bonus_actions.push('Disengage');
 			core_bonus_actions.push('Hide');
 
-			if (data.classAndLevel.includes('Thief')) {
+			if (data.subclass?.includes('Thief')) {
 				core_bonus_actions.push('Fast Hands');
 			}
-			if (data.classAndLevel.includes('Arcane Trickster')) {
+			if (data.subclass?.includes('Arcane Trickster')) {
 				core_actions.push('Spellcasting');
 			}
 
@@ -1201,8 +1161,8 @@ async function findSpellStats(data: CharacterSheetData): Promise<{
 		}
 	}
 
-	// If the mod is positive, we need to manually add a plus
-	let spellAttackString = spellAbilityMod >= 0 ? '+' : '';
+	// If the mod is positive, we need to manually add a plus (pre adjust by 2, since we are adding 2 from prof.)
+	let spellAttackString = spellAbilityMod >= -2 ? '+' : '';
 	spellAttackString += String(spellAbilityMod + 2)
 
 	let spellSaveString = String(10 + spellAbilityMod)
@@ -1361,7 +1321,7 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 	try {
 		
 		console.log('character data: ', data.characterReference);
-		console.log('spell access?: ', getSpellAccessForCharacter(data.characterReference));
+		// console.log('spell access?: ', getSpellAccessForCharacter(data.characterReference));
 
 		// Load templates
 		const frontPageDoc = await loadTemplate('Front Page');

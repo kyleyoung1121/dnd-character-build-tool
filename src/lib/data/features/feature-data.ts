@@ -425,9 +425,9 @@ const FEATURE_BLACKLIST: string[] = [
 	'Expertise: Religion',
 	'Expertise: Sleight of Hand',
 	'Expertise: Stealth',
-	'Expertise: Survival'
+	'Expertise: Survival',
 	// Note: "Expertise: Thieves' Tools" is NOT blacklisted - it should appear
-	// Add more blacklisted features as needed
+	'Magic Initiate',
 ];
 
 /**
@@ -460,11 +460,9 @@ export function formatFeaturesForPDF(
 	
 	// First pass: Filter out blacklisted features
 	const nonBlacklistedFeatures = featureNames.filter(name => {
-		if (FEATURE_BLACKLIST.includes(name)) {
-			//console.log(`  Blacklisted feature removed: "${name}"`);
-			return false;
-		}
-		return true;
+		return !FEATURE_BLACKLIST.some((blacklistedFeature) => {
+			return name.includes(blacklistedFeature)
+		});
 	});
 	
 	//console.log(`Blacklist filtering: ${featureNames.length} -> ${nonBlacklistedFeatures.length} features`);

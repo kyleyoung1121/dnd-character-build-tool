@@ -23,12 +23,14 @@ import { sorcerer } from '$lib/data/classes/sorcerer';
 import { warlock } from '$lib/data/classes/warlock';
 import { wizard } from '$lib/data/classes/wizard';
 import { spells, getSpellByName, getSpellAccessForCharacter, type Spell } from '$lib/data/spells';
+import { simpleWeapons, martialWeapons } from '$lib/data/equipment/weapons';
 
 export interface CharacterSheetData {
 	// Page 1 - Header
 	characterReference: Character;
 	characterName: string;
-	classAndLevel: string;
+	class: string;
+	subclass: string;
 	background: string;
 	species: string;
 	alignment: string;
@@ -166,19 +168,34 @@ function getSavingThrowModifier(
 	abilityName: string,
 	abilityModifier: number
 ): number {
-	// Check if proficient in this saving throw
-	const savingThrowName = `${abilityName} saving throw`;
-	const isProficient = character.proficiencies?.some(
-		prof => prof.toLowerCase().includes(savingThrowName.toLowerCase())
-	) || false;
+
+	// Track if we are proficient in this ability save
+	let isProficient = false
+
+	// Check our class data for what saves we have prof in
+	const classData = getClassData(character.class);
+	const saves = classData?.saves
+	if (saves && saves.includes(abilityName)) {
+		isProficient = true;
 	
+	// Also check the proficiencies array to see if this saving throw is listed there
+	} else {
+		const savingThrowName = `${abilityName} Saving Throw`;
+		console.log('savingThrowName:', savingThrowName)
+		isProficient = character.proficiencies?.some(
+			prof => prof.toLowerCase().includes(savingThrowName.toLowerCase())
+		) || false;
+	}
+
+	console.log('isProficient:', isProficient)
+
 	return isProficient ? abilityModifier + getProficiencyBonus() : abilityModifier;
 }
 
 /**
  * Get class data by class name
  */
-function getClassData(className: string | undefined) {
+export function getClassData(className: string | undefined) {
 	if (!className) return null;
 	
 	const classMap: Record<string, any> = {
@@ -245,7 +262,7 @@ function getEquippedArmor(inventory: string[] | undefined): { type: string; base
 /**
  * Calculate AC from armor and DEX modifier
  */
-function calculateArmorAC(armor: { baseAC: number; maxDex: number | null }, dexMod: number): number {
+function calculateArmorAC(armor: { baseAC: number; maxDex: number | null }, dexMod: number, mediumArmorMaster: boolean): number {
 	if (armor.maxDex === null) {
 		// Light armor: no DEX limit
 		return armor.baseAC + dexMod;
@@ -254,7 +271,8 @@ function calculateArmorAC(armor: { baseAC: number; maxDex: number | null }, dexM
 		return armor.baseAC;
 	} else {
 		// Medium armor: DEX capped at maxDex
-		return armor.baseAC + Math.min(dexMod, armor.maxDex);
+		const newMaxDex = mediumArmorMaster? armor.maxDex + 1 : armor.maxDex
+		return armor.baseAC + Math.min(dexMod, newMaxDex);
 	}
 }
 
@@ -317,6 +335,11 @@ function calculateHitPoints(
 		hp += 3; // Level 3 character
 	}
 	
+	// Tough Feat
+	if (character.features?.includes('Tough')) {
+		hp += 6; // Level 3 character
+	}
+	
 	return Math.max(hp, 3); // Minimum 3 HP (1 per level)
 }
 
@@ -367,21 +390,6 @@ function calculateSpeed(
  * 1. Shield: +2 AC (not compatible with Monk Unarmored Defense)
  * 2. Defense Fighting Style (Fighter/Paladin/Ranger): +1 AC when wearing armor
  * 
- * **Temporary AC Bonuses (not auto-calculated, require spell slots or resources):**
- * - Shield spell: +5 AC (reaction, 1 round)
- * - Shield of Faith spell: +2 AC (concentration, 10 minutes)
- * - Warding Bond spell: +1 AC (concentration, requires spell slot)
- * - Haste spell: +2 AC (concentration, 1 minute)
- * - These are NOT included in base AC calculation
- * 
- * **Species/Background AC Bonuses:**
- * - None in standard D&D 5e Player's Handbook races and backgrounds
- * 
- * **Other Class Features at Level 3:**
- * - No other class features provide AC bonuses at level 3
- * - Bladesong (Wizard) requires level 2+ and is temporary (bonus action activation)
- * - Forge Cleric bonus requires level 6
- * - Other defensive features come at higher levels
  */
 function calculateArmorClass(
 	character: Character,
@@ -390,6 +398,8 @@ function calculateArmorClass(
 	wisMod: number,
 	inventory: string[] | undefined
 ): number {
+
+	const mediumArmorMaster = character.features.includes("Medium Armor Master")
 	const wearingArmor = isWearingArmor(inventory);
 	const usingShield = hasShield(inventory);
 	let bestAC = 10 + dexMod; // Default unarmored AC
@@ -398,7 +408,7 @@ function calculateArmorClass(
 	if (wearingArmor) {
 		const armor = getEquippedArmor(inventory);
 		if (armor) {
-			bestAC = calculateArmorAC(armor, dexMod);
+			bestAC = calculateArmorAC(armor, dexMod, mediumArmorMaster);
 		}
 	} else if (!wearingArmor) {
 		// Check for Unarmored Defense and other special AC calculations
@@ -468,7 +478,19 @@ function calculateAttacks(
 	strMod: number,
 	dexMod: number
 ): Array<{ name: string; bonus: string; damage: string; properties: string[] }> {
-	if (!character.attacks || character.attacks.length === 0) {
+	// Check if we have any attacks from what we are prof with
+	let attacksFromProfs = character.proficiencies.filter((prof) => {
+		if ([...simpleWeapons, ...martialWeapons].includes(prof)) {
+			return prof;
+		}
+	})
+
+	// Combine prof attacks with the original attack array
+	let allAttacks: string[] = []
+	allAttacks.push(...character.attacks)
+	allAttacks.push(...attacksFromProfs)
+	
+	if (!allAttacks || allAttacks.length === 0) {
 		return [];
 	}
 	
@@ -478,7 +500,7 @@ function calculateAttacks(
 	// Assume proficiency with all weapons in attacks array
 	// Players can only select weapons they're proficient with through the equipment tab
 	
-	for (const weaponName of character.attacks) {
+	for (const weaponName of allAttacks) {
 		const weaponData = getWeaponData(weaponName);
 		
 		if (!weaponData) {
@@ -547,7 +569,7 @@ function calculateAttacks(
 				for (let i = 0; i < weaponProperties.length; i++) {
 					if (weaponProperties[i]) {
 						if (weaponProperties[i].includes('Versatile')) {
-							weaponProperties[i] = weaponProperties[i].replace(')', '+2)')
+							weaponProperties[i] = weaponProperties[i].replace(')', '+'+abilityMod+')')
 							console.log('Versatile sub triggered');
 						}
 					}
@@ -815,7 +837,7 @@ function formatProficienciesAndLanguages(character: Character): string {
 			otherProfs.push(prof);
 		}
 	}
-	
+
 	// Deduplicate armor proficiencies
 	const hasAllArmor = armorProfs.some(prof => prof.toLowerCase().includes('all armor'));
 	if (hasAllArmor) {
@@ -905,7 +927,9 @@ function formatProficienciesAndLanguages(character: Character): string {
 		lines.push(`[[DEBUG_FOUR:Languages:]] ${character.languages.join(', ')}`);
 	}
 	
-	return lines.join('\n');
+	const proficienciesAndLanguagesFormatted = lines.join('\n');
+	console.log('proficienciesAndLanguagesFormatted', proficienciesAndLanguagesFormatted);
+	return proficienciesAndLanguagesFormatted
 }
 
 /**
@@ -1106,11 +1130,6 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 	const wisMod = getModifier(character.wisdom);
 	const chaMod = getModifier(character.charisma);
 	
-	// Format class and level
-	const classAndLevel = character.class 
-		? `${character.class} ${character.subclass ? `(${character.subclass}) ` : ''}`
-		: '';
-	
 	// Format species (with subrace if applicable)
 	const species = character.race
 		? character.subrace
@@ -1122,7 +1141,8 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 		// Page 1 - Header
 		characterReference: character,
 		characterName: character.name || '',
-		classAndLevel,
+		class: character.class || '',
+		subclass: character.subclass || '',
 		background: character.background || '',
 		species,
 		alignment: character.alignment || '',
@@ -1193,7 +1213,7 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 		
 		// Page 1 - Combat Stats (calculated from derived stats functions)
 		armorClass: String(calculateArmorClass(character, dexMod, conMod, wisMod, character.inventory)),
-		initiative: formatModifier(dexMod),
+		initiative: formatModifier(character.features.includes("Alert") ? dexMod + 5 : dexMod),
 		speed: calculateSpeed(character, character.inventory),
 		hitPointMaximum: String(calculateHitPoints(character, conMod)),
 		currentHitPoints: String(calculateHitPoints(character, conMod)), // Starts at max

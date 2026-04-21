@@ -29,6 +29,7 @@ export interface SpellAccess {
 	minSpellLevel?: number; // minimum spell level that can be chosen (for separating level 1 and level 2 limits)
 	restrictToSchools?: string[]; // restrict chooseable spells to specific schools (e.g., ['Enchantment', 'Illusion'] for Arcane Trickster)
 	restrictToRituals?: boolean; // restrict to ritual spells only (for Book of Ancient Secrets)
+	restrictToAttacks?: boolean;
 }
 
 export const SPELL_TAGS = [
@@ -2731,7 +2732,157 @@ export const spellAccess: SpellAccess[] = [
 		spells: [],
 		cantrips: ['Minor Illusion'], // Improved Minor Illusion feature
 		chooseable: false // School feature enhancement
-	}
+	},
+
+	// Spells from Feats
+
+	{
+		source: 'feature',
+		sourceName: 'Spell Sniper',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Bard', 'Cleric', 'Druid', 'Sorcerer', 'Warlock', 'Wizard'], // Any class cantrips
+		chooseCantripCount: 1,
+		chooseSpellCount: 0,
+		restrictToAttacks: true
+	},
+
+	{
+		source: 'feature',
+		sourceName: 'Ritual Caster',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Bard', 'Cleric', 'Druid', 'Sorcerer', 'Warlock', 'Wizard'], // Any class ritual spells
+		chooseCantripCount: 0,
+		chooseSpellCount: 2, // Choose 2 ritual spells
+		restrictToRituals: true // Only show ritual spells
+	},
+
+	{
+		source: 'feature',
+		sourceName: 'Magic Initiate Bard (Cantrips)',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Bard'],
+		chooseCantripCount: 2,
+		chooseSpellCount: 0,
+	},
+	{
+		source: 'feature',
+		sourceName: 'Magic Initiate Bard (Once per LR spell)',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Bard'],
+		chooseCantripCount: 0,
+		chooseSpellCount: 1,
+		maxSpellLevel: 1,
+	},	{
+		source: 'feature',
+		sourceName: 'Magic Initiate Cleric (Cantrips)',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Cleric'],
+		chooseCantripCount: 2,
+		chooseSpellCount: 0,
+	},
+	{
+		source: 'feature',
+		sourceName: 'Magic Initiate Cleric (Once per LR spell)',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Cleric'],
+		chooseCantripCount: 0,
+		chooseSpellCount: 1,
+		maxSpellLevel: 1,
+	},	{
+		source: 'feature',
+		sourceName: 'Magic Initiate Druid (Cantrips)',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Druid'],
+		chooseCantripCount: 2,
+		chooseSpellCount: 0,
+	},
+	{
+		source: 'feature',
+		sourceName: 'Magic Initiate Druid (Once per LR spell)',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Druid'],
+		chooseCantripCount: 0,
+		chooseSpellCount: 1,
+		maxSpellLevel: 1,
+	},	{
+		source: 'feature',
+		sourceName: 'Magic Initiate Sorcerer (Cantrips)',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Sorcerer'],
+		chooseCantripCount: 2,
+		chooseSpellCount: 0,
+	},
+	{
+		source: 'feature',
+		sourceName: 'Magic Initiate Sorcerer (Once per LR spell)',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Sorcerer'],
+		chooseCantripCount: 0,
+		chooseSpellCount: 1,
+		maxSpellLevel: 1,
+	},
+	{
+		source: 'feature',
+		sourceName: 'Magic Initiate Warlock (Cantrips)',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Warlock'],
+		chooseCantripCount: 2,
+		chooseSpellCount: 0,
+	},
+	{
+		source: 'feature',
+		sourceName: 'Magic Initiate Warlock (Once per LR spell)',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Warlock'],
+		chooseCantripCount: 0,
+		chooseSpellCount: 1,
+		maxSpellLevel: 1,
+	},
+	{
+		source: 'feature',
+		sourceName: 'Magic Initiate Wizard (Cantrips)',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Wizard'],
+		chooseCantripCount: 2,
+		chooseSpellCount: 0,
+	},
+	{
+		source: 'feature',
+		sourceName: 'Magic Initiate Wizard (Once per LR spell)',
+		spells: [],
+		cantrips: [],
+		chooseable: true,
+		chooseFrom: ['Wizard'],
+		chooseCantripCount: 0,
+		chooseSpellCount: 1,
+		maxSpellLevel: 1,
+	},
 ];
 
 // Helper functions

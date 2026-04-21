@@ -38,7 +38,7 @@ export const PAGE_1_FIELDS = {
 		maxWidth: 400
 	} as FieldConfig,
 	
-	classAndLevel: {
+	class: {
 		x: 215,
 		y: 730,
 		fontSize: 10,

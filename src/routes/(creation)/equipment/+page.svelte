@@ -26,6 +26,7 @@
 
 	// Import weapon utilities
 	import { extractWeaponsFromInventory, normalizeWeaponName } from '$lib/data/equipment/weapon-data';
+	import { simpleWeapons, martialWeapons } from '$lib/data/equipment/weapons';
 
 	import type {
 		ClassData,
@@ -71,6 +72,7 @@
 	let classProficiencyEquipment: string[] = [];
 	let backgroundProficiencyEquipment: string[] = [];
 	let speciesProficiencyEquipment: string[] = [];
+	let uncaughtProficiencyEquipment: string[] = [];
 	
 	$: {
 		const char = $character_store;
@@ -83,6 +85,29 @@
 		classProficiencyEquipment = getEquipmentFromProficienciesBySource(proficiencies, characterClass, characterSubclass, characterBackground, characterSpecies, 'class');
 		backgroundProficiencyEquipment = getEquipmentFromProficienciesBySource(proficiencies, characterClass, characterSubclass, characterBackground, characterSpecies, 'background');
 		speciesProficiencyEquipment = getEquipmentFromProficienciesBySource(proficiencies, characterClass, characterSubclass, characterBackground, characterSpecies, 'species');
+	
+		uncaughtProficiencyEquipment = proficiencies.filter((proficiency) => {
+			if (classProficiencyEquipment.includes(proficiency)) {
+				return
+			}
+			if (backgroundProficiencyEquipment.includes(proficiency)) {
+				return
+			}
+			if (speciesProficiencyEquipment.includes(proficiency)) {
+				return
+			}
+
+			// Filter to only what we want to capture
+
+			// Capture all uncaught weapon profs
+			let allWeapons = [...simpleWeapons, ...martialWeapons]
+			if (allWeapons.includes(proficiency)) {
+				return proficiency
+			}
+		})
+
+		speciesProficiencyEquipment.push(...uncaughtProficiencyEquipment)
+
 	}
 
 	// Helper function to check if a background equipment option should be hidden

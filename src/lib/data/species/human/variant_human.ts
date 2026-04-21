@@ -1,6 +1,7 @@
 import { base } from '$app/paths';
 import type { SpeciesData } from '$lib/data/types/SpeciesData';
 import type { FeaturePrompt } from '$lib/data/types/Features';
+import { simpleWeapons, martialWeapons } from '$lib/data/equipment/weapons';
 
 // Ability Score Choice Prompt
 const abilityScoreChoicePrompt: FeaturePrompt = {
@@ -500,6 +501,11 @@ const featPrompt: FeaturePrompt = {
 								value: 'Heavily Armored'
 							},
 							{
+								target: 'proficiencies',
+								action: 'add',
+								value: 'Heavy Armor'
+							},
+							{
 								target: 'strength',
 								action: 'modify',
 								value: 1
@@ -550,7 +556,25 @@ const featPrompt: FeaturePrompt = {
 						name: 'Inspiring Leader',
 						description: {
 							blocks: [
-										{ type: 'text', text: 'You can spend 10 minutes inspiring your companions. You and your allies gain temporary hit points equal to 3 + your Charisma modifier.' },
+										{
+											type: 'computed-replacement',
+
+											whenAvailable: [
+												{
+													source: 'derived',
+													formula: 'Math.max(3, CHA_MOD + 3)'
+												}
+											],
+
+											fallbackText:
+												'You can spend 10 minutes inspiring your companions. You and your allies gain temporary hit points equal to 3 + your Charisma modifier.',
+
+											replacementTemplate:
+												'You can spend 10 minutes inspiring your companions. You and your allies gain {value} temporary hit points.',
+
+											singularTemplate:
+												'You can spend 10 minutes inspiring your companions. You and your allies gain 1 temporary hit point.',
+										},
 										{ type: 'text', text: 'Affected creatures cannot gain temporary hit points this way again until a short or long rest.' },
 									]
 						},
@@ -624,6 +648,11 @@ const featPrompt: FeaturePrompt = {
 								target: 'features',
 								action: 'add',
 								value: 'Lightly Armored'
+							},
+							{
+								target: 'proficiencies',
+								action: 'add',
+								value: 'Light Armor'
 							},
 							{
 								target: '{userChoice.toLowerCase()}',
@@ -762,12 +791,29 @@ const featPrompt: FeaturePrompt = {
 										{ type: 'text', text: 'In addition, choose one 1st level spell to learn from the same list. Using this feat, you can cast the spell once at its lowest level, and you must finish a long rest before you can cast it this way again.' },
 									]
 						},
+						featureOptions: {
+							placeholderText: 'Select a spellcasting class',
+							options: [
+								'Bard',
+								'Cleric',
+								'Druid',
+								'Sorcerer',
+								'Warlock',
+								'Wizard',
+							],
+							numPicks: 1,
+						},
 						source: 'variant_human.feats',
 						effects: [
 							{
 								target: 'features',
 								action: 'add',
-								value: 'Magic Initiate'
+								value: 'Magic Initiate {userChoice} (Cantrips)'
+							},
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Magic Initiate {userChoice} (Once per LR spell)'
 							},
 						]
 					}
@@ -878,6 +924,16 @@ const featPrompt: FeaturePrompt = {
 								target: 'features',
 								action: 'add',
 								value: 'Moderately Armored'
+							},
+							{
+								target: 'proficiencies',
+								action: 'add',
+								value: 'Medium Armor'
+							},
+							{
+								target: 'proficiencies',
+								action: 'add',
+								value: 'Shields'
 							},
 							{
 								target: '{userChoice.toLowerCase()}',
@@ -1009,7 +1065,12 @@ const featPrompt: FeaturePrompt = {
 								target: '{userChoice.toLowerCase()}',
 								action: 'modify',
 								value: 1,
-							}
+							},
+							{
+								target: 'proficiencies',
+								action: 'add',
+								value: '{userChoice} Saving Throw',
+							},
 						]
 					}
 				]
@@ -1352,12 +1413,11 @@ const featPrompt: FeaturePrompt = {
 				optionDescription: 'DESC.',
 				nestedPrompts: [
 					{
-						id: 'variant_human_feat_weapon_master',
-						name: 'Weapon Master',
+						id: 'variant_human_feat_weapon_master_ability',
+						name: 'Ability Score Increase',
 						description: {
 							blocks: [
 										{ type: 'text', text: '• Increase your Strength or Dexterity score by 1.' },
-										{ type: 'text', text: '• You gain proficiency with four weapons of your choice.' },
 									]
 						},
 						featureOptions: {
@@ -1368,14 +1428,31 @@ const featPrompt: FeaturePrompt = {
 						source: 'variant_human.feats',
 						effects: [
 							{
-								target: 'features',
-								action: 'add',
-								value: 'Weapon Master'
-							},
-							{
 								target: '{userChoice.toLowerCase()}',
 								action: 'modify',
 								value: 1,
+							}
+						]
+					},
+					{
+						id: 'variant_human_feat_weapon_master_profs',
+						name: 'Weapon Proficiencies',
+						description: {
+							blocks: [
+										{ type: 'text', text: '• You gain four weapons (and their proficiencies).' },
+									]
+						},
+						featureOptions: {
+							placeholderText: 'Select 4 Weapons',
+							options: [...simpleWeapons, ...martialWeapons],
+							numPicks: 4,
+						},
+						source: 'variant_human.feats',
+						effects: [
+							{
+								target: 'proficiencies',
+								action: 'add',
+								value: '{userChoice}',
 							}
 						]
 					}

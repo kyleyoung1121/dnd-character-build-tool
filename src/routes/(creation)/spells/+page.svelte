@@ -74,6 +74,15 @@
 					if (access.restrictToRituals) {
 						classSpells = classSpells.filter((spell) => spell.ritual === true);
 					}
+
+					// Apply attacks-only restriction if present
+					if (access.restrictToAttacks) {
+						classSpells = classSpells.filter((spell) => {
+							if (spell.tags?.includes('SpellAttack')) {
+								return spell
+							} 
+						});
+					}
 					
 					classSpells.forEach((spell) => {
 						// Check for duplicates by both name and sourceName to allow same spell in different tabs

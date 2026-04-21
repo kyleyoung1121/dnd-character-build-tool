@@ -374,7 +374,13 @@ const bardCollegePrompt: FeaturePrompt = {
 		]
 	},
 	source: 'bard.college',
-	effects: []
+	effects: [
+		{
+			target: 'subclass',
+			action: 'set',
+			value: '{userChoice}'
+		}
+	]
 };
 
 const classFeaturesPrompt = [

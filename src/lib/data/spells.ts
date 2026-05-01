@@ -2024,7 +2024,7 @@ export const secondLevel: Spell[] = [
 		components: ['V', 'S', 'M'],
 		duration: '1 hour',
 		description:
-			"You touch a length of rope that is up to 60 feet long. One end of the rope then rises into the air until the whole rope hangs perpendicular to the ground. At the upper end of the rope, an invisible entrance opens to an extradimensional space that lasts until the spell ends.\nThe extradimensional space can be reached by climbing to the top of the rope. The space can hold as many as eight Medium or smaller creatures. The rope can be pulled into the space, making the rope disappear from view outside the space.\nAttacks and spells can't cross through the entrance into or out of the extradimensional space, but those inside can see out of it as if through a 3 foot-by-5- foot window centered on the rope.\nAnything inside the extradimensional space drops out when the spell ends.",
+			"You touch a length of rope that is up to 60 feet long. One end of the rope then rises into the air, leading to an invisible entrance that opens to an extradimensional space.\nThe space can hold as many as eight Medium creatures. The rope can be pulled into the space, making the rope disappear from view outside the space.\nAttacks and spells can't cross through the entrance into or out of the extradimensional space, but those inside can see out of the space.",
 		classes: ['Wizard'],
 		tags: ['Utility']
 	},
@@ -2064,7 +2064,7 @@ export const secondLevel: Spell[] = [
 		components: ['V', 'S', 'M'],
 		duration: 'Instantaneous',
 		description:
-			"A sudden loud ringing noise, painfully intense, erupts from a point of your choice within range. Each creature in a 10 foot-radius sphere centered on that point must make a Constitution saving throw. A creature takes 3d8 thunder damage on a failed save, or half as much damage on a successful one. A creature made of inorganic material such as stone, crystal, or metal has disadvantage on this saving throw.\nA nonmagical object that isn't being worn or carried also takes the damage if it's in the spell's area.",
+			"A sudden loud ringing noise, painfully intense, erupts from a point of your choice within range. Each creature in a 10 foot-radius sphere centered on that point must make a Constitution saving throw. A creature takes 3d8 thunder damage on a failed save, or half as much damage on a successful one. A creature made of inorganic material such as stone, crystal, or metal has disadvantage on this saving throw.",
 		classes: ['Bard', 'Sorcerer', 'Warlock', 'Wizard'],
 		tags: ['SpellSave', 'HalfOnSave', 'AreaOfEffect']
 	},
@@ -2105,7 +2105,7 @@ export const secondLevel: Spell[] = [
 		components: ['V', 'S', 'M'],
 		duration: 'Concentration, up to 10 minutes',
 		description:
-			"The ground in a 20 foot radius centered on a point within range twists and sprouts hard spikes and thorns. The area becomes difficult terrain for the duration. When a creature moves into or within the area, it takes 2d4 piercing damage for every 5 feet it travels.\nThe transformation of the ground is camouflaged to look natural. Any creature that can't see the area at the time the spell is cast must make a Wisdom (Perception) check against your spell save DC to recognize the terrain as hazardous before entering it.",
+			"The ground in a 20 foot radius centered on a point within range twists and sprouts hard spikes and thorns. The area becomes difficult terrain. When a creature moves into this area, it takes 2d4 piercing damage for every 5 feet it travels.\nThe transformation of the ground is camouflaged to look natural. Any creature that can't see the area at the time the spell is cast must make a Perception check against your spell save DC to recognize the terrain as hazardous before entering it.",
 		classes: ['Druid', 'Ranger'],
 		tags: ['AreaOfEffect']
 	},
@@ -2118,7 +2118,8 @@ export const secondLevel: Spell[] = [
 		components: ['V', 'S'],
 		duration: '1 minute',
 		description:
-			"You create a floating, spectral weapon within range that lasts for the duration or until you cast this spell again. When you cast the spell, you can make a melee spell attack against a creature within 5 feet of the weapon. On a hit, the target takes force damage equal to 1d8 + your spellcasting ability modifier.\nAs a bonus action on your turn, you can move the weapon up to 20 feet and repeat the attack against a creature within 5 feet of it.\nThe weapon can take whatever form you choose. Clerics of deities who are associated with a particular weapon (as St. Cuthbert is known for his mace and Thor for his hammer) make this spell's effect resemble that weapon.",
+			//"You create a floating, spectral weapon within range that lasts for the duration or until you cast this spell again. When you cast the spell, you can make a melee spell attack against a creature within 5 feet of the weapon. On a hit, the target takes force damage equal to 1d8 + your spellcasting ability modifier.\nAs a bonus action on your turn, you can move the weapon up to 20 feet and repeat the attack against a creature within 5 feet of it.\nThe weapon can take whatever form you choose. Clerics of deities who are associated with a particular weapon (as St. Cuthbert is known for his mace and Thor for his hammer) make this spell's effect resemble that weapon.",
+			"You create a floating, spectral weapon within range that lasts for the duration or until you cast this spell again. When you cast the spell, you can make a melee spell attack against a creature within 5 feet of the weapon. On a hit, the target takes force damage equal to 1d8 + your spellcasting ability modifier.\nAs a bonus action on your turn, you can move the weapon up to 20 feet and repeat the attack.\nThe weapon can take whatever form you choose.",
 		classes: ['Cleric'],
 		tags: ['SpellAttack']
 	},
@@ -2131,7 +2132,8 @@ export const secondLevel: Spell[] = [
 		components: ['V', 'M'],
 		duration: 'Concentration, up to 8 hours',
 		description:
-			"You suggest a course of activity (limited to a sentence or two) and magically influence a creature you can see within range that can hear and understand you. Creatures that can't be charmed are immune to this effect. The suggestion must be worded in such a manner as to make the course of action sound reasonable. Asking the creature to stab itself, throw itself onto a spear, immolate itself, or do some other obviously harmful act ends the spell.\nThe target must make a Wisdom saving throw. On a failed save, it pursues the course of action you described to the best of its ability. The suggested course of action can continue for the entire duration. If the suggested activity can be completed in a shorter time, the spell ends when the subject finishes what it was asked to do.\nYou can also specify conditions that will trigger a special activity during the duration. For example, you might suggest that a knight give her warhorse to the first beggar she meets. If the condition isn't met before the spell expires, the activity isn't performed.\nIf you or any of your companions damage the target, the spell ends.",
+			//"You suggest a course of activity (limited to a sentence or two) and magically influence a creature you can see within range that can hear and understand you. Creatures that can't be charmed are immune to this effect. The suggestion must be worded in such a manner as to make the course of action sound reasonable. Asking the creature to stab itself, throw itself onto a spear, immolate itself, or do some other obviously harmful act ends the spell.\nThe target must make a Wisdom saving throw. On a failed save, it pursues the course of action you described to the best of its ability. The suggested course of action can continue for the entire duration. If the suggested activity can be completed in a shorter time, the spell ends when the subject finishes what it was asked to do.\nYou can also specify conditions that will trigger a special activity during the duration. For example, you might suggest that a knight give her warhorse to the first beggar she meets. If the condition isn't met before the spell expires, the activity isn't performed.\nIf you or any of your companions damage the target, the spell ends.",
+			"You suggest a course of activity (in a few sentences) and magically influence a creature you can see within range that can understand you. Creatures that can't be charmed are immune to this effect. The suggestion cannot be obviously harmful to the creature.\nThe target must make a Wisdom saving throw. On a failed save, it pursues the course of action you described to the best of its ability.\nIf you or any of your companions damage the target, the spell ends.",
 		classes: ['Bard', 'Sorcerer', 'Warlock', 'Wizard'],
 		tags: ['SpellSave', 'Debuff']
 	},
@@ -2144,7 +2146,8 @@ export const secondLevel: Spell[] = [
 		components: ['V', 'S', 'M'],
 		duration: 'Concentration, up to 1 hour',
 		description:
-			'This spell wards a willing creature you touch and creates a mystic connection between you and the target until the spell ends. While the target is within 60 feet of you, it gains a +1 bonus to AC and saving throws, and it has resistance to all damage. Also, each time it takes damage, you take the same amount of damage.\nThe spell ends if you drop to 0 hit points or if you and the target become separated by more than 60 feet. It also ends if the spell is cast again on either of the connected creatures. You can also dismiss the spell as an action.',
+			//'This spell wards a willing creature you touch and creates a mystic connection between you and the target until the spell ends. While the target is within 60 feet of you, it gains a +1 bonus to AC and saving throws, and it has resistance to all damage. Also, each time it takes damage, you take the same amount of damage.\nThe spell ends if you drop to 0 hit points or if you and the target become separated by more than 60 feet. It also ends if the spell is cast again on either of the connected creatures. You can also dismiss the spell as an action.',
+			'This spell wards a willing creature you touch and creates a mystic connection between you and the target until the spell ends. The target gains a +1 bonus to AC and saving throws, and it has resistance to all damage. Also, each time it takes damage, you take the same amount of damage.\nThe spell ends if you drop to 0 hit points or if you are further than 60 feet away from the target. You can also dismiss the spell as an action.',
 		classes: ['Cleric'],
 		tags: ['Buff']
 	},
@@ -2157,7 +2160,8 @@ export const secondLevel: Spell[] = [
 		components: ['V', 'S', 'M'],
 		duration: 'Concentration, up to 1 hour',
 		description:
-			"You conjure a mass of thick, sticky webbing at a point of your choice within range. The webs fill a 20 foot cube from that point for the duration. The webs are difficult terrain and lightly obscure their area.\nIf the webs aren't anchored between two solid masses (such as walls or trees) or layered across a floor, wall, or ceiling, the conjured web collapses on itself, and the spell ends at the start of your next turn. Webs layered over a flat surface have a depth of 5 feet.\nEach creature that starts its turn in the webs or that enters them during its turn must make a Dexterity saving throw. On a failed save, the creature is restrained as long as it remains in the webs or until it breaks free.\nA creature restrained by the webs can use its action to make a Strength check against your spell save DC. If it succeeds, it is no longer restrained.\nThe webs are flammable. Any 5 foot cube of webs exposed to fire burns away in 1 round, dealing 2d4 fire damage to any creature that starts its turn in the fire.",
+			//"You conjure a mass of thick, sticky webbing at a point of your choice within range. The webs fill a 20 foot cube from that point for the duration. The webs are difficult terrain and lightly obscure their area.\nIf the webs aren't anchored between two solid masses (such as walls or trees) or layered across a floor, wall, or ceiling, the conjured web collapses on itself, and the spell ends at the start of your next turn. Webs layered over a flat surface have a depth of 5 feet.\nEach creature that starts its turn in the webs or that enters them during its turn must make a Dexterity saving throw. On a failed save, the creature is restrained as long as it remains in the webs or until it breaks free.\nA creature restrained by the webs can use its action to make a Strength check against your spell save DC. If it succeeds, it is no longer restrained.\nThe webs are flammable. Any 5 foot cube of webs exposed to fire burns away in 1 round, dealing 2d4 fire damage to any creature that starts its turn in the fire.",
+			"You conjure a mass of thick, sticky webbing at a point of your choice within range. The webs fill a 20 foot cube and are difficult terrain.\nEach creature that starts its turn in the webs or that enters them during its turn must succeed on a Dexterity saving throw or become restrained.\nA creature restrained by the webs can break free by succeeding a Strength check against your spell save DC.\nThe webs are flammable and burn 5ft per round, dealing 2d4 fire damage to any creature that starts its turn in the fire.",
 		classes: ['Druid', 'Sorcerer', 'Wizard'],
 		tags: ['SpellSave', 'AreaOfEffect', 'Debuff']
 	},
@@ -2170,7 +2174,7 @@ export const secondLevel: Spell[] = [
 		components: ['V', 'S'],
 		duration: '10 minutes',
 		description:
-			"You create a magical zone that guards against deception in a 15 foot-radius sphere centered on a point of your choice within range. Until the spell ends, a creature that enters the spell's area for the first time on a turn or starts its turn there must make a Charisma saving throw. On a failed save, a creature can't speak a deliberate lie while in the radius. You know whether each creature succeeds or fails on its saving throw.\nAn affected creature is aware of the spell and can thus avoid answering questions to which it would normally respond with a lie. Such a creature can be evasive in its answers as long as it remains within the boundaries of the truth.",
+			"You create a magical zone that guards against deception in a 15 foot-radius sphere. A creature entering the spell's area for the first time must make a Charisma saving throw. On a failed save, a creature can't speak a deliberate lie while in the radius. You know whether each creature succeeds or fails on its saving throw, but so do they.\nAn affected creature can avoid answering questions or be evasive in its answers as long as it remains within the boundaries of the truth.",
 		classes: ['Bard', 'Cleric', 'Paladin'],
 		tags: ['SpellSave', 'AreaOfEffect', 'Debuff']
 	}

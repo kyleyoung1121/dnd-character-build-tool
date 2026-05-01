@@ -126,7 +126,7 @@ const featPrompt: FeaturePrompt = {
 							blocks: [
 										{ type: 'text', text: '• +5 to Initiative rolls' },
 										{ type: 'text', text: '• You can\'t be surprised.' },
-										{ type: 'text', text: '• Enemies cannot gain advantage on attacks against you by being unseen.' },
+										{ type: 'text', text: '• Hidden enemies do not gain advantage on attacks against you.' },
 									]
 						},
 						source: 'variant_human.feats',

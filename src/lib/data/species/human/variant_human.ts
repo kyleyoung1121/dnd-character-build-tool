@@ -323,7 +323,6 @@ const featPrompt: FeaturePrompt = {
 						description: {
 							blocks: [
 										{ type: 'text', text: '• Increase your Constitution score by 1.' },
-										{ type: 'text', text: '• ' },
 										{
 											type: 'computed-inline',
 											text: '• When you roll a Hit Die to regain hit points, the minimum number of hit points you regain from the roll equals twice your CON modifier.',

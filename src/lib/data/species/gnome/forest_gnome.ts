@@ -70,7 +70,12 @@ export const forestGnome: SpeciesData = {
 				]
 			},
 			source: 'forest_gnome',
-			effects: [{ target: 'features', action: 'add', value: 'Gnome Cunning' }]
+			effects: [
+				{ target: 'features', action: 'add', value: 'Gnome Cunning' },
+				{ target: 'proficiencies', action: 'add', value: 'Intelligence Saving Throw' },
+				{ target: 'proficiencies', action: 'add', value: 'Wisdom Saving Throw' },
+				{ target: 'proficiencies', action: 'add', value: 'Charisma Saving Throw' }
+			]
 		},
 		{
 			name: 'Natural Illusionist',

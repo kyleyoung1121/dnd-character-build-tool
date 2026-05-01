@@ -937,6 +937,8 @@ async function fillBeastsPage(
 			continue;
 		}
 		
+		// If the player is anything other than a Wizard, their beast stat block does indeed need attacks.
+		let canBeastAttack = !(data.class == 'Wizard'); 
 
 		let beastSpeed
 		if (beast) {
@@ -989,7 +991,7 @@ async function fillBeastsPage(
 		}
 
 		// List Abilities
-		if (beast.abilities) {
+		if (beast.abilities && beast.abilities.length) {
 			beastsContent += `<bold:>Abilties\n`;
 		}
 		for (let j = 0; j < beast.abilities.length; j++) {
@@ -999,12 +1001,23 @@ async function fillBeastsPage(
 		}
 		
 		// List Actions
-		if (beast.actions) {
+		const eligibleActions = beast.actions.filter((action) => {
+			// If the beast can attack, no need to filter the actions.
+			if (canBeastAttack) {
+				return true
+			}
+			// Otherwise, we should skip any action that is an attack
+			if (!action.text.toLowerCase().includes('attack')) {
+				return true
+			}
+		})
+		if (eligibleActions && eligibleActions.length) {
+			console.log('eligibleActions: ', eligibleActions);
 			beastsContent += `<bold:>Actions\n`;
 		}
-		for (let j = 0; j < beast.actions.length; j++) {
-			if (beast.actions[j]) {
-				beastsContent += `${beast.actions[j].name}: ${beast.actions[j].text}\n`
+		for (let j = 0; j < eligibleActions.length; j++) {
+			if (eligibleActions[j]) {
+				beastsContent += `${eligibleActions[j].name}: ${eligibleActions[j].text}\n`
 			}
 		}
 

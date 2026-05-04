@@ -1105,10 +1105,12 @@ export const ranger: ClassData = {
 				options: [
 					{
 						label: 'Scale mail',
+						description: 'AC: 14 + DEX (max 2), Disadvantage on Stealth',
 						items: ['Scale mail']
 					},
 					{
 						label: 'Leather armor',
+						description: 'AC: 11 + DEX',
 						items: ['Leather armor']
 					}
 				]

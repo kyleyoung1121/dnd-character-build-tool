@@ -794,6 +794,9 @@
 									>
 										<div class="option-content">
 											<div class="option-label">{option.label}</div>
+											{#if option.description}
+												<div class="option-description">{option.description}</div>
+											{/if}
 											{#if !hasRequirements}
 												<div class="requirement-warning">Requires: {option.requires?.join(', ')}</div>
 											{/if}
@@ -1319,9 +1322,8 @@
 	}
 
 	.option-description {
-		display: flex;
-		flex-direction: column;
-		gap: var(--spacing-1);
+		font-size: var(--font-size-base);
+		color: var(--color-text-muted);
 	}
 
 	.item-detail {

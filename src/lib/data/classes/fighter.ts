@@ -716,10 +716,12 @@ export const fighter: ClassData = {
 				options: [
 					{
 						label: 'Chain mail',
+						description: 'AC: 16, Disadvantage on Stealth',
 						items: ['Chain mail']
 					},
 					{
 						label: 'Leather armor, longbow, and arrows',
+						description: 'AC: 11 + DEX',
 						items: ['Leather armor', 'Longbow', '20 arrows']
 					}
 				]
@@ -730,6 +732,7 @@ export const fighter: ClassData = {
 				options: [
 					{
 						label: 'Martial weapon and shield',
+						description: 'AC: +2',
 						subChoices: [
 							{
 								name: 'Martial Weapon',
@@ -749,6 +752,7 @@ export const fighter: ClassData = {
 					},
 					{
 						label: 'Two martial weapons',
+						description: '‎', // Invisible character added for spacing reasons
 						subChoices: [
 							{
 								name: 'Primary Martial Weapon',

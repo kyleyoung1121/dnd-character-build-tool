@@ -510,6 +510,7 @@ export const paladin: ClassData = {
 				options: [
 					{
 						label: 'Martial weapon and shield',
+						description: 'AC: +2',
 						items: ['Shield'],
 						subChoices: [
 							{
@@ -524,6 +525,7 @@ export const paladin: ClassData = {
 					},
 					{
 						label: 'Two martial weapons',
+						description: '‎', // Invisible character added for spacing reasons
 						items: [],
 						subChoices: [
 							{

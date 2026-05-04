@@ -13,6 +13,7 @@ export interface EquipmentSubChoice {
 // An option that might need sub-choices
 export interface EquipmentOption {
 	label: string; // What the user sees: "Martial weapon + Shield"
+	description?: string;
 	items?: string[]; // Direct items if no sub-choices needed
 	subChoices?: EquipmentSubChoice[]; // Sub-choices needed to resolve
 	requires?: string[]; // Required proficiencies (e.g., ['Heavy Armor'], ['Martial Weapons'])

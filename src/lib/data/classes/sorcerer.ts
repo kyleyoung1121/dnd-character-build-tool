@@ -61,6 +61,24 @@ const sorceryPointsPrompt: FeaturePrompt = {
 	]
 };
 
+const flexibleCastingPrompt: FeaturePrompt = {
+	id: 'sorcerer_flexible_casting_01',
+	name: 'Flexible Casting',
+	description: {
+		blocks: [
+			{ type: 'text', text: 'You can convert your spell slots into sorcery points, and vice versa. As a bonus action, you can spend a spell slot to get 1 sorcery point per level spent. You can perform this process in reverse, but doing so is more costly. You can spend 2 sorcery points for a level 1 spell slot, or 3 sorcery points for a level 2 spell slot.' },
+		]
+	},
+	source: 'sorcerer',
+	effects: [
+		{
+			target: 'features',
+			action: 'add',
+			value: 'Flexible Casting'
+		}
+	]
+};
+
 const metamagicPrompt: FeaturePrompt = {
 	id: 'sorcerer_metamagic_01',
 	name: 'Metamagic',
@@ -362,6 +380,7 @@ const sorcerousOriginPrompt: FeaturePrompt = {
 const classFeaturesPrompt: FeaturePrompt[] = [
 	spellcastingPrompt,
 	sorceryPointsPrompt,
+	flexibleCastingPrompt,
 	metamagicPrompt
 ];
 

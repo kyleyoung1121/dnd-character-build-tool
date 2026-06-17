@@ -63,6 +63,13 @@ function fillFormField(form: any, fieldName: string, value: string, fontSize?: n
 	}
 }
 
+async function fillRadioField(form: any, fieldName: string, bubbleName: string) {
+	const radioGroup = form.getRadioGroup(fieldName);
+	radioGroup.select(bubbleName);
+	form.defaultUpdateAppearances();
+
+}
+
 async function fillFrontPage(
 	page: any,
 	data: CharacterSheetData,
@@ -116,6 +123,15 @@ async function fillFrontPage(
 	fillFormField(form, 'wis_save', data.savingThrows.wisdom, 13, TextAlignment.Right);
 	fillFormField(form, 'cha_save', data.savingThrows.charisma, 13, TextAlignment.Right);
 
+	const bubbleFillChar = '•';
+
+	if (data.savingThrowProficiencies.strength) {fillFormField(form, 'str_save_bubble', bubbleFillChar);}
+	if (data.savingThrowProficiencies.dexterity) {fillFormField(form, 'dex_save_bubble', bubbleFillChar);}
+	if (data.savingThrowProficiencies.constitution) {fillFormField(form, 'con_save_bubble', bubbleFillChar);}
+	if (data.savingThrowProficiencies.intelligence) {fillFormField(form, 'int_save_bubble', bubbleFillChar);}
+	if (data.savingThrowProficiencies.wisdom) {fillFormField(form, 'wis_save_bubble', bubbleFillChar);}
+	if (data.savingThrowProficiencies.charisma) {fillFormField(form, 'cha_save_bubble', bubbleFillChar);}
+
 	// - - - - -
 	// Skills
 	let skills = [
@@ -141,6 +157,17 @@ async function fillFrontPage(
 
 	for (let i = 0; i < skills.length; i++) {
 		fillFormField(form, skills[i], data.skills[skills[i]], 13, TextAlignment.Right);
+		console.log('data: ', data);
+		const characterSkills = data.characterReference.skills
+		if (characterSkills) {
+			characterSkills.forEach((element) => {
+				const adjustedString = element.replace(' ', '_').toLowerCase()
+				console.log(adjustedString)
+				if (adjustedString == skills[i]) {
+					fillFormField(form, skills[i] + '_bubble', bubbleFillChar);
+				}
+			});
+		}
 	}
 
 	// - - - - -
@@ -1497,6 +1524,7 @@ async function fillSpellsPage(
 export async function generateCharacterSheet(data: CharacterSheetData): Promise<string> {
 	try {
 		
+		console.log('data: ', data);
 		console.log('character data: ', data.characterReference);
 		// console.log('spell access?: ', getSpellAccessForCharacter(data.characterReference));
 

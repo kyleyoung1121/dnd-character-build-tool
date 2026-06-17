@@ -56,12 +56,25 @@ export interface CharacterSheetData {
 		wisdom: string;
 		charisma: string;
 	};
+
+	savingThrowProficiencies: {
+		strength: boolean;
+		dexterity: boolean;
+		constitution: boolean;
+		intelligence: boolean;
+		wisdom: boolean;
+		charisma: boolean;
+	}
 	
 	// Page 1 - Skills
 	skills: {
 		[key: string]: string;
 	};
 	
+	skillProficiencies: {
+		[key: string]: boolean;
+	};
+
 	passivePerception: string;
 	
 	// Page 1 - Combat Stats
@@ -163,14 +176,12 @@ function getSkillModifier(
 /**
  * Calculate saving throw modifier
  */
-function getSavingThrowModifier(
+function isSavingThrowProficient(
 	character: Character,
 	abilityName: string,
-	abilityModifier: number
-): number {
-
+): boolean {
 	// Track if we are proficient in this ability save
-	let isProficient = false
+	let isProficient = false;
 
 	// Check our class data for what saves we have prof in
 	const classData = getClassData(character.class);
@@ -187,8 +198,18 @@ function getSavingThrowModifier(
 		) || false;
 	}
 
-	console.log('isProficient:', isProficient)
+	console.log('isProficient:', isProficient);
 
+	return isProficient;
+}
+
+function getSavingThrowModifier(
+	character: Character,
+	abilityName: string,
+	abilityModifier: number
+): number {
+	// Track if we are proficient in this ability save
+	let isProficient = isSavingThrowProficient(character, abilityName)
 	return isProficient ? abilityModifier + getProficiencyBonus() : abilityModifier;
 }
 
@@ -1185,6 +1206,15 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 			intelligence: `${formatModifier(getSavingThrowModifier(character, 'Intelligence', intMod))}`,
 			wisdom: `${formatModifier(getSavingThrowModifier(character, 'Wisdom', wisMod))}`,
 			charisma: `${formatModifier(getSavingThrowModifier(character, 'Charisma', chaMod))}`
+		},
+
+		savingThrowProficiencies: {
+			strength: isSavingThrowProficient(character, 'Strength'),
+			dexterity: isSavingThrowProficient(character, 'Dexterity'),
+			constitution: isSavingThrowProficient(character, 'Constitution'),
+			intelligence: isSavingThrowProficient(character, 'Intelligence'),
+			wisdom: isSavingThrowProficient(character, 'Wisdom'),
+			charisma: isSavingThrowProficient(character, 'Charisma'),
 		},
 		
 		// Page 1 - Skills (ability abbreviations drawn separately in gray)

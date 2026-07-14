@@ -99,6 +99,7 @@ export function detectConflicts(): {
 		if (conflictType === 'spell_limit') continue; // Skip spell_limit as it's handled separately
 		for (const [value, sources] of Object.entries(valueMap)) {
 			if (sources.length > 1) {
+				
 				// Check if this is a legitimate proficiency overlap that should be allowed
 				if (conflictType === 'proficiency' && isLegitimateProficiencyOverlap(value, sources)) {
 					continue; // Skip this "conflict" - it's actually fine
@@ -569,7 +570,7 @@ function getTabsFromSources(sources: string[]): string[] {
 			if (isUserChangeableBackgroundFeature(source)) {
 				changeableTabs.add('background');
 			}
-		} else if (source.startsWith('race:') || isSpeciesFeature(source)) {
+		} else if (source.startsWith('race:') || source.startsWith('species:') || isSpeciesFeature(source)) {
 			tabs.add('species');
 			// Most species features are automatic, but some species have choices
 			if (isUserChangeableSpeciesFeature(source)) {
@@ -674,6 +675,8 @@ function isSpeciesFeature(scopeId: string): boolean {
 		const featureName = scopeId.split(':')[1]?.toLowerCase() || '';
 		// Known species features
 		return (
+			featureName.includes('skill versatility') ||
+			featureName.includes('feat') ||
 			featureName.includes('keen sense') ||
 			featureName.includes('darkvision') ||
 			featureName.includes('fey ancestry') ||

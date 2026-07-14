@@ -120,6 +120,8 @@
 				if (source.includes('Brave')) return 'Halfling brave';
 				if (source.includes('Draconic Ancestry')) return 'Dragonborn ancestry';
 				if (source.includes('Fey Ancestry')) return 'Elf fey ancestry';
+				if (source.includes('Skill Versatility')) return 'Species skill selection';
+				if (source.includes('Feat')) return 'Feat selection';
 
 				// Class features - remaining skill proficiencies with indices
 				if (source.includes('Skill Proficiencies')) return 'Class skill selection';

@@ -11,6 +11,7 @@
 
 	// Props
 	export let feature: FeaturePrompt;
+	export let option: any;
 	export let featureSelections: Record<string, (string | null)[]>;
 	export let expandedFeatures: Set<string>;
 	export let selectionVersion: number;
@@ -45,6 +46,23 @@
 		return $activeConflicts.conflicts.some((conflict) =>
 			conflict?.sources?.some((source) => source.includes(featureName))
 		);
+	}
+
+	function checkOptionIsConflicted(optionName: string | null) {
+
+		// Check if this option is one of the options in conflict
+
+		// If there are no conflicts, quit early
+		if (!$activeConflicts.hasConflicts) return false;
+
+		let relevantConflicts = $activeConflicts.conflicts.filter((conflict) =>
+			conflict?.sources?.some((source) => source.includes(feature.name))
+		);
+
+		return relevantConflicts.some((conflict) => 
+			conflict.value == optionName
+		)
+		
 	}
 
 	function getConflictType(featureName: string): 'user-changeable' | 'automatic' | 'none' {
@@ -111,15 +129,23 @@
 		{#if feature.featureOptions}
 			{#each Array(feature.featureOptions.numPicks) as _, idx}
 				<select
+					class="option"
+					class:has-conflicts={
+						checkOptionIsConflicted(featureSelections[feature.name]?.[idx])
+					}
 					value={featureSelections[feature.name]?.[idx] || ''}
 					on:change={(e) => handleSelectChange(e, idx)}
 				>
-					<option value="" disabled>
+					<option 
+						value="" disabled
+					>
 						{feature.featureOptions.placeholderText || 'Select an option'}
 					</option>
 
 					{#each getAvailableOptions(idx) as option (typeof option === 'string' ? option : option.name)}
-						<option value={typeof option === 'string' ? option : option.name}>
+						<option 
+							value={typeof option === 'string' ? option : option.name}
+						>
 							{typeof option === 'string' ? option : option.name}
 						</option>
 					{/each}
@@ -236,6 +262,10 @@
 		background-color: var(--color-warning-bg);
 		border-left: 4px solid var(--color-warning);
 		padding-left: var(--spacing-3);
+	}
+
+	.option.has-conflicts {
+		background-color: #ff8d8d
 	}
 
 	.conflict-badge {

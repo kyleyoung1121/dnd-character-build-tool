@@ -85,9 +85,9 @@ async function fillFrontPage(
 
 	// TODO: Rename these fields to match with the data we are actually placing here
 	fillFormField(form, 'class_info', data.class, 12);
-	fillFormField(form, 'background_info', data.subclass, 12); // subclass is placed into 'background_info'
+	fillFormField(form, 'subclass_info', data.subclass, 12);
 	fillFormField(form, 'species_info', data.species, 12);
-	fillFormField(form, 'alignment_info', data.background, 12); // background is placed into 'alignment_info'
+	fillFormField(form, 'background_info', data.background, 12);
 	//fillFormField(form, 'player_info', 'value');
 	//fillFormField(form, 'character_name', 'value');
 
@@ -157,12 +157,10 @@ async function fillFrontPage(
 
 	for (let i = 0; i < skills.length; i++) {
 		fillFormField(form, skills[i], data.skills[skills[i]], 13, TextAlignment.Right);
-		console.log('data: ', data);
 		const characterSkills = data.characterReference.skills
 		if (characterSkills) {
 			characterSkills.forEach((element) => {
-				const adjustedString = element.replace(' ', '_').toLowerCase()
-				console.log(adjustedString)
+				const adjustedString = element.replaceAll(' ', '_').toLowerCase()
 				if (adjustedString == skills[i]) {
 					fillFormField(form, skills[i] + '_bubble', bubbleFillChar);
 				}
@@ -756,16 +754,10 @@ function chunkLinesWordBumped(input: string, chunkSizeMax: number) {
 		}
 	}
 
-	// console.log('chunks: [length, chunkText]');
-	// for (let i = 0; i < chunks.length; i++) {
-	// console.log(chunks[i].length, chunks[i]);
-	// }
-
 	return chunks;
 }
 
 function processLayeredColumns(input: string, charactersPerRow: number) {
-	// console.log(JSON.stringify(input));
 	
 	let linesUsed = 0;
 	let newLineSplit = input.split('\n');
@@ -774,8 +766,6 @@ function processLayeredColumns(input: string, charactersPerRow: number) {
 	let plainLayer = "";
 	
 	for (let i = 0; i < newLineSplit.length; i++) {
-		// console.log('-------------\nStep 2:');
-		// console.log('newLineSplit[i], charactersPerRow: ' + newLineSplit[i] + ' ' + charactersPerRow);
 		let charLimitSplit = chunkLinesWordBumped(newLineSplit[i], charactersPerRow);``
 		if (!charLimitSplit) {continue;}
 		for (let j = 0; j < charLimitSplit.length; j++) {
@@ -783,17 +773,11 @@ function processLayeredColumns(input: string, charactersPerRow: number) {
 				boldLayer += charLimitSplit[j].substring(7) + '\n';
 				plainLayer += '\n';
 				linesUsed++;
-				// console.log('----------');
-				// console.log('boldLayer += ' + charLimitSplit[j].substring(7) + ' + newline');
-				// console.log('plainLayer += ' + 'newline');
 				
 			} else {
 				boldLayer += '\n';
 				plainLayer += charLimitSplit[j] + '\n';
 				linesUsed++;
-				// console.log('----------');
-				// console.log('boldLayer += ' + 'newline');
-				// console.log('plainLayer += ' + charLimitSplit[j] + ' + newline');
 			}
 		}
 	}
@@ -828,8 +812,6 @@ async function fillFeaturesPage(
 	// Iterate through feature chunks (entire features separated by a blank line)
 	let featureChunks = featureContent.split('\n\n');
 	for (let i = 0; i < featureChunks.length; i++) {	
-		// console.log('--------------\nStep 1:');
-		// console.log(JSON.stringify(featureChunks[i] + '\n\n'));
 		const layeredColumnsProcessed = processLayeredColumns(featureChunks[i] + '\n\n', charactersPerRow);
 
 		if (lineCount + layeredColumnsProcessed.linesUsed <= maxLinesPerColumn) {
@@ -1039,7 +1021,6 @@ async function fillBeastsPage(
 			}
 		})
 		if (eligibleActions && eligibleActions.length) {
-			console.log('eligibleActions: ', eligibleActions);
 			beastsContent += `<bold:>Actions\n`;
 		}
 		for (let j = 0; j < eligibleActions.length; j++) {
@@ -1203,7 +1184,6 @@ async function fillBeastsPage(
 // 			}
 // 		})
 // 		if (eligibleActions && eligibleActions.length) {
-// 			console.log('eligibleActions: ', eligibleActions);
 // 			beastsContent += `<bold:>Actions\n`;
 // 		}
 // 		for (let j = 0; j < eligibleActions.length; j++) {
@@ -1432,15 +1412,8 @@ async function fillSpellsPage(
 		}
 		
 		const layeredColumnsProcessed = processLayeredColumns(spellChunk, charactersPerRow);
-
-		// Figure out which column we are adding to (divide by length)
-		// console.log('layeredColumnsProcessed: ', layeredColumnsProcessed);
-		// console.log('lineCount: ', lineCount);
-		// console.log('layeredColumnsProcessed.linesUsed: ', layeredColumnsProcessed.linesUsed);
-		// console.log('maxLinesPerColumn: ', maxLinesPerColumn);
 		
 		let column_destination = Math.floor((lineCount + layeredColumnsProcessed.linesUsed) / maxLinesPerColumn) + 1;
-		// console.log('column_destination: ', column_destination);
 
 		// Handle overflow, pushing content to next column when there isnt any more room.
 		switch (column_destination) {
@@ -1526,7 +1499,6 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 		
 		console.log('data: ', data);
 		console.log('character data: ', data.characterReference);
-		// console.log('spell access?: ', getSpellAccessForCharacter(data.characterReference));
 
 		// Load templates
 		const frontPageDoc = await loadTemplate('Front Page');
@@ -1677,10 +1649,6 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 				(selectedSubSpecies && ['High Elf', 'Dark Elf', 'Forest Gnome', 'Tiefling'].includes(selectedSubSpecies))
 			) {
 					spellsPageOneDoc = spellsBasicPageDoc;
-				} else {
-					// console.log('Flag! spellsPageOneDoc: ', spellsPageOneDoc);
-					// console.log('selectedSpecies: ', selectedSpecies);
-					// console.log('char.subrace: ', char.subrace);
 				}
 				break;
 		}

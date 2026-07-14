@@ -192,13 +192,10 @@ function isSavingThrowProficient(
 	// Also check the proficiencies array to see if this saving throw is listed there
 	} else {
 		const savingThrowName = `${abilityName} Saving Throw`;
-		console.log('savingThrowName:', savingThrowName)
 		isProficient = character.proficiencies?.some(
 			prof => prof.toLowerCase().includes(savingThrowName.toLowerCase())
 		) || false;
 	}
-
-	console.log('isProficient:', isProficient);
 
 	return isProficient;
 }
@@ -591,7 +588,6 @@ function calculateAttacks(
 					if (weaponProperties[i]) {
 						if (weaponProperties[i].includes('Versatile')) {
 							weaponProperties[i] = weaponProperties[i].replace(')', '+'+abilityMod+')')
-							console.log('Versatile sub triggered');
 						}
 					}
 				}
@@ -667,9 +663,6 @@ function formatEquipment(inventory: string[]): string {
 	// Process each item
 	for (let i = 0; i < inventory.length; i++) {
 		if (processed.has(i)) continue;
-		
-		// console.log('inventory debug:');
-		// console.log(inventory);
 
 		const item = inventory[i];
 		const itemLower = item.toLowerCase();
@@ -770,9 +763,6 @@ function formatEquipment(inventory: string[]): string {
 	if (misc.length > 0) {
 		lines.push(misc.join('\n'));
 	}
-	
-	// console.log('lines debug');
-	// console.log(lines);
 
 	return lines.join('\n');
 }
@@ -949,7 +939,6 @@ function formatProficienciesAndLanguages(character: Character): string {
 	}
 	
 	const proficienciesAndLanguagesFormatted = lines.join('\n');
-	console.log('proficienciesAndLanguagesFormatted', proficienciesAndLanguagesFormatted);
 	return proficienciesAndLanguagesFormatted
 }
 
@@ -1061,7 +1050,6 @@ export function formatSpells(character: Character): string {
 
 			// Add casting details
 			let spellRange = spell.range.replace('feet', 'ft.').replace('foot', 'ft.');
-			// console.log('spellRange: ', spellRange);
 			allSpellsText += `<bold:>( ${spell.castingTime} | ${spellRange} | ${durationText} )\n`;
 			
 			// Add description
@@ -1136,6 +1124,22 @@ export function formatSpells(character: Character): string {
 	return allSpellsText;
 }
 
+
+export function formatSubclass(subclass: string): string {
+	let formattedSubclass = subclass
+
+	if (subclass.toLowerCase().includes('circle of the land')) {
+		let landType = formattedSubclass.substring(20, subclass.length-1);
+		formattedSubclass = 'Circle of the ' + landType;
+	}
+
+	else if (subclass == 'Way of the Four Elements') {
+		formattedSubclass = 'Way of Four Elements';
+	}
+
+	return formattedSubclass
+}
+
 /**
  * Map character store data to PDF field data
  */
@@ -1163,7 +1167,7 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 		characterReference: character,
 		characterName: character.name || '',
 		class: character.class || '',
-		subclass: character.subclass || '',
+		subclass: formatSubclass(character.subclass || ''),
 		background: character.background || '',
 		species,
 		alignment: character.alignment || '',
@@ -1261,11 +1265,6 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 		proficienciesAndLanguages: formatProficienciesAndLanguages(character),
 		features: character.features,
 		featuresAndTraitsBuilt: (() => {
-			//console.log('=== FEATURES DEBUG - Character Data Mapper ===');
-			//console.log('Character features array:', character.features);
-			//console.log('Character class:', character.class);
-			//console.log('Character race:', character.race);
-			//console.log('Character subclass:', character.subclass);
 			
 			// Use new overflow system
 			// Height: 595pt, lineHeight: 10pt -> 59.5 max lines
@@ -1277,10 +1276,6 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 				57, // Max lines on page 1 (based on 595pt height / 10pt lineHeight)
 				{ width: 165, fontSize: 8 } // Page 1 text area config
 			);
-			
-			//console.log('Overflow stats:', result.stats);
-			//console.log('Has overflow:', result.hasOverflow);
-			//console.log('=== END FEATURES DEBUG ===');
 			
 			// Store page 2 text in temporary variable for now
 			// We'll access it below in the page 2 section

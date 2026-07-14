@@ -26,7 +26,7 @@ export const outlander: BackgroundData = {
 		'You have an excellent memory for maps and geography, and you can always recall the general layout of terrain, settlements, and other features around you. In addition, you can find food and shelter for yourself and up to five other people each day, provided that the land offers berries, small game, water, and so forth.',
 	backgroundFeatures: [
 		{
-			name: 'Skill Proficiencies',
+			name: 'Background Skills',
 			id: 'outlander_skills',
 			description: {
 				blocks: [

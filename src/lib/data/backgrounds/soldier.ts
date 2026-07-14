@@ -31,7 +31,7 @@ export const soldier: BackgroundData = {
 		'You have a military rank from your career as a soldier. Soldiers loyal to your former military organization still recognize your authority and influence, and they defer to you if they are of a lower rank. You can invoke your rank to exert influence over other soldiers and requisition simple equipment or horses for temporary use.',
 	backgroundFeatures: [
 		{
-			name: 'Skill Proficiencies',
+			name: 'Background Skills',
 			id: 'soldier_skills',
 			description: {
 				blocks: [

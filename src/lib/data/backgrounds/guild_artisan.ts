@@ -54,7 +54,7 @@ export const guildArtisan: BackgroundData = {
 		'As an established and respected member of a guild, you can rely on certain benefits that membership provides. Your fellow guild members will provide you with lodging and food if necessary, and pay for your funeral if needed. In some cities and towns, a guildhall offers a central place to meet other members of your profession, which can be a good place to meet potential patrons, allies, or hirelings.',
 	backgroundFeatures: [
 		{
-			name: 'Skill Proficiencies',
+			name: 'Background Skills',
 			id: 'guild_artisan_skills',
 			description: {
 				blocks: [

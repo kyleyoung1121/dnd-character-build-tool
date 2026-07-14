@@ -26,7 +26,7 @@ export const knight: BackgroundData = {
 		'You have the service of three retainers loyal to your family. One is a noble who serves as your squire, aiding you in exchange for training on their own path to knighthood. Your two remaining retainers might include a groom to care for your horse and a servant to polish your armor. Your retainers can perform mundane tasks for you, but they do not fight for you, will not follow you into obviously dangerous areas, and will leave if they are frequently endangered.',
 	backgroundFeatures: [
 		{
-			name: 'Skill Proficiencies',
+			name: 'Background Skills',
 			id: 'knight_skills',
 			description: {
 				blocks: [

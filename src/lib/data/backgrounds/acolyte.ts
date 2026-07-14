@@ -38,7 +38,7 @@ export const acolyte: BackgroundData = {
 		'As an acolyte, you command respect from worshipers of your faith. You can perform ceremonies for your deity. You and your companions can expect free healing and care at temples, shrines, or other established presences of your faith (though you must provide components for spells). Those who share your religion will support you at a modest lifestyle.',
 	backgroundFeatures: [
 		{
-			name: 'Skill Proficiencies',
+			name: 'Background Skills',
 			id: 'acolyte_skills',
 			description: {
 				blocks: [

@@ -465,158 +465,417 @@
 		}
 	}
 
-	// --- onMount for feature restoration ---
-	onMount(() => {
+	
+	// --- onMount for species feature restoration ---
+	onMount(async () => {
 		// Set up window resize listener for responsive behavior
 		updateWindowWidth();
 		window.addEventListener('resize', updateWindowWidth);
-
+		
 		const state = get(character_store);
+		if (!state.race) {
+			return;
+		}
 
-		if (state.race) {
-			// New format: look for subrace first if it exists
-			let found: SpeciesData | SpeciesGroup | undefined;
+		// New format: look for subrace first if it exists
+		let found: SpeciesData | SpeciesGroup | undefined;
 
-			if (state.subrace) {
-				// Look for the subrace in species groups
+		if (state.subrace) {
+			// Look for the subrace in species groups
+			for (const speciesItem of species) {
+				if ('subraces' in speciesItem) {
+					const sub = speciesItem.subraces.find((sr) => sr.name === state.subrace);
+					if (sub) {
+						found = sub;
+						break;
+					}
+				}
+			}
+		} else {
+			// Legacy format or species without subraces: look for exact race match
+			found = species.find((r) => r.name === state.race);
+
+			// If not found, maybe race is actually a subrace name (legacy)
+			if (!found) {
 				for (const speciesItem of species) {
 					if ('subraces' in speciesItem) {
-						const sub = speciesItem.subraces.find((sr) => sr.name === state.subrace);
+						const sub = speciesItem.subraces.find((sr) => sr.name === state.race);
 						if (sub) {
 							found = sub;
 							break;
 						}
 					}
 				}
-			} else {
-				// Legacy format or species without subraces: look for exact race match
-				found = species.find((r) => r.name === state.race);
-
-				// If not found, maybe race is actually a subrace name (legacy)
-				if (!found) {
-					for (const speciesItem of species) {
-						if ('subraces' in speciesItem) {
-							const sub = speciesItem.subraces.find((sr) => sr.name === state.race);
-							if (sub) {
-								found = sub;
-								break;
-							}
-						}
-					}
-				}
-			}
-
-			if (found && !('subraces' in found)) {
-				selectedSpeciesData = found;
-				featureSelections = {};
-
-				// Prepare arrays for static features
-				if (state.features && found.speciesFeatures) {
-					for (const feature of found.speciesFeatures) {
-						if (state.features.includes(feature.name)) {
-							const numPicks = feature.featureOptions?.numPicks || 1;
-							featureSelections[feature.name] = Array(numPicks).fill(null);
-						}
-					}
-				}
-
-				const toSnakeCase = (str: string) => str.toLowerCase().replace(/\s+/g, '_');
-
-				// Restore dynamic selections from provenance
-				const prov = state._provenance || {};
-				for (const key of Object.keys(prov)) {
-					if (!key.startsWith('feature:')) continue;
-					const parts = key.split(':'); // feature:FeatureName:<index|static>
-					if (parts.length < 3) continue;
-					const featureName = parts[1];
-					const indexStr = parts[2];
-					if (indexStr === 'static') continue;
-
-					const index = Number.isFinite(parseInt(indexStr, 10)) ? parseInt(indexStr, 10) : null;
-					if (index === null) continue;
-
-					const stored: any = prov[key];
-					const featureDef = found.speciesFeatures?.find((f) => f.name === featureName);
-					if (!featureDef) continue;
-
-					const opts = featureDef.featureOptions?.options || [];
-
-					// Build map: snake_case => label
-					const optionMap = new Map(
-						opts.map((o) => {
-							const label = typeof o === 'string' ? o : o.name;
-							return [toSnakeCase(label), label];
-						})
-					);
-
-					let restored: string | null = null;
-
-					// --- Helper: check if any stored value *contains* an option ---
-					const tryRestoreFromValue = (val: string) => {
-						const snakeVal = toSnakeCase(val);
-						for (const [key, label] of optionMap.entries()) {
-							if (snakeVal.includes(key)) {
-								return label; // return original label, not snake_case key!
-							}
-						}
-						return null;
-					};
-
-					// --- Check _set values ---
-					if (stored?._set) {
-						for (const effect of featureDef.effects || []) {
-							const target = effect.target;
-							const arr = stored._set[target];
-							if (Array.isArray(arr)) {
-								for (const val of arr) {
-									const maybe = tryRestoreFromValue(val);
-									if (maybe) {
-										restored = maybe;
-										break;
-									}
-								}
-							} else if (typeof arr === 'string') {
-								const maybe = tryRestoreFromValue(arr);
-								if (maybe) restored = maybe;
-							}
-							if (restored) break;
-						}
-					}
-
-					// --- Check _mods (for ability score bumps etc.) ---
-					if (!restored && stored?._mods) {
-						for (const modKey of Object.keys(stored._mods)) {
-							const maybe = tryRestoreFromValue(modKey);
-							if (maybe) {
-								restored = maybe;
-								break;
-							}
-						}
-					}
-
-					// Save into featureSelections
-					if (restored) {
-						const numPicks = featureDef.featureOptions?.numPicks || 1;
-						if (!featureSelections[featureName]) {
-							featureSelections[featureName] = Array(numPicks).fill(null);
-						} else {
-							ensureArrayLen(featureSelections[featureName], numPicks);
-						}
-						featureSelections[featureName][index] = restored;
-					}
-				}
-
-				// Nudge reactivity after bulk restore
-				featureSelections = { ...featureSelections };
-				bumpVersion();
 			}
 		}
 
-		// Return cleanup function at the end
-		return () => {
-			window.removeEventListener('resize', updateWindowWidth);
+		if (!found || ('subraces' in found)) {
+			return;
+		}
+
+		selectedSpeciesData = found;
+		featureSelections = {};
+
+		const toSnakeCase = (str: string) =>
+			str
+				? str
+						.toLowerCase()
+						.replace(/[^a-z0-9]+/g, '_')
+						.replace(/^_+|_+$/g, '')
+				: '';
+
+		// Helper: convert stored snake_case value to display label
+		const tryRestoreFromValue = (val: string, optionMap: Map<string, string>) => {
+			if (!val) return null;
+			const snakeVal = toSnakeCase(val);
+			// exact first
+			for (const [key, label] of optionMap.entries()) {
+				if (snakeVal === key) return label;
+			}
+			// then includes
+			for (const [key, label] of optionMap.entries()) {
+				if (snakeVal.includes(key) || key.includes(snakeVal)) return label;
+			}
+			// label equality fallback
+			for (const [key, label] of optionMap.entries()) {
+				if (toSnakeCase(label) === snakeVal) return label;
+			}
+			return null;
 		};
-	});
+
+		// Unified helper to attempt to fetch provenance under multiple plausible key shapes
+		const getProvenanceEntry = (featureName: string, idx?: number, parentFeatureName?: string, parentIndex?: number) => {
+			const prov = state._provenance || {};
+			const namesToTry: string[] = [];
+
+			// CORRECT FORMAT: feature:ParentName:ParentIndex:FeatureName:index (for nested features with parent context)
+			if (parentFeatureName && typeof parentIndex === 'number' && typeof idx === 'number') {
+				namesToTry.push(`feature:${parentFeatureName}:${parentIndex}:${featureName}:${idx}`);
+			}
+
+			// LEGACY FORMAT: feature:ParentName:FeatureName:index (older format without parentIndex)
+			if (parentFeatureName && typeof idx === 'number') {
+				namesToTry.push(`feature:${parentFeatureName}:${featureName}:${idx}`);
+			}
+			// canonical per-requested scheme: feature:Class:Parent:Feature
+			if (selectedSpeciesData) {
+				if (parentFeatureName) {
+					namesToTry.push(`feature:${selectedSpeciesData.name}:${parentFeatureName}:${featureName}`);
+				}
+				// canonical top-level with class
+				namesToTry.push(`feature:${selectedSpeciesData.name}:${featureName}`);
+			}
+
+			// legacy or simpler shapes that we observed in logs
+			if (typeof idx === 'number') {
+				namesToTry.push(`feature:${featureName}:${idx}`);
+			}
+			namesToTry.push(`feature:${featureName}`);
+
+			// also try species + idx variant just in case
+			if (selectedSpeciesData && typeof idx === 'number') {
+				namesToTry.push(`feature:${selectedSpeciesData.name}:${featureName}:${idx}`);
+			}
+
+			for (const n of namesToTry) {
+				if (prov[n]) {
+					return { key: n, entry: prov[n] };
+				}
+			}
+			return null;
+		};
+
+		// Helper: recursively check if any deeper nested features have provenance (matches any key shape)
+		const checkDeeperNestedProvenance = (feature: any): boolean => {
+			const prov = state._provenance || {};
+			if (!feature.featureOptions?.options) return false;
+			for (const opt of feature.featureOptions.options) {
+				if (typeof opt !== 'string' && opt.nestedPrompts) {
+					for (const nested of opt.nestedPrompts) {
+						// check for any key that mentions nested.name
+						const foundAny = Object.keys(prov).some((k) => k.includes(`feature:${nested.name}`) || k.includes(`:${nested.name}:`));
+						if (foundAny) {
+							return true;
+						}
+						if (checkDeeperNestedProvenance(nested)) return true;
+					}
+				}
+			}
+			return false;
+		};
+
+		// restore nested feature selections (parentFeatureName used for key shaping, parentIndex kept for logical recursion)
+		const restoreNestedFeatureSelection = async (feature: FeaturePrompt, parentFeatureName: string, parentIndex: number) => {
+			const numPicks = feature.featureOptions?.numPicks || 1;
+
+			// ensure selection array exists and is correct length
+			if (!featureSelections[feature.name]) featureSelections[feature.name] = Array(numPicks).fill(null);
+			ensureArrayLen(featureSelections[feature.name], numPicks);
+
+			const optionMap = new Map(
+				(feature.featureOptions?.options || []).map((o) => [
+					toSnakeCase(typeof o === 'string' ? o : o.name),
+					typeof o === 'string' ? o : o.name
+				])
+			);
+
+			for (let idx = 0; idx < numPicks; idx++) {
+				// skip if already restored
+				if (featureSelections[feature.name][idx]) {
+					continue;
+				}
+
+				const provLookup = getProvenanceEntry(feature.name, idx, parentFeatureName, parentIndex);
+				const stored = provLookup?.entry;
+				const provKey = provLookup?.key;
+
+				// try to restore from direct provenance entry
+				let restored: string | null = null;
+				
+				// FIRST: Check for __userChoice marker (for features with no effects)
+				if (stored?._set?.['__userChoice']) {
+					const choiceValue = stored._set['__userChoice'];
+					const maybe = tryRestoreFromValue(choiceValue, optionMap);
+					if (maybe) {
+						restored = maybe;
+					}
+				}
+				
+				if (!restored && stored?._set) {
+					for (const effect of feature.effects || []) {
+						const target = effect.target;
+						const arr = stored._set?.[target];
+						if (Array.isArray(arr)) {
+							for (const val of arr) {
+								const maybe = tryRestoreFromValue(val, optionMap);
+								if (maybe) {
+									restored = maybe;
+									break;
+								}
+							}
+						} else if (typeof arr === 'string') {
+							const maybe = tryRestoreFromValue(arr, optionMap);
+							if (maybe) {
+								restored = maybe;
+							}
+						}
+						if (restored) break;
+					}
+				}
+
+				// _mods fallback
+				if (!restored && stored?._mods) {
+					for (const modKey of Object.keys(stored._mods)) {
+						const maybe = tryRestoreFromValue(modKey, optionMap);
+						if (maybe) {
+							restored = maybe;
+							break;
+						}
+					}
+				}
+
+				// If no direct provenance, try to infer by checking deeper nested provenance for each option
+				if (!restored && feature.featureOptions?.options) {
+					for (const opt of feature.featureOptions.options) {
+						if (typeof opt !== 'string' && opt.nestedPrompts) {
+							const hasNestedProv = Object.keys(state._provenance || {}).some((k) =>
+								k.includes(`feature:${opt.name}`) || k.includes(`:${opt.name}:`)
+							);
+							const hasDeeperProv = opt.nestedPrompts.some((n) => checkDeeperNestedProvenance(n));
+							if (hasNestedProv || hasDeeperProv) {
+								restored = opt.name;
+								break;
+							}
+						}
+					}
+				}
+
+				if (restored) {
+					featureSelections[feature.name][idx] = restored;
+				}
+			}
+
+			// Recurse into deeper nested prompts if any (use parent index inferred from selection)
+			if (feature.featureOptions?.options) {
+				for (const o of feature.featureOptions.options) {
+					if (typeof o !== 'string' && o.nestedPrompts) {
+						const parentIdx = featureSelections[feature.name].findIndex((v) => v === o.name);
+						if (parentIdx !== -1) {
+							for (const nested of o.nestedPrompts) {
+								await restoreNestedFeatureSelection(nested, feature.name, parentIdx);
+							}
+						} else {
+							// still try to restore nested if nested provenance exists even when parent wasn't set
+							for (const nested of o.nestedPrompts) {
+								const hasNestedProv = Object.keys(state._provenance || {}).some((k) =>
+									k.includes(`feature:${nested.name}`) || k.includes(`:${nested.name}:`)
+								);
+								if (hasNestedProv) {
+									// ensure parent pick exists
+									if (!featureSelections[feature.name].includes(o.name)) {
+										const emptyIdx = featureSelections[feature.name].findIndex((v) => v === null);
+										if (emptyIdx !== -1) {
+											featureSelections[feature.name][emptyIdx] = o.name;
+										}
+									}
+									const resolvedParentIdx = featureSelections[feature.name].findIndex((v) => v === o.name);
+									if (resolvedParentIdx !== -1) {
+										await restoreNestedFeatureSelection(nested, feature.name, resolvedParentIdx);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		};
+
+		// Restore top-level features and their nested prompts
+		const restoreFeatureSelection = async (feature: FeaturePrompt) => {
+			const numPicks = feature.featureOptions?.numPicks || 1;
+
+			if (!featureSelections[feature.name]) featureSelections[feature.name] = Array(numPicks).fill(null);
+			ensureArrayLen(featureSelections[feature.name], numPicks);
+
+			// build option map (including dynamic generation when necessary)
+			let opts: (string | { name: string })[] = feature.featureOptions?.options || [];
+			if (feature.featureOptions?.dynamicOptionsGenerator) {
+				try {
+					const { generateDynamicOptions } = await import('$lib/components/feature-card-utils');
+					const dynamicOpts = generateDynamicOptions(
+						feature.featureOptions.dynamicOptionsGenerator,
+						character_store,
+						featureSelections
+					);
+					opts = dynamicOpts;
+				} catch (error) {
+					// Failed to generate dynamic options
+				}
+			}
+
+			const optionMap = new Map(
+				(opts as any[]).map((o) => [toSnakeCase(typeof o === 'string' ? o : o.name), typeof o === 'string' ? o : o.name])
+			);
+
+			for (let idx = 0; idx < numPicks; idx++) {
+				if (featureSelections[feature.name][idx]) {
+					continue;
+				}
+
+				// try multiple possible provenance key shapes
+				const provLookup = getProvenanceEntry(feature.name, idx);
+				const stored = provLookup?.entry;
+				const provKey = provLookup?.key;
+
+				let restored: string | null = null;
+
+				// FIRST: Check for __userChoice marker (for features with no effects)
+				if (stored?._set?.['__userChoice']) {
+					const choiceValue = stored._set['__userChoice'];
+					const maybe = tryRestoreFromValue(choiceValue, optionMap);
+					if (maybe) {
+						restored = maybe;
+					}
+				}
+
+			if (!restored && stored?._set) {
+					for (const effect of feature.effects || []) {
+						const target = effect.target;
+						const arr = stored._set?.[target];
+						if (Array.isArray(arr)) {
+							for (const val of arr) {
+								const maybe = tryRestoreFromValue(val, optionMap);
+								if (maybe) {
+									restored = maybe;
+									break;
+								}
+							}
+						} else if (typeof arr === 'string') {
+							const maybe = tryRestoreFromValue(arr, optionMap);
+							if (maybe) {
+								restored = maybe;
+							}
+						}
+						if (restored) break;
+					}
+				}
+
+			if (!restored && stored?._mods) {
+					for (const modKey of Object.keys(stored._mods)) {
+						const maybe = tryRestoreFromValue(modKey, optionMap);
+						if (maybe) {
+							restored = maybe;
+							break;
+						}
+					}
+				}
+
+				// If still not restored, infer from nested provenance (handles empty-effect features)
+				if (!restored && feature.featureOptions?.options) {
+					for (const opt of feature.featureOptions.options) {
+						if (typeof opt !== 'string' && opt.nestedPrompts) {
+							const hasNestedProv = Object.keys(state._provenance || {}).some((k) =>
+								k.includes(`feature:${opt.name}`) || k.includes(`:${opt.name}:`)
+							);
+							const hasDeeperProv = opt.nestedPrompts.some((n) => checkDeeperNestedProvenance(n));
+							if (hasNestedProv || hasDeeperProv) {
+								restored = opt.name;
+								break;
+							}
+						}
+					}
+				}
+
+				if (restored) {
+					featureSelections[feature.name][idx] = restored;
+				}
+
+				// Recurse into nested prompts for this pick
+				if (feature.featureOptions?.options) {
+					for (const o of feature.featureOptions.options) {
+						if (typeof o !== 'string' && o.nestedPrompts) {
+							const parentIdx = featureSelections[feature.name].findIndex((v) => v === o.name);
+							if (parentIdx !== -1) {
+								for (const nested of o.nestedPrompts) {
+									await restoreNestedFeatureSelection(nested, feature.name, parentIdx);
+								}
+							} else {
+								// else check nested provenance and force parent if necessary
+								for (const nested of o.nestedPrompts) {
+									const hasNestedProv = Object.keys(state._provenance || {}).some((k) =>
+										k.includes(`feature:${nested.name}`) || k.includes(`:${nested.name}:`)
+									);
+									if (hasNestedProv) {
+										if (!featureSelections[feature.name].includes(o.name)) {
+											const emptyIdx = featureSelections[feature.name].findIndex((v) => v === null);
+											if (emptyIdx !== -1) {
+												featureSelections[feature.name][emptyIdx] = o.name;
+											}
+										}
+										const resolvedParentIdx = featureSelections[feature.name].findIndex((v) => v === o.name);
+										if (resolvedParentIdx !== -1) {
+											await restoreNestedFeatureSelection(nested, feature.name, resolvedParentIdx);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		};
+
+		// Restore all top-level features
+		for (const feature of found.speciesFeatures || []) {
+			await restoreFeatureSelection(feature);
+		}
+
+		// Trigger Svelte reactivity
+		featureSelections = { ...featureSelections };
+		bumpVersion();
+
+	}); // end onMount
+
 </script>
 
 <div class="main-content">

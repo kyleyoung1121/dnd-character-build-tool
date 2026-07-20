@@ -1,9 +1,14 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
+	import { onMount } from 'svelte';
 	import { applyChoice, revertChanges } from '$lib/stores/character_store_helpers';
 	import { get } from 'svelte/store';
 	import { character_store } from '$lib/stores/character_store';
+
+	let playerName = '';
+	let characterName = '';
+	let library = '';
 
 	function changeCharacterName(event: Event) {
 		const target = event.target as HTMLSelectElement;
@@ -12,6 +17,7 @@
 				characterName: target.value
 			}
 		);
+		characterName = target.value;
 	}
 
 	function changePlayerName(event: Event) {
@@ -22,6 +28,7 @@
 				playerName: target.value
 			}
 		);
+		playerName = target.value;
 	}
 
 	function changeLibrary(event: Event) {
@@ -32,7 +39,26 @@
 				library: target.value
 			}
 		);
+		library = target.value;
 	}
+
+	onMount(async () => {
+		const state = get(character_store);
+
+		if (state.playerName) {
+			playerName = state.playerName
+		}
+
+		if (state.characterName) {
+			characterName = state.characterName
+		}
+
+		if (state.library) {
+			library = state.library
+		}
+		
+	})
+
 </script>
 
 <div class="container">
@@ -43,10 +69,11 @@
 		<br><br>
 		
 		<p>Character Name:</p> 
-		<input 
+		<input
 			placeholder="Enter your character's name" 
 			class="characterNameInput input-style" 
 			type="text"
+			value={characterName ?? ''}
 			on:change='{(e) => changeCharacterName(e)}'
 		>
 		<br><br>
@@ -56,6 +83,7 @@
 			placeholder="Enter your name (First L.)" 
 			class="playerNameInput input-style" 
 			type="text"
+			value={playerName ?? ''}
 			on:change='{(e) => changePlayerName(e)}'
 		>
 		<br><br>
@@ -63,12 +91,17 @@
 		<p>Library:</p> 
 		<select 
 			class="libraryInput input-style" 
+			value={library ?? 'Select Your Library'}
 			on:change={(e) => changeLibrary(e)}
 		>
 			<option>Anderson</option>
-			<option>Reading</option>
-			<option>Avondale</option>
+			<option>Clifton</option>
+			<option>Deer Park</option>
+			<option>Groesbeck</option>
 			<option>Monfort Heights</option>
+			<option>Reading</option>
+			<option>West End</option>
+			<option>Westwood</option>
 		</select>
 	</div>
 </div>

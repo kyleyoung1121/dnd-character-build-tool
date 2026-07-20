@@ -4,7 +4,9 @@ import { writable } from 'svelte/store';
 export type Attack = string;
 
 export type Character = {
-	name: string;
+	characterName: string;
+	playerName: string;
+	library: string;
 	race: string;
 	class: string;
 	characterClass?: string; // Alias for backwards compatibility
@@ -50,7 +52,9 @@ export type Character = {
 };
 
 export const character_store = writable<Character>({
-	name: '',
+	characterName: '',
+	playerName: '',
+	library: '',
 	race: '',
 	class: '',
 	subclass: '',

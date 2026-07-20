@@ -29,6 +29,8 @@ export interface CharacterSheetData {
 	// Page 1 - Header
 	characterReference: Character;
 	characterName: string;
+	playerName: string;
+	library: string;
 	class: string;
 	subclass: string;
 	background: string;
@@ -1165,7 +1167,9 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 	return {
 		// Page 1 - Header
 		characterReference: character,
-		characterName: character.name || '',
+		characterName: character.characterName || '',
+		playerName: character.playerName || '',
+		library: character.library || '',
 		class: character.class || '',
 		subclass: formatSubclass(character.subclass || ''),
 		background: character.background || '',
@@ -1242,6 +1246,8 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 			stealth: `${formatModifier(getSkillModifier(character, dexMod, 'Stealth'))}`,
 			survival: `${formatModifier(getSkillModifier(character, wisMod, 'Survival'))}`
 		},
+
+		skillProficiencies: {},
 		
 		passivePerception: String(10 + getSkillModifier(character, wisMod, 'Perception')),
 		

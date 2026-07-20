@@ -90,6 +90,8 @@ async function fillFrontPage(
 	fillFormField(form, 'background_info', data.background, 12);
 	//fillFormField(form, 'player_info', 'value');
 	//fillFormField(form, 'character_name', 'value');
+	fillFormField(form, 'player_info', data.playerName + ' (' + data.library + ')', 12);
+	fillFormField(form, 'character_name', data.characterName, 12);
 
 	// - - - - -
 	// Stats

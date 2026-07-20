@@ -27,6 +27,7 @@
 	initializeEquipmentCleanup();
 
 	const baseNavItems = [
+		{ name: 'Details', href: base + '/details', id: 'details' },
 		{ name: 'Class', href: base + '/class', id: 'class' },
 		{ name: 'Species', href: base + '/species', id: 'species' },
 		{ name: 'Abilities', href: base + '/abilities', id: 'abilities' },
@@ -53,8 +54,11 @@
 		const isOnClassQuiz = currentPath.includes('/class-quiz');
 		const isOnSpeciesQuiz = currentPath.includes('/species-quiz');
 
+		// Add Details tab
+		items.push(baseNavItems[0]); // Details
+
 		// Add Class tab
-		items.push(baseNavItems[0]); // Class
+		items.push(baseNavItems[1]); // Class
 		
 		// Add Class Quiz tab if on class quiz page
 		if (isOnClassQuiz) {
@@ -62,7 +66,7 @@
 		}
 
 		// Add Species tab
-		items.push(baseNavItems[1]); // Species
+		items.push(baseNavItems[2]); // Species
 		
 		// Add Species Quiz tab if on species quiz page
 		if (isOnSpeciesQuiz) {
@@ -70,9 +74,9 @@
 		}
 
 		// Add remaining base tabs (Abilities, Background, Equipment)
-		items.push(baseNavItems[2]); // Abilities
-		items.push(baseNavItems[3]); // Background
-		items.push(baseNavItems[4]); // Equipment
+		items.push(baseNavItems[3]); // Abilities
+		items.push(baseNavItems[4]); // Background
+		items.push(baseNavItems[5]); // Equipment
 
 		// Add Beasts/Familiars tab if character has access
 		if (hasBeastAccess($character_store)) {
@@ -88,8 +92,9 @@
 			items.push({ name: 'Spells', href: base + '/spells', id: 'spells' });
 		}
 
+		// TO DO: only show export when all other tabs are satisified
 		// Always add Export at the end
-		items.push(baseNavItems[5]); // Export
+		items.push(baseNavItems[6]); // Export
 
 		navItems = items;
 	}

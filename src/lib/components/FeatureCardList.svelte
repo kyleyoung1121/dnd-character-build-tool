@@ -139,7 +139,7 @@
 			// ALSO revert nested prompt effects from the previous option's nestedPrompts
 			// This handles cleanup for invocations and similar features
 			if (feature.featureOptions) {
-				const prevOption = feature.featureOptions.options.find(opt => opt.name === prev);
+				const prevOption = feature.featureOptions.options?.find(opt => opt.name === prev);
 				if (prevOption?.nestedPrompts) {
 					for (const prevOptionNested of prevOption.nestedPrompts) {
 						const prevOptionNestedScopeId = parentFeatureName && parentIndex !== null && parentIndex !== undefined
@@ -334,7 +334,7 @@
 		// has its own nestedPrompts array with effects that need to be applied
 		if (feature.featureOptions) {
 			//console.log(`[OPTION_NESTED] Checking for nested prompts in selected option: "${choice}"`);
-			const selectedOption = feature.featureOptions.options.find(opt => opt.name === choice);
+			const selectedOption = feature.featureOptions.options?.find(opt => opt.name === choice);
 			//console.log(`[OPTION_NESTED] Selected option:`, selectedOption);
 			if (selectedOption?.nestedPrompts) {
 				//console.log(`[OPTION_NESTED] Found ${selectedOption.nestedPrompts.length} nested prompts in option "${choice}"`);

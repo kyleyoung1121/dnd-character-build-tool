@@ -1,6 +1,14 @@
 import { base } from '$app/paths';
 import type { BackgroundData } from '../types/BackgroundData';
 
+let startingEquipment = [
+		'Map of the city you grew up in',
+		'Tin cup',
+		'Token to remember your parents by',
+		'Common clothes',
+		'Belt pouch with 10 gp'
+];
+
 export const urchin: BackgroundData = {
 	name: 'Urchin',
 	image: base + '/background_icons/urchin.jpg',
@@ -10,23 +18,9 @@ export const urchin: BackgroundData = {
 		"You grew up on the streets alone, orphaned, and poor. You had no one to watch over you or provide for you, so you learned to provide for yourself. You fought fiercely over food and kept a constant watch out for other desperate souls who might steal from you. You slept on rooftops and in alleyways, exposed to the elements, and endured sickness without the advantage of medicine or a place to recuperate. You've survived despite all odds, and did so through cunning, strength, speed, or some combination of each.",
 	skillProficiencies: ['Sleight of Hand', 'Stealth'],
 	toolProficiencies: ['Disguise kit', "Thieves' tools"],
-	equipment: [
-		'Small knife',
-		'Map of the city you grew up in',
-		'Pet mouse',
-		'Token to remember your parents by',
-		'Common clothes',
-		'Belt pouch with 10 gp'
-	],
+	equipment: startingEquipment,
 	startingEquipment: {
-		fixed: [
-			'Small knife',
-			'Map of the city you grew up in',
-			'Pet mouse',
-			'Token to remember your parents by',
-			'Common clothes',
-			'Belt pouch with 10 gp'
-		],
+		fixed: startingEquipment,
 		choices: []
 	},
 	feature: 'City Secrets',
@@ -72,7 +66,7 @@ export const urchin: BackgroundData = {
 			id: 'urchin_equipment',
 			description: {
 				blocks: [
-					{ type: 'text', text: 'You start with a small knife, city map, pet mouse, token from parents, common clothes, and 10 gp.' },
+					{ type: 'text', text: 'You start with a tin cup, city map, token from parents, common clothes, and 10 gp.' },
 				]
 			},
 			source: 'background:Urchin'

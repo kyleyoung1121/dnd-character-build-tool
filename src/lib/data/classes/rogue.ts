@@ -139,7 +139,7 @@ const rogueArchetypePrompt: FeaturePrompt = {
 		placeholderText: '-Choose an Archetype-',
 		options: [
 			{
-				name: 'Thief',
+				name: 'Former Thief',
 				optionDescription: `Fast hands and second-story work. You gain the ability to use the Use Magic Device feature and climb faster.`,
 				nestedPrompts: [
 					{
@@ -179,7 +179,7 @@ const rogueArchetypePrompt: FeaturePrompt = {
 				]
 			},
 			{
-				name: 'Assassin',
+				name: 'Former Assassin',
 				optionDescription: `You are an expert at infiltration, disguise, and dealing deadly strikes.`,
 				nestedPrompts: [
 					{
@@ -200,8 +200,8 @@ const rogueArchetypePrompt: FeaturePrompt = {
 						]
 					},
 					{
-						id: 'rogue_assassin_assassinate_01',
-						name: 'Assassinate',
+						id: 'rogue_assassin_deadly_blow_01',
+						name: 'Deadly Blow',
 						description: {
 							blocks: [
 								{ type: 'text', text: 'Any hit you score against a creature that is surprised is a critical hit.' },
@@ -212,7 +212,7 @@ const rogueArchetypePrompt: FeaturePrompt = {
 							{
 								target: 'features',
 								action: 'add',
-								value: 'Assassinate'
+								value: 'Deadly Blow'
 							}
 						]
 					}

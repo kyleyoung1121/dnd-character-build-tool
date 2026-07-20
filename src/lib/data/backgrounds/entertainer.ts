@@ -12,13 +12,13 @@ export const entertainer: BackgroundData = {
 	toolProficiencies: ['Disguise kit', 'One type of musical instrument'],
 	equipment: [
 		'Musical instrument (one of your choice)',
-		'Favor of an admirer (letter, trinket, etc)',
+		'Piece of fan mail',
 		'Costume',
 		'Belt pouch with 15 gp'
 	],
 	startingEquipment: {
 		fixed: [
-			'Favor of an admirer (letter, trinket, etc)',
+			'Piece of fan mail',
 			'Costume',
 			'Belt pouch with 15 gp'
 		],
@@ -100,7 +100,7 @@ export const entertainer: BackgroundData = {
 			id: 'entertainer_equipment',
 			description: {
 				blocks: [
-					{ type: 'text', text: 'You start with a musical instrument, favor of an admirer, costume, and 15 gp.' },
+					{ type: 'text', text: 'You start with a musical instrument, piece of fan mail, costume, and 15 gp.' },
 				]
 			},
 			source: 'background:Entertainer'

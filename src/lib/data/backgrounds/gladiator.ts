@@ -11,14 +11,14 @@ export const gladiator: BackgroundData = {
 	skillProficiencies: ['Acrobatics', 'Performance'],
 	toolProficiencies: ['Disguise kit', 'One type of unusual weapon'],
 	equipment: [
-		'Favor of an admirer (letter, trinket, etc)',
-		'Costume',
+		'Piece of fan mail',
+		'Gladiator Costume',
 		'Belt pouch with 15 gp'
 	],
 	startingEquipment: {
 		fixed: [
-			'Favor of an admirer (letter, trinket, etc)',
-			'Costume',
+			'Piece of fan mail',
+			'Gladiator Costume',
 			'Belt pouch with 15 gp'
 		],
 		choices: []
@@ -76,7 +76,7 @@ export const gladiator: BackgroundData = {
 			id: 'gladiator_equipment',
 			description: {
 				blocks: [
-					{ type: 'text', text: 'You start with an unusual weapon, favor of an admirer, costume, and 15 gp.' },
+					{ type: 'text', text: 'You start with an unusual weapon, piece of fan mail, gladiator costume, and 15 gp.' },
 				]
 			},
 			source: 'background:Gladiator'

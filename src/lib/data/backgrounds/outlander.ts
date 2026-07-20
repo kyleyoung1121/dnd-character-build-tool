@@ -11,11 +11,11 @@ export const outlander: BackgroundData = {
 	skillProficiencies: ['Athletics', 'Survival'],
 	toolProficiencies: ['One type of musical instrument'],
 	languageCount: 1,
-	equipment: ['Staff', 'Hunting trap', "Traveler's clothes", 'Belt pouch with 10 gp'],
+	equipment: ['Staff', 'Snare', "Traveler's clothes", 'Belt pouch with 10 gp'],
 	startingEquipment: {
 		fixed: [
 			'Staff',
-			'Hunting trap',
+			'Snare',
 			"Traveler's clothes",
 			'Belt pouch with 10 gp'
 		],
@@ -119,7 +119,7 @@ export const outlander: BackgroundData = {
 			id: 'outlander_equipment',
 			description: {
 				blocks: [
-					{ type: 'text', text: 'You start with a staff, hunting trap, traveler\'s clothes, and 10 gp.' },
+					{ type: 'text', text: 'You start with a staff, snare, traveler\'s clothes, and 10 gp.' },
 				]
 			},
 			source: 'background:Outlander'

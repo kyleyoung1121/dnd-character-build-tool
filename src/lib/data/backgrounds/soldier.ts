@@ -11,7 +11,6 @@ export const soldier: BackgroundData = {
 	toolProficiencies: ['One type of gaming set', 'Vehicles (land)'],
 	equipment: [
 		'Insignia of rank',
-		'Trophy from fallen enemy',
 		'Deck of cards',
 		'Common clothes',
 		'Belt pouch with 10 gp'
@@ -19,7 +18,6 @@ export const soldier: BackgroundData = {
 	startingEquipment: {
 		fixed: [
 			'Insignia of rank',
-			'Trophy from fallen enemy',
 			'Deck of cards',
 			'Common clothes',
 			'Belt pouch with 10 gp'
@@ -74,7 +72,7 @@ export const soldier: BackgroundData = {
 			id: 'soldier_equipment',
 			description: {
 				blocks: [
-					{ type: 'text', text: 'You start with insignia of rank, trophy from fallen enemy, deck of cards, common clothes, and 10 gp.' },
+					{ type: 'text', text: 'You start with insignia of rank, deck of cards, common clothes, and 10 gp.' },
 				]
 			},
 			source: 'background:Soldier'

@@ -354,6 +354,9 @@ export const PDF_CONFIG = {
 		['Spells Sorcerer', '/pdf-templates/spells_sorcerer.pdf'],
 		['Spells Warlock', '/pdf-templates/spells_warlock.pdf'],
 		['Spells Monk', '/pdf-templates/spells_monk.pdf'],
+
+		['Wild Magic', '/pdf-templates/wild_magic.pdf'],
+		['Exhaustion', '/pdf-templates/exhaustion.pdf'],
 	]),
 
 	fontPaths: [

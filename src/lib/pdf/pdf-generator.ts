@@ -88,8 +88,6 @@ async function fillFrontPage(
 	fillFormField(form, 'subclass_info', data.subclass, 12);
 	fillFormField(form, 'species_info', data.species, 12);
 	fillFormField(form, 'background_info', data.background, 12);
-	//fillFormField(form, 'player_info', 'value');
-	//fillFormField(form, 'character_name', 'value');
 	fillFormField(form, 'player_info', data.playerName + ' (' + data.library + ')', 12);
 	fillFormField(form, 'character_name', data.characterName, 12);
 
@@ -1518,6 +1516,9 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 		const spellsWarlockPageDoc = await loadTemplate('Spells Warlock');
 		const spellsMonkPageDoc = await loadTemplate('Spells Monk');
 
+		const wildMagicDoc = await loadTemplate('Wild Magic');
+		const exhaustionDoc = await loadTemplate('Exhaustion');
+
 		// Custom Fonts
 		const fontOneBuffer = await loadFontBuffer(0);
 		//const fontTwoBuffer = await loadFontBuffer(1);
@@ -1535,6 +1536,8 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 			spellsSorcererPageDoc,
 			spellsWarlockPageDoc,
 			spellsMonkPageDoc,
+			wildMagicDoc,
+			exhaustionDoc,
 		]
 
 		// Register and store fonts for each page
@@ -1573,7 +1576,9 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 		const spellsWarlockPage = spellsWarlockPageDoc.getPages()[0];
 		const spellsMonkPage = spellsMonkPageDoc.getPages()[0];
 
-		
+		const wildMagicPage = wildMagicDoc.getPages()[0];
+		const exhaustionPage = exhaustionDoc.getPages()[0];
+
 		// Start filling pages with data
 		let freshPdfDoc = await PDFDocument.create()
 
@@ -1590,14 +1595,12 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 		freshPdfDoc.addPage(featuresPageCopy)
 		freshPdfDoc.addPage(equipmentPageCopy)
 
-
 		// For other export pages, we may need to check the character's details to see what pages will be added
 		const char = data.characterReference;
 		let selectedClass = char.class;
 		let selectedSubClass = char.subclass;
 		let selectedSpecies = char.race;
 		let selectedSubSpecies = char.subrace;
-
 
 		// Check beast usage
 		if (hasBeastAccess(char)) {
@@ -1606,8 +1609,6 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 			freshPdfDoc.addPage(beastsPageCopy)
 		}
 		
-
-
 		// Check spell usage, and ID which spell page one to use for this character
 		let spellsPageOneDoc: PDFDocument | undefined;
 		switch (selectedClass) {
@@ -1687,6 +1688,16 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 			
 		}
 
+		if (data.subclass == 'Berserker') {
+			const [exhaustionPageCopy] = await freshPdfDoc.copyPages(exhaustionDoc, [0])
+			freshPdfDoc.addPage(exhaustionPageCopy)
+		}
+
+		if (data.subclass == 'Wild Magic') {
+			const [wildMagicPageCopy] = await freshPdfDoc.copyPages(wildMagicDoc, [0])
+			freshPdfDoc.addPage(wildMagicPageCopy)
+		}
+		
 		const pdfBytes = await freshPdfDoc.save();
 
 		const byteArray = new Uint8Array(pdfBytes);

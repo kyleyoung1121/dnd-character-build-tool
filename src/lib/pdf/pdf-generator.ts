@@ -88,7 +88,11 @@ async function fillFrontPage(
 	fillFormField(form, 'subclass_info', data.subclass, 12);
 	fillFormField(form, 'species_info', data.species, 12);
 	fillFormField(form, 'background_info', data.background, 12);
-	fillFormField(form, 'player_info', data.playerName + ' (' + data.library + ')', 12);
+	let playerNameWithLibrary = '';
+	if (data.playerName && data.library) {
+		playerNameWithLibrary = data.playerName + ' (' + data.library + ')';
+	}
+	fillFormField(form, 'player_info', playerNameWithLibrary, 12);
 	fillFormField(form, 'character_name', data.characterName, 12);
 
 	// - - - - -

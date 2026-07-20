@@ -52,7 +52,8 @@
 	async function handleDownload() {
 		try {
 			const sheetData = mapCharacterToSheetData(character);
-			await downloadCharacterSheet(sheetData, `${character.name || 'character'}-sheet.pdf`);
+			const fileName = `${character.library} - ${character.playerName} - ${character.characterName}.pdf`
+			await downloadCharacterSheet(sheetData, fileName);
 			showExportDialog = false;
 		} catch (error) {
 			console.error('Failed to download PDF:', error);

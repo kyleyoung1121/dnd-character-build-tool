@@ -402,15 +402,10 @@ export function cleanDescription(description: string): string {
 	result = result.replace(/<\/?ul>/gi, '');
 	result = result.replace(/<\/?ol>/gi, '');
 	
-	// Convert <strong> and <b> tags to PDF bold markers
+	// Convert <strong> tags to PDF bold markers
 	result = result.replace(/<strong>(.*?)<\/strong>/gi, (match, p1) => {
 		return `${p1.toUpperCase()}`;
 	});
-	result = result.replace(/<b>(.*?)<\/b>/gi, '[[DEBUG_THREE:$1]]');
-	
-	// Convert <i> and <em> tags to PDF italic markers
-	result = result.replace(/<i>(.*?)<\/i>/gi, '[[ITALIC:$1]]');
-	result = result.replace(/<em>(.*?)<\/em>/gi, '[[ITALIC:$1]]');
 	
 	// Remove any remaining HTML tags
 	result = result.replace(/<[^>]+>/g, '');

@@ -66,9 +66,9 @@
 		<p class="intro-text">
 			Welcome to the D&D Character Building Tool!
 		</p>
-		<br><br>
+		<br>
 		
-		<p>Character Name:</p> 
+		<p class="bold-header">Character Name:</p> 
 		<input
 			placeholder="Enter your character's name" 
 			class="characterNameInput input-style" 
@@ -78,7 +78,7 @@
 		>
 		<br><br>
 
-		<p>Player Name:</p> 
+		<p class="bold-header">Player Name:</p> 
 		<input 
 			placeholder="Enter your name (First L.)" 
 			class="playerNameInput input-style" 
@@ -88,7 +88,7 @@
 		>
 		<br><br>
 
-		<p>Library:</p> 
+		<p class="bold-header">Library:</p> 
 		<select 
 			class="libraryInput input-style" 
 			value={library ?? 'Select Your Library'}
@@ -151,6 +151,12 @@
 	.input-style:focus {
 		border-color: #007bff;
 		box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+	}
+
+	.bold-header {
+		margin: 0;
+		font-weight: var(--font-weight-bold);
+		font-size: var(--font-size-lg);
 	}
 
 	.librarySelect {

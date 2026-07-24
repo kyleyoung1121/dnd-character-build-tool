@@ -509,7 +509,7 @@ export const druid: ClassData = {
 	startingEquipment: {
 		fixed: [
 			'Leather armor',
-			"Explorer's pack (includes: backpack, bedroll, mess kit, tinderbox, 10 torches, 10 days of rations, waterskin, 50 feet of hempen rope)"
+			"Explorer's pack (includes: backpack, bedroll, 10 torches (tinderbox), 10 days of rations, waterskin, 50 feet of hempen rope)",
 		],
 		choices: [
 			{

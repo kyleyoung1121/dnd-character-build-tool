@@ -454,13 +454,13 @@ export const wizard: ClassData = {
 					{
 						label: "Scholar's pack",
 						items: [
-							"Scholar's pack (includes: backpack, book of lore, ink bottle, ink pen, 10 sheets of parchment, little bag of sand, small knife)"
+							"Scholar's pack (includes: backpack, ink bottle and pen, 10 sheets of parchment, little bag of sand, small knife)"
 						]
 					},
 					{
 						label: "Explorer's pack",
 						items: [
-							"Explorer's pack (includes: backpack, bedroll, mess kit, tinderbox, 10 torches, 10 days of rations, waterskin, 50 feet of hempen rope)"
+							"Explorer's pack (includes: backpack, bedroll, 10 torches (tinderbox), 10 days of rations, waterskin, 50 feet of hempen rope)",
 						]
 					}
 				]

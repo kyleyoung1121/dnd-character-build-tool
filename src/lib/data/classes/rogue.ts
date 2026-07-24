@@ -367,19 +367,19 @@ export const rogue: ClassData = {
 					{
 						label: "Burglar's pack",
 						items: [
-							"Burglar's pack (includes: backpack, 1,000 ball bearings, 10 feet of string, bell, 5 candles, crowbar, hammer, 10 pitons, hooded lantern, 2 oil flasks, 5 days rations, tinderbox, waterskin, 50 feet of hempen rope)"
+							"Burglar's pack (includes: backpack, 1,000 ball bearings, bell with 10 feet of string, 5 candles (tinderbox), crowbar, hammer and 10 pitons, hooded lantern with 2 oil flasks, 5 days rations and a waterskin, 50 feet of hempen rope)"
 						]
 					},
 					{
 						label: "Dungeoneer's pack",
 						items: [
-							"Dungeoneer's pack (includes: backpack, crowbar, hammer, 10 pitons, 10 torches, tinderbox, 10 days of rations, waterskin, 50 feet of hempen rope)"
+							"Dungeoneer's pack (includes: backpack, crowbar, hammer and 10 pitons, 10 torches (tinderbox), 10 days of rations and waterskin, 50 feet of hempen rope)"
 						]
 					},
 					{
 						label: "Explorer's pack",
 						items: [
-							"Explorer's pack (includes: backpack, bedroll, mess kit, tinderbox, 10 torches, 10 days of rations, waterskin, 50 feet of hempen rope)"
+							"Explorer's pack (includes: backpack, bedroll, 10 torches (tinderbox), 10 days of rations, waterskin, 50 feet of hempen rope)",
 						]
 					}
 				]

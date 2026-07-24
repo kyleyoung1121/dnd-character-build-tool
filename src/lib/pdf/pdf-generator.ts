@@ -862,8 +862,8 @@ async function fillEquipmentPage(
 
 	// Check for any packs, which we will display separately. Assume packs always come first.
 	if (data.equipment.includes('pack') && data.equipment.includes('(includes:') && data.equipment.includes(')')) {
-		packTextRaw = data.equipment.substring(0, data.equipment.indexOf(')')+1);
-		remainingText = data.equipment.substring(data.equipment.indexOf(')')+1);
+		packTextRaw = data.equipment.substring(0, data.equipment.lastIndexOf(')')+1);
+		remainingText = data.equipment.substring(data.equipment.lastIndexOf(')')+1);
 
 		// Pack Name: all text, up to the string 'pack'
 		packTextFormatted += packTextRaw.substring(0, packTextRaw.indexOf('pack')+4) + ':\n';
@@ -879,7 +879,6 @@ async function fillEquipmentPage(
 		// For all other equipement add a bullet point and new line to each item
 		if (remainingText[0] == '\n') {
 			remainingText = remainingText.substring(1);
-			remainingText = '•  ' + remainingText.replace(/\n/g, '\n•  ');
 		}
 	}
 

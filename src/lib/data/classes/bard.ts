@@ -438,13 +438,13 @@ export const bard: ClassData = {
 					{
 						label: "Diplomat's pack",
 						items: [
-							"Diplomat's pack (includes: chest, 2 cases for maps and scrolls, fine clothes, ink bottle, ink pen, lamp, 2 oil flasks, 5 sheets of paper, vial of perfume, sealing wax, soap)"
+							"Diplomat's pack (includes: chest, 2 cases for maps and scrolls, fine clothes, ink pen and 5 sheets of paper, lamp with 2 oil flasks, vial of perfume, sealing wax)"
 						]
 					},
 					{
 						label: "Entertainer's pack",
 						items: [
-							"Entertainer's pack (includes: backpack, bedroll, 2 costumes, 5 candles, 5 days of rations, waterskin, disguise kit)"
+							"Entertainer's pack (includes: backpack, bedroll, 2 costumes, 5 candles, 5 days of rations and a waterskin, disguise kit)"
 						]
 					}
 				]

@@ -451,13 +451,13 @@ export const sorcerer: ClassData = {
 					{
 						label: "Dungeoneer's pack",
 						items: [
-							"Dungeoneer's pack (includes: backpack, crowbar, hammer, 10 pitons, 10 torches, tinderbox, 10 days of rations, waterskin, 50 feet of hempen rope)"
+							"Dungeoneer's pack (includes: backpack, crowbar, hammer and 10 pitons, 10 torches (tinderbox), 10 days of rations and waterskin, 50 feet of hempen rope)"
 						]
 					},
 					{
 						label: "Explorer's pack",
 						items: [
-							"Explorer's pack (includes: backpack, bedroll, mess kit, tinderbox, 10 torches, 10 days of rations, waterskin, 50 feet of hempen rope)"
+							"Explorer's pack (includes: backpack, bedroll, 10 torches (tinderbox), 10 days of rations, waterskin, 50 feet of hempen rope)",
 						]
 					}
 				]

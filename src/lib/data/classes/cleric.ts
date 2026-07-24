@@ -661,13 +661,13 @@ export const cleric: ClassData = {
 					{
 						label: "Priest's pack",
 						items: [
-							"Priest's pack (includes: backpack, blanket, 10 candles, tinderbox, alms box, 2 blocks of incense, censer, vestments, 2 days of rations, waterskin)"
+							"Priest's pack (includes: backpack, blanket, 10 candles with tinderbox, 2 blocks of incense, vestments, 2 days of rations and a waterskin)"
 						]
 					},
 					{
 						label: "Explorer's pack",
 						items: [
-							"Explorer's pack (includes: backpack, bedroll, mess kit, tinderbox, 10 torches, 10 days of rations, waterskin, 50 feet of hempen rope)"
+							"Explorer's pack (includes: backpack, bedroll, 10 torches (tinderbox), 10 days of rations, waterskin, 50 feet of hempen rope)",
 						]
 					}
 				]

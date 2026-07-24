@@ -95,7 +95,7 @@ const primalPathPrompt: FeaturePrompt = {
 							blocks: [
 								{
 									type: 'text',
-									text: "Your path attunes you to the natural world. You can cast <i>beast sense</i> and <i>speak with animals</i>, but only as rituals (add 10 minutes)."
+									text: "Your path attunes you to the natural world. You can cast beast sense and speak with animals, but only as rituals (add 10 minutes)."
 								}
 							]
 						},
@@ -380,7 +380,7 @@ export const barbarian: ClassData = {
 	weaponProficiencies: ['Simple Weapons', 'Martial Weapons'],
 	startingEquipment: {
 		fixed: [
-			"Explorer's pack (includes: backpack, bedroll, mess kit, tinderbox, 10 torches, 10 days of rations, waterskin, 50 feet of hempen rope)",
+			"Explorer's pack (includes: backpack, bedroll, 10 torches (tinderbox), 10 days of rations, waterskin, 50 feet of hempen rope)",
 			'4 javelins'
 		],
 		choices: [

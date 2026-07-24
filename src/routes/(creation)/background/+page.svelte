@@ -563,8 +563,8 @@
 	<ConflictWarning tabName="background" />
 
 	<p class="intro-text">
-		Your character's background reveals where you came from, how you became an adventurer, and your
-		place in the world. Backgrounds provide skill proficiencies, languages, equipment, and special
+		Your character's background reveals what you did before joining the Order of Ethics. 
+		Backgrounds provide skill proficiencies, languages, equipment, and special
 		features that reflect your past experiences.
 	</p>
 

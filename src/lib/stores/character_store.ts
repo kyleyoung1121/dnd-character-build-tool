@@ -45,6 +45,8 @@ export type Character = {
 	dragonbornElement?: string; // Stores the chosen element (Acid, Cold, Fire, Lightning, Poison)
 	dragonbornBreathShape?: string; // Stores the chosen breath shape (15 ft. Cone, 5 ft. by 30 ft. Line)
 
+	completedCreationTabs?: string[];
+
 	// INTERNAL metadata for tracking changes
 	_provenance?: {
 		[scopeId: string]: Partial<Character>;

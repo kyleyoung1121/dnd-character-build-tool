@@ -2,7 +2,7 @@
 	import { get } from 'svelte/store';
 	import { onMount } from 'svelte';
 	import { character_store } from '$lib/stores/character_store';
-	import { applyChoice } from '$lib/stores/character_store_helpers';
+	import { applyChoice, revertChanges, applyListAddition } from '$lib/stores/character_store_helpers';
 	import { base } from '$app/paths';
 	import { getProficiencyGrantedEquipment } from '$lib/stores/proficiency_equipment_sync';
 	import { shouldHideEquipmentChoice, getEquipmentFromProficienciesBySource } from '$lib/data/proficiency-equipment-mapping';
@@ -36,6 +36,7 @@
 		EquipmentSubChoice
 	} from '$lib/data/types/ClassData';
 	import type { BackgroundData } from '$lib/data/types/BackgroundData';
+	import { AcroChoiceFlags } from 'pdf-lib';
 
 	// Create class lookup
 	const classLookup: Record<string, ClassData> = {
@@ -723,6 +724,68 @@
 			subchoiceCompletionStates = newStates;
 		}
 	}
+
+
+	// Detect if all equipment choices have been made
+	$: {
+		// Start assuming that everything is complete
+		let isEquipmentComplete = true
+
+		// If the user hasn't selected both a background and a class, the equipment cannot be complete yet
+		if ($character_store && (!$character_store.background || !$character_store.class)) {
+			isEquipmentComplete = false;
+		}
+
+		// If any sub selections remain, the equipment is not complete
+		if (subchoiceCompletionStates) {
+			for (var state in subchoiceCompletionStates) {
+				if (!subchoiceCompletionStates[state]) {
+					isEquipmentComplete = false;
+				}
+			}
+		}
+
+		// Check if each base-level choice has been completed
+		const classChoices = currentClass?.startingEquipment.choices
+		if (classChoices) {
+			// Iterate through each class choice. These are the starter equipment choices
+			for (let choiceIndex = 0; choiceIndex < classChoices.length; choiceIndex++) {
+				if (isEquipmentChoice(classChoices[choiceIndex])) {
+					let isOneOptionSelected = false;
+					// Iterate through each option for this class equipment choice
+					const optionChoices = classChoices[choiceIndex].options
+					for (let optionIndex = 0; optionIndex < optionChoices.length; optionIndex++) {
+						// If any of the options match what is selected, we know this equipment choice is done
+						if (equipmentChoices[choiceIndex]?.selectedOption === optionIndex) {
+							isOneOptionSelected = true;
+						}
+					}
+					// If none of the options match what is saved for this choice, we know more work needs to be done here
+					if (!isOneOptionSelected) {
+						isEquipmentComplete = false;
+					}
+				}
+			}
+		}
+		
+		// If all equipment choices have been made, go ahead and mark this tab as complete.
+		if (isEquipmentComplete) {
+			applyTabCompletion();
+		} else {
+			clearTabCompletion();
+		}
+	}
+
+	function applyTabCompletion() {
+		console.log('Equipment page complete!');
+		applyListAddition('tab_check:equipment', 'completedCreationTabs', 'equipment');
+	}
+
+	export function clearTabCompletion() {
+		console.log('Equipment tab not complete...');
+		revertChanges(get(character_store), 'tab_check:equipment');
+	}
+
 </script>
 
 <div class="main-content">

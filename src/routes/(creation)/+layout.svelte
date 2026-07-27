@@ -8,6 +8,7 @@
 		hasBeastAccess,
 		getBeastTabName
 	} from '$lib/stores/character_store';
+	import { get } from 'svelte/store';
 	import NotificationToast from '$lib/components/NotificationToast.svelte';
 	import { onMount } from 'svelte';
 	import { initializeSpellCleanup } from '$lib/stores/spell_cleanup';
@@ -48,6 +49,13 @@
 	// Build navigation items dynamically based on character's abilities
 	$: {
 		const items = [];
+		let tabsRequired = [];
+
+		for (const navItem of baseNavItems) {
+			if (navItem.name != "Export") {
+				tabsRequired.push(navItem.name.toLowerCase())
+			}
+		}
 
 		// Check if we're on quiz pages
 		const currentPath = $page.url.pathname;
@@ -85,17 +93,26 @@
 				href: base + '/beasts',
 				id: 'beasts'
 			});
+			tabsRequired.push('beasts')
 		}
 
 		// Add Spells tab if character has spell access
 		if (hasSpellAccess($character_store)) {
 			items.push({ name: 'Spells', href: base + '/spells', id: 'spells' });
+			tabsRequired.push('spells')
 		}
 
-		// TO DO: only show export when all other tabs are satisified
-		// Always add Export at the end
-		items.push(baseNavItems[6]); // Export
+		const state = get(character_store);
 
+		console.log('state.completedCreationTabs:', state.completedCreationTabs);
+		console.log('tabsRequired:', tabsRequired);
+
+		// Check to see if the player has completed a number of tabs equal to how many we expect to be finished
+		if (state.completedCreationTabs?.length === tabsRequired.length) {
+			console.log('All Tabs Done!');
+			items.push(baseNavItems[6]); // Export
+		}
+		
 		navItems = items;
 	}
 

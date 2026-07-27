@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
 	import { onMount } from 'svelte';
-	import { applyChoice, revertChanges } from '$lib/stores/character_store_helpers';
+	import { applyChoice, revertChanges, applyListAddition } from '$lib/stores/character_store_helpers';
 	import { get } from 'svelte/store';
 	import { character_store } from '$lib/stores/character_store';
 
@@ -18,6 +18,7 @@
 			}
 		);
 		characterName = target.value;
+		checkTabCompletion();
 	}
 
 	function changePlayerName(event: Event) {
@@ -29,6 +30,7 @@
 			}
 		);
 		playerName = target.value;
+		checkTabCompletion();
 	}
 
 	function changeLibrary(event: Event) {
@@ -40,6 +42,25 @@
 			}
 		);
 		library = target.value;
+		checkTabCompletion();
+	}
+
+	function applyTabCompletion() {
+		console.log('Details page complete!');
+		applyListAddition('tab_check:details', 'completedCreationTabs', 'details');
+	}
+
+	export function clearTabCompletion() {
+		console.log('Details tab not complete...');
+		revertChanges(get(character_store), 'tab_check:details');
+	}
+
+	function checkTabCompletion() {
+		if (playerName && characterName && library) {
+			applyTabCompletion();
+		} else {
+			clearTabCompletion();
+		}
 	}
 
 	onMount(async () => {
@@ -56,6 +77,8 @@
 		if (state.library) {
 			library = state.library
 		}
+
+		checkTabCompletion();
 		
 	})
 

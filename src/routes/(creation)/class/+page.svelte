@@ -4,6 +4,7 @@
 	import FeatureCardList from '$lib/components/FeatureCardList.svelte';
 	import ConflictWarning from '$lib/components/ConflictWarning.svelte';
 	import { isFeatureIncomplete } from '$lib/components/feature-card-utils';
+
 	import FeatureDescription from '$lib/components/FeatureDescription.svelte';
 	
 	import { barbarian } from '$lib/data/classes/barbarian';
@@ -21,7 +22,9 @@
 	import type { ClassData } from '$lib/data/types/ClassData';
 	import type { FeaturePrompt } from '$lib/data/types/Features';
 
-	import { applyChoice, revertChanges } from '$lib/stores/character_store_helpers';
+
+
+	import { applyChoice, revertChanges, applyListAddition } from '$lib/stores/character_store_helpers';
 	import { get } from 'svelte/store';
 	import { character_store } from '$lib/stores/character_store';
 	// import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
@@ -66,6 +69,25 @@
 		feature,
 		incomplete: isFeatureIncomplete(feature, featureSelections)
 	}));
+
+	$: {
+		if (selectedClassData && featureStatuses) {
+			let everythingComplete = true;
+			for (let i = 0; i < featureStatuses.length; i++) {
+				if (featureStatuses[i].incomplete) {
+					everythingComplete = false;
+				}
+			}
+			if (everythingComplete) {
+				applyTabCompletion();
+			} else {
+				clearTabCompletion();
+			}
+
+		} else {
+			clearTabCompletion();
+		}
+	}
 
 	function removeSelectedClass() {
 		if (selectedClassData) {
@@ -129,6 +151,11 @@
 		featureSelections = {};
 		expandedFeatures = new Set();
 		bumpVersion();
+
+		clearTabCompletion()
+		revertChanges(get(character_store), 'tab_check:equipment');
+		revertChanges(get(character_store), 'tab_check:spells');
+		revertChanges(get(character_store), 'tab_check:beasts');
 	}
 
 	function confirmAddClass(classInfo: ClassData) {
@@ -600,12 +627,21 @@
 
 		// Trigger Svelte reactivity
 		featureSelections = { ...featureSelections };
+		console.log('featureSelections: ', featureSelections);
 		bumpVersion();
 	}); // end onMount
 
+	function applyTabCompletion() {
+		console.log('Class page complete!');
+		applyListAddition('tab_check:class', 'completedCreationTabs', 'class');
+	}
+
+	export function clearTabCompletion() {
+		console.log('Class tab not complete...');
+		revertChanges(get(character_store), 'tab_check:class');
+	}
 
 </script>
-
 
 
 <div class="main-content">

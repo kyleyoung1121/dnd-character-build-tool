@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
 	import { character_store, getBeastTabName, hasBeastAccess } from '$lib/stores/character_store';
-	import { applyChoice, revertChanges } from '$lib/stores/character_store_helpers';
+	import { applyChoice, revertChanges, applyListAddition } from '$lib/stores/character_store_helpers';
 	import { beasts } from '$lib/data/beasts/index';
 	import BeastCard from '$lib/components/BeastCard.svelte';
 	import type { Beast } from '$lib/data/beasts/types';
@@ -176,6 +176,8 @@
 		// Persist selections
 		persistBeastSelections();
 		// If at max capacity and trying to select a new beast, button will be disabled so this won't be called
+
+		checkTabCompletion();
 	}
 
 	function toggleCR(cr: Number) {
@@ -278,6 +280,33 @@
 	onMount(() => {
 		restoreBeastSelectionsFromStore();
 	});
+
+	$: {
+		if (selectedBeasts.size === MAX_SELECTIONS) {
+			applyTabCompletion();
+		} else {
+			clearTabCompletion();
+		}
+	}
+
+	function checkTabCompletion() {
+		if (selectedBeasts.size === MAX_SELECTIONS) {
+			applyTabCompletion();
+		} else {
+			clearTabCompletion();
+		}
+	}
+	
+
+	function applyTabCompletion() {
+		console.log('Beasts page complete!');
+		applyListAddition('tab_check:beasts', 'completedCreationTabs', 'beasts');
+	}
+
+	export function clearTabCompletion() {
+		console.log('Beasts tab not complete...');
+		revertChanges(get(character_store), 'tab_check:beasts');
+	}
 </script>
 
 <div class="page-container">

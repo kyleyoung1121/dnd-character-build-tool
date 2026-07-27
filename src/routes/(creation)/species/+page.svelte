@@ -24,7 +24,7 @@
 	import FeatureDescription from '$lib/components/FeatureDescription.svelte';
 	// import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
 
-	import { applyChoice, revertChanges } from '$lib/stores/character_store_helpers';
+	import { applyChoice, revertChanges, applyListAddition } from '$lib/stores/character_store_helpers';
 	import { get } from 'svelte/store';
 	import { character_store } from '$lib/stores/character_store';
 	import { getSpellAccessForCharacter, getSpellsByLevel } from '$lib/data/spells';
@@ -126,6 +126,25 @@
 		feature,
 		incomplete: isFeatureIncomplete(feature, featureSelections)
 	}));
+
+	$: {
+		if (selectedSpeciesData && featureStatuses) {
+			let everythingComplete = true;
+			for (let i = 0; i < featureStatuses.length; i++) {
+				if (featureStatuses[i].incomplete) {
+					everythingComplete = false;
+				}
+			}
+			if (everythingComplete) {
+				applyTabCompletion();
+			} else {
+				clearTabCompletion();
+			}
+
+		} else {
+			clearTabCompletion();
+		}
+	}
 
 	// Helper function needed by onMount
 	function ensureArrayLen(arr: (string | null)[], len: number) {
@@ -875,6 +894,16 @@
 		bumpVersion();
 
 	}); // end onMount
+
+	function applyTabCompletion() {
+		console.log('Species page complete!');
+		applyListAddition('tab_check:species', 'completedCreationTabs', 'species');
+	}
+
+	export function clearTabCompletion() {
+		console.log('Species tab not complete...');
+		revertChanges(get(character_store), 'tab_check:species');
+	}
 
 </script>
 

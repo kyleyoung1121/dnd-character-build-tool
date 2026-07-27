@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { character_store } from '$lib/stores/character_store';
 	import { get } from 'svelte/store';
+	import { applyChoice, revertChanges, applyListAddition } from '$lib/stores/character_store_helpers';
 	import { getSpellAccessForCharacter, getSpellsByLevel } from '$lib/data/spells';
 
 	const standardArray = [15, 14, 13, 12, 10, 8];
@@ -333,6 +334,14 @@
 	// Filter out null and 0 (0 indicates only bonuses exist, not a real selection)
 	$: usedScores = Object.values(selectedScores).filter((s) => s !== null && s > 0);
 
+	$: {
+		if (usedScores && usedScores.length == 6) {
+			applyTabCompletion();
+		} else {
+			clearTabCompletion();
+		}
+	}
+
 	// Apply ability scores to character store
 	$: {
 		const updates = {} as any;
@@ -501,6 +510,24 @@
 	function dismissSpellLimitWarning() {
 		showSpellLimitWarning = false;
 	}
+
+	function applyTabCompletion() {
+		console.log('Abilities page complete!');
+		applyListAddition('tab_check:abilities', 'completedCreationTabs', 'abilities');
+	}
+
+	export function clearTabCompletion() {
+		console.log('Abilities tab not complete...');
+		revertChanges(get(character_store), 'tab_check:abilities');
+	}
+
+	function checkTabCompletion() {
+		if (usedScores && usedScores.length == 6) {
+			applyTabCompletion();
+		} else {
+			clearTabCompletion();
+		}
+	}
 </script>
 
 <div class="container">
@@ -559,6 +586,7 @@
 					<select
 						bind:value={selectedScores[stat]}
 						class="w-full rounded border px-2 py-1 focus:ring-2 focus:ring-indigo-200 focus:outline-none"
+						on:change={(e) => checkTabCompletion()}
 					>
 						<option value={null}>--</option>
 						{#each standardArray as num}

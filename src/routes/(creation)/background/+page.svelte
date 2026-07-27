@@ -12,7 +12,7 @@
 	import type { BackgroundData } from '$lib/data/types/BackgroundData';
 	import type { FeaturePrompt } from '$lib/data/types/Features';
 
-	import { applyChoice, revertChanges } from '$lib/stores/character_store_helpers';
+	import { applyChoice, revertChanges, applyListAddition } from '$lib/stores/character_store_helpers';
 	import { get } from 'svelte/store';
 	import { character_store } from '$lib/stores/character_store';
 	//import EnhancedPopup from '$lib/components/EnhancedPopup.svelte';
@@ -72,6 +72,25 @@
 		incomplete: isFeatureIncomplete(feature, featureSelections)
 	}));
 
+	$: {
+		if (selectedBackgroundData && featureStatuses) {
+			let everythingComplete = true;
+			for (let i = 0; i < featureStatuses.length; i++) {
+				if (featureStatuses[i].incomplete) {
+					everythingComplete = false;
+				}
+			}
+			if (everythingComplete) {
+				applyTabCompletion();
+			} else {
+				clearTabCompletion();
+			}
+
+		} else {
+			clearTabCompletion();
+		}
+	}
+
 	function removeSelectedBackground() {
 		if (selectedBackgroundData) {
 			const state = get(character_store);
@@ -113,6 +132,10 @@
 		featureSelections = {};
 		expandedFeatures = new Set();
 		bumpVersion();
+
+		clearTabCompletion()
+		revertChanges(get(character_store), 'tab_check:equipment');
+		revertChanges(get(character_store), 'tab_check:spells');
 	}
 
 	function confirmAddBackground(backgroundInfo: BackgroundData) {
@@ -556,6 +579,17 @@
 		bumpVersion();
 		//console.log('[BG DEBUG] Background restoration completed');
 	});
+
+	function applyTabCompletion() {
+		console.log('Background page complete!');
+		applyListAddition('tab_check:background', 'completedCreationTabs', 'background');
+	}
+
+	export function clearTabCompletion() {
+		console.log('Background tab not complete...');
+		revertChanges(get(character_store), 'tab_check:background');
+	}
+
 </script>
 
 <div class="main-content">

@@ -190,6 +190,20 @@ export function revertChanges(char: Character, scopeId: string): Character {
 	return char;
 }
 
+export function applyListAddition(scopeID: string, target: string, value: any) {
+	// Collect updates from static effects
+	const update: Record<string, any> = {};
+
+	const arr = Array.isArray(value) ? value : [value];
+	if (!update[target]) update[target] = [];
+	update[target].push(...arr);
+
+	// Apply changes, if valid
+	if (Object.keys(update).length > 0) {
+		applyChoice(scopeID, update);
+	}
+}
+
 /**
  * Smart array removal that removes the correct number of instances contributed by target scope
  * while preserving instances from other sources

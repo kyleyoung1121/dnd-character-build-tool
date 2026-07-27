@@ -4,7 +4,7 @@
 	import { detectSpellLimitViolations } from '$lib/stores/conflict_detection'
 	import ConflictWarning from '$lib/components/ConflictWarning.svelte';
 	import { character_store, hasSpellAccess } from '$lib/stores/character_store';
-	import { applyChoice } from '$lib/stores/character_store_helpers';
+	import { applyChoice, revertChanges, applyListAddition } from '$lib/stores/character_store_helpers';
 	import {
 		spells,
 		getSpellsByLevel,
@@ -407,6 +407,7 @@
 
 		// Persist spell selections to character store
 		persistSpellSelections();
+		checkPageCompletion();
 	}
 
 	// Toggle spell card expansion
@@ -1742,6 +1743,51 @@
 
 		return null;
 	})();
+
+	$: {
+		let isPageComplete = true
+		if (hasSpellAccess(character)) {
+			for (const source of spellSources) {
+				if (!isTabCompleted(character, source.id)) {
+					isPageComplete = false;
+				}
+			}
+		}
+
+		if (isPageComplete) {
+			applyTabCompletion();
+		} else {
+			clearTabCompletion();
+		}
+	}
+
+	function checkPageCompletion() {
+		let isPageComplete = true
+		if (hasSpellAccess(character)) {
+			for (const source of spellSources) {
+				if (!isTabCompleted(character, source.id)) {
+					isPageComplete = false;
+				}
+			}
+		}
+
+		if (isPageComplete) {
+			applyTabCompletion();
+		} else {
+			clearTabCompletion();
+		}
+	}
+
+	function applyTabCompletion() {
+		console.log('Spells page complete!');
+		applyListAddition('tab_check:spells', 'completedCreationTabs', 'spells');
+	}
+
+	export function clearTabCompletion() {
+		console.log('Spells tab not complete...');
+		revertChanges(get(character_store), 'tab_check:spells');
+	}
+
 </script>
 
 <div class="main-content">

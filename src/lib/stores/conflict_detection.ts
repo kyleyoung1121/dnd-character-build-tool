@@ -159,7 +159,7 @@ export function detectSpellLimitViolations(character: Character): Conflict[] {
 	const violations: SpellLimitViolation[] = [];
 
 	// let metadata = (character._provenance?.spell_selections as any)._metadata
-	let metadata = character._provenance?.spell_selections._metadata;
+	let metadata = character._provenance?.spell_selections?._metadata;
 
 	if (!metadata) {
 		// Calculate current spell limits (mirroring the logic from spells page)

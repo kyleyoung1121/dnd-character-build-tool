@@ -13,6 +13,7 @@
 	// Determine max selections based on character
 	$: maxSelections = isBeastMaster ? 1 : 3;
 	$: MAX_SELECTIONS = maxSelections; // Keep constant name for template compatibility
+	$: REQUIRED_SELECTIONS = 1
 
 	// Sorting and filtering
 	let sortBy = 'cr'; // 'name' or 'cr' - default to CR
@@ -282,7 +283,7 @@
 	});
 
 	$: {
-		if (selectedBeasts.size === MAX_SELECTIONS) {
+		if (selectedBeasts.size >= REQUIRED_SELECTIONS) {
 			applyTabCompletion();
 		} else {
 			clearTabCompletion();
@@ -290,7 +291,7 @@
 	}
 
 	function checkTabCompletion() {
-		if (selectedBeasts.size === MAX_SELECTIONS) {
+		if (selectedBeasts.size >= REQUIRED_SELECTIONS) {
 			applyTabCompletion();
 		} else {
 			clearTabCompletion();

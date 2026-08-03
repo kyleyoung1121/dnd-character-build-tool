@@ -761,8 +761,8 @@
 		padding: var(--spacing-4) var(--spacing-6);
 		font-size: var(--font-size-lg);
 		cursor: pointer;
-		border: 2px solid var(--color-border);
-		border-radius: var(--radius-md);
+		border: 2px solid var(--color-neutral-500);
+		border-radius: var(--radius-lg);
 		background-color: var(--color-background-alt);
 		transition: background-color var(--transition-base);
 		text-align: left;
@@ -1115,8 +1115,8 @@
 
 	.simple-background-card {
 		background-color: var(--color-background-alt);
-		border: 2px solid var(--color-border);
-		border-radius: var(--radius-md);
+		border: 2px solid var(--color-neutral-500);
+		border-radius: var(--radius-lg);
 		padding: var(--spacing-6);
 		transition: border-color var(--transition-base), box-shadow var(--transition-base);
 	}

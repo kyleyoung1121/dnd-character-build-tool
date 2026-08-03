@@ -202,7 +202,8 @@
 	/* Highlight current page */
 	nav a[aria-current='page'] {
 		background-color: var(--color-primary-blue); /* blue for current page */
-		box-shadow: var(--shadow-primary);
+		border-width: 3px;
+		border-color: white;
 	}
 
 	/* Conflict indicator styles */

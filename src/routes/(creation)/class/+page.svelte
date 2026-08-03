@@ -381,7 +381,7 @@
 				}
 
 				const provLookup = getProvenanceEntry(feature.name, idx, parentFeatureName, parentIndex);
-				const stored = provLookup?.entry;
+				const stored = provLookup?.entry as any;
 				const provKey = provLookup?.key;
 
 				// try to restore from direct provenance entry
@@ -519,7 +519,7 @@
 
 				// try multiple possible provenance key shapes
 				const provLookup = getProvenanceEntry(feature.name, idx);
-				const stored = provLookup?.entry;
+				const stored = provLookup?.entry as any;
 				const provKey = provLookup?.key;
 
 				let restored: string | null = null;

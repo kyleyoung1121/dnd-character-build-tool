@@ -287,9 +287,7 @@
 		// Filter to only count leveled spells (exclude cantrips and always-prepared spells)
 		// NOTE: currentCharacter.spells may contain strings OR objects with a 'name' property
 		const preparedSpells = currentCharacter.spells.filter((spell) => {
-			// Extract spell name (handle both string and object formats)
-			const spellName = typeof spell === 'string' ? spell : spell.name;
-			return !alwaysPreparedSpells.includes(spellName) && !cantripNames.has(spellName);
+			return !alwaysPreparedSpells.includes(spell) && !cantripNames.has(spell);
 		});
 
 		// If current prepared spells exceed new limit, show warning
@@ -329,7 +327,7 @@
 					for (const feat of features) {
 						names.push(feat.name);
 						if (feat.featureOptions) {
-							for (const opt of feat.featureOptions.options) {
+							for (const opt of feat.featureOptions.options || []) {
 								if (typeof opt !== 'string' && opt.nestedPrompts) {
 									names.push(...collectFeatureNames(opt.nestedPrompts));
 								}
@@ -339,10 +337,10 @@
 					return names;
 				}
 
-				const allFeatureNames = collectFeatureNames(selectedSpeciesData.speciesFeatures || []);
+				const allFeatureNames = collectFeatureNames(selectedSpeciesData?.speciesFeatures || []);
 
 				const prefixes = [
-					`race:${selectedSpeciesData.name}`,
+					`race:${selectedSpeciesData?.name}`,
 					...allFeatureNames.map((f) => `feature:${f}`)
 				];
 
@@ -381,7 +379,7 @@
 						for (const feat of features) {
 							names.push(feat.name);
 							if (feat.featureOptions) {
-								for (const opt of feat.featureOptions.options) {
+								for (const opt of feat.featureOptions.options || []) {
 									if (typeof opt !== 'string' && opt.nestedPrompts) {
 										names.push(...collectFeatureNames(opt.nestedPrompts));
 									}
@@ -391,10 +389,10 @@
 						return names;
 					}
 
-					const allFeatureNames = collectFeatureNames(selectedSpeciesData.speciesFeatures || []);
+					const allFeatureNames = collectFeatureNames(selectedSpeciesData?.speciesFeatures || []);
 
 					const prefixes = [
-						`race:${selectedSpeciesData.name}`,
+						`race:${selectedSpeciesData?.name}`,
 						...allFeatureNames.map((f) => `feature:${f}`)
 					];
 
@@ -645,7 +643,7 @@
 				}
 
 				const provLookup = getProvenanceEntry(feature.name, idx, parentFeatureName, parentIndex);
-				const stored = provLookup?.entry;
+				const stored = provLookup?.entry as any;
 				const provKey = provLookup?.key;
 
 				// try to restore from direct provenance entry
@@ -663,7 +661,7 @@
 				if (!restored && stored?._set) {
 					for (const effect of feature.effects || []) {
 						const target = effect.target;
-						const arr = stored._set?.[target];
+						const arr = stored?._set?.[target];
 						if (Array.isArray(arr)) {
 							for (const val of arr) {
 								const maybe = tryRestoreFromValue(val, optionMap);
@@ -783,7 +781,7 @@
 
 				// try multiple possible provenance key shapes
 				const provLookup = getProvenanceEntry(feature.name, idx);
-				const stored = provLookup?.entry;
+				const stored = provLookup?.entry as any;
 				const provKey = provLookup?.key;
 
 				let restored: string | null = null;

@@ -865,27 +865,6 @@
 		color: var(--color-text-secondary);
 	}
 
-	/* Fighter-specific styles */
-	.fighter-options {
-		display: flex;
-		flex-direction: column;
-		gap: var(--spacing-4);
-	}
-
-	.priority-subgroup {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: var(--spacing-2);
-		margin-left: var(--spacing-4);
-	}
-
-	.priority-sublabel {
-		font-weight: var(--font-weight-medium);
-		font-size: var(--font-size-sm);
-		color: var(--color-neutral-500);
-	}
-
 	.mb-6 {
 		margin-bottom: var(--spacing-6);
 	}
@@ -1015,95 +994,6 @@
 
 	.popup-affects-list li:last-child {
 		margin-bottom: 0;
-	}
-
-	/* Validation card styles */
-	.validation-card {
-		border-left: 4px solid var(--color-accent-orange);
-		background: linear-gradient(to right, #fffbeb, #fde68a);
-	}
-
-	.validation-card.success {
-		border-left-color: var(--color-success-bright);
-		background: linear-gradient(to right, #ecfdf5, #d1fae5);
-	}
-
-	.validation-header {
-		margin-bottom: var(--spacing-3);
-	}
-
-	.validation-title {
-		font-size: var(--font-size-base);
-		font-weight: var(--font-weight-bold);
-		color: #92400e;
-		margin: 0;
-	}
-
-	.validation-card.success .validation-title {
-		color: #065f46;
-	}
-
-	.validation-content {
-		display: flex;
-		flex-direction: column;
-		gap: var(--spacing-2);
-	}
-
-	.validation-section {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: var(--spacing-2);
-	}
-
-	.validation-label {
-		font-weight: var(--font-weight-semibold);
-		font-size: var(--font-size-sm);
-	}
-
-	.validation-label.warning {
-		color: #d97706;
-	}
-
-	.validation-label.info {
-		color: var(--color-primary-purple);
-	}
-
-	.validation-list {
-		display: flex;
-		flex-wrap: wrap;
-		gap: var(--spacing-2);
-	}
-
-	.validation-item {
-		padding: var(--spacing-1) var(--spacing-2);
-		border-radius: var(--radius-sm);
-		font-size: var(--font-size-xs);
-		font-weight: var(--font-weight-medium);
-		border: 1px solid;
-	}
-
-	.validation-item.warning {
-		background-color: #fed7aa;
-		color: #9a3412;
-		border-color: #fb923c;
-	}
-
-	.validation-item.info {
-		background-color: #dbeafe;
-		color: #1e40af;
-		border-color: #60a5fa;
-	}
-
-	.success-message {
-		color: #065f46;
-		font-size: var(--font-size-sm);
-		line-height: 1.5;
-		margin: 0;
-	}
-
-	.mb-4 {
-		margin-bottom: var(--spacing-4);
 	}
 
 	/* Modifier header button styles */

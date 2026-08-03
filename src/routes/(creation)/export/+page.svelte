@@ -143,18 +143,6 @@
 		padding: calc(var(--spacing-16) * 1.5) var(--spacing-8) var(--spacing-8) var(--spacing-8);
 	}
 
-	.header {
-		max-width: 1000px;
-		margin: 0 auto var(--spacing-8) auto;
-		text-align: center;
-	}
-
-	.header p {
-		font-size: var(--font-size-base);
-		color: var(--color-text-muted);
-		margin: 0;
-	}
-
 	.content-wrapper {
 		max-width: 1000px;
 		margin: 0 auto;

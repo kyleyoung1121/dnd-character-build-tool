@@ -1167,25 +1167,6 @@
 		margin: 0 auto;
 	}
 
-	.intro-text {
-		text-align: center;
-		margin-bottom: var(--spacing-8);
-	}
-
-	.intro-text h1 {
-		font-size: var(--font-size-3xl);
-		font-weight: var(--font-weight-bold);
-		margin-bottom: var(--spacing-4);
-		color: var(--color-text-primary);
-	}
-
-	.intro-text p {
-		font-size: var(--font-size-md);
-		color: var(--color-text-muted);
-		max-width: 600px;
-		margin: 0 auto;
-	}
-
 	.equipment-section {
 		background: var(--color-background);
 		border-radius: var(--radius-lg);
@@ -1235,16 +1216,10 @@
 	}
 
 	.choice-description,
-	.fixed-equipment-note,
-	.background-note,
 	.proficiency-note {
 		color: var(--color-text-muted);
 		margin-bottom: var(--spacing-4);
 		font-size: var(--font-size-sm);
-	}
-
-	.section-header.proficiency-section h2 {
-		color: var(--color-accent-purple);
 	}
 
 	.equipment-list {
@@ -1286,10 +1261,6 @@
 
 	.equipment-item-pack.class-equipment {
 		border-left-color: var(--color-primary-purple);
-	}
-
-	.equipment-item-pack.background {
-		border-left-color: var(--color-success);
 	}
 
 	.pack-name {

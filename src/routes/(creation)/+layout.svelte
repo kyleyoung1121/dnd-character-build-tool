@@ -181,9 +181,6 @@
 		justify-content: center;
 	}
 
-	nav li {
-	}
-
 	nav a {
 		color: white;
 		text-decoration: none;

@@ -558,15 +558,6 @@
 		font-size: var(--font-size-sm);
 	}
 
-	/* Hidden for now - keeping code in case needed later */
-	.results-count-inline {
-		display: none;
-		color: var(--color-text-muted);
-		font-size: var(--font-size-sm);
-		font-weight: var(--font-weight-normal);
-		margin-left: auto;
-	}
-
 	.controls-content {
 		padding: var(--spacing-5);
 		border-top: 1px solid var(--color-border-dark);

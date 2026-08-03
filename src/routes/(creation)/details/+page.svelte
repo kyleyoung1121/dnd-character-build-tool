@@ -182,39 +182,4 @@
 		font-size: var(--font-size-lg);
 	}
 
-	.librarySelect {
-		padding: 10px;
-		border: 2px solid #ccc;
-		border-radius: 5px;
-		font-size: 16px;
-		color: #555;
-		outline: none;
-		width: 60%;
-		align-content: center;
-		text-align: center;
-	}
-
-	.save {
-		display: inline-block;
-		padding: var(--spacing-3) var(--spacing-6);
-		background: var(--color-primary-purple);
-		color: white;
-		text-decoration: none;
-		border-radius: var(--radius-md);
-		font-weight: var(--font-weight-medium);
-		transition: background-color var(--transition-base);
-	}
-
-	.save:hover {
-		background: #2563eb;
-	}
-
-	h1 {
-		margin-bottom: var(--spacing-8);
-		font-size: var(--font-size-3xl);
-		font-weight: var(--font-weight-bold);
-		color: var(--color-text-primary);
-		font-family: var(--font-family-base);
-	}
-
 </style>

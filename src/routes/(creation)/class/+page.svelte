@@ -819,63 +819,6 @@
 		box-shadow: var(--shadow-focus);
 	}
 
-	.popup {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100vw;
-		height: 100vh;
-		background-color: rgba(0, 0, 0, 0.6);
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		z-index: 1000;
-	}
-
-	.popup-content {
-		background: #fff;
-		width: 50vw;
-		height: 80vh;
-		border-radius: 8px;
-		display: flex;
-		flex-direction: column;
-		overflow: hidden;
-		box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-	}
-
-	.popup-header {
-		background: #222;
-		color: white;
-		padding: 12px 16px;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		font-weight: bold;
-		position: sticky;
-		top: 0;
-		z-index: 10;
-	}
-
-	.close-button {
-		background: none;
-		border: none;
-		color: white;
-		font-size: 1.2rem;
-		cursor: pointer;
-	}
-
-	.popup-body {
-		padding: 16px;
-		overflow-y: auto;
-		flex: 1;
-	}
-
-	.description {
-		font-size: var(--font-size-sm);
-		color: var(--color-text-secondary);
-		margin-bottom: var(--spacing-1);
-	}
-
 	.selected-class-card {
 		max-width: 50vw;
 		margin: var(--spacing-8) auto var(--spacing-4) auto;
@@ -928,66 +871,6 @@
 	}
 	.remove-class-button:hover {
 		background-color: var(--color-warning-bg);
-	}
-
-	/* Feature card styling for popup content */
-	.feature-card {
-		border: 1px solid #ddd;
-		border-radius: 6px;
-		padding: 12px;
-		margin-top: 12px;
-		background-color: #f9f9f9;
-	}
-
-	.feature-card h4 {
-		margin: 0 0 8px 0;
-		font-size: 1rem;
-		font-weight: bold;
-		color: #333;
-	}
-
-	.feature-card p {
-		margin: 0;
-		font-size: 0.9rem;
-		color: #555;
-		line-height: 1.4;
-	}
-
-	.popup-footer {
-		padding: 12px 16px;
-		display: flex;
-		justify-content: flex-end;
-		gap: 10px;
-		border-top: 1px solid #ddd;
-		background: #f0f0f0;
-	}
-
-	.cancel-button {
-		background-color: #333;
-		color: white;
-		border: none;
-		padding: 0.6rem 1.2rem;
-		font-size: 1rem;
-		border-radius: 6px;
-		cursor: pointer;
-		transition: background-color 0.3s ease;
-	}
-	.cancel-button:hover {
-		background-color: #555;
-	}
-
-	.add-button {
-		background-color: #2e7d32;
-		color: white;
-		border: none;
-		padding: 0.6rem 1.2rem;
-		font-size: 1rem;
-		border-radius: 6px;
-		cursor: pointer;
-		transition: background-color 0.3s ease;
-	}
-	.add-button:hover {
-		background-color: #1b4d20;
 	}
 
 	.quiz-link-container {

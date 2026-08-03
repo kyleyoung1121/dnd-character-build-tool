@@ -1365,58 +1365,6 @@
 		transform: translateX(4px);
 	}
 
-	/* Popup and modal styles remain unchanged */
-	.popup {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100vw;
-		height: 100vh;
-		background-color: var(--color-overlay);
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		z-index: 1000;
-	}
-
-	.popup-content {
-		background: var(--color-background);
-		width: 50vw;
-		height: 80vh;
-		border-radius: var(--radius-lg);
-		display: flex;
-		flex-direction: column;
-		overflow: hidden;
-		box-shadow: var(--shadow-2xl);
-	}
-
-	.popup-header {
-		background: var(--color-primary-dark);
-		color: white;
-		padding: var(--spacing-3) var(--spacing-4);
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		font-weight: var(--font-weight-bold);
-		position: sticky;
-		top: 0;
-		z-index: 10;
-	}
-
-	.close-button {
-		background: none;
-		border: none;
-		color: white;
-		font-size: var(--font-size-lg);
-		cursor: pointer;
-	}
-
-	.popup-body {
-		padding: var(--spacing-4);
-		overflow-y: auto;
-		flex: 1;
-	}
-
 	.description {
 		font-size: var(--font-size-sm);
 		color: var(--color-text-secondary);
@@ -1469,66 +1417,6 @@
 	}
 	.remove-race-button:hover {
 		background-color: var(--color-warning-bg);
-	}
-
-	/* Feature card styling for popup content */
-	.feature-card {
-		border: 1px solid var(--color-border-light);
-		border-radius: var(--radius-md);
-		padding: var(--spacing-3);
-		margin-bottom: var(--spacing-3);
-		background-color: var(--color-neutral-50);
-	}
-
-	.feature-card h4 {
-		margin: 0 0 var(--spacing-2) 0;
-		font-size: var(--font-size-base);
-		font-weight: var(--font-weight-bold);
-		color: var(--color-text-primary);
-	}
-
-	.feature-card p {
-		margin: 0;
-		font-size: 0.9rem;
-		color: #555;
-		line-height: 1.4;
-	}
-
-	.popup-footer {
-		padding: 12px 16px;
-		display: flex;
-		justify-content: flex-end;
-		gap: 10px;
-		border-top: 1px solid #ddd;
-		background: #f0f0f0;
-	}
-
-	.cancel-button {
-		background-color: #333;
-		color: white;
-		border: none;
-		padding: 0.6rem 1.2rem;
-		font-size: 1rem;
-		border-radius: 6px;
-		cursor: pointer;
-		transition: background-color 0.3s ease;
-	}
-	.cancel-button:hover {
-		background-color: #555;
-	}
-
-	.add-button {
-		background-color: #2e7d32;
-		color: white;
-		border: none;
-		padding: 0.6rem 1.2rem;
-		font-size: 1rem;
-		border-radius: 6px;
-		cursor: pointer;
-		transition: background-color 0.3s ease;
-	}
-	.add-button:hover {
-		background-color: #1b4d20;
 	}
 
 	/* Spell Limit Warning Banner Styles */

@@ -71,7 +71,7 @@
 		font-weight: var(--font-weight-semibold);
 		font-family: var(--font-family-base);
 		color: white;
-		background: var(--color-primary-blue);
+		background: var(--color-primary-purple);
 		border: none;
 		border-radius: var(--radius-md);
 		cursor: pointer;

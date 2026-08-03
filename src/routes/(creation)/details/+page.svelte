@@ -197,7 +197,7 @@
 	.save {
 		display: inline-block;
 		padding: var(--spacing-3) var(--spacing-6);
-		background: var(--color-primary-blue);
+		background: var(--color-primary-purple);
 		color: white;
 		text-decoration: none;
 		border-radius: var(--radius-md);

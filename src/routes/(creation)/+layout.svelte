@@ -195,13 +195,13 @@
 	}
 
 	nav a:hover {
-		background-color: var(--color-primary-blue); /* bright blue on hover */
+		background-color: var(--color-primary-purple); /* bright blue on hover */
 		color: white;
 	}
 
 	/* Highlight current page */
 	nav a[aria-current='page'] {
-		background-color: var(--color-primary-blue); /* blue for current page */
+		background-color: var(--color-primary-purple); /* blue for current page */
 		border-width: 3px;
 		border-color: white;
 	}

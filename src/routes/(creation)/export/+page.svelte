@@ -208,7 +208,7 @@
 		width: 50px;
 		height: 50px;
 		border: 4px solid var(--color-border);
-		border-top-color: var(--color-primary-blue);
+		border-top-color: var(--color-primary-purple);
 		border-radius: var(--radius-circle);
 		animation: spin 1s linear infinite;
 		margin: 0 auto var(--spacing-4) auto;
@@ -248,7 +248,7 @@
 		position: fixed;
 		bottom: var(--spacing-8);
 		right: var(--spacing-8);
-		background: var(--color-primary-blue);
+		background: var(--color-primary-purple);
 		color: white;
 		border: none;
 		border-radius: var(--radius-pill);
@@ -262,7 +262,7 @@
 	}
 
 	.fab:hover {
-		background: var(--color-primary-blue-dark);
+		background: var(--color-primary-purple-dark);
 		transform: translateY(-2px);
 		box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
 	}
@@ -283,18 +283,18 @@
 	}
 
 	.btn-primary {
-		background: var(--color-primary-blue);
+		background: var(--color-primary-purple);
 		color: white;
 	}
 
 	.btn-primary:hover {
-		background: var(--color-primary-blue-dark);
+		background: var(--color-primary-purple-dark);
 	}
 
 	.btn-secondary {
 		background: var(--color-background);
-		color: var(--color-primary-blue);
-		border: 2px solid var(--color-primary-blue);
+		color: var(--color-primary-purple);
+		border: 2px solid var(--color-primary-purple);
 	}
 
 	.btn-secondary:hover {

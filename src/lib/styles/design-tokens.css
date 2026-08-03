@@ -16,11 +16,11 @@
 	   ======================================== */
 
 	/* Primary Colors - Navy/Blue (used for headers, primary actions, selected states) */
-	--color-primary-dark: #2c3e50;      /* Dark navy - popup headers, main navigation */
+	--color-primary-dark: #2F0E63;      /* Dark Indigo - popup headers, main navigation */
 	--color-primary: #34495e;           /* Navy - secondary headers, accents */
 	--color-primary-light: #4a5f7f;     /* Lighter navy for hover states */
-	--color-primary-blue: #3b82f6;      /* Bright blue - selected items, active tabs */
-	--color-primary-blue-light: #60a5fa; /* Light blue - hover states */
+	--color-primary-purple: #8847EF;      /* Purple Glitter - selected items, active tabs */
+	--color-primary-purple-light: #AF89ED; /* Soft Purple - hover states */
 
 	/* Success Colors - Green (confirm buttons, completed states) */
 	--color-success-dark: #229954;      /* Dark green - button hover */
@@ -30,7 +30,7 @@
 
 	/* Warning Colors - Red (incomplete states, delete/remove actions) */
 	--color-warning-dark: #b91c1c;      /* Dark red - active/pressed states */
-	--color-warning: #dc2626;           /* Red - incomplete items, alerts */
+	--color-warning: #DC2626;           /* Red - incomplete items, alerts */
 	--color-warning-light: #ef4444;     /* Light red - hover states */
 	--color-warning-bg: #fef2f2;        /* Very light red - warning backgrounds */
 
@@ -143,6 +143,8 @@
 	--shadow-primary: 0 0 0 3px var(--color-focus-ring);
 	--shadow-success: 0 4px 12px rgba(39, 174, 96, 0.2);
 	--shadow-warning: 0 4px 12px rgba(220, 38, 38, 0.2);
+
+	--highlight-primary: 0 0 3px #ffffff;
 
 	/* ========================================
 	   TRANSITIONS

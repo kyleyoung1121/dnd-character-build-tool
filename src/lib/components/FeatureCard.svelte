@@ -230,7 +230,7 @@
 	}
 
 	.feature-card.complete {
-		border-color: var(--color-primary-blue);
+		border-color: var(--color-primary-purple);
 	}
 
 	.feature-header {

@@ -1046,7 +1046,7 @@
 		left: 0;
 		right: 0;
 		bottom: 0;
-		background-color: var(--color-primary-blue);
+		background-color: var(--color-primary-purple);
 		transition: var(--transition-slow);
 		border-radius: 24px;
 	}
@@ -1072,7 +1072,7 @@
 	}
 
 	.toggle-slider:hover {
-		box-shadow: 0 0 4px var(--color-primary-blue);
+		box-shadow: 0 0 4px var(--color-primary-purple);
 	}
 
 	@media (max-width: 768px) {
@@ -1122,7 +1122,7 @@
 	}
 
 	.simple-background-card:hover {
-		border-color: var(--color-primary-blue);
+		border-color: var(--color-primary-purple);
 		box-shadow: var(--shadow-lg);
 	}
 

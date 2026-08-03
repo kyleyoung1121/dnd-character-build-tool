@@ -2077,14 +2077,14 @@
 	}
 
 	.tab-btn:hover {
-		border-color: var(--color-primary-blue);
+		border-color: var(--color-primary-purple);
 		background: #f0f9ff;
 		color: #1e40af;
 	}
 
 	.tab-btn.active {
-		border-color: var(--color-primary-blue);
-		background: var(--color-primary-blue);
+		border-color: var(--color-primary-purple);
+		background: var(--color-primary-purple);
 		color: #ffffff;
 		font-weight: var(--font-weight-semibold);
 	}
@@ -2107,8 +2107,8 @@
 	}
 
 	.tab-btn.completed.active {
-		background: var(--color-primary-blue);
-		border-color: var(--color-primary-blue);
+		background: var(--color-primary-purple);
+		border-color: var(--color-primary-purple);
 	}
 
 	.spell-section {
@@ -2167,7 +2167,7 @@
 	}
 
 	.spell-card:hover {
-		border-color: var(--color-primary-blue);
+		border-color: var(--color-primary-purple);
 		background: #f0f9ff;
 	}
 

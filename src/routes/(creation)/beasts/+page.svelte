@@ -478,7 +478,7 @@
 		padding: var(--spacing-4) var(--spacing-5);
 		background: var(--color-neutral-50);
 		border-radius: var(--radius-md);
-		border-left: 4px solid var(--color-primary-blue);
+		border-left: 4px solid var(--color-primary-purple);
 	}
 
 	.info-section h2 {
@@ -627,9 +627,9 @@
 	}
 
 	.control-button.active {
-		background: var(--color-primary-blue);
+		background: var(--color-primary-purple);
 		color: white;
-		border-color: var(--color-primary-blue);
+		border-color: var(--color-primary-purple);
 	}
 
 	.cr-filters {
@@ -647,7 +647,7 @@
 	.link-button {
 		background: none;
 		border: none;
-		color: var(--color-primary-blue);
+		color: var(--color-primary-purple);
 		cursor: pointer;
 		font-size: var(--font-size-sm);
 		text-decoration: underline;

@@ -252,7 +252,7 @@
 		font-size: var(--font-size-lg);
 		font-weight: var(--font-weight-semibold);
 		color: var(--color-primary-dark);
-		border-bottom: 2px solid var(--color-primary-blue);
+		border-bottom: 2px solid var(--color-primary-purple);
 		padding-bottom: var(--spacing-1);
 		display: inline-block;
 		width: fit-content;

@@ -1066,7 +1066,7 @@
 	}
 
 	.validation-label.info {
-		color: var(--color-primary-blue);
+		color: var(--color-primary-purple);
 	}
 
 	.validation-list {

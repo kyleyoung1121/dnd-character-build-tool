@@ -996,7 +996,7 @@
 	}
 
 	.quiz-link {
-		color: var(--color-primary-blue);
+		color: var(--color-primary-purple);
 		font-size: var(--font-size-md);
 		text-decoration: underline;
 		transition: color var(--transition-base);

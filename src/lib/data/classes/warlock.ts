@@ -1191,33 +1191,13 @@ export const warlock: ClassData = {
 		fixed: ['Leather armor', '2 Daggers'],
 		choices: [
 			{
-				name: 'Ranged Weapon',
-				description: 'Choose your ranged weapon or primary weapon',
+				name: 'Primary Weapon',
+				description: 'Choose your primary weapon',
 				options: [
 					{
 						label: 'Light crossbow and 20 bolts',
 						items: ['Light crossbow', '20 crossbow bolts']
 					},
-					{
-						label: 'Simple weapon',
-						items: [],
-						subChoices: [
-							{
-								name: 'Simple Weapon',
-								description: 'Choose a simple weapon',
-								type: 'weapon-list',
-								category: 'simple',
-								options: simpleWeapons,
-								count: 1
-							}
-						]
-					}
-				]
-			} as EquipmentChoice,
-			{
-				name: 'Secondary Weapon',
-				description: 'Choose your secondary simple weapon',
-				options: [
 					{
 						label: 'Simple weapon',
 						items: [],

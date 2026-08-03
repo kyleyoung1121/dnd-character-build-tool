@@ -463,6 +463,8 @@
 	function restoreSpellSelectionsFromStore() {
 		const char = $character_store;
 		if (!char._provenance) return;
+		
+		detectSpellLimitViolations(char);
 
 		const scopeId = 'spell_selections';
 		const provenanceData = char._provenance[scopeId];

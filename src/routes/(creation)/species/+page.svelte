@@ -954,7 +954,7 @@
 											<!-- Use arrow for selectable items -->
 											<img
 												class="card-arrow"
-												src="{base}/basic_icons/blue_next.png"
+												src="{base}/basic_icons/next_arrow.png"
 												alt="select"
 											/>
 										</button>
@@ -971,7 +971,7 @@
 									<span>{speciesInfo.name}</span>
 								</div>
 								<!-- Use arrow for directly selectable species -->
-								<img class="card-arrow" src="{base}/basic_icons/blue_next.png" alt="select" />
+								<img class="card-arrow" src="{base}/basic_icons/next_arrow.png" alt="select" />
 							</button>
 						</div>
 					{/if}
@@ -1014,7 +1014,7 @@
 											<!-- Use arrow for selectable items -->
 											<img
 												class="card-arrow"
-												src="{base}/basic_icons/blue_next.png"
+												src="{base}/basic_icons/next_arrow.png"
 												alt="select"
 											/>
 										</button>
@@ -1031,7 +1031,7 @@
 									<span>{speciesInfo.name}</span>
 								</div>
 								<!-- Use arrow for directly selectable species -->
-								<img class="card-arrow" src="{base}/basic_icons/blue_next.png" alt="select" />
+								<img class="card-arrow" src="{base}/basic_icons/next_arrow.png" alt="select" />
 							</button>
 						</div>
 					{/if}
@@ -1074,7 +1074,7 @@
 											<!-- Use arrow for selectable items -->
 											<img
 												class="card-arrow"
-												src="{base}/basic_icons/blue_next.png"
+												src="{base}/basic_icons/next_arrow.png"
 												alt="select"
 											/>
 										</button>
@@ -1091,7 +1091,7 @@
 									<span>{speciesInfo.name}</span>
 								</div>
 								<!-- Use arrow for directly selectable species -->
-								<img class="card-arrow" src="{base}/basic_icons/blue_next.png" alt="select" />
+								<img class="card-arrow" src="{base}/basic_icons/next_arrow.png" alt="select" />
 							</button>
 						</div>
 					{/if}

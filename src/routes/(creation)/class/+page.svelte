@@ -662,7 +662,7 @@
 						<img src={classInfo.image} alt={`${classInfo.name} icon`} />
 						<span>{classInfo.name}</span>
 					</div>
-					<img class="card-arrow" src="{base}/basic_icons/blue_next.png" alt="next arrow" />
+					<img class="card-arrow" src="{base}/basic_icons/next_arrow.png" alt="next arrow" />
 				</button>
 			{/each}
 		</div>

@@ -488,7 +488,7 @@ const classFeaturesPrompt: FeaturePrompt[] = [spellcastingPrompt, wildShapePromp
 
 export const druid: ClassData = {
 	name: 'Druid',
-	image: base + '/class_icons/druid.jpg',
+	image: base + '/class_icons/druid.png',
 	description: 'You wield the powers of nature—moonlight and plant growth, fire and lightning—and are capable of shifting into animal forms.',
 	cultureNotes: 'Druids are the embodiment of nature\'s resilience, cunning, and fury. They fight for balance in the natural world and strive for a life of living in harmony with nature, not in opposition to it.',
 	hitDie: 'd8',

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { base } from '$app/paths';
 	import { page } from '$app/stores';
 	import { activeConflicts, markTabAsVisited } from '$lib/stores/conflict_store';
@@ -124,13 +124,13 @@
 		}
 	}
 
-	function getCurrentTabId(routeId) {
+	function getCurrentTabId(routeId: string) {
 		// Extract tab id from route like "/(creation)/class" -> "class"
 		const match = routeId.match(/\(creation\)\/([^/]+)/);
 		return match ? match[1] : null;
 	}
 
-	function hasConflict(tabId) {
+	function hasConflict(tabId: string) {
 		return $activeConflicts.tabsNeedingAttention.includes(tabId);
 	}
 </script>

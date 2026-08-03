@@ -433,9 +433,7 @@
 		// Filter to only count leveled spells (exclude cantrips and oath spells)
 		// NOTE: currentCharacter.spells may contain strings OR objects with a 'name' property
 		const preparedSpells = currentCharacter.spells.filter((spell) => {
-			// Extract spell name (handle both string and object formats)
-			const spellName = typeof spell === 'string' ? spell : spell.name;
-			return !oathSpells.includes(spellName) && !cantripNames.has(spellName);
+			return !oathSpells.includes(spell) && !cantripNames.has(spell);
 		});
 
 		// If current prepared spells exceed new limit, show warning
@@ -487,9 +485,7 @@
 		// Filter to only count leveled spells (exclude cantrips and domain spells)
 		// NOTE: currentCharacter.spells may contain strings OR objects with a 'name' property
 		const preparedSpells = currentCharacter.spells.filter((spell) => {
-			// Extract spell name (handle both string and object formats)
-			const spellName = typeof spell === 'string' ? spell : spell.name;
-			return !domainSpells.includes(spellName) && !cantripNames.has(spellName);
+			return !domainSpells.includes(spell) && !cantripNames.has(spell);
 		});
 
 		// If current prepared spells exceed new limit, show warning

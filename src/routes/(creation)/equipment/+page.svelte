@@ -316,7 +316,7 @@
 		// Restore each equipment choice
 		currentClass.startingEquipment.choices.forEach((choice, choiceIndex) => {
 			const scopeId = `class_equipment_${choiceIndex}`;
-			const  provenanceData = char._provenance![scopeId];
+			const  provenanceData = char._provenance![scopeId] as any;
 
 			if (provenanceData) {
 				if (isEquipmentChoice(choice)) {
@@ -378,7 +378,7 @@
 		// Restore each background equipment choice
 		currentBackground.startingEquipment.choices.forEach((choice, choiceIndex) => {
 			const scopeId = `background_equipment_${choiceIndex}`;
-			const provenanceData = char._provenance![scopeId];
+			const provenanceData = char._provenance![scopeId] as any;
 
 			if (provenanceData) {
 				// Access data from _set property (character store wraps our data)
@@ -707,7 +707,7 @@
 
 		return selectedOption.subChoices.every(
 			(subChoice) =>
-				equipmentChoices[choiceIndex].subChoiceSelections?.[subChoice.name]?.length > 0
+				(equipmentChoices[choiceIndex].subChoiceSelections?.[subChoice.name]?.length ?? 0) > 0
 		);
 	}
 

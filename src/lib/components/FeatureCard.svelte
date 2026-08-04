@@ -185,7 +185,7 @@
 		margin: var(--spacing-3) 0;
 		background: var(--color-background-alt);
 		width: 100%;
-		max-width: 50vw;
+		max-width: 100vw;
 		box-sizing: border-box;
 		transition: border-color var(--transition-base);
 	}

@@ -662,6 +662,7 @@
 						<img src={classInfo.image} alt={`${classInfo.name} icon`} />
 						<span>{classInfo.name}</span>
 					</div>
+					
 					<img class="card-arrow" src="{base}/basic_icons/next_arrow.png" alt="next arrow" />
 				</button>
 			{/each}
@@ -745,6 +746,16 @@
 		color: var(--color-text-secondary);
 	}
 
+	@media (max-width: 700px) {
+		.intro-text {
+			max-width: 80vw;
+			margin: 0 auto;
+			text-align: center;
+			font-size: var(--font-size-sm);
+			color: var(--color-text-secondary);
+		}
+	}
+
 	.class-cards {
 		display: grid;
 		grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
@@ -757,7 +768,7 @@
 	}
 
 	/* Responsive grid behavior - matches species page breakpoints */
-	@media (max-width: 768px) {
+	@media (max-width: 1000px) {
 		.class-cards {
 			grid-template-columns: repeat(2, 1fr); /* 2 columns on tablets */
 			gap: 0.75rem; /* slightly smaller gap on tablets */
@@ -779,8 +790,8 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: var(--spacing-4);
-		padding: var(--spacing-4) var(--spacing-6);
-		font-size: var(--font-size-lg);
+		padding: var(--spacing-3) var(--spacing-6);
+		font-size: var(--font-size-xl);
 		cursor: pointer;
 		border: 2px solid var(--color-neutral-500);
 		border-radius: var(--radius-lg);
@@ -790,16 +801,44 @@
 		box-sizing: border-box;
 	}
 
+	.class-card img {
+		width: 55px;
+		height: 55px;
+		object-fit: contain;
+	}
+	
+	@media (max-width: 1000px) {
+		.class-card {
+			gap: var(--spacing-4);
+			padding: var(--spacing-2) var(--spacing-6);
+		}
+	}
+
+	@media (max-width: 700px) {
+		.class-card {
+			font-size: var(--font-size-md);
+		}
+	}
+
+	@media (max-width: 550px) {
+		.class-card {
+			grid-template-columns: 1fr; /* single column on mobile */
+			gap: 0.5rem; /* smaller gap on mobile */
+			padding: 0 0.5rem; /* reduced padding on mobile */
+			font-size: var(--font-size-md);
+		}
+
+		.class-card img {
+			width: 40px;
+			height: 40px;
+			object-fit: contain;
+		}
+	}
+
 	.card-left {
 		display: flex;
 		align-items: center;
-		gap: var(--spacing-4);
-	}
-
-	.class-card img {
-		width: 40px;
-		height: 40px;
-		object-fit: contain;
+		gap: var(--spacing-8);
 	}
 
 	.card-arrow {
@@ -807,6 +846,12 @@
 		height: 24px;
 		object-fit: contain;
 		margin-left: auto;
+	}
+
+	@media (max-width: 615px) {
+		.card-arrow {
+			display: none;
+		}
 	}
 
 	.class-card:hover,
@@ -829,6 +874,24 @@
 		box-shadow: var(--shadow-md);
 	}
 
+	@media (max-width: 1200px) {
+		.selected-class-card {
+			max-width: 60vw;
+		}
+	}
+
+	@media (max-width: 1000px) {
+		.selected-class-card {
+			max-width: 70vw;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.selected-class-card {
+			max-width: 90vw;
+		}
+	}
+
 	.selected-class-info {
 		display: flex;
 		align-items: center;
@@ -836,8 +899,8 @@
 	}
 
 	.selected-class-icon {
-		width: 60px;
-		height: 60px;
+		width: 70px;
+		height: 70px;
 		object-fit: contain;
 		border-radius: var(--radius-md);
 		box-shadow: var(--shadow-sm);

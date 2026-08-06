@@ -133,6 +133,12 @@
 	function hasConflict(tabId: string) {
 		return $activeConflicts.tabsNeedingAttention.includes(tabId);
 	}
+
+	function tabIncomplete(tabId: string) {
+		const state = get(character_store);
+		const tabFinished = state?.completedCreationTabs?.includes(tabId) ?? false;
+		return !tabFinished || tabId == 'Export'
+	}
 </script>
 
 <nav>
@@ -142,6 +148,7 @@
 				<a 
 					href={item.href} 
 					class:has-conflict={hasConflict(item.id)}
+					class:incomplete={tabIncomplete(item.id)}
 					aria-current={$page.url.pathname === item.href ? 'page' : undefined}
 				>
 					{item.name}
@@ -191,9 +198,12 @@
 		transition: background-color var(--transition-slow);
 	}
 
+	nav a.incomplete {
+		color: #B3B3B3;
+	}
+
 	nav a:hover {
 		background-color: var(--color-primary-purple); /* bright blue on hover */
-		color: white;
 	}
 
 	/* Highlight current page */

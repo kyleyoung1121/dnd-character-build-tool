@@ -3,7 +3,7 @@
 	import { base } from '$app/paths';
 
 	function start() {
-		goto(base + '/class');
+		goto(base + '/details');
 	}
 </script>
 

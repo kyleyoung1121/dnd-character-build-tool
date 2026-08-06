@@ -754,7 +754,7 @@
 	/* Card style */
 	.card.ability-card {
 		background: var(--color-background);
-		border: 1px solid var(--color-border-light);
+		border: 2px solid var(--color-neutral-500);
 		border-radius: var(--radius-lg);
 		padding: var(--spacing-6);
 		box-shadow: var(--shadow-md);

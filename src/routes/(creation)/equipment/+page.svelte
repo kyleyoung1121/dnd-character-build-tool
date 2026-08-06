@@ -1169,6 +1169,7 @@
 
 	.equipment-section {
 		background: var(--color-background);
+		border: 2px solid var(--color-neutral-500);
 		border-radius: var(--radius-lg);
 		box-shadow: var(--shadow-md);
 		margin-bottom: var(--spacing-8);

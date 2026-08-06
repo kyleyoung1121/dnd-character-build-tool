@@ -144,11 +144,11 @@
 		width: 100%;
 		max-width: 800px;
 		background: var(--color-background);
+		border: 2px solid var(--color-neutral-500);
 		border-radius: var(--radius-lg);
 		padding: var(--spacing-8);
 		text-align: center;
 		box-shadow: var(--shadow-lg);
-		border: 1px solid var(--color-border);
 	}
 
     .container {
@@ -161,8 +161,8 @@
 	/* From Uiverse.io by JayRamoliya */ 
 	.input-style {
 		padding: 10px;
-		border: 2px solid #ccc;
-		border-radius: 5px;
+		border: 2px solid var(--color-neutral-500);
+		border-radius: var(--radius-lg);
 		font-size: 16px;
 		color: #555;
 		outline: none;

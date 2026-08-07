@@ -622,7 +622,7 @@
 				</div>
 
 				<!-- Modifier -->
-				<div class="modifier-column text-center font-mono font-bold text-indigo-600">
+				<div class="modifier-column text-center font-mono font-bold">
 					{selectedScores[stat] !== null && selectedScores[stat] > 0
 						? getModifierString(selectedScores[stat] + (bonuses[stat] ?? 0))
 						: ''}
@@ -1056,7 +1056,7 @@
 		text-align: center;
 		font-size: var(--font-size-sm);
 		font-weight: var(--font-weight-semibold);
-		color: #4338ca;
+		color: var(--color-primary-purple);
 	}
 
 	/* Spell Limit Warning Banner Styles */
@@ -1106,13 +1106,13 @@
 	}
 
 	.warning-text a {
-		color: #1d4ed8;
+		color: var(--color-primary-purple);
 		text-decoration: underline;
 		font-weight: var(--font-weight-medium);
 	}
 
 	.warning-text a:hover {
-		color: #1e40af;
+		color: var(--color-primary-purple-hover);
 	}
 
 	.warning-dismiss {
@@ -1157,5 +1157,6 @@
 	/* Modifier column - larger font size to emphasize importance */
 	.modifier-column {
 		font-size: var(--font-size-lg);
+		color: var(--color-primary-purple);
 	}
 </style>

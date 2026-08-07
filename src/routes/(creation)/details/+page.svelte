@@ -142,13 +142,13 @@
 
 	.details-card {
 		width: 100%;
-		max-width: 800px;
 		background: var(--color-background);
 		border: 2px solid var(--color-neutral-500);
 		border-radius: var(--radius-lg);
 		padding: var(--spacing-8);
 		text-align: center;
 		box-shadow: var(--shadow-lg);
+		align-content: center;
 	}
 
     .container {
@@ -156,6 +156,7 @@
 		padding-bottom: 400px;
 		max-width: 900px;
 		margin: 0 auto;
+		align-content: center;
 	}
 	
 	/* From Uiverse.io by JayRamoliya */ 
@@ -166,7 +167,7 @@
 		font-size: 16px;
 		color: #555;
 		outline: none;
-		width: 60%;
+		width: 70%;
 		align-content: center;
 		text-align: center;
 	}

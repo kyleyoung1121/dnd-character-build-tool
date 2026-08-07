@@ -14,13 +14,13 @@ const abilityScoreChoicePrompt: FeaturePrompt = {
 	},
 	featureOptions: {
 		placeholderText: '-Choose 2 Ability Scores-',
-		options: ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'],
+		options: ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'],
 		numPicks: 2
 	},
 	source: 'variant_human',
 	effects: [
 		{
-			target: '{userChoice}',
+			target: '{userChoice.toLowerCase()}',
 			action: 'modify',
 			value: 1
 		}
@@ -159,7 +159,7 @@ const featPrompt: FeaturePrompt = {
 						},
 						featureOptions: {
 							placeholderText: 'Increase Strength or Dexterity',
-							options: ['Strength', 'Dexterity'],
+							options: ['strength', 'dexterity'],
 							numPicks: 1,
 						},
 						source: 'variant_human.feats',
@@ -638,7 +638,7 @@ const featPrompt: FeaturePrompt = {
 						},
 						featureOptions: {
 							placeholderText: 'Increase Strength or Dexterity',
-							options: ['Strength', 'Dexterity'],
+							options: ['strength', 'dexterity'],
 							numPicks: 1,
 						},
 						source: 'variant_human.feats',
@@ -914,7 +914,7 @@ const featPrompt: FeaturePrompt = {
 						},
 						featureOptions: {
 							placeholderText: 'Increase Strength or Dexterity',
-							options: ['Strength', 'Dexterity'],
+							options: ['strength', 'dexterity'],
 							numPicks: 1,
 						},
 						source: 'variant_human.feats',
@@ -988,7 +988,7 @@ const featPrompt: FeaturePrompt = {
 						},
 						featureOptions: {
 							placeholderText: 'Increase Intelligence or Wisdom',
-							options: ['Intelligence', 'Wisdom'],
+							options: ['intelligence', 'wisdom'],
 							numPicks: 1,
 						},
 						source: 'variant_human.feats',
@@ -1050,7 +1050,7 @@ const featPrompt: FeaturePrompt = {
 						},
 						featureOptions: {
 							placeholderText: 'Choose one ability score.',
-							options: ['Strength', 'Dexterity', 'Constituion', 'Intelligence', 'Wisdom', 'Charisma'],
+							options: ['strength', 'dexterity', 'constituion', 'intelligence', 'wisdom', 'charisma'],
 							numPicks: 1,
 						},
 						source: 'variant_human.feats',
@@ -1334,7 +1334,7 @@ const featPrompt: FeaturePrompt = {
 						},
 						featureOptions: {
 							placeholderText: 'Increase Strength or Constitution',
-							options: ['Strength', 'Constitution'],
+							options: ['strength', 'constitution'],
 							numPicks: 1,
 						},
 						source: 'variant_human.feats',
@@ -1421,7 +1421,7 @@ const featPrompt: FeaturePrompt = {
 						},
 						featureOptions: {
 							placeholderText: 'Increase Strength or Dexterity',
-							options: ['Strength', 'Dexterity'],
+							options: ['strength', 'dexterity'],
 							numPicks: 1,
 						},
 						source: 'variant_human.feats',
@@ -1481,6 +1481,7 @@ export const variantHuman: SpeciesData = {
 	size: 'Medium',
 	knownLanguages: ['Common', 'One extra language of your choice'],
 	speciesFeatures: [
+		featPrompt,
 		abilityScoreChoicePrompt, 
 		skillVersatilityPrompt, 
 		{
@@ -1523,6 +1524,5 @@ export const variantHuman: SpeciesData = {
 				{ target: 'languages', action: 'add', value: 'Common'},
 			]
 		},
-		featPrompt,
 	]
 };

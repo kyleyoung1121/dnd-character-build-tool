@@ -833,6 +833,315 @@ const featPrompt: FeaturePrompt = {
 										{ type: 'text', text: '• You gain one superiority die, which is a d6. You regain this die on a short or long rest.' },
 									]
 						},
+						featureOptions: {
+							placeholderText: 'Select 2 maneuvers',
+							options: [
+								{
+									name: "Commander's Strike",
+									optionDescription: 'Direct an ally to strike.',
+									nestedPrompts: [
+										{
+											id: 'fighter_commanders_strike_desc',
+											name: "Commander's Strike",
+											description: {
+												blocks: [
+													{ type: 'text', text: 'When you take the Attack action on your turn, you can forgo one of your attacks and use a bonus action to direct one of your companions to strike. When you do so, choose a friendly creature who can see or hear you and expend one superiority die. That creature can immediately use its reaction to make one weapon attack, adding the superiority die to the attack\'s damage roll.' },
+												]
+											},
+											source: 'fighter.battle_master',
+											effects: []
+										}
+									]
+								},
+								{
+									name: 'Disarming Attack',
+									optionDescription: 'Force a target to drop their weapon.',
+									nestedPrompts: [
+										{
+											id: 'fighter_disarming_attack_desc',
+											name: 'Disarming Attack',
+											description: {
+												blocks: [
+													{ type: 'text', text: 'When you hit a creature with a weapon attack, you can expend one superiority die to attempt to disarm the target, forcing it to drop one item of your choice that it\'s holding. You add the superiority die to the attack\'s damage roll, and the target must make a Strength saving throw. On a failed save, it drops the object you choose. The object lands at its feet.' },
+												]
+											},
+											source: 'fighter.battle_master',
+											effects: []
+										}
+									]
+								},
+								{
+									name: 'Distracting Strike',
+									optionDescription: 'Distract a foe to aid an ally.',
+									nestedPrompts: [
+										{
+											id: 'fighter_distracting_strike_desc',
+											name: 'Distracting Strike',
+											description: {
+												blocks: [
+													{ type: 'text', text: 'When you hit a creature with a weapon attack, you can expend one superiority die to distract the creature, giving your allies an opening. You add the superiority die to the attack\'s damage roll. The next attack roll against the target by an attacker other than you has advantage if the attack is made before the start of your next turn.' },
+												]
+											},
+											source: 'fighter.battle_master',
+											effects: []
+										}
+									]
+								},
+								{
+									name: 'Evasive Footwork',
+									optionDescription: 'Increase AC while moving.',
+									nestedPrompts: [
+										{
+											id: 'fighter_evasive_footwork_desc',
+											name: 'Evasive Footwork',
+											description: {
+												blocks: [
+													{ type: 'text', text: 'When you move, you can expend one superiority die, rolling the die and adding the number rolled to your AC until you stop moving.' },
+												]
+											},
+											source: 'fighter.battle_master',
+											effects: []
+										}
+									]
+								},
+								{
+									name: 'Feinting Attack',
+									optionDescription: 'Feint to gain advantage on your attack.',
+									nestedPrompts: [
+										{
+											id: 'fighter_feinting_attack_desc',
+											name: 'Feinting Attack',
+											description: {
+												blocks: [
+													{ type: 'text', text: 'You can expend one superiority die and use a bonus action on your turn to feint, choosing one creature within 5 feet of you as your target. You have advantage on your next attack roll against that creature this turn. If that attack hits, add the superiority die to the attack\'s damage roll.' },
+												]
+											},
+											source: 'fighter.battle_master',
+											effects: []
+										}
+									]
+								},
+								{
+									name: 'Goading Attack',
+									optionDescription: 'Goad an enemy to attack you.',
+									nestedPrompts: [
+										{
+											id: 'fighter_goading_attack_desc',
+											name: 'Goading Attack',
+											description: {
+												blocks: [
+													{ type: 'text', text: 'When you hit a creature with a weapon attack, you can expend one superiority die to attempt to goad the target into attacking you. You add the superiority die to the attack\'s damage roll, and the target must make a Wisdom saving throw. On a failed save, the target has disadvantage on all attack rolls against targets other than you until the end of your next turn.' },
+												]
+											},
+											source: 'fighter.battle_master',
+											effects: []
+										}
+									]
+								},
+								{
+									name: 'Lunging Attack',
+									optionDescription: 'Extend your reach for one attack.',
+									nestedPrompts: [
+										{
+											id: 'fighter_lunging_attack_desc',
+											name: 'Lunging Attack',
+											description: {
+												blocks: [
+													{ type: 'text', text: 'When you make a melee weapon attack on your turn, you can expend one superiority die to increase your reach for that attack by 5 feet. If you hit, you add the superiority die to the attack\'s damage roll.' },
+												]
+											},
+											source: 'fighter.battle_master',
+											effects: []
+										}
+									]
+								},
+								{
+									name: 'Maneuvering Attack',
+									optionDescription: 'Allow an ally to move without provoking opportunity attacks.',
+									nestedPrompts: [
+										{
+											id: 'fighter_maneuvering_attack_desc',
+											name: 'Maneuvering Attack',
+											description: {
+												blocks: [
+													{ type: 'text', text: 'When you hit a creature with a weapon attack, you can expend one superiority die to maneuver one of your comrades into a more advantageous position. You add the superiority die to the attack\'s damage roll, and you choose a friendly creature who can see or hear you. That creature can use its reaction to move up to half its speed without provoking opportunity attacks from the target of your attack.' },
+												]
+											},
+											source: 'fighter.battle_master',
+											effects: []
+										}
+									]
+								},
+								{
+									name: 'Menacing Attack',
+									optionDescription: 'Frighten your opponent.',
+									nestedPrompts: [
+										{
+											id: 'fighter_menacing_attack_desc',
+											name: 'Menacing Attack',
+											description: {
+												blocks: [
+													{ type: 'text', text: 'When you hit a creature with a weapon attack, you can expend one superiority die to attempt to frighten the target. You add the superiority die to the attack\'s damage roll, and the target must make a Wisdom saving throw. On a failed save, it is frightened of you until the end of your next turn.' },
+												]
+											},
+											source: 'fighter.battle_master',
+											effects: []
+										}
+									]
+								},
+								{
+									name: 'Parry',
+									optionDescription: 'Reduce damage from an attack.',
+									nestedPrompts: [
+										{
+											id: 'fighter_parry_desc',
+											name: 'Parry',
+											description: {
+												blocks: [
+													{
+														type: 'computed-replacement',
+										
+														whenAvailable: [
+															{
+																source: 'derived',
+																formula: 'Math.max(0, DEX_MOD)'
+															}
+														],
+										
+														fallbackText:
+															'When another creature damages you with a melee attack, you can use your reaction and expend one superiority die to reduce the damage by the number you roll on your superiority die + your Dexterity modifier.',
+															
+														replacementTemplate:
+															'When another creature damages you with a melee attack, you can use your reaction and expend one superiority die to reduce the damage by the number you roll on your superiority die + {value}.'
+													}
+												]
+											},
+											source: 'fighter.battle_master',
+											effects: []
+										}
+									]
+								},
+								{
+									name: 'Precision Attack',
+									optionDescription: 'Add superiority die to attack roll.',
+									nestedPrompts: [
+										{
+											id: 'fighter_precision_attack_desc',
+											name: 'Precision Attack',
+											description: {
+												blocks: [
+													{ type: 'text', text: 'When you make a weapon attack roll against a creature, you can expend one superiority die to add it to the roll. You can use this maneuver before or after making the attack roll, but before any effects of the attack are applied.' },
+												]
+											},
+											source: 'fighter.battle_master',
+											effects: []
+										}
+									]
+								},
+								{
+									name: 'Pushing Attack',
+									optionDescription: 'Push your target away.',
+									nestedPrompts: [
+										{
+											id: 'fighter_pushing_attack_desc',
+											name: 'Pushing Attack',
+											description: {
+												blocks: [
+													{ type: 'text', text: 'When you hit a creature with a weapon attack, you can expend one superiority die to attempt to drive the target back. You add the superiority die to the attack\'s damage roll, and if the target is Large or smaller, it must make a Strength saving throw. On a failed save, you push the target up to 15 feet away from you.' },
+												]
+											},
+											source: 'fighter.battle_master',
+											effects: []
+										}
+									]
+								},
+								{
+									name: 'Rally',
+									optionDescription: "Bolster an ally's resolve.",
+									nestedPrompts: [
+										{
+											id: 'fighter_rally_desc',
+											name: 'Rally',
+											description: {
+												blocks: [
+													{ type: 'text', text: 'On your turn, you can use a bonus action and expend one superiority die to bolster the resolve of one of your companions. When you do so, choose a friendly creature who can see or hear you.' },
+													{
+														type: 'computed-replacement',
+										
+														whenAvailable: [
+															{
+																source: 'derived',
+																formula: 'Math.max(0, CHA_MOD)'
+															}
+														],
+										
+														fallbackText:
+															'That creature gains temporary hit points equal to the superiority die roll + your Charisma modifier.',
+										
+														replacementTemplate:
+															'That creature gains temporary hit points equal to the superiority die roll + {value}.'
+													}
+												]
+											},
+											source: 'fighter.battle_master',
+											effects: []
+										}
+									]
+								},
+								{
+									name: 'Riposte',
+									optionDescription: 'Strike back when an enemy misses you.',
+									nestedPrompts: [
+										{
+											id: 'fighter_riposte_desc',
+											name: 'Riposte',
+											description: {
+												blocks: [
+													{ type: 'text', text: 'When a creature misses you with a melee attack, you can use your reaction and expend one superiority die to make a melee weapon attack against the creature. If you hit, you add the superiority die to the attack\'s damage roll.' },
+												]
+											},
+											source: 'fighter.battle_master',
+											effects: []
+										}
+									]
+								},
+								{
+									name: 'Sweeping Attack',
+									optionDescription: 'Strike an additional nearby enemy.',
+									nestedPrompts: [
+										{
+											id: 'fighter_sweeping_attack_desc',
+											name: 'Sweeping Attack',
+											description: {
+												blocks: [
+													{ type: 'text', text: 'When you hit a creature with a melee weapon attack, you can expend one superiority die to attempt to damage another creature with the same attack. Choose another creature within 5 feet of the original target and within your reach. If the original attack roll would hit the second creature, it takes damage equal to the number you roll on your superiority die. The damage is of the same type dealt by the original attack.' },
+												]
+											},
+											source: 'fighter.battle_master',
+											effects: []
+										}
+									]
+								},
+								{
+									name: 'Trip Attack',
+									optionDescription: 'Knock your target prone.',
+									nestedPrompts: [
+										{
+											id: 'fighter_trip_attack_desc',
+											name: 'Trip Attack',
+											description: {
+												blocks: [
+													{ type: 'text', text: 'When you hit a creature with a weapon attack, you can expend one superiority die to attempt to knock the target down. You add the superiority die to the attack\'s damage roll, and if the target is Large or smaller, it must make a Strength saving throw. On a failed save, you knock the target prone.' },
+												]
+											},
+											source: 'fighter.battle_master',
+											effects: []
+										}
+									]
+								}
+							],
+							numPicks: 2,
+						},
 						source: 'variant_human.feats',
 						effects: [
 							{
@@ -840,7 +1149,13 @@ const featPrompt: FeaturePrompt = {
 								action: 'add',
 								value: 'Martial Adept'
 							},
+							{
+								target: 'features',
+								action: 'add',
+								value: '{userChoice}'
+							},
 						]
+						
 					}
 				]
 			},

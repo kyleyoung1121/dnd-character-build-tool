@@ -116,6 +116,11 @@ export function hasSpellAccess(character: Character): boolean {
 			return true;
 		}
 
+		// Magic Feats
+		if (character.feats && character.feats.includes('Magic Initiate')) {
+			return true;
+		}
+
 		// Racial spell access
 		if (
 			character.race === 'Tiefling' ||

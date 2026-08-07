@@ -117,7 +117,7 @@
 			value={library ?? 'Select Your Library'}
 			on:change={(e) => changeLibrary(e)}
 		>
-			<option>Anderson</option>
+			<option class="dropdown-content">Anderson</option>
 			<option>Clifton</option>
 			<option>Deer Park</option>
 			<option>Groesbeck</option>
@@ -172,8 +172,8 @@
 	}
 
 	.input-style:focus {
-		border-color: #007bff;
-		box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+		border-color: var(--color-primary-purple);
+		box-shadow: 0 0 0 0.2rem var(--color-primary-purple-light);
 	}
 
 	.bold-header {

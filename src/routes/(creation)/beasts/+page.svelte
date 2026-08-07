@@ -506,17 +506,13 @@
 	}
 
 	.selection-summary {
-		background: #e0f2fe;
+		background: var(--color-neutral-light-purple);
 		padding: var(--spacing-3) var(--spacing-4);
 		border-radius: var(--radius-sm);
 		margin-top: var(--spacing-4);
-		border: 1px solid #38bdf8;
-		color: #0c4a6e;
+		border: 1px solid var(--color-primary-purple-light);
+		color: var(--color-primary-purple);
 		font-size: var(--font-size-sm);
-	}
-
-	.selection-summary strong {
-		color: #0369a1;
 	}
 
 	/* Controls Section */
@@ -646,7 +642,7 @@
 	}
 
 	.link-button:hover {
-		color: #2563eb;
+		color: var(--color-primary-purple);
 	}
 
 	.separator {
@@ -672,6 +668,9 @@
 		cursor: pointer;
 		width: 16px;
 		height: 16px;
+		background-color: var(--color-primary-purple-light);
+		border: 2px solid var(--color-primary-purple);
+		
 	}
 
 	.cr-label {

@@ -160,10 +160,10 @@
 
 <style>
 	.beast-card {
-		border: 2px solid #8b4513;
-		border-radius: 8px;
+		border: 2px solid var(--color-neutral-500);
+		border-radius: var(--radius-lg);
 		padding: 0.875rem;
-		background: #faf8f5;
+		background-color: var(--color-background-alt);
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 		transition: border-color 0.2s ease, box-shadow 0.2s ease;
 		height: 100%;
@@ -176,7 +176,7 @@
 	}
 
 	.beast-card.selected {
-		border-color: #3b82f6;
+		border-color: var(--color-primary-purple);
 		box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
 	}
 
@@ -184,7 +184,7 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: flex-start;
-		border-bottom: 2px solid #8b4513;
+		border-bottom: 2px solid var(--color-neutral-500);
 		padding-bottom: 0.5rem;
 		margin-bottom: 0.625rem;
 		gap: 1rem;
@@ -203,7 +203,7 @@
 	.beast-name {
 		font-size: 1.4rem;
 		font-weight: bold;
-		color: #5c2e0e;
+		color: var(--color-neutral-800);
 		margin: 0 0 0.25rem 0;
 		line-height: 1.2;
 	}
@@ -220,16 +220,16 @@
 
 	.challenge-rating {
 		margin-bottom: 0.25rem;
-		color: #5c2e0e;
+		color: var(--color-neutral-800);
 	}
 
 	.speed-info {
-		color: #5c2e0e;
+		color: var(--color-neutral-800);
 	}
 
 	.basic-stats {
 		padding: 0.5rem 0;
-		border-bottom: 1px solid #d4af37;
+		border-bottom: 1px solid var(--color-primary-purple-light);
 		font-size: 0.9rem;
 	}
 
@@ -246,7 +246,7 @@
 		display: flex;
 		justify-content: space-around;
 		padding: 0.5rem 0;
-		border-bottom: 1px solid #d4af37;
+		border-bottom: 1px solid var(--color-primary-purple-light);
 		background: #fff;
 		border-radius: 4px;
 		margin: 0.5rem 0;
@@ -261,7 +261,7 @@
 
 	.ability-name {
 		font-weight: bold;
-		color: #5c2e0e;
+		color: var(--color-neutral-800);
 		display: block;
 		margin-bottom: 0.125rem;
 	}
@@ -279,11 +279,11 @@
 	.section-header {
 		font-size: 0.95rem;
 		font-weight: bold;
-		color: #d4af37;
+		color: var(--color-primary-purple-light);
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
 		margin: 0.375rem 0 0.25rem 0;
-		border-bottom: 2px solid #d4af37;
+		border-bottom: 2px solid var(--color-primary-purple-light);
 		padding-bottom: 0.25rem;
 	}
 
@@ -296,13 +296,13 @@
 	}
 
 	strong {
-		color: #5c2e0e;
+		color: var(--color-neutral-800);
 	}
 
 	.selection-area {
 		margin-top: auto;
 		padding-top: 0.75rem;
-		border-top: 1px solid #d4af37;
+		border-top: 1px solid var(--color-primary-purple-light);
 		text-align: center;
 	}
 
@@ -310,17 +310,16 @@
 		padding: var(--spacing-2) var(--spacing-6);
 		font-size: var(--font-size-sm);
 		font-weight: var(--font-weight-semibold);
-		border: 2px solid var(--color-success-bright);
 		border-radius: var(--radius-md);
-		background: var(--color-success-bright);
+		background: var(--color-primary-purple);
 		color: white;
 		cursor: pointer;
 		transition: all var(--transition-base);
 	}
 
 	.select-button:hover {
-		background: #059669;
-		border-color: #059669;
+		background: var(--color-primary-purple-hover);
+		border-color: var(--color-primary-purple);
 	}
 
 	.select-button.selected {

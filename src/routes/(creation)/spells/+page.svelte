@@ -2079,7 +2079,7 @@
 	.tab-btn:hover {
 		border-color: var(--color-primary-purple);
 		background: #f0f9ff;
-		color: #1e40af;
+		color: var(--color-primary-purple-hover);
 	}
 
 	.tab-btn.active {
@@ -2090,20 +2090,20 @@
 	}
 
 	.tab-btn.active:hover {
-		background: #2563eb;
-		border-color: #2563eb;
+		background: var(--color-primary-purple-hover);
+		border-color: var(--color-primary-purple-hover);
 	}
 
 	.tab-btn.completed {
-		border-color: var(--color-success-bright);
-		background: var(--color-success-bright);
+		border-color: var(--color-primary-purple-light);
+		background: var(--color-primary-purple-light);
 		color: #ffffff;
 		font-weight: var(--font-weight-semibold);
 	}
 
 	.tab-btn.completed:hover {
-		background: #059669;
-		border-color: #059669;
+		background: var(--color-primary-purple-hover);
+		border-color: var(--color-primary-purple-hover);
 	}
 
 	.tab-btn.completed.active {
@@ -2225,14 +2225,14 @@
 	}
 
 	.learn-button {
-		background: var(--color-success-bright);
+		background: var(--color-primary-purple-light);
 		color: white;
-		border-color: var(--color-success-bright);
+		border-color: var(--color-primary-purple-light);
 	}
 
 	.learn-button:hover:not(:disabled) {
-		background: #059669;
-		border-color: #059669;
+		background: var(--color-primary-purple-hover);
+		border-color: var(--color-primary-purple-hover);
 	}
 
 	.learn-button:disabled {
@@ -2452,7 +2452,7 @@
 		left: 0;
 		right: 0;
 		bottom: 0;
-		background-color: #2563eb;
+		background-color: var(--color-primary-purple);
 		transition: var(--transition-slow);
 		border-radius: var(--radius-pill);
 	}
@@ -2470,7 +2470,7 @@
 	}
 
 	input:checked + .toggle-slider {
-		background-color: var(--color-success-bright);
+		background-color: var(--color-neutral-700);
 	}
 
 	input:checked + .toggle-slider:before {

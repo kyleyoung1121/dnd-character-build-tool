@@ -20,6 +20,7 @@
 	--color-primary: #34495e;           /* Navy - secondary headers, accents */
 	--color-primary-light: #4a5f7f;     /* Lighter navy for hover states */
 	--color-primary-purple: #8847EF;      /* Purple Glitter - selected items, active tabs */
+	--color-primary-purple-hover: #9563e7;
 	--color-primary-purple-light: #AF89ED; /* Soft Purple - hover states */
 
 	/* Success Colors - Green (confirm buttons, completed states) */
@@ -35,6 +36,7 @@
 	--color-warning-bg: #fef2f2;        /* Very light red - warning backgrounds */
 
 	/* Neutral Colors - Grays (backgrounds, text, borders) */
+	--color-neutral-light-purple: #f5eeff; /* Soft Purple - hover states */
 	--color-neutral-50: #f8f9fa;        /* Lightest gray - backgrounds */
 	--color-neutral-100: #f1f3f4;       /* Very light gray - subtle backgrounds */
 	--color-neutral-200: #e9ecef;       /* Light gray - borders, dividers */

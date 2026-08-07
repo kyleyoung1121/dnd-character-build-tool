@@ -17,8 +17,18 @@
 	</p>
 	<button
 		on:click={start}
-		class="rounded-lg bg-blue-600 px-6 py-3 text-white shadow-md transition hover:bg-blue-700"
+		class="start-button rounded-lg px-6 py-3 text-white shadow-md transition hover:bg-blue-700"
 	>
 		Start Character Creation
 	</button>
 </div>
+
+<style>
+	.start-button {
+		background-color: var(--color-primary-purple);
+	}
+
+	.start-button:hover {
+		background-color: var(--color-primary-purple-hover);
+	}
+</style>

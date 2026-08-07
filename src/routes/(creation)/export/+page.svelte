@@ -244,15 +244,15 @@
 		font-size: var(--font-size-base);
 		font-weight: var(--font-weight-semibold);
 		cursor: pointer;
-		box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+		box-shadow: 0 4px 12px var(--color-neutral-700);
 		transition: all var(--transition-slow);
 		z-index: 100;
 	}
 
 	.fab:hover {
-		background: var(--color-primary-purple-dark);
+		background: var(--color-primary-purple-hover);
 		transform: translateY(-2px);
-		box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
+		box-shadow: 0 6px 16px var(--color-neutral-700);
 	}
 
 	.fab:active {
@@ -276,7 +276,7 @@
 	}
 
 	.btn-primary:hover {
-		background: var(--color-primary-purple-dark);
+		background: var(--color-primary-purple-hover);
 	}
 
 	.btn-secondary {
@@ -286,7 +286,7 @@
 	}
 
 	.btn-secondary:hover {
-		background: #eff6ff;
+		background: var(--color-neutral-light-purple);
 	}
 
 	/* Empty State */

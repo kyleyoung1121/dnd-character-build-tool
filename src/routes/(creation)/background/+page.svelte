@@ -921,7 +921,7 @@
 	}
 
 	input:checked + .toggle-slider {
-		background-color: var(--color-success);
+		background-color: var(--color-neutral-700);
 	}
 
 	input:checked + .toggle-slider:before {
@@ -1018,7 +1018,7 @@
 	}
 
 	.select-background-button {
-		background-color: var(--color-success);
+		background-color: var(--color-primary-purple);
 		color: white;
 		border: none;
 		padding: var(--spacing-3) var(--spacing-6);
@@ -1033,7 +1033,7 @@
 	}
 
 	.select-background-button:hover {
-		background-color: var(--color-success-light);
+		background-color: var(--color-primary-purple-hover);
 	}
 
 	@media (max-width: 768px) {

@@ -894,12 +894,10 @@
 	}); // end onMount
 
 	function applyTabCompletion() {
-		console.log('Species page complete!');
 		applyListAddition('tab_check:species', 'completedCreationTabs', 'species');
 	}
 
 	export function clearTabCompletion() {
-		console.log('Species tab not complete...');
 		revertChanges(get(character_store), 'tab_check:species');
 	}
 

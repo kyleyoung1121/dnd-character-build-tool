@@ -1781,12 +1781,10 @@
 	}
 
 	function applyTabCompletion() {
-		console.log('Spells page complete!');
 		applyListAddition('tab_check:spells', 'completedCreationTabs', 'spells');
 	}
 
 	export function clearTabCompletion() {
-		console.log('Spells tab not complete...');
 		revertChanges(get(character_store), 'tab_check:spells');
 	}
 

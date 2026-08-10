@@ -102,12 +102,8 @@
 
 		const state = get(character_store);
 
-		console.log('state.completedCreationTabs:', state.completedCreationTabs);
-		console.log('tabsRequired:', tabsRequired);
-
 		// Check to see if the player has completed a number of tabs equal to how many we expect to be finished
 		if (state.completedCreationTabs?.length === tabsRequired.length) {
-			console.log('All Tabs Done!');
 			items.push(baseNavItems[6]); // Export
 		}
 		

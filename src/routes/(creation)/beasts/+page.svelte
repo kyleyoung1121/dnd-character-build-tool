@@ -300,12 +300,10 @@
 	
 
 	function applyTabCompletion() {
-		console.log('Beasts page complete!');
 		applyListAddition('tab_check:beasts', 'completedCreationTabs', 'beasts');
 	}
 
 	export function clearTabCompletion() {
-		console.log('Beasts tab not complete...');
 		revertChanges(get(character_store), 'tab_check:beasts');
 	}
 </script>

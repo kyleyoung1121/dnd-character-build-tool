@@ -508,12 +508,10 @@
 	}
 
 	function applyTabCompletion() {
-		console.log('Abilities page complete!');
 		applyListAddition('tab_check:abilities', 'completedCreationTabs', 'abilities');
 	}
 
 	export function clearTabCompletion() {
-		console.log('Abilities tab not complete...');
 		revertChanges(get(character_store), 'tab_check:abilities');
 	}
 

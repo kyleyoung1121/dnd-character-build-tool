@@ -23,7 +23,6 @@
 
 	function changePlayerName(event: Event) {
 		const target = event.target as HTMLSelectElement;
- 		console.log(target.value);
 		applyChoice('playerName:' + target.value,
 			{
 				playerName: target.value
@@ -35,7 +34,6 @@
 
 	function changeLibrary(event: Event) {
 		const target = event.target as HTMLSelectElement;
- 		console.log(target.value);
 		applyChoice('library:' + target.value,
 			{
 				library: target.value
@@ -46,12 +44,10 @@
 	}
 
 	function applyTabCompletion() {
-		console.log('Details page complete!');
 		applyListAddition('tab_check:details', 'completedCreationTabs', 'details');
 	}
 
 	export function clearTabCompletion() {
-		console.log('Details tab not complete...');
 		revertChanges(get(character_store), 'tab_check:details');
 	}
 

@@ -167,10 +167,6 @@
 			featureSelections = {};
 			expandedFeatures = new Set();
 
-			//console.log('\n=== CONFIRM ADD CLASS ===');
-			//console.log(`Class: ${selectedClassData.name}`);
-			//console.log(`Total features in classFeatures array: ${selectedClassData.classFeatures?.length || 0}`);
-
 			applyChoice(`class:${selectedClassData.name}`, {
 				class: selectedClassData.name
 			});
@@ -179,13 +175,9 @@
 			let skippedCount = 0;
 
 			for (const feature of selectedClassData.classFeatures || []) {
-				//console.log(`\nFeature: "${feature.name}"`);
-				//console.log(`  Has featureOptions: ${!!feature.featureOptions}`);
-				//console.log(`  Effects count: ${feature.effects?.length || 0}`);
-
+				
 				// Skip features with options; those will be applied later
 				if (feature.featureOptions) {
-					//console.log(`  -> SKIPPED (has featureOptions)`);
 					skippedCount++;
 					continue;
 				}
@@ -200,8 +192,6 @@
 				for (const effect of feature.effects || []) {
 					const target = effect.target;
 					const value = effect.value;
-
-					//console.log(`  Effect: ${effect.action} on "${target}" = "${value}"`);
 
 					switch (effect.action) {
 						case 'add': {
@@ -224,14 +214,9 @@
 					}
 				}
 
-				//console.log(`  Calling applyChoice with scopeId="${scopeId}", update=`, update, ', modify=', modify);
 				applyChoice(scopeId, update, modify);
 				processedCount++;
-				//console.log(`  -> PROCESSED`);
 			}
-
-			//console.log(`\nSummary: Processed ${processedCount} features, skipped ${skippedCount} features`);
-			//console.log('=========================\n');
 
 			bumpVersion();
 		}
@@ -627,17 +612,14 @@
 
 		// Trigger Svelte reactivity
 		featureSelections = { ...featureSelections };
-		console.log('featureSelections: ', featureSelections);
 		bumpVersion();
 	}); // end onMount
 
 	function applyTabCompletion() {
-		console.log('Class page complete!');
 		applyListAddition('tab_check:class', 'completedCreationTabs', 'class');
 	}
 
 	export function clearTabCompletion() {
-		console.log('Class tab not complete...');
 		revertChanges(get(character_store), 'tab_check:class');
 	}
 

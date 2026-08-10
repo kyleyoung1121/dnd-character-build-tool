@@ -118,18 +118,7 @@ export function detectConflicts(): {
 	}
 
 	// Check for spell limit violations
-	//console.log('[Conflict Detection] Checking spell limit violations...');
-	//console.log('[Conflict Detection] Character state:', {
-	// 	class: character.class,
-	// 	charisma: character.charisma,
-	// 	spells: character.spells,
-	// 	spellsType: typeof character.spells,
-	// 	spellsIsArray: Array.isArray(character.spells),
-	// 	spellsLength: character.spells?.length,
-	// 	provenance: Object.keys(character._provenance || {})
-	// });
 	const spellLimitConflicts = detectSpellLimitViolations(character);
-	//console.log('[Conflict Detection] Spell limit conflicts found:', spellLimitConflicts.length, spellLimitConflicts);
 	conflicts.push(...spellLimitConflicts);
 
 	// Get unique list of tabs needing attention
@@ -151,7 +140,6 @@ export function detectSpellLimitViolations(character: Character): Conflict[] {
 
 	// Only check if character has spells selected
 	if (!character.spells || !Array.isArray(character.spells) || character.spells.length === 0) {
-		//console.log('[Spell Limit] No spells found, returning empty');
 		return conflicts;
 	}
 
@@ -164,11 +152,8 @@ export function detectSpellLimitViolations(character: Character): Conflict[] {
 	if (!metadata) {
 		// Calculate current spell limits (mirroring the logic from spells page)
 		const spellLimits = calculateSpellLimits(character, true);
-		console.log('spellLimits: ', spellLimits);
-		console.log('[Spell Limit] Bulk Calculated limits:', spellLimits);
 		
 		// If we cant check each source individually (no metadata yet), lets at least check altogether counts
-		//console.log('character.spells', character.spells);
 		let totalSpellLimit = 0;
 		if (spellLimits) {
 			totalSpellLimit += spellLimits.cantrips
@@ -201,7 +186,6 @@ export function detectSpellLimitViolations(character: Character): Conflict[] {
 	else {
 		// Calculate current spell limits (mirroring the logic from spells page)
 		const spellLimits = calculateSpellLimits(character, false);
-		console.log('[Spell Limit] Meta Calculated limits:', spellLimits);
 		
 		const spellsWithMetadata: Array<{ name: string; tabSource?: string }> = metadata.map((spellObj) => {
 			if (spellObj.name && spellObj.tabSource) {
@@ -217,11 +201,9 @@ export function detectSpellLimitViolations(character: Character): Conflict[] {
 		}).filter((spell) => spell.name !== '');
 
 		const selectedSpells = new Set(spellsWithMetadata.map(s => s.name));
-		console.log('[Spell Limit] Selected spells:', Array.from(selectedSpells));
 
 		// Count selected spells by level
 		const spellCounts = countSelectedSpells(character, spellsWithMetadata);
-		console.log('[Spell Limit] Spell counts:', spellCounts);
 
 		// Check cantrips
 		if (spellCounts.cantrips > spellLimits.cantrips) {
@@ -285,8 +267,6 @@ export function detectSpellLimitViolations(character: Character): Conflict[] {
 		};
 		conflicts.push(conflict);
 		console.log('[Spell Limit] Created conflict:', conflict);
-	} else {
-		//console.log('[Spell Limit] No violations detected');
 	}
 
 	return conflicts;
@@ -413,42 +393,32 @@ function countSelectedSpells(
 
 	// Count selected spells that come from limit-counting sources
 	// EXCLUDE spells selected from Circle of Land, feature tabs, or race tabs based on tabSource
-	//console.log('[Spell Limit] Processing spells with metadata:', spellsWithMetadata);
 	for (const spell of spellsWithMetadata) {
 		const spellName = spell.name;
 		const tabSource = spell.tabSource || '';
-		// console.log(`[Spell Limit] Checking spell "${spellName}" with tabSource: "${tabSource}"`);
 		
 		// Skip spells selected from Circle of Land tab
 		if (tabSource.includes('Circle of the Land')) {
-			//console.log(`[Spell Limit]   -> Skipping (Circle of the Land)`);
 			continue;
 		}
 		
 		// Skip spells selected from feature tabs (Pact of the Tome, etc.)
 		if (tabSource.includes('Pact of the') || tabSource.includes('Book of Ancient')) {
-			//console.log(`[Spell Limit]   -> Skipping (Feature tab)`);
 			continue;
 		}
 		
 		// Skip spells selected from race tabs (High Elf, Tiefling, etc.)
 		if (tabSource.includes('High Elf') || tabSource.includes('Tiefling') || tabSource.includes('Forest Gnome') || tabSource.includes('Dark Elf')) {
-			//console.log(`[Spell Limit]   -> Skipping (Race tab)`);
 			continue;
 		}
 		
 		// Count the spell if it's in a limit-counting source
 		if (limitCountingSpells.cantrips.has(spellName)) {
-			//console.log(`[Spell Limit]   -> Counting as cantrip (total now: ${counts.cantrips + 1})`);
 			counts.cantrips++;
 		} else if (limitCountingSpells.level1.has(spellName)) {
-			//console.log(`[Spell Limit]   -> Counting as level 1 (total now: ${counts.level1 + 1})`);
 			counts.level1++;
 		} else if (limitCountingSpells.level2.has(spellName)) {
-			//console.log(`[Spell Limit]   -> Counting as level 2 (total now: ${counts.level2 + 1})`);
 			counts.level2++;
-		} else {
-			//console.log(`[Spell Limit]   -> Not in any limit-counting spell list`);
 		}
 	}
 

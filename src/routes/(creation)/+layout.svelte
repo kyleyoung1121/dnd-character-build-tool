@@ -52,9 +52,7 @@
 		let tabsRequired = [];
 
 		for (const navItem of baseNavItems) {
-			if (navItem.name != "Export") {
-				tabsRequired.push(navItem.name.toLowerCase())
-			}
+			tabsRequired.push(navItem.name.toLowerCase())
 		}
 
 		// Check if we're on quiz pages
@@ -137,7 +135,7 @@
 	function tabIncomplete(tabId: string) {
 		const state = get(character_store);
 		const tabFinished = state?.completedCreationTabs?.includes(tabId) ?? false;
-		return !tabFinished || tabId == 'Export'
+		return !tabFinished
 	}
 </script>
 

@@ -82,7 +82,9 @@ export const character_store = writable<Character>({
 	hp: null,
 	ac: null,
 	speed: null,
-	size: null
+	size: null,
+
+	completedCreationTabs: ['export'],
 });
 
 /**

@@ -370,7 +370,7 @@ export const barbarian: ClassData = {
 	image: base + '/class_icons/barbarian.jpg',
 	description: 'Frenzied warriors fueled by primal rage.',
 	// Enhanced popup content for narrative preview
-	enhancedFlavor: "You are a fierce warrior, capable of entering a battle rage.",
+	enhancedFlavor: "Barbarians are mighty warriors who are powered by primal forces of magic that manifest as a Rage. For every Barbarian, their Rage is a power that fuels not just battle prowess, but also uncanny reflexes and heightened senses. They charge headlong into danger so those under their protection don’t have to. Their courage in the face of danger makes Barbarians perfectly suited for adventure.",
 	cultureNotes: "Barbarians tend to embrace nature, valuing keen instincts, primal physicality, and ferocious rage. They thrive in the wilds of their homelands, where their tribes live and hunt.",
 	popupImage: "/class-popup-art/barbarian-ritual-rage.jpg", // Placeholder for professional artwork
 	hitDie: 'd12',

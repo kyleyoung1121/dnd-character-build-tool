@@ -395,6 +395,7 @@ export const bard: ClassData = {
 	name: 'Bard',
 	image: base + '/class_icons/bard.jpg',
 	description: 'You are an inspiring leader whose power echoes the music of creation.',
+	enhancedFlavor: "Invoking magic through music, dance, and verse, Bards are experts of both performance and spellcasting. Bardic magic harnesses the universal language of art, allowing them to inspire others, sooth hurts, dishearten foes, and create illusions. Though they may become masters of many artforms, a Bard's magical ability sets them apart from the average entertainer.",
 	cultureNotes: 'Bards thrive on stories, whether those stories are true or not. A bard weaves magic through words and music to inspire allies, demoralize foes, manipulate minds, create illusions, and even heal wounds.',
 	hitDie: 'd8',
 	primaryAbility: 'Charisma',

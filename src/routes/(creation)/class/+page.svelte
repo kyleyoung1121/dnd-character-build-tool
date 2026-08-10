@@ -648,11 +648,19 @@
 	<!-- Show conflict warnings for this tab -->
 	<ConflictWarning tabName="class" />
 
-	<p class="intro-text">
-		In Dungeons & Dragons, your character's class determines what they can do. It marks what role
-		your character will play in your party of adventurers. Each class has strengths and weaknesses,
-		so its important to use teamwork!
-	</p>
+	{#if !selectedClassData}
+		<p class="intro-text">
+			In Dungeons & Dragons, your character's class determines what they can do. It marks what role
+			your character will play in your party of adventurers. Each class has strengths and weaknesses,
+			so its important to use teamwork!
+		</p>
+	{:else}
+		<p class="intro-text">
+			{selectedClassData.enhancedFlavor}
+		</p>
+	{/if}
+
+	
 
 	{#if !selectedClassData}
 		<div class="class-cards">

@@ -508,7 +508,7 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 
 export const monk: ClassData = {
 	name: 'Monk',
-	image: base + '/class_icons/monk.png',
+	image: base + '/class_icons/monk.jpg',
 	description: 'You are a master of martial arts, harnessing the power of the body in pursuit of physical and spiritual perfection.',
 	enhancedFlavor: "Monks use rigorous combat training and mental discipline to align themselves with the multiverse and focus their internal reservoirs of power. Different Monks conceptualize this power in various ways: as breath, energy, life force, essence, or self, for example. Whether channeled as a striking display of martial prowess or as a subtler manifestation of defense and speed, this power infuses all that a Monk does.",
 	cultureNotes: 'Monks make use of Ki, the magic that flows through living bodies, to create magical effects and to extend their bodies’ physical capabilities. Monks take their quests seriously, seeing them as personal tests of their physical and spiritual growth.',

@@ -88,12 +88,18 @@ async function fillFrontPage(
 	fillFormField(form, 'subclass_info', data.subclass, 12);
 	fillFormField(form, 'species_info', data.species, 12);
 	fillFormField(form, 'background_info', data.background, 12);
+
+	// Attach the player's library to their name
 	let playerNameWithLibrary = '';
 	if (data.playerName && data.library) {
 		playerNameWithLibrary = data.playerName + ' (' + data.library + ')';
 	}
-	fillFormField(form, 'player_info', playerNameWithLibrary, 12);
-	fillFormField(form, 'character_name', data.characterName, 12);
+	// If the total name is shorter than 30 characters, pad it with spaces
+	// this ensures that the auto font size doesn't become very large in cases of short names
+	playerNameWithLibrary = playerNameWithLibrary.padEnd(30, ' ')
+
+	fillFormField(form, 'player_info', playerNameWithLibrary);
+	fillFormField(form, 'character_name', data.characterName.padEnd(30, ' '));
 
 	// - - - - -
 	// Stats
@@ -1454,6 +1460,8 @@ async function fillSpellsPage(
 
 	// Format page 1
 	if (form1) {
+		console.log("SPELL MOD DEBUG: Attempting to read spellAttack && spell save:", spellAttack, spellSave)
+		
 		if (spellAttack && spellSave) {
 			fillFormField(form1, 'spell_attack', spellAttack);
 			fillFormField(form1, 'spell_save_dc', spellSave);

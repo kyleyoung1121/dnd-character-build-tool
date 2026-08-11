@@ -1,5 +1,5 @@
 import { get } from 'svelte/store';
-import { character_store, type Character } from './character_store';
+import { character_store, isEmpty, testEmptiness, type Character } from './character_store';
 
 // New internal provenance shape for a scope:
 // {
@@ -74,6 +74,8 @@ export function applyChoice(
 			_mods: mods && Object.keys(mods).length ? mods : null,
 			_modsPrev: Object.keys(modsPrev).length ? modsPrev : null
 		} as any;
+
+		testEmptiness(char);
 
 		return char;
 	});
@@ -181,6 +183,8 @@ export function revertChanges(char: Character, scopeId: string): Character {
 			}
 		}
 	}
+
+	testEmptiness(char);
 
 	// Delete scope AFTER all processing is complete
 	delete char._provenance?.[scopeId];

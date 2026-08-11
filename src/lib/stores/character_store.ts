@@ -1,3 +1,4 @@
+import { prefersReducedMotion } from 'svelte/motion';
 import { writable } from 'svelte/store';
 
 // Attacks now store just weapon names - weapon data is looked up from weapon-data.ts
@@ -245,3 +246,57 @@ export function getBeastTabName(character: Character): string {
 	// Default fallback
 	return 'Beasts';
 }
+
+
+export function isEmpty(character: Character): boolean {
+
+	// Loop through every property in the character store
+	for (const property in character) {
+		if (!(property == '_provenance' || property == 'completedCreationTabs')) {
+			let val = property as keyof typeof character;
+			
+			// If this property is null, we can move on
+			if (character[val] == null) {
+				continue;
+			}
+
+			// If this property is not an object, but is falsy, we can move on
+			if (!(typeof character[val] == 'object')) {
+				if (Boolean(character[val]) == false) {
+					continue;
+				}
+			
+			// If this property is an object, we need to check if its an empty array
+			} else if (Object.keys(character[val]).length == 0) {
+				continue;
+			}
+			
+			// If we haven't hit a continue yet, we have found a property with a stored value
+			// Return false, the store is not empty
+			return false;
+		}
+	}
+
+	// If we have gone through all properties, we never found any with a value
+	// Return true, the store has no stored values
+	return true;
+}
+
+// 
+export function testEmptiness(character: Character) {
+	const isStoreEmpty = isEmpty(character);
+
+	if (isStoreEmpty) {
+		window.removeEventListener("beforeunload", beforeUnloadHandler);
+	} else {
+		window.addEventListener("beforeunload", beforeUnloadHandler);
+	}
+}
+
+const beforeUnloadHandler = (event: any) => {
+	// Recommended
+	event.preventDefault();
+
+	// Included for legacy support, e.g. Chrome/Edge < 119
+	event.returnValue = true;
+};

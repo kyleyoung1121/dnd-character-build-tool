@@ -67,6 +67,12 @@ export const twoHandedWeapons = [
 	'Longbow'
 ];
 
+export const unusualWeapons = [
+	'Spiked chain',
+	'Cestus',
+	'Gladius',
+]
+
 // Musical instruments for equipment selection
 export const musicalInstruments = [
 	'Bagpipes',

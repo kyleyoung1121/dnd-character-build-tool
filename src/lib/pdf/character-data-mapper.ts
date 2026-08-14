@@ -23,7 +23,7 @@ import { sorcerer } from '$lib/data/classes/sorcerer';
 import { warlock } from '$lib/data/classes/warlock';
 import { wizard } from '$lib/data/classes/wizard';
 import { spells, getSpellByName, getSpellAccessForCharacter, type Spell } from '$lib/data/spells';
-import { simpleWeapons, martialWeapons } from '$lib/data/equipment/weapons';
+import { simpleWeapons, martialWeapons, unusualWeapons } from '$lib/data/equipment/weapons';
 
 export interface CharacterSheetData {
 	// Page 1 - Header
@@ -500,7 +500,7 @@ function calculateAttacks(
 ): Array<{ name: string; bonus: string; damage: string; properties: string[] }> {
 	// Check if we have any attacks from what we are prof with
 	let attacksFromProfs = character.proficiencies.filter((prof) => {
-		if ([...simpleWeapons, ...martialWeapons].includes(prof)) {
+		if ([...simpleWeapons, ...martialWeapons, ...unusualWeapons].includes(prof)) {
 			return prof;
 		}
 	})

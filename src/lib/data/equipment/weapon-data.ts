@@ -9,7 +9,7 @@ export interface WeaponProperties {
 	damageType: string; // e.g., "slashing", "piercing", "bludgeoning"
 	attackAbility: 'STR' | 'DEX' | 'EITHER'; // Which ability modifier to use
 	properties: string[]; // weapon properties like "finesse", "versatile", "two-handed"
-	category: 'simple' | 'martial';
+	category: 'simple' | 'martial' | 'unusual';
 	type: 'melee' | 'ranged';
 }
 
@@ -357,7 +357,35 @@ export const weaponData: Record<string, WeaponProperties> = {
 		properties: ['Thrown (5/15ft)', 'Restrain (DC 10)'],
 		category: 'martial',
 		type: 'ranged'
-	}
+	},
+	// A few homebrew weapons for Gladiator
+	'Spiked chain': {
+		name: 'Spiked chain',
+		damage: '1d6',
+		damageType: 'piercing',
+		attackAbility: 'STR',
+		properties: ['Reach'],
+		category: 'unusual',
+		type: 'melee'
+	},
+	'Cestus': {
+		name: 'Cestus',
+		damage: '1d6',
+		damageType: 'bludgeoning',
+		attackAbility: 'STR',
+		properties: ['Light'],
+		category: 'unusual',
+		type: 'melee'
+	},
+	'Gladius': {
+		name: 'Gladius',
+		damage: '1d6',
+		damageType: 'piercing',
+		attackAbility: 'EITHER',
+		properties: ['Finesse', 'Light'],
+		category: 'unusual',
+		type: 'melee'
+	},
 };
 
 /**

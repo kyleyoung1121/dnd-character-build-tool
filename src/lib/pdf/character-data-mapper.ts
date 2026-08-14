@@ -516,7 +516,7 @@ function calculateAttacks(
 	
 	const proficiencyBonus = getProficiencyBonus();
 	const attacks: Array<{ name: string; bonus: string; damage: string; properties: string[] }> = [];
-	
+
 	// Assume proficiency with all weapons in attacks array
 	// Players can only select weapons they're proficient with through the equipment tab
 	
@@ -536,7 +536,10 @@ function calculateAttacks(
 		
 		// Determine which ability modifier to use
 		let abilityMod: number;
-		if (weaponData.attackAbility === 'EITHER') {
+		if (character.class == 'Monk' && (dexMod >= strMod)) {
+			// Monk weapons all may use DEX. So, we can 
+			abilityMod = dexMod;
+		} else if (weaponData.attackAbility === 'EITHER') {
 			// Finesse weapons - use higher of STR or DEX
 			abilityMod = Math.max(strMod, dexMod);
 		} else if (weaponData.attackAbility === 'DEX') {
@@ -603,6 +606,34 @@ function calculateAttacks(
 			damage: damageWithModifier.trim(),
 			properties: weaponProperties,
 		});
+	}
+	
+	// Monk automatically gets the upgraded Unarmed Strike attack
+	if (character.class == 'Monk') {
+		const unarmedStrike = {
+			name: 'Unarmed Strike',
+			bonus: formatModifier(dexMod + 2),
+			damage: '1d4'+formatModifier(dexMod)+' bludgeoning',
+			properties: []
+		};
+		attacks.push(unarmedStrike);
+	
+	// If the player is a Monk, automatically add the upgraded Unarmed Strike attack
+	} else if (character.feats?.includes('Tavern Brawler')) {
+		const improvisedWeapon = {
+			name: 'Improvised Attack',
+			bonus: formatModifier(Math.max(strMod, dexMod) + 2),
+			damage: '1d4'+formatModifier(Math.max(strMod, dexMod))+' damage',
+			properties: ['DM determines damage type']
+		};
+		const unarmedStrike = {
+			name: 'Unarmed Strike',
+			bonus: formatModifier(Math.max(strMod, dexMod) + 2),
+			damage: '1d4'+formatModifier(Math.max(strMod, dexMod))+' bludgeoning',
+			properties: []
+		};
+		attacks.push(improvisedWeapon);
+		attacks.push(unarmedStrike);
 	}
 	
 	return attacks;

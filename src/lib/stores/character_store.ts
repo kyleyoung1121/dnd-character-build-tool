@@ -1,5 +1,6 @@
 import { prefersReducedMotion } from 'svelte/motion';
 import { writable } from 'svelte/store';
+import { browser } from '$app/environment';
 
 // Attacks now store just weapon names - weapon data is looked up from weapon-data.ts
 export type Attack = string;
@@ -284,8 +285,9 @@ export function isEmpty(character: Character): boolean {
 
 // 
 export function testEmptiness(character: Character) {
-	const isStoreEmpty = isEmpty(character);
+	if (!browser) return;
 
+	const isStoreEmpty = isEmpty(character);
 	if (isStoreEmpty) {
 		window.removeEventListener("beforeunload", beforeUnloadHandler);
 	} else {

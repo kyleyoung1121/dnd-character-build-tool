@@ -476,6 +476,11 @@
 						}
 					}
 				}
+
+				// If we found a value to restore, apply to featureSelections
+				if (restored) {
+					featureSelections[feature.name][idx] = restored;
+				}
 			}
 
 			// Recurse into nested prompts if any

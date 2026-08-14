@@ -280,7 +280,7 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '1d6',
 		damageType: 'piercing',
 		attackAbility: 'STR',
-		properties: ['Thrown (20/60ft)', 'Versatile (1d8)'],
+		properties: ['Thrown (20/60ft)', 'Versatile (d8)'],
 		category: 'martial',
 		type: 'melee'
 	},
@@ -354,7 +354,7 @@ export const weaponData: Record<string, WeaponProperties> = {
 		damage: '0',
 		damageType: 'special',
 		attackAbility: 'DEX',
-		properties: ['Thrown (5/15ft)', 'Restrain (DC 10)'],
+		properties: ['Thrown (5/15ft)', 'Restrain DC 10'],
 		category: 'martial',
 		type: 'ranged'
 	},

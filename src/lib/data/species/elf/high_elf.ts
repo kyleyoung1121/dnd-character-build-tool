@@ -122,7 +122,6 @@ export const highElf: SpeciesData = {
 			featureOptions: {
 				placeholderText: 'Select 1 language',
 				options: [
-					'Common',
 					'Dwarvish',
 					'Elvish',
 					'Giant',

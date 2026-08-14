@@ -66,7 +66,6 @@ export const acolyte: BackgroundData = {
 			featureOptions: {
 				placeholderText: 'Select 2 languages',
 				options: [
-					'Common',
 					'Dwarvish',
 					'Elvish',
 					'Giant',

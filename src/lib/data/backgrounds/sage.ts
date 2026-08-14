@@ -61,7 +61,6 @@ export const sage: BackgroundData = {
 			featureOptions: {
 				placeholderText: 'Select 2 languages',
 				options: [
-					'Common',
 					'Dwarvish',
 					'Elvish',
 					'Giant',

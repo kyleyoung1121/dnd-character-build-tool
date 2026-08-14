@@ -1654,6 +1654,10 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 				break;
 
 			case 'Monk':
+				// Way of the Open Hand is the only Monk subclass that doesn't get spells
+				if (selectedSubClass == 'Way of the Open Hand') {
+					break;
+				}
 				spellsPageOneDoc = spellsMonkPageDoc;
 				break;
 

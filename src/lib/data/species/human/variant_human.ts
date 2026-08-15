@@ -5,7 +5,7 @@ import { simpleWeapons, martialWeapons } from '$lib/data/equipment/weapons';
 
 // Ability Score Choice Prompt
 const abilityScoreChoicePrompt: FeaturePrompt = {
-	name: 'Ability Score Increase',
+	name: 'Ability Score Increases',
 	id: 'variant_human_ability_score',
 	description: {
 		blocks: [
@@ -23,49 +23,6 @@ const abilityScoreChoicePrompt: FeaturePrompt = {
 			target: '{userChoice.toLowerCase()}',
 			action: 'modify',
 			value: 1
-		}
-	]
-};
-
-// Skill Versatility Prompt
-const skillVersatilityPrompt: FeaturePrompt = {
-	name: 'Skill Versatility',
-	id: 'variant_human_skill_versatility',
-	description: {
-		blocks: [
-			{ type: 'text', text: 'You gain proficiency in one skill of your choice.' },
-		]
-	},
-	featureOptions: {
-		placeholderText: '-Choose 1 Skill-',
-		options: [
-			'Acrobatics',
-			'Animal Handling',
-			'Arcana',
-			'Athletics',
-			'Deception',
-			'History',
-			'Insight',
-			'Intimidation',
-			'Investigation',
-			'Medicine',
-			'Nature',
-			'Perception',
-			'Performance',
-			'Persuasion',
-			'Religion',
-			'Sleight of Hand',
-			'Stealth',
-			'Survival'
-		],
-		numPicks: 1
-	},
-	source: 'variant_human',
-	effects: [
-		{
-			target: 'skills',
-			action: 'add',
-			value: '{userChoice}'
 		}
 	]
 };
@@ -1784,6 +1741,49 @@ const featPrompt: FeaturePrompt = {
 	effects: [
 		{
 			target: 'feats',
+			action: 'add',
+			value: '{userChoice}'
+		}
+	]
+};
+
+// Skill Versatility Prompt
+const skillVersatilityPrompt: FeaturePrompt = {
+	name: 'Skill Versatility',
+	id: 'variant_human_skill_versatility',
+	description: {
+		blocks: [
+			{ type: 'text', text: 'You gain proficiency in one skill of your choice.' },
+		]
+	},
+	featureOptions: {
+		placeholderText: '-Choose 1 Skill-',
+		options: [
+			'Acrobatics',
+			'Animal Handling',
+			'Arcana',
+			'Athletics',
+			'Deception',
+			'History',
+			'Insight',
+			'Intimidation',
+			'Investigation',
+			'Medicine',
+			'Nature',
+			'Perception',
+			'Performance',
+			'Persuasion',
+			'Religion',
+			'Sleight of Hand',
+			'Stealth',
+			'Survival'
+		],
+		numPicks: 1
+	},
+	source: 'variant_human',
+	effects: [
+		{
+			target: 'skills',
 			action: 'add',
 			value: '{userChoice}'
 		}

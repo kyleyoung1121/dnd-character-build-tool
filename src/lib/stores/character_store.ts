@@ -121,7 +121,11 @@ export function hasSpellAccess(character: Character): boolean {
 		}
 
 		// Magic Feats
-		if (character.feats && character.feats.includes('Magic Initiate')) {
+		if (character.feats && (
+			character.feats.includes('Magic Initiate') ||
+			character.feats.includes('Ritual Caster') ||
+			character.feats.includes('Spell Sniper')
+		)) {
 			return true;
 		}
 
@@ -160,7 +164,9 @@ export function hasSpellAccess(character: Character): boolean {
 			return true;
 		}
 
+		// If we haven't found a match yet, assume the player does not have spell access
 		return false;
+
 	} catch (error) {
 		// Fallback in case of import issues
 		return (

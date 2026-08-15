@@ -473,6 +473,11 @@ const featPrompt: FeaturePrompt = {
 								action: 'add',
 								value: 'Healer'
 							},
+							{
+								target: 'inventory',
+								action: 'add',
+								value: "Healer's Kit"
+							},
 						]
 					}
 				]

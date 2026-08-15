@@ -9,7 +9,7 @@
 		<div class="portrait-box"></div>
 
 		<div class="char-info">
-			<div class="info-row"><label>Character Name:</label> <span>{character.name}</span></div>
+			<div class="info-row"><label>Character Name:</label> <span>{character.characterName}</span></div>
 			<div class="info-row"><label>Race:</label> <span>{character.race}</span></div>
 			<div class="info-row"><label>Class:</label> <span>{character.class}</span></div>
 			<div class="info-row"><label>Background:</label> <span>{character.background}</span></div>

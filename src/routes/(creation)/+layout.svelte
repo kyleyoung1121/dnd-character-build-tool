@@ -123,7 +123,6 @@
 		for (const requiredTab of requiredTabs) {
 			// If even one required tab is missing from the list of finished tabs, return false 
 			if (!finishedTabs.includes(requiredTab)) {
-				console.log('requiredTab not found in finishedTabs. ', requiredTab, finishedTabs);
 				return false
 			}
 		}

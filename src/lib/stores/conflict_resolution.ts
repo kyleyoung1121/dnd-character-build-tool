@@ -22,9 +22,10 @@ export type ConflictResolution = {
  */
 export function getResolutionOptions(conflict: Conflict): ConflictResolution {
 	const actions: ResolutionAction[] = [];
+	const conflictSources = conflict.sources || [];
 
 	// For each source, offer to revert that scope
-	for (const source of conflict.sources) {
+	for (const source of conflictSources) {
 		const description = getSourceDescription(source);
 		actions.push({
 			type: 'revert_scope',
@@ -32,9 +33,9 @@ export function getResolutionOptions(conflict: Conflict): ConflictResolution {
 			scopeId: source
 		});
 	}
-
+	
 	// If this is a user-selected skill (not automatically granted), suggest alternatives
-	const userSelectableSources = conflict.sources.filter(isUserSelectableSource);
+	const userSelectableSources = conflictSources.filter(isUserSelectableSource);
 	if (userSelectableSources.length > 0) {
 		const alternatives = getSuggestedAlternatives(conflict);
 		if (alternatives.length > 0) {
@@ -47,7 +48,7 @@ export function getResolutionOptions(conflict: Conflict): ConflictResolution {
 	}
 
 	// Recommend action: prioritize user choices over automatic grants
-	const automaticSources = conflict.sources.filter((source) => !isUserSelectableSource(source));
+	const automaticSources = conflictSources.filter((source) => !isUserSelectableSource(source));
 	const recommendedAction =
 		automaticSources.length > 0 && userSelectableSources.length > 0
 			? actions.find((a) => a.type === 'suggest_alternative')
@@ -72,8 +73,9 @@ export function autoResolveConflicts(): { resolved: number; remaining: Conflict[
 	let resolved = 0;
 
 	for (const conflict of result.conflicts) {
-		const userSources = conflict.sources.filter(isUserSelectableSource);
-		const autoSources = conflict.sources.filter((source) => !isUserSelectableSource(source));
+		const conflictSources = conflict.sources || [];
+		const userSources = conflictSources.filter(isUserSelectableSource);
+		const autoSources = conflictSources.filter((source) => !isUserSelectableSource(source));
 
 		// If we have both user selections and automatic grants, revert the user selections
 		if (userSources.length > 0 && autoSources.length > 0) {
@@ -97,7 +99,8 @@ export function autoResolveConflicts(): { resolved: number; remaining: Conflict[
  * Resolve a specific conflict by reverting a specific scope using smart revert
  */
 export function resolveConflictByReverting(conflict: Conflict, scopeId: string): boolean {
-	if (!conflict.sources.includes(scopeId)) {
+	const conflictSources = conflict.sources || [];
+	if (!conflictSources.includes(scopeId)) {
 		return false;
 	}
 
@@ -136,7 +139,8 @@ function getSuggestedAlternatives(conflict: Conflict): string[] {
 		},
 		proficiency: {},
 		language: {},
-		feature: {}
+		feature: {},
+		spell_limit: {},
 	};
 
 	const suggestions = commonAlternatives[conflict.type]?.[conflict.value] || [];
@@ -208,8 +212,9 @@ function getSourceDescription(source: string): string {
 export function getAutoResolvableConflicts(): Conflict[] {
 	const result = detectConflicts();
 	return result.conflicts.filter((conflict) => {
-		const userSources = conflict.sources.filter(isUserSelectableSource);
-		const autoSources = conflict.sources.filter((source) => !isUserSelectableSource(source));
+		const conflictSources = conflict.sources || [];
+		const userSources = conflictSources.filter(isUserSelectableSource);
+		const autoSources = conflictSources.filter((source) => !isUserSelectableSource(source));
 		return userSources.length > 0 && autoSources.length > 0;
 	});
 }
@@ -220,9 +225,10 @@ export function getAutoResolvableConflicts(): Conflict[] {
 export function hasManualConflicts(): boolean {
 	const result = detectConflicts();
 	const manualConflicts = result.conflicts.filter((conflict) => {
-		const userSources = conflict.sources.filter(isUserSelectableSource);
+		const conflictSources = conflict.sources || [];
+		const userSources = conflictSources.filter(isUserSelectableSource);
 		// Manual conflicts are those where all sources are user-selectable or all are automatic
-		return userSources.length === 0 || userSources.length === conflict.sources.length;
+		return userSources.length === 0 || userSources.length === conflictSources.length;
 	});
 	return manualConflicts.length > 0;
 }

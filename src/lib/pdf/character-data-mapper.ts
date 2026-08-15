@@ -1012,7 +1012,7 @@ export function formatSpells(character: Character): string {
 			if (!spellAccess[i].chooseable) {
 				autoSpells.push.apply(autoSpells, spellAccess[i].spells)
 				if (spellAccess[i].cantrips) {
-					autoSpells.push.apply(autoSpells, spellAccess[i].cantrips)
+					autoSpells.push.apply(autoSpells, (spellAccess[i].cantrips || []))
 				}
 			}
 		}

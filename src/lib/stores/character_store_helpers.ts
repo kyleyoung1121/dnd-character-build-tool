@@ -329,7 +329,7 @@ export function getProvenanceSummary(): Record<
 	if (!char._provenance) return summary;
 
 	for (const [scopeId, prov] of Object.entries(char._provenance)) {
-		const changes = '_set' in prov && prov._set ? prov._set : prov;
+		const changes: any = '_set' in prov && prov._set ? prov._set : prov;
 		if (!changes) continue;
 
 		summary[scopeId] = {

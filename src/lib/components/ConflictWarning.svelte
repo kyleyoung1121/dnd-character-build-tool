@@ -1,6 +1,6 @@
-<script>
+<script lang="ts">
 	import { activeConflicts } from '$lib/stores/conflict_store';
-	import { getPrimaryResolutionTab } from '$lib/stores/conflict_detection';
+	import { getPrimaryResolutionTab, type Conflict } from '$lib/stores/conflict_detection';
 
 	export let tabName = '';
 
@@ -20,7 +20,7 @@
 		// Conflicts detected for this tab
 	}
 
-	function getConflictDescription(conflict) {
+	function getConflictDescription(conflict: Conflict) {
 		// Handle spell limit violations differently
 		if (conflict.type === 'spell_limit') {
 			return getSpellLimitDescription(conflict);
@@ -33,8 +33,9 @@
 			feature: 'Feature'
 		};
 
+		const conflictSources = conflict.sources || [];
 		const typeLabel = typeMap[conflict.type] || conflict.type;
-		const sourceDescriptions = conflict.sources.map((source) => {
+		const sourceDescriptions = conflictSources.map((source) => {
 			// Convert source IDs to human-readable descriptions
 
 			// Class sources
@@ -136,7 +137,7 @@
 		return `${typeLabel} "${conflict.value}" is granted by multiple sources: ${sourceDescriptions.join(', ')}`;
 	}
 
-	function getSpellLimitDescription(conflict) {
+	function getSpellLimitDescription(conflict: Conflict) {
 		if (!conflict.violations || conflict.violations.length === 0) {
 			return 'Spell limit violation detected';
 		}
@@ -155,7 +156,7 @@
 		return `Spell limits exceeded: ${violationDescriptions.join(', ')}`;
 	}
 
-	function getResolutionSuggestion(conflict) {
+	function getResolutionSuggestion(conflict: Conflict) {
 		// Handle spell limit violations differently
 		if (conflict.type === 'spell_limit') {
 			return getSpellLimitResolution(conflict);
@@ -172,7 +173,7 @@
 		return 'This conflict involves automatic grants. Consider changing your other selections.';
 	}
 
-	function getSpellLimitResolution(conflict) {
+	function getSpellLimitResolution(conflict: Conflict) {
 		let message = 'Go to the Spells tab and deselect excess spells.';
 
 		// Add specific cause information if available

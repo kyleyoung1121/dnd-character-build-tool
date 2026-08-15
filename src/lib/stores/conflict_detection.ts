@@ -146,8 +146,10 @@ export function detectSpellLimitViolations(character: Character): Conflict[] {
 	// Check for violations
 	const violations: SpellLimitViolation[] = [];
 
-	// let metadata = (character._provenance?.spell_selections as any)._metadata
-	let metadata = character._provenance?.spell_selections?._metadata;
+	let metadata = null;
+	if (character._provenance?.spell_selections && ('_metadata' in character._provenance?.spell_selections)) {
+		metadata = character._provenance?.spell_selections?._metadata;
+	}
 
 	if (!metadata) {
 		// Calculate current spell limits (mirroring the logic from spells page)
@@ -187,7 +189,7 @@ export function detectSpellLimitViolations(character: Character): Conflict[] {
 		// Calculate current spell limits (mirroring the logic from spells page)
 		const spellLimits = calculateSpellLimits(character, false);
 		
-		const spellsWithMetadata: Array<{ name: string; tabSource?: string }> = metadata.map((spellObj) => {
+		const spellsWithMetadata: Array<{ name: string; tabSource?: string }> = (metadata as any).map((spellObj: any) => {
 			if (spellObj.name && spellObj.tabSource) {
 				return {
 					name: spellObj.name,
@@ -198,7 +200,7 @@ export function detectSpellLimitViolations(character: Character): Conflict[] {
 				return { name: '' };
 			}
 
-		}).filter((spell) => spell.name !== '');
+		}).filter((spell: any) => spell.name !== '');
 
 		const selectedSpells = new Set(spellsWithMetadata.map(s => s.name));
 

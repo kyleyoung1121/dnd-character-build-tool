@@ -1095,11 +1095,11 @@
 			</div>
 		</div>
 		
-		<div class="quiz-link-container">
+		<!-- <div class="quiz-link-container">
 			<a href="{base}/species-quiz" class="quiz-link">
 				Not sure? Take the Species quiz!
 			</a>
-		</div>
+		</div> -->
 	{/if}
 
 	{#if selectedSpecies}

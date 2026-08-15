@@ -658,11 +658,11 @@
 			{/each}
 		</div>
 		
-		<div class="quiz-link-container">
+		<!-- <div class="quiz-link-container">
 			<a href="{base}/class-quiz" class="quiz-link">
 				Not sure? Take the Class quiz!
 			</a>
-		</div>
+		</div> -->
 	{/if}
 
 	{#if selectedClass}

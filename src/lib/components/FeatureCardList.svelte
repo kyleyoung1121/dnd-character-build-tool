@@ -62,7 +62,7 @@
 			
 			// Find and revert all scopes that are children of this feature
 			// Pattern: starts with prevScopeId followed by a colon (indicating nested scope)
-			const state = get(characterStore);
+			const state: any = get(characterStore);
 			if (state._provenance) {
 				const scopesToRevert = Object.keys(state._provenance).filter(key => 
 					key.startsWith(prevScopeId + ':')
@@ -117,7 +117,7 @@
 			// ALSO revert nested prompt effects from the previous option's nestedPrompts
 			// This handles cleanup for invocations and similar features
 			if (feature.featureOptions) {
-				const prevOption = feature.featureOptions.options?.find(opt => opt.name === prev);
+				const prevOption: any = feature.featureOptions.options?.find((opt: any) => opt.name === prev);
 				if (prevOption?.nestedPrompts) {
 					for (const prevOptionNested of prevOption.nestedPrompts) {
 						const prevOptionNestedScopeId = parentFeatureName && parentIndex !== null && parentIndex !== undefined
@@ -299,7 +299,7 @@
 		// This handles cases like Warlock invocations where the option (e.g., "Beguiling Influence")
 		// has its own nestedPrompts array with effects that need to be applied
 		if (feature.featureOptions) {
-			const selectedOption = feature.featureOptions.options?.find(opt => opt.name === choice);
+			const selectedOption: any = feature.featureOptions.options?.find((opt: any) => opt.name === choice);
 			if (selectedOption?.nestedPrompts) {
 				for (const optionNested of selectedOption.nestedPrompts) {
 					const optionNestedScopeId = parentFeatureName && parentIndex !== null && parentIndex !== undefined

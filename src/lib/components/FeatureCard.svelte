@@ -11,7 +11,6 @@
 
 	// Props
 	export let feature: FeaturePrompt;
-	export let option: any;
 	export let featureSelections: Record<string, (string | null)[]>;
 	export let expandedFeatures: Set<string>;
 	export let selectionVersion: number;
@@ -207,22 +206,6 @@
 		border-color: var(--color-neutral-400);
 		border-width: 1px;
 		padding: var(--spacing-2) var(--spacing-3);
-	}
-
-	/* Enhanced nesting: each level gets progressively more indented and lighter */
-	.feature-card.nested .feature-card.nested {
-		margin-left: var(--spacing-4);
-		background-color: var(--color-neutral-50);
-		border-color: var(--color-neutral-300);
-		padding: var(--spacing-2);
-	}
-
-	.feature-card.nested .feature-card.nested .feature-card.nested {
-		margin-left: var(--spacing-3);
-		background-color: var(--color-background);
-		border-color: var(--color-border);
-		padding: var(--spacing-1) var(--spacing-2);
-		font-size: var(--font-size-sm);
 	}
 
 	.feature-card.incomplete {

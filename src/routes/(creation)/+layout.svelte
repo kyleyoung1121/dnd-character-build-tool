@@ -49,10 +49,10 @@
 	// Build navigation items dynamically based on character's abilities
 	$: {
 		const items = [];
-		let tabsRequired = [];
+		let requiredTabs = [];
 
 		for (const navItem of baseNavItems) {
-			tabsRequired.push(navItem.name.toLowerCase())
+			requiredTabs.push(navItem.name.toLowerCase())
 		}
 
 		// Check if we're on quiz pages
@@ -91,19 +91,19 @@
 				href: base + '/beasts',
 				id: 'beasts'
 			});
-			tabsRequired.push('beasts')
+			requiredTabs.push('beasts')
 		}
 
 		// Add Spells tab if character has spell access
 		if (hasSpellAccess($character_store)) {
 			items.push({ name: 'Spells', href: base + '/spells', id: 'spells' });
-			tabsRequired.push('spells')
+			requiredTabs.push('spells')
 		}
 
 		const state = get(character_store);
 
 		// Check to see if the player has completed a number of tabs equal to how many we expect to be finished
-		if (state.completedCreationTabs?.length === tabsRequired.length) {
+		if (allRequiredTabsComplete(requiredTabs, state.completedCreationTabs || [])) {
 			items.push(baseNavItems[6]); // Export
 		}
 		
@@ -116,6 +116,19 @@
 		if (currentTabId) {
 			markTabAsVisited(currentTabId);
 		}
+	}
+
+	// Check that all required tabs appear in the given list of finished tabs
+	function allRequiredTabsComplete(requiredTabs: any[], finishedTabs: any[]): boolean {
+		for (const requiredTab of requiredTabs) {
+			// If even one required tab is missing from the list of finished tabs, return false 
+			if (!finishedTabs.includes(requiredTab)) {
+				console.log('requiredTab not found in finishedTabs. ', requiredTab, finishedTabs);
+				return false
+			}
+		}
+		// If we never quit early, we know that all required tabs are accounted for. Return true.
+		return true
 	}
 
 	function getCurrentTabId(routeId: string) {

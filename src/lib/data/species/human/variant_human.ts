@@ -1508,7 +1508,7 @@ const featPrompt: FeaturePrompt = {
 										{ type: 'text', text: 'While you use a shield, you gain the following benefits:' },
 										{ type: 'text', text: '• If you take the Attack action on your turn, you can use a bonus action to try to shove a creature with your shield.' },
 										{ type: 'text', text: '• You can add your shield\'s AC bonus (+2) to any Dexterity saving throw you make against a spell or other harmful effect that targets only you.' },
-										{ type: 'text', text: '• If you are subjected to an effect that allows you to make a Dexterity to take only half damage, you can use your reaction to take no damage if you succeed on the saving throw, interpose your shield between yourself and the source of the effect.' },
+										{ type: 'text', text: '• If you are subjected to an effect that allows you to make a Dexterity to take only half damage, you can use your reaction to take no damage if you succeed on the saving throw, as you interpose your shield between yourself and the source of the effect.' },
 									]
 						},
 						source: 'variant_human.feats',

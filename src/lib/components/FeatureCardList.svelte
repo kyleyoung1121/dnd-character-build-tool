@@ -26,13 +26,6 @@
 
 	// Handle feature option selection
 	function handleSelectOption(feature: FeaturePrompt, index: number, selectedOption: string, parentFeatureName?: string | null, parentIndex?: number | null) {
-		console.log(`[HANDLE_SELECT] Called with:`, {
-			feature: feature.name,
-			index,
-			selectedOption,
-			parentFeatureName,
-			parentIndex
-		});
 		if (!selectedOption) return;
 
 		const normalizedChoice = selectedOption;

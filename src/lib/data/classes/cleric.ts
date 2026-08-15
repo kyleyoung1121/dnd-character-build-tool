@@ -583,7 +583,7 @@ const classFeaturesPrompt: FeaturePrompt[] = [spellcastingPrompt, channelDivinit
 
 export const cleric: ClassData = {
 	name: 'Cleric',
-	image: base + '/class_icons/cleric.jpg',
+	image: base + '/class_icons/cleric.png',
 	description: 'You are a priestly champion who wields divine magic in service to a higher power.',
 	enhancedFlavor: "Clerics draw power from the realms of the gods and harness it to work miracles. Blessed by a deity, a pantheon, or another immortal entity, a Cleric can reach out to the divine, and channel it to bolster friends and battle foes. Since they wield the power of their respective deities, Clerics are incredibly diverse, each having their own array of magical abilities.",
 	cultureNotes: 'Clerics are the connection between the mortal world and the distant planes of the gods. They use their divine magic to heal and inspire their allies, but are also capable of unleashing spells that devastate evildoers.',

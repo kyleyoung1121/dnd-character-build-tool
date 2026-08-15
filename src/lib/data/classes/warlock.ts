@@ -1179,7 +1179,7 @@ const classFeaturesPrompt: FeaturePrompt[] = [pactMagicPrompt, pactBoonPrompt];
 
 export const warlock: ClassData = {
 	name: 'Warlock',
-	image: base + '/class_icons/warlock.jpg',
+	image: base + '/class_icons/warlock.png',
 	description: 'You are a wielder of magic that is derived from a bargain with an otherworldly entity.',
 	enhancedFlavor: "Warlocks quest for knowledge that lies hidden in the fabric of the multiverse. They often begin their search for magical power by delving into tomes of forbidden lore, dabbling in invocations meant to attract the power of extraplanar beings, or seeking places of power where the influence of these beings can be felt. In no time, each Warlock is drawn into a binding pact with a powerful patron. Drawing on the ancient knowledge of beings such as angels, archfey, demons, devils, hags, and alien entities of the Far Realm, Warlocks piece together arcane secrets to bolster their own power.",
 	cultureNotes: 'Warlocks are usually driven by a need for knowledge and power, which compels them into their pacts and shapes their lives. These pacts unlock magical effects, both subtle and spectacular. These gifts come at the cost of occasional gifts or services performed on the patron\'s behalf.',

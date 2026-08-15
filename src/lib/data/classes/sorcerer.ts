@@ -386,7 +386,7 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 
 export const sorcerer: ClassData = {
 	name: 'Sorcerer',
-	image: base + '/class_icons/sorcerer.jpg',
+	image: base + '/class_icons/sorcerer.png',
 	description: 'You are a spellcaster who draws on inherent magic from a gift or bloodline.',
 	enhancedFlavor: "Sorcerers wield innate magic that is stamped into their being. Some Sorcerers can’t name the origin of their power, while others trace it to strange events in their personal or family history. The blessing of a dragon or a dryad at a baby’s birth or the strike of lightning from a clear sky might spark a Sorcerer’s gift. So too might the gift of a deity, exposure to the strange magic of another plane of existence, or a glimpse into the inner workings of reality. Whatever the origin, the result is an indelible mark on the Sorcerer, a churning magic that can be passed down through generations.",
 	cultureNotes: 'Sorcerers are connected to raw magic. It suffuses body, mind, and spirit with a latent power that waits to be tapped. A sorcerer\'s magic wants to be wielded, and it has a tendency to spill out in unpredictable ways if it isn’t called upon.',

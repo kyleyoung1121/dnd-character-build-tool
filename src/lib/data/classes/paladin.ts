@@ -493,7 +493,7 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 
 export const paladin: ClassData = {
 	name: 'Paladin',
-	image: base + '/class_icons/paladin.jpg',
+	image: base + '/class_icons/paladin.png',
 	description: 'You are a holy warrior bound to a sacred oath.',
 	enhancedFlavor: "Paladins are united by their oaths to stand against the forces of annihilation and corruption. Whether sworn before a god’s altar, in a sacred glade before nature spirits, or in a moment of desperation and grief with the dead as the only witnesses, a Paladin’s oath is a powerful bond. It is a source of power that turns a devout warrior into a blessed champion.",
 	cultureNotes: 'Paladins swear to uphold justice and righteousness, to stand with the good things of the world against the encroaching darkness, and to hunt the forces of evil wherever they lurk.',

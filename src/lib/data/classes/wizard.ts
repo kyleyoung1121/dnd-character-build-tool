@@ -399,7 +399,7 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 
 export const wizard: ClassData = {
 	name: 'Wizard',
-	image: base + '/class_icons/wizard.jpg',
+	image: base + '/class_icons/wizard.png',
 	description: 'You are a scholarly magic-user capable of manipulating the structures of reality.',
 	enhancedFlavor: "Wizards are defined by their exhaustive study of magic’s inner workings. They cast spells of explosive fire, arcing lightning, subtle deception, and spectacular transformations. Their magic conjures monsters from other planes of existence, glimpses the future, or forms protective barriers. Their mightiest spells change one substance into another, call meteors from the sky, or open portals to other worlds.",
 	cultureNotes: 'Wizards seek to master the mysteries of magic. Wizards live and die by their spells, spending years of apprenticeship and countless hours of study to become adept in manipulating the weave. When not studying, wizards often find themselves in crumbling ruins and lost cities, seeking knowledge that has been lost to time.',

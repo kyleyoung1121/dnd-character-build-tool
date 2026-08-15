@@ -367,7 +367,7 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 
 export const barbarian: ClassData = {
 	name: 'Barbarian',
-	image: base + '/class_icons/barbarian.jpg',
+	image: base + '/class_icons/barbarian.png',
 	description: 'Frenzied warriors fueled by primal rage.',
 	// Enhanced popup content for narrative preview
 	enhancedFlavor: "Barbarians are mighty warriors who are powered by primal forces of magic that manifest as a Rage. For every Barbarian, their Rage is a power that fuels not just battle prowess, but also uncanny reflexes and heightened senses. They charge headlong into danger so those under their protection don’t have to. Their courage in the face of danger makes Barbarians perfectly suited for adventure.",

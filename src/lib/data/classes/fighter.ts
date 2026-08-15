@@ -697,7 +697,7 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 
 export const fighter: ClassData = {
 	name: 'Fighter',
-	image: base + '/class_icons/fighter.jpg',
+	image: base + '/class_icons/fighter.png',
 	description: 'You are a master of combat, skilled with a variety of weapons and armor.',
 	enhancedFlavor: "Fighters control battlefields with ease, demonstrating unparalleled prowess with weapons and armor. A well-equipped Fighter always has the right tool at hand for any combat situation. Beyond mastery in general combat, each Fighter specializes in certain styles of combat. Some concentrate on archery, some on fighting with two weapons at once, and some on augmenting their martial skills with magic. This combination of broad ability and extensive specialization make Fighters superior combatants.",
 	cultureNotes: 'Fighters hold an unparalleled mastery with weapons and armor, having an excellent foundation in all aspects of battle. Fighters hold a keen understanding of reading a battlefield and executing a well-planned strategy.',

@@ -321,7 +321,7 @@ const classFeaturesPrompt: FeaturePrompt[] = [
 
 export const rogue: ClassData = {
 	name: 'Rogue',
-	image: base + '/class_icons/rogue.jpg',
+	image: base + '/class_icons/rogue.png',
 	description: 'You are a scoundrel who uses stealth and trickery to overcome obstacles and enemies.',
 	enhancedFlavor: "Rogues rely on cunning, stealth, and their foes’ vulnerabilities to get the upper hand in any situation. They have a knack for finding the solution to just about any problem. A few even learn magical tricks to supplement their other abilities. Many Rogues focus on stealth and deception, while others refine skills that help them in a dungeon environment, such as climbing, finding and disarming traps, and opening locks.",
 	cultureNotes: 'Rogues rely on skill, stealth, and their foes’ vulnerabilities to get the upper hand in any situation. They have a knack for finding the solution to just about any problem, demonstrating resourcefulness and versatility that pairs well with any successful adventuring party.',

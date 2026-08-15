@@ -690,6 +690,44 @@ async function fillFrontPage(
 			break;
 	}
 
+	// Core actions, bonus actions, other, from Variant Human's Feats
+	if (data.characterReference.feats?.includes("Defensive Duelist")) {
+		core_other.push("Defensive Duelist");
+	}
+	if (data.characterReference.feats?.includes("Charger")) {
+		core_actions.push("Dash (Charger)")
+		core_bonus_actions.push("Attack/Shove (Charger)");
+	}
+	if (data.characterReference.feats?.includes("Crossbow Expert")) {
+		core_bonus_actions.push("Hand Crossbow (Feat)");
+	}
+	if (data.characterReference.feats?.includes("Grappler")) {
+		core_actions.push("Grapple");
+		core_actions.push("Pin (Grappler Feat)");
+	}
+	if (data.characterReference.feats?.includes("Healer")) {
+		core_actions.push("Healer's Kit Heal");
+	}
+	if (data.characterReference.feats?.includes("Lucky")) {
+		core_other.push("Lucky Reroll (Feat)");
+	}
+	if (data.characterReference.feats?.includes("Mage Slayer")) {
+		core_other.push("Mage Slayer Attack");
+	}
+	if (data.characterReference.feats?.includes("Mobile")) {
+		core_actions.push("Dash (Mobile)");
+	}
+	if (data.characterReference.feats?.includes("Polearm Master")) {
+		core_bonus_actions.push("Polearm Attack");
+	}
+	if (data.characterReference.feats?.includes("Shield Master")) {
+		core_bonus_actions.push("Shield Master Shove");
+	}
+	if (data.characterReference.feats?.includes("Tavern Brawler")) {
+		core_bonus_actions.push("Tavern Brawler Grapple");
+	}
+
+
 	let core_actions_string = core_actions.join(",\n");
 	let core_bonus_actions_string = core_bonus_actions.join(",\n");
 	let core_reactions_string = core_other.join(",\n");

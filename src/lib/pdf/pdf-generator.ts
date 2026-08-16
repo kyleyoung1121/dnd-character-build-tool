@@ -1368,7 +1368,7 @@ async function findSpellStats(data: CharacterSheetData): Promise<{
 	}
 
 	// If no primary source for spellcasting is found, also check the character's species
-	if (!spellAbilityMod) {
+	if (!spellAbilityMod == undefined) {
 		switch (characterReference.race) {
 			case 'High Elf':
 				if (characterReference.intelligence) {
@@ -1398,7 +1398,7 @@ async function findSpellStats(data: CharacterSheetData): Promise<{
 		}
 	}
 
-	if (!spellAbilityMod) {
+	if (spellAbilityMod == undefined) {
 		return {
 			spellAttack: undefined,
 			spellSave: undefined,
@@ -1511,7 +1511,6 @@ async function fillSpellsPage(
 
 	// Format page 1
 	if (form1) {
-		console.log("SPELL MOD DEBUG: Attempting to read spellAttack && spell save:", spellAttack, spellSave)
 		
 		if (spellAttack && spellSave) {
 			fillFormField(form1, 'spell_attack', spellAttack);

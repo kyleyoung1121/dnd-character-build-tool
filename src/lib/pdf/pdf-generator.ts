@@ -217,7 +217,7 @@ async function fillFrontPage(
 		attacks_notes_string += attacks_notes[i] + '\n';
 	}
 
-	// TODO: go through all damage cantrips and add to the appropriate array
+	// Go through all damage cantrips and add to the appropriate array
 	if (data.spells) {
 
 		let damageCantrips: Spell[];
@@ -283,7 +283,19 @@ async function fillFrontPage(
 
 			// Cantrip Notes
 			if (damageCantrips[i].quickReferenceStats && damageCantrips[i].quickReferenceStats?.get('properties')) {
-				attacks_notes_string += damageCantrips[i].quickReferenceStats?.get('properties') + '\n';
+				let cantripNotes = damageCantrips[i].quickReferenceStats?.get('properties') + '\n';
+				if (data.characterReference.feats?.includes("Spell Sniper")) {
+					// Double the range of ranged spell attacks
+					if (damageCantrips[i].tags?.includes('SpellAttack')) {
+						const spellRangeValue = cantripNotes.match(/\d+/);
+						
+						if (spellRangeValue && spellRangeValue[0]) {
+							cantripNotes = cantripNotes.replace(String(spellRangeValue[0]), String(Number(spellRangeValue[0]) * 2));
+						}
+					}
+				}
+
+				attacks_notes_string += cantripNotes;
 			} else {
 				attacks_notes_string += '\n';
 			}
@@ -1297,6 +1309,7 @@ async function findSpellStats(data: CharacterSheetData): Promise<{
 		case 'Warlock':
 			if (characterReference.charisma) {
 				spellAbilityMod = Math.floor(((characterReference.charisma - 10) / 2))
+				
 			}
 			break;
 		

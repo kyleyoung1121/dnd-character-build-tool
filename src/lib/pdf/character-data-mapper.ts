@@ -1081,9 +1081,26 @@ export function formatSpells(character: Character): string {
 			durationText = durationText.replace('hours', 'hr.')
 			durationText = durationText.replace('hour', 'hr.')
 
+			let spellRangeText = spell.range.replace('feet', 'ft.').replace('foot', 'ft.');
+
+			if (character.features?.includes("Eldritch Spear")) {
+				if (spell.name = "Eldritch Blast") {
+					spellRangeText = '300 ft.';
+				}
+			}
+
+			if (character.feats?.includes("Spell Sniper")) {
+				// Double the range of ranged spell attacks
+				if (spell.tags?.includes('SpellAttack')) {
+					const spellRangeValue = spellRangeText.match(/\d+/);
+					if (spellRangeValue && spellRangeValue[0]) {					
+						spellRangeText = spellRangeText.replace(String(spellRangeValue[0]), String(Number(spellRangeValue[0]) * 2));
+					}
+				}
+			}
+
 			// Add casting details
-			let spellRange = spell.range.replace('feet', 'ft.').replace('foot', 'ft.');
-			allSpellsText += `<bold:>( ${spell.castingTime} | ${spellRange} | ${durationText} )\n`;
+			allSpellsText += `<bold:>( ${spell.castingTime} | ${spellRangeText} | ${durationText} )\n`;
 			
 			// Add description
 			allSpellsText += spell.description + '\n\n';
@@ -1140,9 +1157,20 @@ export function formatSpells(character: Character): string {
 				durationText = durationText.replace('hours', 'hr.')
 				durationText = durationText.replace('hour', 'hr.')
 
+				let spellRangeText = spell.range.replace('feet', 'ft.').replace('foot', 'ft.');
+
+				if (character.feats?.includes("Spell Sniper")) {
+					// Double the range of ranged spell attacks
+					if (spell.tags?.includes('SpellAttack')) {
+						const spellRangeValue = spellRangeText.match(/\d+/);
+						if (spellRangeValue && spellRangeValue[0]) {					
+							spellRangeText = spellRangeText.replace(String(spellRangeValue[0]), String(Number(spellRangeValue[0]) * 2));
+						}
+					}
+				}
+
 				// Add casting details
-				let spellRange = spell.range.replace('feet', 'ft.').replace('foot', 'ft.');
-				allSpellsText += `<bold:>( ${spell.castingTime}  |  ${spellRange}  |  ${durationText} )\n`;
+				allSpellsText += `<bold:>( ${spell.castingTime}  |  ${spellRangeText}  |  ${durationText} )\n`;
 				
 				// Add description
 				allSpellsText += spell.description;

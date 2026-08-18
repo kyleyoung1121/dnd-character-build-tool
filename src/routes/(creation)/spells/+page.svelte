@@ -1519,6 +1519,10 @@
 				if (meta.tabSource.includes('High Elf') || meta.tabSource.includes('Tiefling') || meta.tabSource.includes('Forest Gnome') || meta.tabSource.includes('Dark Elf')) {
 					return false;
 				}
+				// Exclude spells selected from Feat tabs
+				if (meta.tabSource.includes('Magic Initiate') || meta.tabSource.includes('Ritual Caster') || meta.tabSource.includes('Spell Sniper')) {
+					return false;
+				}
 			}
 			
 			return true;
@@ -1547,6 +1551,10 @@
 				if (meta.tabSource.includes('High Elf') || meta.tabSource.includes('Tiefling') || meta.tabSource.includes('Forest Gnome') || meta.tabSource.includes('Dark Elf')) {
 					return false;
 				}
+				// Exclude spells selected from Feat tabs
+				if (meta.tabSource.includes('Magic Initiate') || meta.tabSource.includes('Ritual Caster') || meta.tabSource.includes('Spell Sniper')) {
+					return false;
+				}
 			}
 			
 			return true;
@@ -1573,6 +1581,10 @@
 				}
 				// Exclude spells selected from race tabs
 				if (meta.tabSource.includes('High Elf') || meta.tabSource.includes('Tiefling') || meta.tabSource.includes('Forest Gnome') || meta.tabSource.includes('Dark Elf')) {
+					return false;
+				}
+				// Exclude spells selected from Feat tabs
+				if (meta.tabSource.includes('Magic Initiate') || meta.tabSource.includes('Ritual Caster') || meta.tabSource.includes('Spell Sniper')) {
 					return false;
 				}
 			}
@@ -1956,9 +1968,10 @@
 											{@const isRaceTab = activeTab.startsWith('race-')}
 											{@const selectedMeta = selectedSpells.get(spell.name)}
 											{@const selectedFromFeature = selectedMeta && selectedMeta.tabSource && (selectedMeta.tabSource.includes('Pact of the') || selectedMeta.tabSource.includes('Book of Ancient') || selectedMeta.tabSource.includes('Circle of the Land'))}
+											{@const selectedFromFeat = selectedMeta && selectedMeta.tabSource && (selectedMeta.tabSource.includes('Magic Initiate') || selectedMeta.tabSource.includes('Ritual Caster') || selectedMeta.tabSource.includes('Spell Sniper'))}
 											{@const selectedFromRace = selectedMeta && selectedMeta.tabSource && (selectedMeta.tabSource.includes('High Elf') || selectedMeta.tabSource.includes('Tiefling') || selectedMeta.tabSource.includes('Forest Gnome') || selectedMeta.tabSource.includes('Dark Elf'))}
 											{@const selectedFromBase = selectedMeta && selectedMeta.tabSource && (selectedMeta.tabSource === 'cantrips' || selectedMeta.tabSource === 'level1' || selectedMeta.tabSource === 'level2')}
-											{@const showAlreadyKnown = (isBaseTab && (selectedFromFeature || selectedFromRace)) || ((isFeatureTab || isRaceTab) && selectedFromBase)}
+											{@const showAlreadyKnown = (isBaseTab && (selectedFromFeature || selectedFromRace || selectedFromFeat)) || ((isFeatureTab || isRaceTab) && selectedFromBase)}
 											{#if showAlreadyKnown}
 												<span class="spell-status unavailable-status">Already Known</span>
 											{:else}

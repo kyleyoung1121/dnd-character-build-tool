@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { base } from '$app/paths';
 	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
 	import { activeConflicts, markTabAsVisited } from '$lib/stores/conflict_store';
 	import {
 		character_store,
@@ -48,6 +49,7 @@
 
 	// Build navigation items dynamically based on character's abilities
 	$: {
+		const state = get(character_store);
 		const items = [];
 		let requiredTabs = [];
 
@@ -100,14 +102,16 @@
 			requiredTabs.push('spells')
 		}
 
-		const state = get(character_store);
-
 		// Check to see if the player has completed a number of tabs equal to how many we expect to be finished
 		if (
 			allRequiredTabsComplete(requiredTabs, state.completedCreationTabs || []) &&
 			!$activeConflicts.hasConflicts
 		) {
 			items.push(baseNavItems[6]); // Export
+		} else {
+			if (currentPath.includes('/export')) {
+				goto(base + '/details');
+			} 
 		}
 		
 		navItems = items;
@@ -131,10 +135,6 @@
 		}
 		// If we never quit early, we know that all required tabs are accounted for. Return true.
 		return true
-	}
-
-	function allTabsErrorFree(tabsToCheck: string[]) {
-		
 	}
 
 	function getCurrentTabId(routeId: string) {

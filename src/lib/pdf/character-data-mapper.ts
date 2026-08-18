@@ -386,6 +386,10 @@ function calculateSpeed(
 		}
 	}
 	
+	if (character.feats?.includes('Mobile')) {
+		speed += 10;
+	}
+
 	return `${speed} ft`;
 }
 

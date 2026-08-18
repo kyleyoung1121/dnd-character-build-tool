@@ -103,7 +103,10 @@
 		const state = get(character_store);
 
 		// Check to see if the player has completed a number of tabs equal to how many we expect to be finished
-		if (allRequiredTabsComplete(requiredTabs, state.completedCreationTabs || [])) {
+		if (
+			allRequiredTabsComplete(requiredTabs, state.completedCreationTabs || []) &&
+			!$activeConflicts.hasConflicts
+		) {
 			items.push(baseNavItems[6]); // Export
 		}
 		
@@ -128,6 +131,10 @@
 		}
 		// If we never quit early, we know that all required tabs are accounted for. Return true.
 		return true
+	}
+
+	function allTabsErrorFree(tabsToCheck: string[]) {
+		
 	}
 
 	function getCurrentTabId(routeId: string) {

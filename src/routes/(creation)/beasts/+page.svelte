@@ -37,7 +37,7 @@
 	$: isDruid = $character_store.class === 'Druid';
 	$: isBeastMaster = $character_store.class === 'Ranger' && $character_store.subclass === 'Beast Master';
 	$: isWizard = 
-		$character_store.class === 'Wizard' && 
+		$character_store.class != 'Warlock' && 
 		$character_store.spells && 
 		$character_store.spells.some((spell: any) => {
 			// Handle both object format (new) and string format (old)

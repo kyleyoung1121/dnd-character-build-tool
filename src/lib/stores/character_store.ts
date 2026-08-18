@@ -209,9 +209,9 @@ export function hasBeastAccess(character: Character): boolean {
 		return true;
 	}
 
-	// Wizards can learn Find Familiar - only show tab if they've selected it
+	// Wizards (and other classes who take the Wizard Magic Initiate Feat) can learn Find Familiar - only show tab if they've selected it
 	if (
-		character.class === 'Wizard' &&
+		character.class != 'Warlock' &&
 		character.spells &&
 		character.spells.some((spell: any) => {
 			// Handle both object format (new) and string format (old)

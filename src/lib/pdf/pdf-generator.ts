@@ -1559,7 +1559,6 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 	try {
 		
 		console.log('data: ', data);
-		console.log('character data: ', data.characterReference);
 
 		// Load templates
 		const frontPageDoc = await loadTemplate('Front Page');

@@ -316,6 +316,8 @@
 		// First, validate spell limits
 		validateSpellLimitBeforeRemoval();
 
+		clearTabCompletion();
+
 		if (selectedSpeciesData) {
 			// Use character_store.update() to ensure the store is properly updated
 			character_store.update((state) => {
@@ -361,6 +363,8 @@
 		featureSelections = {};
 		expandedFeatures = new Set();
 		bumpVersion();
+
+		revertChanges(get(character_store), 'tab_check:spells');
 	}
 
 	function confirmAddSpecies(speciesInfo: SpeciesData) {

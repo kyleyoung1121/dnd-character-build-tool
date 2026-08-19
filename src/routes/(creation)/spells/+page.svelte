@@ -2225,7 +2225,8 @@
 	}
 
 	.spell-button {
-		padding: var(--spacing-1) var(--spacing-3);
+		min-width: 8rem;
+		padding: 0.55rem;
 		border: 1px solid transparent;
 		border-radius: var(--radius-sm);
 		font-size: var(--font-size-xs);
@@ -2271,11 +2272,13 @@
 	}
 
 	.spell-status {
-		padding: var(--spacing-1) var(--spacing-3);
+		min-width: 8rem;
+		padding: 0.55rem;
 		border-radius: var(--radius-sm);
 		font-size: var(--font-size-xs);
 		font-weight: var(--font-weight-medium);
 		margin-right: var(--spacing-2);
+		text-align: center;
 	}
 
 	.unavailable-status {

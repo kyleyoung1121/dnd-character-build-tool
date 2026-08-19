@@ -307,7 +307,8 @@
 	}
 
 	.select-button {
-		padding: var(--spacing-2) var(--spacing-6);
+		min-width: 8rem;
+		padding: 0.55rem;
 		font-size: var(--font-size-sm);
 		font-weight: var(--font-weight-semibold);
 		border-radius: var(--radius-md);
@@ -323,14 +324,14 @@
 	}
 
 	.select-button.selected {
-		background: var(--color-warning);
+		background: var(--color-warning-light);
 		color: white;
-		border-color: var(--color-warning);
+		border-color: var(--color-warning-light);
 	}
 
 	.select-button.selected:hover {
-		background: var(--color-warning-dark);
-		border-color: var(--color-warning-dark);
+		background: var(--color-warning);
+		border-color: var(--color-warning);
 	}
 
 	.select-button.disabled,

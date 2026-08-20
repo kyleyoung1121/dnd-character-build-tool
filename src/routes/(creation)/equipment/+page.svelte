@@ -745,17 +745,7 @@
 			// Iterate through each class choice. These are the starter equipment choices
 			for (let choiceIndex = 0; choiceIndex < classChoices.length; choiceIndex++) {
 				if (isEquipmentChoice(classChoices[choiceIndex])) {
-					let isOneOptionSelected = false;
-					// Iterate through each option for this class equipment choice
-					const optionChoices = classChoices[choiceIndex].options
-					for (let optionIndex = 0; optionIndex < optionChoices.length; optionIndex++) {
-						// If any of the options match what is selected, we know this equipment choice is done
-						if (equipmentChoices[choiceIndex]?.selectedOption === optionIndex) {
-							isOneOptionSelected = true;
-						}
-					}
-					// If none of the options match what is saved for this choice, we know more work needs to be done here
-					if (!isOneOptionSelected) {
+					if (choiceNeedsInput(classChoices[choiceIndex], choiceIndex)) {
 						isEquipmentComplete = false;
 					}
 				}
@@ -767,6 +757,24 @@
 			applyTabCompletion();
 		} else {
 			clearTabCompletion();
+		}
+	}
+
+	function choiceNeedsInput(choice: (EquipmentChoice | SimpleEquipmentChoice), choiceIndex: number) {
+		let isOneOptionSelected = false;
+		// Iterate through each option for this class equipment choice
+		const optionChoices = choice.options
+		for (let optionIndex = 0; optionIndex < optionChoices.length; optionIndex++) {
+			// If any of the options match what is selected, we know this equipment choice is done
+			if (equipmentChoices[choiceIndex]?.selectedOption === optionIndex) {
+				isOneOptionSelected = true;
+			}
+		}
+		// If none of the options match what is saved for this choice, we know more work needs to be done here
+		if (!isOneOptionSelected) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -844,6 +852,7 @@
 										class="choice-option"
 										class:selected={equipmentChoices[choiceIndex]?.selectedOption === optionIndex}
 										class:disabled={!hasRequirements}
+										class:needs-input={choiceNeedsInput(choice, choiceIndex)}
 										disabled={!hasRequirements}
 										on:click={() => hasRequirements && handleMainOptionSelection(choiceIndex, optionIndex)}
 									>
@@ -1333,6 +1342,11 @@
 	.choice-option.disabled:hover {
 		border-color: var(--color-border);
 		box-shadow: none;
+	}
+
+	.choice-option.needs-input {
+		border-color: var(--color-warning-light);
+		box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 	}
 
 	.option-content {

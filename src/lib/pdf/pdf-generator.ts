@@ -92,7 +92,11 @@ async function fillFrontPage(
 	// Attach the player's library to their name
 	let playerNameWithLibrary = '';
 	if (data.playerName && data.library) {
-		playerNameWithLibrary = data.playerName + ' (' + data.library + ')';
+		if (data.library === 'N/A') {
+			playerNameWithLibrary = data.playerName	
+		} else {
+			playerNameWithLibrary = data.playerName + ' (' + data.library + ')';
+		}
 	}
 	// If the total name is shorter than 30 characters, pad it with spaces
 	// this ensures that the auto font size doesn't become very large in cases of short names

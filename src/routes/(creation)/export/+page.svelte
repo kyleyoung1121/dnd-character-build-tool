@@ -52,7 +52,24 @@
 	async function handleDownload() {
 		try {
 			const sheetData = mapCharacterToSheetData(character);
-			const fileName = `${character.library} - ${character.playerName} - ${character.characterName}.pdf`
+			let fileName = `${character.library} - ${character.playerName} - ${character.characterName}.pdf`
+			
+			// If the character details are unfilled (such as in a premade character sheet), try to name the file based on the character class & species
+			if (
+				character.library == 'N/A' &&
+				character.playerName.trim() == '' &&
+				character.characterName.trim() == ''
+			) {
+				if (character.subrace && character.class) {
+					fileName = character.class + ' ' + character.subrace + '.pdf'; 
+				} else if (character.race && character.class) {
+					fileName = character.class + ' ' + character.race + '.pdf'; 
+				} else {
+					fileName = 'UNNAMED CHARACTER.pdf'
+				}
+				
+			}
+
 			await downloadCharacterSheet(sheetData, fileName);
 			showExportDialog = false;
 		} catch (error) {

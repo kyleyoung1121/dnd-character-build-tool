@@ -55,12 +55,12 @@ async function loadFontBuffer(fontNumber: number): Promise<ArrayBuffer> {
 
 function fillFormField(form: any, fieldName: string, value: string, fontSize?: number, textAlignment?: TextAlignment) {
 	form.getTextField(fieldName).setText(value);
-	if (fontSize) {
-		form.getTextField(fieldName).setFontSize(fontSize);
-	}
-	if (textAlignment) {
-		form.getTextField(fieldName).setAlignment(textAlignment);
-	}
+	// if (fontSize) {
+	// 	form.getTextField(fieldName).setFontSize(fontSize);
+	// }
+	// if (textAlignment) {
+	// 	form.getTextField(fieldName).setAlignment(textAlignment);
+	// }
 }
 
 async function fillRadioField(form: any, fieldName: string, bubbleName: string) {
@@ -75,7 +75,8 @@ async function fillFrontPage(
 	data: CharacterSheetData,
 	font: any,
 	boldFont: any,
-	italicFont: any
+	italicFont: any,
+	hasShield: boolean
 ) {
 	
 	const form = page.getForm();
@@ -123,7 +124,14 @@ async function fillFrontPage(
 
 	// - - - - -
 	// Battle Stats
-	fillFormField(form, 'armor_class', data.armorClass);
+
+	if (hasShield) {
+		fillFormField(form, 'armor_class', String(Number(data.armorClass) - 2));
+		fillFormField(form, 'armor_class_shield', data.armorClass);
+	} else {
+		
+		fillFormField(form, 'armor_class', data.armorClass);
+	}
 	fillFormField(form, 'initiative', data.initiative);
 	fillFormField(form, 'speed', data.speed);
 	fillFormField(form, 'health', '/' + data.hitPointMaximum);
@@ -1561,11 +1569,10 @@ async function fillSpellsPage(
  */
 export async function generateCharacterSheet(data: CharacterSheetData): Promise<string> {
 	try {
-		
-		console.log('data: ', data);
 
 		// Load templates
 		const frontPageDoc = await loadTemplate('Front Page');
+		const frontPageShieldDoc = await loadTemplate('Front Page With Shield');
 		const featuresPageDoc = await loadTemplate('Two Column Page');
 		const equipmentPageDoc = await loadTemplate('Equipment Languages Notes');
 
@@ -1589,6 +1596,7 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 
 		const templates = [
 			frontPageDoc,
+			frontPageShieldDoc,
 			featuresPageDoc,
 			equipmentPageDoc,
 			beastsPageDoc,
@@ -1627,6 +1635,7 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 		// Grab a reference to each first page (each array only has one page anyways)
 		// TODO: Consider removing. Currently unused
 		const frontPage = frontPageDoc.getPages()[0];
+		const frontPageShield = frontPageShieldDoc.getPages()[0];
 		const featuresPage = featuresPageDoc.getPages()[0];
 		const equipmentPage = equipmentPageDoc.getPages()[0];
 
@@ -1646,16 +1655,26 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 		// Start filling pages with data
 		let freshPdfDoc = await PDFDocument.create()
 
-		// The first three pages will be the same across all characters
-		await fillFrontPage(frontPageDoc, data, templateFonts.get(frontPageDoc)[3], templateFonts.get(frontPageDoc)[1], templateFonts.get(frontPageDoc)[2]);
+		// Check if we need to use the default Front Page or the version with a shield
+		if (data.characterReference.inventory.some(item => item.toLowerCase().includes('shield'))) {
+			// Shield found! Use the shield variant of page one
+			await fillFrontPage(frontPageShieldDoc, data, templateFonts.get(frontPageShieldDoc)[3], templateFonts.get(frontPageShieldDoc)[1], templateFonts.get(frontPageShieldDoc)[2], true);
+			const [frontPageShieldCopy] = await freshPdfDoc.copyPages(frontPageShieldDoc, [0])
+			freshPdfDoc.addPage(frontPageShieldCopy)
+
+		} else {
+			// All other characters use the basic page one, with a simple AC layout
+			await fillFrontPage(frontPageDoc, data, templateFonts.get(frontPageDoc)[3], templateFonts.get(frontPageDoc)[1], templateFonts.get(frontPageDoc)[2], false);
+			const [frontPageCopy] = await freshPdfDoc.copyPages(frontPageDoc, [0])
+			freshPdfDoc.addPage(frontPageCopy)
+		}
+
 		await fillFeaturesPage(featuresPageDoc, data, templateFonts.get(featuresPageDoc)[3], templateFonts.get(featuresPageDoc)[1], templateFonts.get(featuresPageDoc)[2]);
 		await fillEquipmentPage(equipmentPageDoc, data, templateFonts.get(equipmentPageDoc)[3], templateFonts.get(equipmentPageDoc)[1], templateFonts.get(equipmentPageDoc)[2]);
 		
-		const [frontPageCopy] = await freshPdfDoc.copyPages(frontPageDoc, [0])
 		const [featuresPageCopy] = await freshPdfDoc.copyPages(featuresPageDoc, [0])
 		const [equipmentPageCopy] = await freshPdfDoc.copyPages(equipmentPageDoc, [0])
 
-		freshPdfDoc.addPage(frontPageCopy)
 		freshPdfDoc.addPage(featuresPageCopy)
 		freshPdfDoc.addPage(equipmentPageCopy)
 

@@ -343,6 +343,7 @@ export const PDF_CONFIG = {
 
 	templatePaths: new Map([
 		['Front Page', '/pdf-templates/page_one.pdf'],
+		['Front Page With Shield', '/pdf-templates/page_one_shield.pdf'],
 		['Two Column Page', '/pdf-templates/page_two.pdf'],
 		['Equipment Page', '/pdf-templates/page_three.pdf'],
 		['Equipment Languages Notes', '/pdf-templates/equipment-languages-notes.pdf'],

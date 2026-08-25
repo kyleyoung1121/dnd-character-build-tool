@@ -408,7 +408,15 @@
 		// Calculate new Charisma-based spell limit
 		const totalCharisma = (selectedScores.charisma || 10) + (bonuses.charisma || 0);
 		const charismaModifier = getModifier(totalCharisma);
-		const newSpellLimit = Math.max(1, charismaModifier + 1);
+		let newSpellLimit = Math.max(1, charismaModifier + 1);
+		
+		// Some Feats will change the number of expected leveled spells
+		if (currentCharacter.feats?.includes('Magic Initiate')) {
+			newSpellLimit += 1;
+		}
+		if (currentCharacter.feats?.includes('Ritual Caster')) {
+			newSpellLimit += 2;
+		}
 
 		// Get current paladin spell access to determine chooseable spells
 		const tempCharacter = { ...currentCharacter, charisma: totalCharisma };
@@ -460,7 +468,15 @@
 		// Calculate new Wisdom-based spell limit
 		const totalWisdom = (selectedScores.wisdom || 10) + (bonuses.wisdom || 0);
 		const wisdomModifier = getModifier(totalWisdom);
-		const newSpellLimit = Math.max(1, wisdomModifier + 3);
+		let newSpellLimit = Math.max(1, wisdomModifier + 3);
+
+		// Some Feats will change the number of expected leveled spells
+		if (currentCharacter.feats?.includes('Magic Initiate')) {
+			newSpellLimit += 1;
+		}
+		if (currentCharacter.feats?.includes('Ritual Caster')) {
+			newSpellLimit += 2;
+		}
 
 		// Get current cleric spell access to determine chooseable spells
 		const tempCharacter = { ...currentCharacter, wisdom: totalWisdom };

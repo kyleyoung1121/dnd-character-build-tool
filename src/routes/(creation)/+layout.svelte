@@ -16,6 +16,7 @@
 	import { initializeBeastCleanup } from '$lib/stores/beast_cleanup';
 	import { initializeEquipmentCleanup } from '$lib/stores/equipment_cleanup';
 	import { debugConflicts } from '$lib/debug/conflict_debug';
+	import { browser } from '$app/environment';
 
 	// Initialize spell cleanup service when app loads
 	// This ensures spells are cleaned up when class/race/subclass changes,
@@ -109,7 +110,7 @@
 		) {
 			items.push(baseNavItems[6]); // Export
 		} else {
-			if (currentPath.includes('/export')) {
+			if (currentPath.includes('/export') && browser) {
 				goto(base + '/details');
 			} 
 		}

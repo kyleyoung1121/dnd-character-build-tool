@@ -901,7 +901,6 @@ async function fillFeaturesPage(
 
 	let fontSize = 10;
 
-	fillFormField(form, 'page_title', 'Features', 12, TextAlignment.Center);
 	fillFormField(form, 'column_one', columnOneContent, fontSize);
 	fillFormField(form, 'column_two', columnTwoContent, fontSize);
 
@@ -951,7 +950,6 @@ async function fillEquipmentPage(
 	}
 
 	if (packTextFormatted) {
-		fillFormField(form, 'page_title_top_left', 'Equipment', 12, TextAlignment.Center);
 		fillFormField(form, 'top_left_text', packTextFormatted + '\n' + remainingText);
 	} else {
 
@@ -961,7 +959,6 @@ async function fillEquipmentPage(
 			equipmentSplitBulleted.push('•  ' + equipmentSplit[i]);
 		}
 
-		fillFormField(form, 'page_title_top_left', 'Equipment', 12, TextAlignment.Center);
 		fillFormField(form, 'top_left_text', equipmentSplitBulleted.join('\n'));
 	}
 
@@ -970,10 +967,6 @@ async function fillEquipmentPage(
 		languagesText += '•  ' + data.characterReference.languages[i] + '\n';
 	}
 	fillFormField(form, 'top_right_text', languagesText);
-	fillFormField(form, 'page_title_top_right', 'Languages', 12, TextAlignment.Center);
-
-	// Character Notes is left blank for the player to fill in after printing
-	fillFormField(form, 'page_title_bottom', 'Character Notes', 12, TextAlignment.Center);
 
 	form.flatten()
 }
@@ -991,9 +984,6 @@ async function fillBeastsPage(
 
 	const charactersPerRow = 56;
 	const maxLinesPerColumn = 65;
-
-	let beastTabName = getBeastTabName(data.characterReference);
-	fillFormField(form, 'page_title', beastTabName, 12, TextAlignment.Center);
 
 	let beastsContent = ''
 	
@@ -1573,10 +1563,10 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 		// Load templates
 		const frontPageDoc = await loadTemplate('Front Page');
 		const frontPageShieldDoc = await loadTemplate('Front Page With Shield');
-		const featuresPageDoc = await loadTemplate('Two Column Page');
+		const featuresPageDoc = await loadTemplate('Features Page');
 		const equipmentPageDoc = await loadTemplate('Equipment Languages Notes');
 
-		const beastsPageDoc = await loadTemplate('Two Column Page');
+		const beastsPageDoc = await loadTemplate('Beasts Page');
 
 		const spellsBasicPageDoc = await loadTemplate('Spells Basic');
 		const spellsPageTwoDoc = await loadTemplate('Spells Basic');

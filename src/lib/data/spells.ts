@@ -1727,7 +1727,7 @@ export const secondLevel: Spell[] = [
 		level: 2,
 		school: 'Evocation',
 		castingTime: '1 action',
-		range: '60 foot line',
+		range: 'Self',
 		components: ['V', 'S', 'M'],
 		duration: 'Concentration, up to 1 minute',
 		description:

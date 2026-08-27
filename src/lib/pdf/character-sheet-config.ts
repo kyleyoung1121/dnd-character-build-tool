@@ -348,6 +348,7 @@ export const PDF_CONFIG = {
 
 		['Features Page', '/pdf-templates/features_page.pdf'],
 		['Beasts Page', '/pdf-templates/beasts_page.pdf'],
+		['Familiars Page', '/pdf-templates/familiars_page.pdf'],
 
 		['Equipment Page', '/pdf-templates/page_three.pdf'],
 		['Equipment Languages Notes', '/pdf-templates/equipment-languages-notes.pdf'],

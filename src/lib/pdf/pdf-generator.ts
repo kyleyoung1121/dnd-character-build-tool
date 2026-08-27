@@ -1567,6 +1567,7 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 		const equipmentPageDoc = await loadTemplate('Equipment Languages Notes');
 
 		const beastsPageDoc = await loadTemplate('Beasts Page');
+		const familiarsPageDoc = await loadTemplate('Familiars Page');
 
 		const spellsBasicPageDoc = await loadTemplate('Spells Basic');
 		const spellsPageTwoDoc = await loadTemplate('Spells Basic');
@@ -1590,6 +1591,7 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 			featuresPageDoc,
 			equipmentPageDoc,
 			beastsPageDoc,
+			familiarsPageDoc,
 			spellsBasicPageDoc,
 			spellsPageTwoDoc,
 			spellsFullCasterPageDoc,
@@ -1630,6 +1632,7 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 		const equipmentPage = equipmentPageDoc.getPages()[0];
 
 		const beastsPage = beastsPageDoc.getPages()[0];
+		const familiarsPage = familiarsPageDoc.getPages()[0];
 		
 		const spellsBasicPage = spellsBasicPageDoc.getPages()[0];
 		const spellsFullCasterPage = spellsFullCasterPageDoc.getPages()[0];
@@ -1677,9 +1680,17 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 
 		// Check beast usage
 		if (hasBeastAccess(char)) {
-			await fillBeastsPage(beastsPageDoc, data, templateFonts.get(beastsPageDoc)[3], templateFonts.get(beastsPageDoc)[1], templateFonts.get(beastsPageDoc)[2]);
-			const [beastsPageCopy] = await freshPdfDoc.copyPages(beastsPageDoc, [0])
-			freshPdfDoc.addPage(beastsPageCopy)
+			const beastType = getBeastTabName(char);
+			if (beastType == 'Familiars') {
+				await fillBeastsPage(familiarsPageDoc, data, templateFonts.get(familiarsPageDoc)[3], templateFonts.get(familiarsPageDoc)[1], templateFonts.get(familiarsPageDoc)[2]);
+				const [familiarsPageCopy] = await freshPdfDoc.copyPages(familiarsPageDoc, [0])
+				freshPdfDoc.addPage(familiarsPageCopy)
+			} else {
+				await fillBeastsPage(beastsPageDoc, data, templateFonts.get(beastsPageDoc)[3], templateFonts.get(beastsPageDoc)[1], templateFonts.get(beastsPageDoc)[2]);
+				const [beastsPageCopy] = await freshPdfDoc.copyPages(beastsPageDoc, [0])
+				freshPdfDoc.addPage(beastsPageCopy)
+			}
+			
 		}
 		
 		// Check spell usage, and ID which spell page one to use for this character

@@ -182,7 +182,7 @@ export function prepareFeaturesWithOverflow(
 	for (const name of featureNames) {
 		const featureData = getFeatureData(name, character);
 		if (!featureData) {
-			console.warn(`Could not find feature data for: ${name}`);
+			//console.warn(`Could not find feature data for: ${name}`);
 			continue;
 		}
 		

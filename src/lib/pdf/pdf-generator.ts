@@ -1303,33 +1303,32 @@ async function findSpellStats(data: CharacterSheetData): Promise<{
 	const characterReference = data.characterReference
 	let spellAbilityMod = undefined;
 
+	function setAbilityMod(ability: number | null) {
+		if (ability) {
+			spellAbilityMod = Math.floor(((ability - 10) / 2))
+		}
+	}
+
 	switch (characterReference.class) {
 		// CHARISMA based
 		case 'Bard':
 		case 'Paladin':
 		case 'Sorcerer':
 		case 'Warlock':
-			if (characterReference.charisma) {
-				spellAbilityMod = Math.floor(((characterReference.charisma - 10) / 2))
-				
-			}
+			setAbilityMod(characterReference.charisma);
 			break;
 		
 		// WISDOM based
 		case 'Cleric':
 		case 'Druid':
 		case 'Ranger':
-			if (characterReference.wisdom) {
-				spellAbilityMod = Math.floor(((characterReference.wisdom - 10) / 2))
-			}
+			setAbilityMod(characterReference.wisdom);
 			break;
 		
 		// WISDOM based (must be Way of Shadow or Four Elements)
 		case 'Monk':
 			if (characterReference.subclass && ['Way of Shadow', 'Way of the Four Elements'].includes(characterReference.subclass)) {
-				if (characterReference.wisdom) {
-					spellAbilityMod = Math.floor(((characterReference.wisdom - 10) / 2))
-				}
+				setAbilityMod(characterReference.wisdom);
 			}
 			break;
 		
@@ -1337,66 +1336,134 @@ async function findSpellStats(data: CharacterSheetData): Promise<{
 		// TODO: Consider having totem warrior have no casting ability
 		case 'Barbarian':
 			if (characterReference.subclass == 'Totem Warrior') {
-				if (characterReference.wisdom) {
-					spellAbilityMod = Math.floor(((characterReference.wisdom - 10) / 2))
-				}
+				setAbilityMod(characterReference.wisdom);
 			}
 			break;
 
 		// INTELLIGENCE based
 		case 'Wizard':
-			if (characterReference.intelligence) {
-				spellAbilityMod = Math.floor(((characterReference.intelligence - 10) / 2))
-			}
+			setAbilityMod(characterReference.intelligence);
 			break;
 		
 		// INTELLIGENCE based (Must be Eldritch Knight)
 		case 'Fighter':
 			if (characterReference.subclass == 'Eldritch Knight') {
-				if (characterReference.intelligence) {
-					spellAbilityMod = Math.floor(((characterReference.intelligence - 10) / 2))
-				}
+				setAbilityMod(characterReference.intelligence);
 			}
 			break;
 		
 		// INTELLIGENCE based (Must be Arcane Trickster)
 		case 'Rogue':
 			if (characterReference.subclass == 'Arcane Trickster') {
-				if (characterReference.intelligence) {
-					spellAbilityMod = Math.floor(((characterReference.intelligence - 10) / 2))
-				}
+				setAbilityMod(characterReference.intelligence);
 			}
 			break;
 	}
 
-	// If no primary source for spellcasting is found, also check the character's species
-	if (!spellAbilityMod == undefined) {
-		switch (characterReference.race) {
+	// If no primary source for spellcasting is found, also check the character's species (or sub species)
+	if (spellAbilityMod == undefined) {
+		let speciesToCheck = characterReference.race;
+		if (characterReference.subrace) speciesToCheck = characterReference.subrace;
+
+		switch (speciesToCheck) {
 			case 'High Elf':
-				if (characterReference.intelligence) {
-					spellAbilityMod = Math.floor(((characterReference.intelligence - 10) / 2))
-				}
+				setAbilityMod(characterReference.intelligence);
 				break;
 
 			case 'Dark Elf':
-				if (characterReference.charisma) {
-					spellAbilityMod = Math.floor(((characterReference.charisma - 10) / 2))
-				}
+				setAbilityMod(characterReference.charisma);
 				break;
 
 			case 'Forest Gnome':
-				if (characterReference.intelligence) {
-					spellAbilityMod = Math.floor(((characterReference.intelligence - 10) / 2))
-				}
+				setAbilityMod(characterReference.intelligence);
 				break;
 
 			case 'Tiefling':
-				if (characterReference.charisma) {
-					spellAbilityMod = Math.floor(((characterReference.charisma - 10) / 2))
-				}
+				setAbilityMod(characterReference.charisma);
 				break;
 
+			case 'Variant Human':
+				const magicInitiateRegex = /Magic Initiate (.+) \(/;
+				let magicInitiateClass: string | undefined = undefined
+				let isSpellSniper = false
 
+				// Check each feature for relevant Feats
+				data.features.map((feature: string) => {
+					// Check for Magic Initiate
+					const regexResults = feature.match(magicInitiateRegex);
+					if (regexResults?.length && (regexResults?.length >= 2)) {
+						magicInitiateClass = regexResults[1];
+					}
+
+					// Check for Spell Sniper
+					if (feature == 'Spell Sniper') {
+						isSpellSniper = true;
+					}
+				});
+
+				// If the user has Magic Initiate (and no primary spellcasting), assign the relevant mod to the type of Magic Intiate
+				if (magicInitiateClass) {
+					switch (magicInitiateClass) {
+						case 'Bard':
+						case 'Sorcerer':
+						case 'Warlock':
+							setAbilityMod(characterReference.charisma);
+							break;
+
+						case 'Cleric':
+						case 'Druid':
+							setAbilityMod(characterReference.wisdom);
+							break;
+
+						case 'Wizard':
+							setAbilityMod(characterReference.intelligence);
+							break;
+					}
+
+				// If the user has Spell Sniper (and no primary spellcasting), assign the best mod relevant to that spell
+				} else if (isSpellSniper) {
+					let firstSpell: Spell | undefined;
+					if (data.spells.length >= 1) {
+						firstSpell = data.spells[0];
+					}
+					switch (firstSpell?.name) {
+						case 'Chill Touch':
+							// CHA, INT
+							setAbilityMod(Math.max(characterReference.charisma || 0, characterReference.intelligence || 0));
+							break;
+
+						case 'Eldritch Blast':
+							// CHA
+							setAbilityMod(characterReference.charisma);
+							break;
+
+						case 'Fire Bolt':
+							// CHA, INT
+							setAbilityMod(Math.max(characterReference.charisma || 0, characterReference.intelligence || 0));
+							break;
+
+						case 'Produce Flame':
+							// WIS
+							setAbilityMod(characterReference.wisdom);
+							break;
+
+						case 'Ray of Frost':
+							// CHA, INT
+							setAbilityMod(Math.max(characterReference.charisma || 0, characterReference.intelligence || 0));
+							break;
+
+						case 'Shocking Grasp':
+							// CHA, INT
+							setAbilityMod(Math.max(characterReference.charisma || 0, characterReference.intelligence || 0));
+							break;
+
+						case 'Thorn Whip':
+							// WIS
+							setAbilityMod(characterReference.wisdom);
+							break;
+					}
+				}
+				break;
 		}
 	}
 
@@ -1407,7 +1474,7 @@ async function findSpellStats(data: CharacterSheetData): Promise<{
 		}
 	}
 
-	// If the mod is positive, we need to manually add a plus (pre adjust by 2, since we are adding 2 from prof.)
+	// If the mod is positive (or zero), we need to manually add a plus (pre adjust by 2, since we are adding 2 from prof.)
 	let spellAttackString = spellAbilityMod >= -2 ? '+' : '';
 	spellAttackString += String(spellAbilityMod + 2)
 
@@ -1735,9 +1802,28 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 				break;
 
 			default: 
+				const magicInitiateRegex = /Magic Initiate (.+) \(/;
+				let magicInitiateClass: string | undefined = undefined
+				let isSpellSniper = false
+
+				// Check each feature for relevant Feats
+				data.features.map((feature: string) => {
+					// Check for Magic Initiate
+					const regexResults = feature.match(magicInitiateRegex);
+					if (regexResults?.length && (regexResults?.length >= 2)) {
+						magicInitiateClass = regexResults[1];
+					}
+
+					// Check for Spell Sniper
+					if (feature == 'Spell Sniper') {
+						isSpellSniper = true;
+					}
+				});
+
 				if ((selectedSubClass == 'Totem Warrior') || 
 				['High Elf', 'Dark Elf', 'Forest Gnome', 'Tiefling'].includes(selectedSpecies) ||
-				(selectedSubSpecies && ['High Elf', 'Dark Elf', 'Forest Gnome', 'Tiefling'].includes(selectedSubSpecies))
+				(selectedSubSpecies && ['High Elf', 'Dark Elf', 'Forest Gnome', 'Tiefling'].includes(selectedSubSpecies)) ||
+				(magicInitiateClass) || (isSpellSniper)
 			) {
 					spellsPageOneDoc = spellsBasicPageDoc;
 				}

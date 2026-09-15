@@ -80,7 +80,8 @@ export interface CharacterSheetData {
 	passivePerception: string;
 	
 	// Page 1 - Combat Stats
-	armorClass: string;
+	armorClass: number;
+	potentialArmorClass: number;
 	initiative: string;
 	speed: string;
 	hitPointMaximum: string;
@@ -421,7 +422,7 @@ function calculateArmorClass(
 	conMod: number,
 	wisMod: number,
 	inventory: string[] | undefined
-): number {
+) {
 
 	const mediumArmorMaster = character.features.includes("Medium Armor Master")
 	const wearingArmor = isWearingArmor(inventory);
@@ -476,21 +477,37 @@ function calculateArmorClass(
 		bestAC = Math.max(...alternatives);
 	}
 	
-	// Add shield bonus (+2) if using shield and it's allowed
-	if (usingShield) {
-		// Monk Unarmored Defense does NOT allow shields
-		const isMonkWithUnarmored = character.class === 'Monk' && character.features?.includes('Unarmored Defense');
-		if (!isMonkWithUnarmored) {
-			bestAC += 2;
-		}
-	}
-	
 	// Defense Fighting Style: +1 AC when wearing armor
 	if (wearingArmor && character.features?.includes('Defense Fighting Style')) {
 		bestAC += 1;
 	}
-	
-	return bestAC;
+
+	// Now that the best static AC is calculated, lets examine what potential boosts the player may get
+	let potentialAC = bestAC;
+
+	// Mage Armor raises the base AC to 13 + Dex
+	if (character.spells?.some(spellName => spellName.toLowerCase().includes('mage armor'))) {
+		const mageArmorAC = 13 + getModifier(character.dexterity);
+		if (mageArmorAC > potentialAC) potentialAC = mageArmorAC;
+	}
+
+	// A shield gives a +2 bonus
+	if (usingShield) {
+		// Monk Unarmored Defense does NOT allow shields
+		const isMonkWithUnarmored = character.class === 'Monk' && character.features?.includes('Unarmored Defense');
+		if (!isMonkWithUnarmored) {
+			potentialAC += 2;
+		}
+	}
+
+	// Barkskin can bring an AC to 16
+	if (character.spells?.some(spellName => spellName.toLowerCase().includes('barkskin'))) {
+		if (potentialAC < 16) {
+			potentialAC = 16;
+		}
+	}
+
+	return [bestAC, potentialAC];
 }
 
 /**
@@ -1235,6 +1252,8 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 			: character.race
 		: '';
 	
+	const armorClassResults = calculateArmorClass(character, dexMod, conMod, wisMod, character.inventory);
+
 	return {
 		// Page 1 - Header
 		characterReference: character,
@@ -1323,7 +1342,8 @@ export function mapCharacterToSheetData(character: Character): CharacterSheetDat
 		passivePerception: String(10 + getSkillModifier(character, wisMod, 'Perception')),
 		
 		// Page 1 - Combat Stats (calculated from derived stats functions)
-		armorClass: String(calculateArmorClass(character, dexMod, conMod, wisMod, character.inventory)),
+		armorClass: armorClassResults[0],
+		potentialArmorClass: armorClassResults[1],
 		initiative: formatModifier(character.features.includes("Alert") ? dexMod + 5 : dexMod),
 		speed: calculateSpeed(character, character.inventory),
 		hitPointMaximum: String(calculateHitPoints(character, conMod)),

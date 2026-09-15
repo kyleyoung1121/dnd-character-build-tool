@@ -343,7 +343,7 @@ export const PDF_CONFIG = {
 
 	templatePaths: new Map([
 		['Front Page', '/pdf-templates/page_one.pdf'],
-		['Front Page With Shield', '/pdf-templates/page_one_shield.pdf'],
+		['Front Page Advanced Armor Class', '/pdf-templates/page_one_shield.pdf'],
 		['Two Column Page', '/pdf-templates/page_two.pdf'],
 
 		['Features Page', '/pdf-templates/features_page.pdf'],

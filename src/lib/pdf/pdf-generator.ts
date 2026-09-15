@@ -76,7 +76,7 @@ async function fillFrontPage(
 	font: any,
 	boldFont: any,
 	italicFont: any,
-	hasShield: boolean
+	usesAdvancedAC: boolean,
 ) {
 	
 	const form = page.getForm();
@@ -125,12 +125,11 @@ async function fillFrontPage(
 	// - - - - -
 	// Battle Stats
 
-	if (hasShield) {
-		fillFormField(form, 'armor_class', String(Number(data.armorClass) - 2));
-		fillFormField(form, 'armor_class_shield', data.armorClass);
+	if (usesAdvancedAC) {
+		fillFormField(form, 'armor_class', String(data.armorClass));
+		fillFormField(form, 'armor_class_shield', String(data.potentialArmorClass));
 	} else {
-		
-		fillFormField(form, 'armor_class', data.armorClass);
+		fillFormField(form, 'armor_class', String(data.armorClass));
 	}
 	fillFormField(form, 'initiative', data.initiative);
 	fillFormField(form, 'speed', data.speed);
@@ -1629,7 +1628,7 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 
 		// Load templates
 		const frontPageDoc = await loadTemplate('Front Page');
-		const frontPageShieldDoc = await loadTemplate('Front Page With Shield');
+		const frontPageAdvancedArmorClass = await loadTemplate('Front Page Advanced Armor Class');
 		const featuresPageDoc = await loadTemplate('Features Page');
 		const equipmentPageDoc = await loadTemplate('Equipment Languages Notes');
 
@@ -1654,7 +1653,7 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 
 		const templates = [
 			frontPageDoc,
-			frontPageShieldDoc,
+			frontPageAdvancedArmorClass,
 			featuresPageDoc,
 			equipmentPageDoc,
 			beastsPageDoc,
@@ -1694,7 +1693,7 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 		// Grab a reference to each first page (each array only has one page anyways)
 		// TODO: Consider removing. Currently unused
 		const frontPage = frontPageDoc.getPages()[0];
-		const frontPageShield = frontPageShieldDoc.getPages()[0];
+		const frontPageAdvancedArmorClassPage = frontPageAdvancedArmorClass.getPages()[0];
 		const featuresPage = featuresPageDoc.getPages()[0];
 		const equipmentPage = equipmentPageDoc.getPages()[0];
 
@@ -1715,18 +1714,19 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 		// Start filling pages with data
 		let freshPdfDoc = await PDFDocument.create()
 
-		// Check if we need to use the default Front Page or the version with a shield
-		if (data.characterReference.inventory.some(item => item.toLowerCase().includes('shield'))) {
-			// Shield found! Use the shield variant of page one
-			await fillFrontPage(frontPageShieldDoc, data, templateFonts.get(frontPageShieldDoc)[3], templateFonts.get(frontPageShieldDoc)[1], templateFonts.get(frontPageShieldDoc)[2], true);
-			const [frontPageShieldCopy] = await freshPdfDoc.copyPages(frontPageShieldDoc, [0])
-			freshPdfDoc.addPage(frontPageShieldCopy)
+		// Decide if we use default first page, or with advanced Armor Class
 
-		} else {
-			// All other characters use the basic page one, with a simple AC layout
+		// If there is no special potential AC boost, use the standard Front Page.
+		if (data.armorClass == data.potentialArmorClass) {
 			await fillFrontPage(frontPageDoc, data, templateFonts.get(frontPageDoc)[3], templateFonts.get(frontPageDoc)[1], templateFonts.get(frontPageDoc)[2], false);
 			const [frontPageCopy] = await freshPdfDoc.copyPages(frontPageDoc, [0])
 			freshPdfDoc.addPage(frontPageCopy)
+		
+		// Otherwise, use the advanced AC version
+		} else {
+			await fillFrontPage(frontPageAdvancedArmorClass, data, templateFonts.get(frontPageAdvancedArmorClass)[3], templateFonts.get(frontPageAdvancedArmorClass)[1], templateFonts.get(frontPageAdvancedArmorClass)[2], true);
+			const [frontPageShieldCopy] = await freshPdfDoc.copyPages(frontPageAdvancedArmorClass, [0])
+			freshPdfDoc.addPage(frontPageShieldCopy)
 		}
 
 		await fillFeaturesPage(featuresPageDoc, data, templateFonts.get(featuresPageDoc)[3], templateFonts.get(featuresPageDoc)[1], templateFonts.get(featuresPageDoc)[2]);

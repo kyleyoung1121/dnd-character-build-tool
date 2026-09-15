@@ -5,6 +5,9 @@
 	import { generateCharacterSheet, downloadCharacterSheet } from '$lib/pdf/pdf-generator';
 	import { onMount } from 'svelte';
 
+	import BeastPageExport from '$lib/components/BeastPageExport.svelte';
+	import SpellPageExport from '$lib/components/SpellPageExport.svelte';
+
 	let character: Character;
 	let pdfUrl: string | null = null;
 	let isGenerating = false;
@@ -153,7 +156,25 @@
 	{/if}
 </div>
 
+<div class="beast-page-export" id="beast-page-export" style="display: none;">
+	<BeastPageExport/>
+</div>
+
+<div class="spell-page-export" id="spell-page-export" style="display: none;">
+	<SpellPageExport/>
+</div>
+
 <style>
+	.beast-page-export {
+        width: 2212px;
+        height: 2856px;
+	}
+	
+	.spell-page-export {
+        width: 8848px;
+        height: 1428px;
+	}
+
 	.export-page {
 		min-height: 100vh;
 		background: var(--color-background);

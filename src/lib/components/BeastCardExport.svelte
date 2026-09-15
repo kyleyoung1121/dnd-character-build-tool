@@ -1,0 +1,333 @@
+<script lang="ts">
+	import type { Beast } from '$lib/data/beasts/types';
+
+	export let beast: Beast;
+	export let isBeastMaster: boolean = false; // For Beast Master HP minimum rule
+
+	// Calculate ability modifiers
+	function getModifier(score: number): string {
+		const mod = Math.floor((score - 10) / 2);
+		return mod >= 0 ? `+${mod}` : `${mod}`;
+	}
+
+	// Convert CR decimal to fraction display
+	function crToDisplay(cr: number): string {
+		if (cr === 0) return '0';
+		if (cr === 0.125) return '1/8';
+		if (cr === 0.25) return '1/4';
+		if (cr === 0.5) return '1/2';
+		return cr.toString(); // For CR 1 and above
+	}
+
+	// Format speed for display
+	function formatSpeed(): string {
+		return Object.entries(beast.speed)
+			.map(([type, value]) => {
+				const typeLabel = type === 'walk' ? '' : type + ' ';
+				return `${typeLabel}${value} ft.`;
+			})
+			.join(', ');
+	}
+
+	// Calculate displayed HP (Beast Master rule: minimum 12 HP for level 3 ranger)
+	$: displayedHP = isBeastMaster ? Math.max(beast.hit_points.average, 12) : beast.hit_points.average;
+</script>
+
+
+<div class="beast-card-wrapper">
+	<div class="beast-card" id="beast-card">
+		<div class="card-content">
+		<!-- Header with CR in top right -->
+		<div class="beast-header">
+			<div class="header-left">
+				<h3 class="beast-name">{beast.name}</h3>
+				<div class="beast-meta">
+					<span class="beast-size">{beast.size} {beast.type}</span>
+				</div>
+			</div>
+			<div class="header-right">
+				<div class="challenge-rating">
+					<strong>CR:</strong> {crToDisplay(beast.challenge_rating)}
+				</div>
+				<div class="speed-info">
+					<strong>Speed:</strong> {formatSpeed()}
+				</div>
+			</div>
+		</div>
+
+		<div class="stats-with-abilties">
+			<!-- AC and HP stacked -->
+			<div class="basic-stats">
+				<div class="stat-row">
+					<strong>Armor Class:</strong> {beast.armor_class}
+				</div>
+				<div class="stat-row">
+					<strong>Hit Points:</strong> {displayedHP}
+					<!-- Formula hidden but kept in data for future use -->
+					<!-- {#if beast.hit_points.formula}
+						<span class="formula">({beast.hit_points.formula})</span>
+					{/if} -->
+				</div>
+			</div>
+
+			<!-- Ability Scores - compact inline format -->
+			<div class="ability-scores">
+				<div class="ability">
+					<span class="ability-name">STR</span>
+					<span class="ability-value">{beast.ability_scores.STR} ({getModifier(beast.ability_scores.STR)})</span>
+				</div>
+				<div class="ability">
+					<span class="ability-name">DEX</span>
+					<span class="ability-value">{beast.ability_scores.DEX} ({getModifier(beast.ability_scores.DEX)})</span>
+				</div>
+				<div class="ability">
+					<span class="ability-name">CON</span>
+					<span class="ability-value">{beast.ability_scores.CON} ({getModifier(beast.ability_scores.CON)})</span>
+				</div>
+				<div class="ability">
+					<span class="ability-name">INT</span>
+					<span class="ability-value">{beast.ability_scores.INT} ({getModifier(beast.ability_scores.INT)})</span>
+				</div>
+				<div class="ability">
+					<span class="ability-name">WIS</span>
+					<span class="ability-value">{beast.ability_scores.WIS} ({getModifier(beast.ability_scores.WIS)})</span>
+				</div>
+				<div class="ability">
+					<span class="ability-name">CHA</span>
+					<span class="ability-value">{beast.ability_scores.CHA} ({getModifier(beast.ability_scores.CHA)})</span>
+				</div>
+			</div>
+		</div>
+
+		
+
+		<!-- Proficiencies -->
+		{#if beast.proficiencies.length > 0}
+			<div class="proficiencies">
+				{#each beast.proficiencies as prof}
+					<div class="proficiency-item">
+						<strong>{prof.name}:</strong> {prof.text}
+					</div>
+				{/each}
+			</div>
+		{/if}
+
+		<!-- Abilities -->
+		{#if beast.abilities.length > 0}
+			<div class="abilities-section">
+				{#each beast.abilities as ability}
+					<div class="ability-item">
+						<strong>{ability.name}.</strong> {ability.text}
+					</div>
+				{/each}
+			</div>
+		{/if}
+
+		<!-- Actions -->
+		{#if beast.actions.length > 0}
+			<div class="actions-section">
+				<h4 class="section-header">Actions</h4>
+				{#each beast.actions as action}
+					<div class="action-item">
+						<strong>{action.name}.</strong> {action.text}
+					</div>
+				{/each}
+			</div>
+		{/if}
+
+		</div>
+	</div>
+</div>
+
+
+<style>
+	.beast-card-wrapper {
+		width: 50%;
+	}
+
+	.beast-card {
+		border: 2px solid var(--color-neutral-500);
+		border-radius: var(--radius-lg);
+		padding: 1.75rem;
+        margin: 1.75rem;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.card-content {
+		flex: 1;
+	}
+
+	.beast-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		border-bottom: 4px solid var(--color-neutral-500);
+		padding-bottom: 1rem;
+		margin-bottom: 1.25rem;
+		gap: 1rem;
+	}
+
+	.header-left {
+		flex: 1;
+	}
+
+	.header-right {
+		text-align: right;
+		font-size: 1.70rem;
+		min-width: 300px;
+	}
+
+	.beast-name {
+		font-size: 2.8rem;
+		font-weight: bold;
+		color: var(--color-neutral-800);
+		margin: 0 0 0.5rem 0;
+		line-height: 1.8;
+	}
+
+	.beast-meta {
+		font-size: 1.7rem;
+		color: #666;
+		font-style: italic;
+	}
+
+	.beast-size {
+		text-transform: capitalize;
+	}
+
+	.challenge-rating {
+		margin-bottom: 0.5rem;
+		color: var(--color-neutral-800);
+	}
+
+	.speed-info {
+		color: var(--color-neutral-800);
+	}
+
+	.stats-with-abilties {
+		
+	}
+
+	.basic-stats {
+		padding: 1rem 0;
+		border-bottom: 2px solid var(--color-primary-purple-light);
+		font-size: 1.8rem;
+	}
+
+	.stat-row {
+		margin: 0.25rem 0;
+	}
+
+	.formula {
+		color: #666;
+		font-size: 1.7rem;
+	}
+
+	.ability-scores {
+		display: flex;
+		justify-content: space-around;
+		padding: 1rem 0;
+		border-bottom: 2px solid var(--color-primary-purple-light);
+		border-radius: 4px;
+		margin: 1rem 0;
+		gap: 0.5rem;
+		width: 100%;
+	}
+
+	.ability {
+		text-align: center;
+		flex: 1;
+		font-size: 1.7rem;
+	}
+
+	.ability-name {
+		font-weight: bold;
+		color: var(--color-neutral-800);
+		display: block;
+		margin-bottom: 0.25rem;
+	}
+
+	.ability-value {
+		color: #333;
+	}
+
+	.proficiencies,
+	.abilities-section,
+	.actions-section {
+		margin: 1.25rem 0;
+	}
+
+	.section-header {
+		font-size: 1.90rem;
+		font-weight: bold;
+		color: var(--color-primary-purple-light);
+		text-transform: uppercase;
+		letter-spacing: 1px;
+		margin: 0.75rem 0 0.5rem 0;
+		border-bottom: 2px solid var(--color-primary-purple-light);
+		padding-bottom: 0.5rem;
+	}
+
+	.proficiency-item,
+	.ability-item,
+	.action-item {
+		margin: 0.75rem 0;
+		font-size: 1.7rem;
+		line-height: 1.8;
+	}
+
+	strong {
+		color: var(--color-neutral-800);
+	}
+
+	.selection-area {
+		margin-top: auto;
+		padding-top: 1.5rem;
+		border-top: 2px solid var(--color-primary-purple-light);
+		text-align: center;
+	}
+
+	.select-button {
+		min-width: 16rem;
+		padding: 1.1rem;
+		font-size: var(--font-size-sm);
+		font-weight: var(--font-weight-semibold);
+		border-radius: var(--radius-md);
+		background: var(--color-primary-purple);
+		color: white;
+		cursor: pointer;
+		transition: all var(--transition-base);
+	}
+
+	.select-button:hover {
+		background: var(--color-primary-purple-hover);
+		border-color: var(--color-primary-purple);
+	}
+
+	.select-button.selected {
+		background: var(--color-warning-light);
+		color: white;
+		border-color: var(--color-warning-light);
+	}
+
+	.select-button.selected:hover {
+		background: var(--color-warning);
+		border-color: var(--color-warning);
+	}
+
+	.select-button.disabled,
+	.select-button:disabled {
+		background: #e5e7eb;
+		color: #9ca3af;
+		border-color: #d1d5db;
+		cursor: not-allowed;
+		opacity: 0.6;
+	}
+
+	.select-button.disabled:hover,
+	.select-button:disabled:hover {
+		background: #e5e7eb;
+		border-color: #d1d5db;
+	}
+</style>

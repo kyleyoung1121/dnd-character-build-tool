@@ -17,6 +17,8 @@ import { druid } from '$lib/data/classes/druid';
 import { get } from 'svelte/store';
 import { character_store, hasBeastAccess, getBeastTabName } from '$lib/stores/character_store';
 import { detectSpellLimitViolations } from '$lib/stores/conflict_detection';
+import html2canvas from "html2canvas";
+import BeastCard from '$lib/components/BeastCard.svelte';
 
 /**
  * Load the blank PDF template from static folder
@@ -974,326 +976,37 @@ async function fillEquipmentPage(
 
 // Original working version of fillBeastsPage(). This version fills the pdf template columns.
 async function fillBeastsPage(
-	page: any,
+	doc: PDFDocument,
 	data: CharacterSheetData,
 	font: any,
 	boldFont: any,
 	italicFont: any
 ) {
-	const form = page.getForm()
+	doc.getForm().flatten();
 
-	const charactersPerRow = 56;
-	const maxLinesPerColumn = 65;
-
-	let beastsContent = ''
+	const elementToPrint = document.getElementById('beast-page-export');
+	elementToPrint?.setAttribute('style', '');
 	
-	// If no beasts are selected, we can return early. But, still flatten the file!
-	if (!data.characterReference.beasts) {
-		form.flatten()
-		return;
+	if (elementToPrint) {
+		// Convert HTML element into data URL
+		const dataURL = (await html2canvas(elementToPrint)).toDataURL("image/png");
+
+		// Embed Data URL into PDF
+		const pngImageBytes = await fetch(dataURL).then((res) => res.arrayBuffer());
+
+		const page = doc.getPage(0);
+		const pngImage = await doc.embedPng(pngImageBytes);
+
+		page.drawImage(pngImage, {
+			x: 28,
+			y: 28,
+			width: 556,
+			height: 720,
+		});
 	}
 
-	for (let i = 0; i < data.characterReference.beasts.length; i++) {
-		const beastName = data.characterReference.beasts[i].name;
-		const beastFilteringResult = beasts.filter((beast) => beast.name == beastName);
-		let beast;
-		if (beastFilteringResult) {
-			beast = beastFilteringResult[0]
-		} else {
-			continue;
-		}
-
-		if (!beast) {
-			continue;
-		}
-		
-		// If the player is anything other than a Wizard, their beast stat block does indeed need attacks.
-		let canBeastAttack = !(data.class == 'Wizard'); 
-
-		let beastSpeed
-		if (beast) {
-			beastSpeed= Object.entries(beast.speed)
-			.map(([type, value]) => {
-				const typeLabel = type === 'walk' ? '' : type + ' ';
-				return `${typeLabel}${value} ft.`;
-			})
-			.join(', ');
-		}
-
-		function signedScore(score: number) {
-			const abilityMod = Math.floor((score-10)/2)
-			return abilityMod < 0 ? abilityMod : '+' + abilityMod;
-		}
-		
-		beastsContent += `<bold:>${beastName} (${beast.size} ${beast.type})\n` ;
-		beastsContent += `Armor Class: ${beast.armor_class}, Hit Points: ${beast.hit_points.average}\n`;
-		beastsContent += `Speed: ${beastSpeed}\n`;
-		beastsContent += `<bold:>STR ${signedScore(beast.ability_scores.STR)} (${beast.ability_scores.STR})  DEX ${signedScore(beast.ability_scores.DEX)} (${beast.ability_scores.DEX})  CON ${signedScore(beast.ability_scores.CON)} (${beast.ability_scores.CON})\n`;
-		
-		const skills = beast.proficiencies.filter((prof) => prof.name == 'Skills')[0]?.text
-		if (skills) {
-			beastsContent += `Skills: ${skills}\n`;
-		}
-		
-		const senses = beast.proficiencies.filter((prof) => prof.name == 'Senses')[0]?.text
-		if (senses) {
-			beastsContent += `Senses: ${senses}\n`;
-		}
-		
-		// Languages
-		// Druids cannot speak while wildshaped (unless their form can, which none of the Druid options have)
-		const isDruid = data.characterReference.class.includes('Druid');
-		const hasVoiceOfChainMaster = data.characterReference.features.includes('Voice of the Chain Master');
-		const beastLanguages = beast.proficiencies.filter((prof) => prof.name == 'Languages')[0]?.text
-
-		if (isDruid) {
-			beastsContent += `Languages: you cannot speak in this form\n`;
-		
-		// Warlocks: some familiars can speak. Voice of Chain Master also grants speaking through the familiar.
-		} else if (hasVoiceOfChainMaster && !beastLanguages) {
-			beastsContent += `Languages: you can speak through your familiar with your own voice\n`;
-		} else if (hasVoiceOfChainMaster && beastLanguages) {
-			beastsContent += `Languages: ${beastLanguages}. You may also speak through your familiar with your own voice\n`;
-		
-		// For all other circumstances, if the beast can speak, simply list its languages
-		} else if (beastLanguages) {
-			beastsContent += `Languages: ${beastLanguages}\n`
-		}
-
-		// List Abilities
-		if (beast.abilities && beast.abilities.length) {
-			beastsContent += `<bold:>Abilties\n`;
-		}
-		for (let j = 0; j < beast.abilities.length; j++) {
-			if (beast.abilities[j]) {
-				beastsContent += `${beast.abilities[j].name}: ${beast.abilities[j].text}\n`
-			}
-		}
-		
-		// List Actions
-		const eligibleActions = beast.actions.filter((action) => {
-			// If the beast can attack, no need to filter the actions.
-			if (canBeastAttack) {
-				return true
-			}
-			// Otherwise, we should skip any action that is an attack
-			if (!action.text.toLowerCase().includes('attack')) {
-				return true
-			}
-		})
-		if (eligibleActions && eligibleActions.length) {
-			beastsContent += `<bold:>Actions\n`;
-		}
-		for (let j = 0; j < eligibleActions.length; j++) {
-			if (eligibleActions[j]) {
-				beastsContent += `${eligibleActions[j].name}: ${eligibleActions[j].text}\n`
-			}
-		}
-
-		beastsContent += '\n'
-	}
-
-	let columnOneContent = '';
-	let columnOneBoldContent = '';
-	let columnTwoContent = '';
-	let columnTwoBoldContent = '';
-
-	let lineCount = 0;
-
-	// Iterate through beasts data chunks (entire beasts separated by a blank line)
-	let beastChunks = beastsContent.split('\n\n');
-	for (let i = 0; i < beastChunks.length; i++) {	
-		const layeredColumnsProcessed = processLayeredColumns(beastChunks[i] + '\n\n', charactersPerRow);
-
-		if (lineCount + layeredColumnsProcessed.linesUsed <= maxLinesPerColumn) {
-			lineCount += layeredColumnsProcessed.linesUsed;
-			columnOneContent += layeredColumnsProcessed.plainLayer;
-			columnOneBoldContent += layeredColumnsProcessed.boldLayer;
-		}
-
-		else {
-			lineCount += layeredColumnsProcessed.linesUsed;
-			columnTwoContent += layeredColumnsProcessed.plainLayer;
-			columnTwoBoldContent += layeredColumnsProcessed.boldLayer;
-		}
-	}
-
-	let fontSize = 10;
-
-	fillFormField(form, 'column_one', columnOneContent, fontSize);
-	fillFormField(form, 'column_two', columnTwoContent, fontSize);
-
-	
-	fillFormField(form, 'column_one_back', columnOneBoldContent, fontSize);
-	form.getTextField('column_one_back').updateAppearances(boldFont);
-	fillFormField(form, 'column_two_back', columnTwoBoldContent, fontSize);
-	form.getTextField('column_two_back').updateAppearances(boldFont);
-
-	form.flatten()
+	elementToPrint?.setAttribute('style', "display: none;");
 }
-
-// // Experimental version of fillBeastsPage(). Lets try creating an HTML stat block, saving it as an image, and embedding it into the PDF
-// async function fillBeastsPage(
-// 	page: any,
-// 	data: CharacterSheetData,
-// 	font: any,
-// 	boldFont: any,
-// 	italicFont: any
-// ) {
-// 	const form = page.getForm()
-
-// 	const charactersPerRow = 56;
-// 	const maxLinesPerColumn = 65;
-
-// 	let beastTabName = getBeastTabName(data.characterReference);
-// 	fillFormField(form, 'page_title', beastTabName, 12, TextAlignment.Center);
-
-// 	let beastsContent = ''
-	
-// 	// If no beasts are selected, we can return early. But, still flatten the file!
-// 	if (!data.characterReference.beasts) {
-// 		form.flatten()
-// 		return;
-// 	}
-
-// 	for (let i = 0; i < data.characterReference.beasts.length; i++) {
-// 		const beastName = data.characterReference.beasts[i].name;
-// 		const beastFilteringResult = beasts.filter((beast) => beast.name == beastName);
-// 		let beast;
-// 		if (beastFilteringResult) {
-// 			beast = beastFilteringResult[0]
-// 		} else {
-// 			continue;
-// 		}
-
-// 		if (!beast) {
-// 			continue;
-// 		}
-		
-// 		// If the player is anything other than a Wizard, their beast stat block does indeed need attacks.
-// 		let canBeastAttack = !(data.class == 'Wizard'); 
-
-// 		let beastSpeed
-// 		if (beast) {
-// 			beastSpeed= Object.entries(beast.speed)
-// 			.map(([type, value]) => {
-// 				const typeLabel = type === 'walk' ? '' : type + ' ';
-// 				return `${typeLabel}${value} ft.`;
-// 			})
-// 			.join(', ');
-// 		}
-
-// 		function signedScore(score: number) {
-// 			const abilityMod = Math.floor((score-10)/2)
-// 			return abilityMod < 0 ? abilityMod : '+' + abilityMod;
-// 		}
-		
-// 		beastsContent += `<bold:>${beastName} (${beast.size} ${beast.type})\n` ;
-// 		beastsContent += `Armor Class: ${beast.armor_class}, Hit Points: ${beast.hit_points.average}\n`;
-// 		beastsContent += `Speed: ${beastSpeed}\n`;
-// 		beastsContent += `<bold:>STR ${signedScore(beast.ability_scores.STR)} (${beast.ability_scores.STR})  DEX ${signedScore(beast.ability_scores.DEX)} (${beast.ability_scores.DEX})  CON ${signedScore(beast.ability_scores.CON)} (${beast.ability_scores.CON})\n`;
-		
-// 		const skills = beast.proficiencies.filter((prof) => prof.name == 'Skills')[0]?.text
-// 		if (skills) {
-// 			beastsContent += `Skills: ${skills}\n`;
-// 		}
-		
-// 		const senses = beast.proficiencies.filter((prof) => prof.name == 'Senses')[0]?.text
-// 		if (senses) {
-// 			beastsContent += `Senses: ${senses}\n`;
-// 		}
-		
-// 		// Languages
-// 		// Druids cannot speak while wildshaped (unless their form can, which none of the Druid options have)
-// 		const isDruid = data.characterReference.class.includes('Druid');
-// 		const hasVoiceOfChainMaster = data.characterReference.features.includes('Voice of the Chain Master');
-// 		const beastLanguages = beast.proficiencies.filter((prof) => prof.name == 'Languages')[0]?.text
-
-// 		if (isDruid) {
-// 			beastsContent += `Languages: you cannot speak in this form\n`;
-		
-// 		// Warlocks: some familiars can speak. Voice of Chain Master also grants speaking through the familiar.
-// 		} else if (hasVoiceOfChainMaster && !beastLanguages) {
-// 			beastsContent += `Languages: you can speak through your familiar with your own voice\n`;
-// 		} else if (hasVoiceOfChainMaster && beastLanguages) {
-// 			beastsContent += `Languages: ${beastLanguages}. You may also speak through your familiar with your own voice\n`;
-		
-// 		// For all other circumstances, if the beast can speak, simply list its languages
-// 		} else if (beastLanguages) {
-// 			beastsContent += `Languages: ${beastLanguages}\n`
-// 		}
-
-// 		// List Abilities
-// 		if (beast.abilities && beast.abilities.length) {
-// 			beastsContent += `<bold:>Abilties\n`;
-// 		}
-// 		for (let j = 0; j < beast.abilities.length; j++) {
-// 			if (beast.abilities[j]) {
-// 				beastsContent += `${beast.abilities[j].name}: ${beast.abilities[j].text}\n`
-// 			}
-// 		}
-		
-// 		// List Actions
-// 		const eligibleActions = beast.actions.filter((action) => {
-// 			// If the beast can attack, no need to filter the actions.
-// 			if (canBeastAttack) {
-// 				return true
-// 			}
-// 			// Otherwise, we should skip any action that is an attack
-// 			if (!action.text.toLowerCase().includes('attack')) {
-// 				return true
-// 			}
-// 		})
-// 		if (eligibleActions && eligibleActions.length) {
-// 			beastsContent += `<bold:>Actions\n`;
-// 		}
-// 		for (let j = 0; j < eligibleActions.length; j++) {
-// 			if (eligibleActions[j]) {
-// 				beastsContent += `${eligibleActions[j].name}: ${eligibleActions[j].text}\n`
-// 			}
-// 		}
-
-// 		beastsContent += '\n'
-// 	}
-
-// 	let columnOneContent = '';
-// 	let columnOneBoldContent = '';
-// 	let columnTwoContent = '';
-// 	let columnTwoBoldContent = '';
-
-// 	let lineCount = 0;
-
-// 	// Iterate through beasts data chunks (entire beasts separated by a blank line)
-// 	let beastChunks = beastsContent.split('\n\n');
-// 	for (let i = 0; i < beastChunks.length; i++) {	
-// 		const layeredColumnsProcessed = processLayeredColumns(beastChunks[i] + '\n\n', charactersPerRow);
-
-// 		if (lineCount + layeredColumnsProcessed.linesUsed <= maxLinesPerColumn) {
-// 			lineCount += layeredColumnsProcessed.linesUsed;
-// 			columnOneContent += layeredColumnsProcessed.plainLayer;
-// 			columnOneBoldContent += layeredColumnsProcessed.boldLayer;
-// 		}
-
-// 		else {
-// 			lineCount += layeredColumnsProcessed.linesUsed;
-// 			columnTwoContent += layeredColumnsProcessed.plainLayer;
-// 			columnTwoBoldContent += layeredColumnsProcessed.boldLayer;
-// 		}
-// 	}
-
-// 	let fontSize = 10;
-
-// 	fillFormField(form, 'column_one', columnOneContent, fontSize);
-// 	fillFormField(form, 'column_two', columnTwoContent, fontSize);
-
-	
-// 	fillFormField(form, 'column_one_back', columnOneBoldContent, fontSize);
-// 	form.getTextField('column_one_back').updateAppearances(boldFont);
-// 	fillFormField(form, 'column_two_back', columnTwoBoldContent, fontSize);
-// 	form.getTextField('column_two_back').updateAppearances(boldFont);
-
-// 	form.flatten()
-// }
 
 
 async function findSpellStats(data: CharacterSheetData): Promise<{
@@ -1429,124 +1142,105 @@ async function fillSpellsPage(
 		italicFont: any
 	}[]
 ): Promise<boolean> {
-	
-	let form1;
-	let form2;
-	
-	if (pagesData[0] && pagesData[0].page) {
-		form1 = pagesData[0].page.getForm()
-	}
-	if (pagesData[1] && pagesData[1].page) {
-		form2 = pagesData[1].page.getForm()
-	}
 
-	const charactersPerRow = 50;
-	let maxLinesPerColumn = 45;
-	// For spells, we want to leave room for Spell Save, Spell Attack, and Spell Slots. So, both columns should have a couple leading lines of whitespace
-	const whitespaceLines = 1;
-	maxLinesPerColumn -= whitespaceLines;
-
-	let spellsContent = formatSpells(data.characterReference);
-
-	let columnOneContent = '\n'.repeat(whitespaceLines);
-	let columnOneBoldContent = '\n'.repeat(whitespaceLines);
-
-	let columnTwoContent = '\n'.repeat(whitespaceLines);
-	let columnTwoBoldContent = '\n'.repeat(whitespaceLines);
-	
-	let columnThreeContent = '\n'.repeat(whitespaceLines);
-	let columnThreeBoldContent = '\n'.repeat(whitespaceLines);
-	
-	let columnFourContent = '\n'.repeat(whitespaceLines);
-	let columnFourBoldContent = '\n'.repeat(whitespaceLines);
-	
-	let lineCount = 0;
-	let pageTwoUsed = false;
-	
-	// Iterate through feature chunks (entire features separated by a blank line)
-	let spellsChunks = spellsContent.split('\n\n');
-	for (let i = 0; i < spellsChunks.length; i++) {	
-		let spellChunk: string;
-		if (i != spellsChunks.length - 1) {
-			spellChunk = spellsChunks[i] + '\n\n';
-		} else {
-			spellChunk = spellsChunks[i];
-		}
-		
-		const layeredColumnsProcessed = processLayeredColumns(spellChunk, charactersPerRow);
-		
-		let column_destination = Math.floor((lineCount + layeredColumnsProcessed.linesUsed) / maxLinesPerColumn) + 1;
-
-		// Handle overflow, pushing content to next column when there isnt any more room.
-		switch (column_destination) {
-			case 1:
-				lineCount += layeredColumnsProcessed.linesUsed;
-				columnOneContent += layeredColumnsProcessed.plainLayer;
-				columnOneBoldContent += layeredColumnsProcessed.boldLayer;
-				break;
-			case 2:
-				lineCount += layeredColumnsProcessed.linesUsed;
-				columnTwoContent += layeredColumnsProcessed.plainLayer;
-				columnTwoBoldContent += layeredColumnsProcessed.boldLayer;
-				break;
-			case 3:
-				lineCount += layeredColumnsProcessed.linesUsed;
-				columnThreeContent += layeredColumnsProcessed.plainLayer;
-				columnThreeBoldContent += layeredColumnsProcessed.boldLayer;
-				pageTwoUsed = true;
-				break;
-			case 4:
-				lineCount += layeredColumnsProcessed.linesUsed;
-				columnFourContent += layeredColumnsProcessed.plainLayer;
-				columnFourBoldContent += layeredColumnsProcessed.boldLayer;
-				pageTwoUsed = true;
-				break;		
-		}
-	}
+	let pageTwoUsed = true;
 
 	let spellStats = findSpellStats(data);
 
 	let spellAttack = (await spellStats).spellAttack;
 	let spellSave = (await spellStats).spellSave;
 
-	let fontSize = 4;
-
-	// Format page 1
-	if (form1) {
+	// Spells Page One
+	if (pagesData[0] && pagesData[0].page) {
 		
-		if (spellAttack && spellSave) {
-			fillFormField(form1, 'spell_attack', spellAttack);
-			fillFormField(form1, 'spell_save_dc', spellSave);
+		const form1 = pagesData[0].page.getForm();
+
+		fillFormField(form1, 'spell_attack', spellAttack || "+0");
+		fillFormField(form1, 'spell_save_dc', spellSave || "12");
+		
+		form1.flatten();
+
+		const elementToPrint = document.getElementById('spell-page-export');
+		elementToPrint?.setAttribute('style', '');
+		
+		if (elementToPrint) {
+			// Convert HTML element into data URL
+			const dataURL = (await html2canvas(elementToPrint, {backgroundColor:null})).toDataURL("image/png");
+
+			// Embed Data URL into PDF
+			const pngImageBytes = await fetch(dataURL).then((res) => res.arrayBuffer());
+
+			const page = pagesData[0].page.getPage(0);
+			const pngImage = await pagesData[0].page.embedPng(pngImageBytes);
+
+			page.drawImage(pngImage, {
+				x: -528,
+				y: 28,
+				width: 4448,
+				height: 685,
+			});
+
+			page.drawImage(pngImage, {
+				x: 28,
+				y: 28,
+				width: 4448,
+				height: 685,
+			});
+
 		}
-		
-		fillFormField(form1, 'column_one_top', columnOneContent, fontSize);
-		fillFormField(form1, 'column_two_top', columnTwoContent, fontSize);
 
-		fillFormField(form1, 'column_one_bottom', columnOneBoldContent, fontSize);
-		form1.getTextField('column_one_bottom').updateAppearances(pagesData[0].boldFont);
-		fillFormField(form1, 'column_two_bottom', columnTwoBoldContent, fontSize);
-		form1.getTextField('column_two_bottom').updateAppearances(pagesData[0].boldFont);
-
-		form1.flatten()
+		elementToPrint?.setAttribute('style', "display: none;");
 	}
 	
-
-	// Format page 2
-	if (form2) {
-		if (spellAttack && spellSave) {
-			fillFormField(form2, 'spell_attack', spellAttack);
-			fillFormField(form2, 'spell_save_dc', spellSave);
-		}
+	// Spells Page Two
+	if (pagesData[1] && pagesData[1].page) {
 		
-		fillFormField(form2, 'column_one_top', columnThreeContent, fontSize);
-		fillFormField(form2, 'column_two_top', columnFourContent, fontSize);
+		const form1 = pagesData[1].page.getForm();
 
-		fillFormField(form2, 'column_one_bottom', columnThreeBoldContent, fontSize);
-		form2.getTextField('column_one_bottom').updateAppearances(pagesData[1].boldFont);
-		fillFormField(form2, 'column_two_bottom', columnFourBoldContent, fontSize);
-		form2.getTextField('column_two_bottom').updateAppearances(pagesData[1].boldFont);
+		fillFormField(form1, 'spell_attack', spellAttack || "+0");
+		fillFormField(form1, 'spell_save_dc', spellSave || "12");
+		
+		form1.flatten();
 
-		form2.flatten()
+		const elementToPrint = document.getElementById('spell-page-export');
+		elementToPrint?.setAttribute('style', '');
+		
+		if (elementToPrint) {
+			// Convert HTML element into data URL
+			const dataURL = (await html2canvas(elementToPrint, {backgroundColor:null})).toDataURL("image/png");
+
+			// Embed Data URL into PDF
+			const pngImageBytes = await fetch(dataURL).then((res) => res.arrayBuffer());
+
+			const page = pagesData[1].page.getPage(0);
+			const pngImage = await pagesData[1].page.embedPng(pngImageBytes);
+
+			page.drawImage(pngImage, {
+				x: -1640,
+				y: 28,
+				width: 4448,
+				height: 685,
+			});
+
+			page.drawImage(pngImage, {
+				x: -2196,
+				y: 28,
+				width: 4448,
+				height: 685,
+			});
+
+		}
+
+
+		const spellDiv = document.getElementById('spells-grid');
+		if (spellDiv) {
+			console.log('areSpellsOverflowing? -> ', spellDiv.scrollWidth > spellDiv.clientWidth);
+			console.log('spellDiv.scrollWidth -> ', spellDiv.scrollWidth);
+			console.log('spellDiv.clientWidth -> ', spellDiv.clientWidth);
+			console.log('spellDiv.offsetWidth -> ', spellDiv.offsetWidth);
+		}
+
+		elementToPrint?.setAttribute('style', "display: none;");
 	}
 
 	return pageTwoUsed;

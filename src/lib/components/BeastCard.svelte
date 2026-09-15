@@ -42,7 +42,7 @@
 	}
 </script>
 
-<div class="beast-card" class:selected={isSelected}>
+<div class="beast-card" class:selected={isSelected} id="beast-card">
 	<div class="card-content">
 	<!-- Header with CR in top right -->
 	<div class="beast-header">

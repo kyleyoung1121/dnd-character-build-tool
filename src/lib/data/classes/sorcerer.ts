@@ -399,8 +399,8 @@ export const sorcerer: ClassData = {
 		fixed: ['2 Daggers'],
 		choices: [
 			{
-				name: 'Ranged Weapon',
-				description: 'Choose your ranged weapon',
+				name: 'Primary Weapon',
+				description: 'Choose your primary weapon',
 				options: [
 					{
 						label: 'Light crossbow and 20 bolts',

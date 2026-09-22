@@ -348,8 +348,8 @@ export const rogue: ClassData = {
 				]
 			} as EquipmentChoice,
 			{
-				name: 'Ranged Weapon',
-				description: 'Choose your ranged option',
+				name: 'Secondary Weapon',
+				description: 'Choose your secondary weapon',
 				options: [
 					{
 						label: 'Shortbow and quiver of 20 arrows',

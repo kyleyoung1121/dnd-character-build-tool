@@ -633,8 +633,8 @@ export const cleric: ClassData = {
 				]
 			} as EquipmentChoice,
 			{
-				name: 'Ranged Weapon',
-				description: 'Choose your ranged option',
+				name: 'Secondary Weapon',
+				description: 'Choose your secondary option',
 				options: [
 					{
 						label: 'Light crossbow and 20 bolts',

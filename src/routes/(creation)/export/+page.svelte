@@ -139,15 +139,8 @@
 			<h2>Export Your Character</h2>
 			<p>Your character sheet is ready to export.</p>
 			
-			<div class="dialog-actions">
-				<button class="btn-primary" on:click={handleDownload}>
-					Download PDF
-				</button>
-				<button class="btn-secondary" on:click={handlePrint}>
-					Print
-				</button>
-			</div>
-			
+			<button class="btn-primary" on:click={handleDownload}>Download PDF</button>
+			<button class="btn-secondary" on:click={handlePrint}>Print</button>
 			<button class="btn-close" on:click={toggleExportDialog}>Close</button>
 		</div>
 	{/if}
@@ -280,11 +273,12 @@
 	.btn-secondary {
 		border: none;
 		border-radius: var(--radius-md);
-		padding: var(--spacing-3-5) var(--spacing-8);
+		padding: var(--spacing-3);
 		font-size: var(--font-size-base);
 		font-weight: var(--font-weight-medium);
 		cursor: pointer;
 		transition: all var(--transition-base);
+		margin-bottom: var(--spacing-4);
 	}
 
 	.btn-primary {
@@ -362,6 +356,7 @@
 		flex-direction: column;
 		gap: var(--spacing-3);
 		margin-bottom: var(--spacing-4);
+		/* padding: var(--spacing-2); */
 	}
 
 	.dialog .btn-primary,

@@ -220,6 +220,8 @@
 
 			bumpVersion();
 		}
+
+		revertChanges(get(character_store), 'tab_check:spells');
 	}
 
 	function calculateMaxHP(hitDie: string | undefined) {

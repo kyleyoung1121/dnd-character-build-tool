@@ -264,13 +264,33 @@ const sacredOathPrompt: FeaturePrompt = {
 						]
 					},
 					{
+						id: 'paladin_channel_divinity',
+						name: 'Channel Divinity',
+						description: {
+							blocks: [
+								{
+									type: 'text',
+									text: 'Your oath allows you to channel divine energy to fuel magical effects. Each Channel Divinity option provided by your oath explains how to use it. When you use your Channel Divinity, you choose which option to use. You must then finish a short or long rest to use your Channel Divinity again. Some Channel Divinity effects require saving throws. When you use such an effect from this class, the DC equals your paladin spell save DC.'
+								}
+							]
+						},
+						source: 'paladin.oath_devotion',
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Channel Divinity'
+							}
+						]
+					},
+					{
 						id: 'paladin_sacred_weapon_01',
 						name: 'Sacred Weapon',
 						description: {
 							blocks: [
 								{
 									type: 'computed-inline',
-									text: 'As an action, you can imbue one weapon that you are holding with positive energy. For 1 minute, you add +1, or your Charisma modifier to that weapon\'s attack rolls, whichever is higher. Additionally, the weapon glows with light and becomes magical for the duration. ',
+									text: 'As an action, you may spend your use of Channel Divinity to imbue a weapon that you are holding with positive energy. For 1 minute, you add +1, or your Charisma modifier to that weapon\'s attack rolls, whichever is higher. Additionally, the weapon glows with light and becomes magical for the duration. ',
 									hints: [
 										{
 											afterText: 'Charisma modifier',
@@ -306,10 +326,10 @@ const sacredOathPrompt: FeaturePrompt = {
 									],
 					
 									fallbackText:
-										'As an action, you present your holy symbol, repelling fiends and undead. Such creatures within 30 feet must make a Wisdom saving throw (DC 10 + CHA) or become turned for 1 minute (or until it takes damage). A turned creature must spend its turns moving as far away from you as it can. For its action, it can only use the Dash action. It may also use the Dodge action if it has nowhere to move. It also can\'t take reactions.',
+										'As an action, you present your holy symbol, spending your use of Channel Divinity to repel fiends and undead. Such creatures within 30 feet must make a Wisdom saving throw (DC 10 + CHA) or become turned for 1 minute (or until it takes damage). A turned creature must spend its turns moving as far away from you as it can. For its action, it can only use the Dash action. It may also use the Dodge action if it has nowhere to move. It also can\'t take reactions.',
 					
 									replacementTemplate:
-										'As an action, you present your holy symbol, repelling fiends and undead. Such creatures within 30 feet must make a Wisdom saving throw (DC {value}) or become turned for 1 minute (or until it takes damage). A turned creature must spend its turns moving as far away from you as it can. For its action, it can only use the Dash action. It may also use the Dodge action if it has nowhere to move. It also can\'t take reactions.',
+										'As an action, you present your holy symbol, spending your use of Channel Divinity to repel fiends and undead. Such creatures within 30 feet must make a Wisdom saving throw (DC {value}) or become turned for 1 minute (or until it takes damage). A turned creature must spend its turns moving as far away from you as it can. For its action, it can only use the Dash action. It may also use the Dodge action if it has nowhere to move. It also can\'t take reactions.',
 								}
 							]
 						},
@@ -347,11 +367,31 @@ const sacredOathPrompt: FeaturePrompt = {
 						]
 					},
 					{
+						id: 'paladin_channel_divinity',
+						name: 'Channel Divinity',
+						description: {
+							blocks: [
+								{
+									type: 'text',
+									text: 'Your oath allows you to channel divine energy to fuel magical effects. Each Channel Divinity option provided by your oath explains how to use it. When you use your Channel Divinity, you choose which option to use. You must then finish a short or long rest to use your Channel Divinity again. Some Channel Divinity effects require saving throws. When you use such an effect from this class, the DC equals your paladin spell save DC.'
+								}
+							]
+						},
+						source: 'paladin.oath_devotion',
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Channel Divinity'
+							}
+						]
+					},
+					{
 						id: 'paladin_natures_wrath_01',
 						name: "Nature's Wrath",
 						description: {
 							blocks: [
-								{ type: 'text', text: 'As an action, you can cause spectral vines to spring up and reach for a creature within 10 feet of you that you can see. The creature must succeed on a Strength or Dexterity saving throw (its choice) or be restrained. While restrained by the vines, the creature repeats the saving throw at the end of each of its turns. On a success, it frees itself and the vines vanish.' },
+								{ type: 'text', text: 'As an action, you may spend your use of Channel Divinity to cause spectral vines to spring up and reach for a creature within 10 feet of you that you can see. The creature must succeed on a Strength or Dexterity saving throw (its choice) or be restrained. While restrained by the vines, the creature repeats the saving throw at the end of each of its turns. On a success, it frees itself and the vines vanish.' },
 							]
 						},
 						source: 'paladin.oath_ancients',
@@ -379,10 +419,10 @@ const sacredOathPrompt: FeaturePrompt = {
 									],
 					
 									fallbackText:
-										'As an action, you present your holy symbol, repelling fey and fiends. Such creatures within 30 feet must make a Wisdom saving throw (DC 10 + CHA) or become turned for 1 minute (or until it takes damage). A turned creature must spend its turns moving as far away from you as it can. For its action, it can only use the Dash action. It may also use the Dodge action if it has nowhere to move. It also can\'t take reactions.',
+										'As an action, you present your holy symbol, spending your use of Channel Divinity to repel fey and fiends. Such creatures within 30 feet must make a Wisdom saving throw (DC 10 + CHA) or become turned for 1 minute (or until it takes damage). A turned creature must spend its turns moving as far away from you as it can. For its action, it can only use the Dash action. It may also use the Dodge action if it has nowhere to move. It also can\'t take reactions.',
 					
 									replacementTemplate:
-										'As an action, you present your holy symbol, repelling fey and fiends. Such creatures within 30 feet must make a Wisdom saving throw (DC {value}) or become turned for 1 minute (or until it takes damage). A turned creature must spend its turns moving as far away from you as it can. For its action, it can only use the Dash action. It may also use the Dodge action if it has nowhere to move. It also can\'t take reactions.',
+										'As an action, you present your holy symbol, spending your use of Channel Divinity to repel fey and fiends. Such creatures within 30 feet must make a Wisdom saving throw (DC {value}) or become turned for 1 minute (or until it takes damage). A turned creature must spend its turns moving as far away from you as it can. For its action, it can only use the Dash action. It may also use the Dodge action if it has nowhere to move. It also can\'t take reactions.',
 								}
 							]
 						},
@@ -416,6 +456,26 @@ const sacredOathPrompt: FeaturePrompt = {
 								target: 'features',
 								action: 'add',
 								value: 'Oath Spells'
+							}
+						]
+					},
+					{
+						id: 'paladin_channel_divinity',
+						name: 'Channel Divinity',
+						description: {
+							blocks: [
+								{
+									type: 'text',
+									text: 'Your oath allows you to channel divine energy to fuel magical effects. Each Channel Divinity option provided by your oath explains how to use it. When you use your Channel Divinity, you choose which option to use. You must then finish a short or long rest to use your Channel Divinity again. Some Channel Divinity effects require saving throws. When you use such an effect from this class, the DC equals your paladin spell save DC.'
+								}
+							]
+						},
+						source: 'paladin.oath_devotion',
+						effects: [
+							{
+								target: 'features',
+								action: 'add',
+								value: 'Channel Divinity'
 							}
 						]
 					},

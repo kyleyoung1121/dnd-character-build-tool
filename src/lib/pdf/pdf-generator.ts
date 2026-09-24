@@ -1761,7 +1761,7 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 		}
 		
 		// Check spell usage, and ID which spell page one to use for this character
-		let spellsPageOneDoc: PDFDocument | undefined;
+		let spellsPageOneDoc: PDFDocument | undefined = undefined;
 		switch (selectedClass) {
 			case 'Bard':
 			case 'Cleric':
@@ -1780,8 +1780,6 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 				// Go deeper and see if the right subclass is there
 				if (selectedSubClass == 'Eldritch Knight' || selectedSubClass == 'Arcane Trickster') {
 					spellsPageOneDoc = spellsThirdCasterPageDoc;
-				} else {
-					spellsPageOneDoc = undefined;
 				}
 				break;
 
@@ -1802,32 +1800,35 @@ export async function generateCharacterSheet(data: CharacterSheetData): Promise<
 				break;
 
 			default: 
-				const magicInitiateRegex = /Magic Initiate (.+) \(/;
-				let magicInitiateClass: string | undefined = undefined
-				let isSpellSniper = false
+				break;
+		}
 
-				// Check each feature for relevant Feats
-				data.features.map((feature: string) => {
-					// Check for Magic Initiate
-					const regexResults = feature.match(magicInitiateRegex);
-					if (regexResults?.length && (regexResults?.length >= 2)) {
-						magicInitiateClass = regexResults[1];
-					}
+		if (!spellsPageOneDoc) {
+			const magicInitiateRegex = /Magic Initiate (.+) \(/;
+			let magicInitiateClass: string | undefined = undefined
+			let isSpellSniper = false
 
-					// Check for Spell Sniper
-					if (feature == 'Spell Sniper') {
-						isSpellSniper = true;
-					}
-				});
+			// Check each feature for relevant Feats
+			data.features.map((feature: string) => {
+				// Check for Magic Initiate
+				const regexResults = feature.match(magicInitiateRegex);
+				if (regexResults?.length && (regexResults?.length >= 2)) {
+					magicInitiateClass = regexResults[1];
+				}
 
-				if ((selectedSubClass == 'Totem Warrior') || 
+				// Check for Spell Sniper
+				if (feature == 'Spell Sniper') {
+					isSpellSniper = true;
+				}
+			});
+
+			if ((selectedSubClass == 'Totem Warrior') || 
 				['High Elf', 'Dark Elf', 'Forest Gnome', 'Tiefling'].includes(selectedSpecies) ||
 				(selectedSubSpecies && ['High Elf', 'Dark Elf', 'Forest Gnome', 'Tiefling'].includes(selectedSubSpecies)) ||
 				(magicInitiateClass) || (isSpellSniper)
 			) {
-					spellsPageOneDoc = spellsBasicPageDoc;
-				}
-				break;
+				spellsPageOneDoc = spellsBasicPageDoc;
+			}
 		}
 
 		// If spells are indeed used, also attach the spell page(s)

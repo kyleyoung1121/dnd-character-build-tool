@@ -10,9 +10,11 @@
 		revertChanges,
 		applyChoiceWithSpellLimitCheck
 	} from '$lib/stores/character_store_helpers';
+	import { character_store } from '$lib/stores/character_store';
 	import { get } from 'svelte/store';
 	import { conflicts } from '$lib/stores/conflict_store';
 	import FeatureCard from './FeatureCard.svelte';
+	
 
 	// Props
 	export let features: FeaturePrompt[];
@@ -23,6 +25,31 @@
 
 	// Events
 	export let onBumpVersion: () => void;
+
+	// Features that reset tab completion
+	const tabClearingFeatures: Record<string, string[]> = {
+		// Subclasses -> remove spells
+		'Primal Path': ['tab_check:spells'],
+		'Bard College': ['tab_check:spells'],
+		'Druid Circle': ['tab_check:spells', 'tab_check:beasts'],
+		'Divine Domain': ['tab_check:spells'],
+		'Martial Archetype': ['tab_check:spells'],
+		'Monastic Tradition': ['tab_check:spells'],
+		'Sacred Oath': ['tab_check:spells'],
+		'Ranger Archetype': ['tab_check:spells', 'tab_check:beasts'],
+		'Roguish Archetype': ['tab_check:spells'],
+		'Sorcerous Origin': ['tab_check:spells'],
+		'Pact Boon': ['tab_check:spells', 'tab_check:beasts'],
+		'Arcane Tradition': ['tab_check:spells'],
+
+		// Special cases
+		'Metamagic': ['tab_check:spells'],
+		'Fighting Style': ['tab_check:spells'],
+		'Natural Explorer': ['tab_check:spells'],
+		'Favored Enemy': ['tab_check:spells'],
+		'Expertise': ['tab_check:spells'],
+		'Otherworldly Patron': ['tab_check:spells'],
+	}
 
 	// Handle feature option selection
 	function handleSelectOption(feature: FeaturePrompt, index: number, selectedOption: string, parentFeatureName?: string | null, parentIndex?: number | null) {
@@ -132,6 +159,14 @@
 
 		// Apply the new choice effects (applyChoice handles reverting previous effects automatically)
 		applyFeatureEffects(feature, normalizedChoice, scopeId, index, parentFeatureName, parentIndex);
+
+		console.log('handleSelectOption()', feature);
+		if (tabClearingFeatures[feature.name]) {
+			for (let i = 0; i < tabClearingFeatures[feature.name].length; i++) {
+				console.log('revertChanges being called on tabClearingFeature: ',tabClearingFeatures[feature.name][i]);
+				revertChanges(get(character_store), tabClearingFeatures[feature.name][i]);
+			}
+		}
 
 		// Force conflict detection to trigger immediately for reactive UI updates
 		// The derived store should handle this automatically, but this ensures immediate updates

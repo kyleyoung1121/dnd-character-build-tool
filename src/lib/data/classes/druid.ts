@@ -120,7 +120,7 @@ const druidCirclePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'druid.circle_of_the_land_arctic',
-						effects: [{ target: 'spells', action: 'add', value: 'User chooses one druid cantrip' }]
+						effects: []
 					},
 					{
 						name: 'Circle Spells',
@@ -162,7 +162,7 @@ const druidCirclePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'druid.circle_of_the_land_coast',
-						effects: [{ target: 'spells', action: 'add', value: 'User chooses one druid cantrip' }]
+						effects: []
 					},
 					{
 						name: 'Circle Spells',
@@ -174,7 +174,7 @@ const druidCirclePrompt: FeaturePrompt = {
 						},
 						source: 'druid.circle_of_the_land_coast',
 						importance: 'invisible',
-						effects: [{ target: 'features', action: 'add', value: 'Circle Spells' }]
+						effects: []
 					},
 					{
 						name: 'Natural Recovery',
@@ -186,7 +186,7 @@ const druidCirclePrompt: FeaturePrompt = {
 						},
 						source: 'druid.circle_of_the_land_coast',
 						importance: 'minor',
-						effects: [{ target: 'features', action: 'add', value: 'Natural Recovery' }]
+						effects: []
 					}
 				]
 			},
@@ -204,7 +204,7 @@ const druidCirclePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'druid.circle_of_the_land_desert',
-						effects: [{ target: 'spells', action: 'add', value: 'User chooses one druid cantrip' }]
+						effects: []
 					},
 					{
 						name: 'Circle Spells',
@@ -246,7 +246,7 @@ const druidCirclePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'druid.circle_of_the_land_forest',
-						effects: [{ target: 'spells', action: 'add', value: 'User chooses one druid cantrip' }]
+						effects: []
 					},
 					{
 						name: 'Circle Spells',
@@ -288,7 +288,7 @@ const druidCirclePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'druid.circle_of_the_land_grassland',
-						effects: [{ target: 'spells', action: 'add', value: 'User chooses one druid cantrip' }]
+						effects: []
 					},
 					{
 						name: 'Circle Spells',
@@ -330,7 +330,7 @@ const druidCirclePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'druid.circle_of_the_land_mountain',
-						effects: [{ target: 'spells', action: 'add', value: 'User chooses one druid cantrip' }]
+						effects: []
 					},
 					{
 						name: 'Circle Spells',
@@ -372,7 +372,7 @@ const druidCirclePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'druid.circle_of_the_land_swamp',
-						effects: [{ target: 'spells', action: 'add', value: 'User chooses one druid cantrip' }]
+						effects: []
 					},
 					{
 						name: 'Circle Spells',
@@ -414,7 +414,7 @@ const druidCirclePrompt: FeaturePrompt = {
 							]
 						},
 						source: 'druid.circle_of_the_land_underdark',
-						effects: [{ target: 'spells', action: 'add', value: 'User chooses one druid cantrip' }]
+						effects: []
 					},
 					{
 						name: 'Circle Spells',

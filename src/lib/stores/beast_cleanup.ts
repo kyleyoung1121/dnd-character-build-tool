@@ -1,6 +1,8 @@
 import { character_store } from './character_store';
-import { applyChoice } from './character_store_helpers';
+import { applyChoice, revertChanges, applyListAddition } from './character_store_helpers';
 import { addNotification } from './notification_store';
+import { get } from 'svelte/store';
+	
 
 /**
  * Beast cleanup service that monitors character changes and removes invalid beast selections
@@ -88,6 +90,7 @@ export function initializeBeastCleanup() {
 
 		// Notify user if beasts were removed
 		if (removedBeasts.length > 0) {
+			revertChanges(get(character_store), 'tab_check:beasts');
 			const removedBeastNames = removedBeasts.join(', ');
 			const changeType = classChanged ? 'class' : 
 						   subclassChanged ? 'subclass' : 

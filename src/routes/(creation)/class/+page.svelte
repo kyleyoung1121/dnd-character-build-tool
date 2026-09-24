@@ -222,6 +222,7 @@
 		}
 
 		revertChanges(get(character_store), 'tab_check:spells');
+		revertChanges(get(character_store), 'tab_check:beasts');
 	}
 
 	function calculateMaxHP(hitDie: string | undefined) {

@@ -26,6 +26,7 @@ export function initializeSpellCleanup() {
 
 	// Subscribe to character store changes
 	character_store.subscribe((character) => {
+		
 		const currentClass = character.class || '';
 		const currentSubclass = character.subclass || '';
 		const currentRace = character.race || '';
@@ -105,7 +106,7 @@ export function initializeSpellCleanup() {
 				'info',
 				'Patron Changed',
 				`Changing your Otherworldly Patron removed ${removedSpells.patronSpells.length} expanded spell(s) that are no longer available: ${patronSpellNames}. Please visit the Spells tab to select replacement spells.`,
-				10000
+				5000
 			);
 		}
 		
@@ -116,7 +117,7 @@ export function initializeSpellCleanup() {
 				'info',
 				'Pact Boon Changed',
 				`Changing your Pact Boon removed ${removedSpells.pactBoonSpells.length} spell(s) from your previous pact: ${pactBoonSpellNames}. Please visit the Spells tab to select replacement spells if needed.`,
-				10000
+				5000
 			);
 		}
 

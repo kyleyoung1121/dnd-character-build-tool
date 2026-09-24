@@ -200,6 +200,8 @@
 
 			bumpVersion();
 		}
+
+		revertChanges(get(character_store), 'tab_check:spells');
 	}
 
 	// Helper function needed by onMount

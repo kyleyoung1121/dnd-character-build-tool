@@ -2313,7 +2313,8 @@ export const spellAccess: SpellAccess[] = [
 		chooseable: true,
 		chooseFrom: ['Ranger'],
 		chooseCantripCount: 0, // Rangers get no cantrips
-		chooseSpellCount: 3 // 3 spells known at level 3
+		chooseSpellCount: 3, // 3 spells known at level 3
+		maxSpellLevel: 1 // 3rd level Rangers only have access to 1st level spells
 	},
 
 	// Subclass-based spell access for non-casters

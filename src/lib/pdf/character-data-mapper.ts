@@ -1027,7 +1027,7 @@ export function formatSpells(character: Character): string {
 	}
 	
 	// Extract spell names (handle both string and object format)
-	const spellNames = character.spells.map((spell: any) => {
+	let spellNames = character.spells.map((spell: any) => {
 		if (typeof spell === 'string') {
 			return spell;
 		} else if (spell && typeof spell === 'object' && 'name' in spell) {
@@ -1038,6 +1038,8 @@ export function formatSpells(character: Character): string {
 	
 	spellNames.push.apply(spellNames, autoSpells)
 	spellNames.sort()
+	// Remove duplicate spells (e.g. shadow monk + forest gnome both have minor illusion)
+	spellNames = spellNames.filter((item, index) => spellNames.indexOf(item) === index);
 
 	if (spellNames.length === 0) {
 		return '';

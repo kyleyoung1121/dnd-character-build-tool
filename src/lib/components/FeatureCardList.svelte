@@ -160,10 +160,8 @@
 		// Apply the new choice effects (applyChoice handles reverting previous effects automatically)
 		applyFeatureEffects(feature, normalizedChoice, scopeId, index, parentFeatureName, parentIndex);
 
-		console.log('handleSelectOption()', feature);
 		if (tabClearingFeatures[feature.name]) {
 			for (let i = 0; i < tabClearingFeatures[feature.name].length; i++) {
-				console.log('revertChanges being called on tabClearingFeature: ',tabClearingFeatures[feature.name][i]);
 				revertChanges(get(character_store), tabClearingFeatures[feature.name][i]);
 			}
 		}

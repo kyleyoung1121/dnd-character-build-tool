@@ -201,7 +201,38 @@ async function fillFrontPage(
 		if (index < PAGE_1_FIELDS.attacks.length) {
 			attacks_names.push(attack.name);
 			attacks_to_hit.push('d20 ' + attack.bonus.substring(0,1) + ' ' + attack.bonus.substring(1));
-			attacks_damage.push(attack.damage);
+			let attackDamage = attack.damage;
+
+			// Check for Archery fighting style
+			if (data.features.includes('Archery Fighting Style')) {
+				// This only applies to weapons that are ranged
+				if (attack.properties.some((property) => property.toLowerCase().includes('range'))) {
+					try {
+						// Split '1d8+2 slashing' into the formula and the damage type
+						const damageSplit = attackDamage.split(' ');
+						const formula = damageSplit[0];
+						const damageType = damageSplit[1];
+
+						// Split '1d8+2' into the dice and the mod
+						const formulaSplit = formula.split('+');
+						const damageDice = formulaSplit[0];
+						
+						// We can only pull the mod out if there was a mod to begin with! If dex = +0, the mod is omitted
+						let damageMod = '0'; // default to +0
+						if (formulaSplit.length >= 2) {
+							// But if we can pull out the mod, use the true mod
+							damageMod = formulaSplit[1];
+						}
+
+						// Convert the string mod into a number, add 2 from archery fighting style, and back into a string
+						damageMod = String(Number(damageMod) + 2);
+						// Reassemble the damage text
+						attackDamage = damageDice + '+' + damageMod + ' ' + damageType;
+					} catch {}
+				}
+			}
+
+			attacks_damage.push(attackDamage);
 			
 			let build_attacks_notes = "";
 			let properties_blacklist = ["Ammunition", "Heavy", "Loading"];

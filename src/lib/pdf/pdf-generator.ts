@@ -83,8 +83,6 @@ async function fillFrontPage(
 	
 	// - - - - -
 	// Info Box
-
-	// TODO: Rename these fields to match with the data we are actually placing here
 	fillFormField(form, 'class_info', data.class, 12);
 	fillFormField(form, 'subclass_info', data.subclass, 12);
 	fillFormField(form, 'species_info', data.species, 12);
@@ -782,6 +780,10 @@ async function fillFrontPage(
 		core_bonus_actions.push("Tavern Brawler Grapple");
 	}
 
+	// Check for if the user has weapons that can be dual wielded
+	if (hasDualWieldWeapons(data)) {
+		core_bonus_actions.push("Dual Wield Attack");
+	}
 
 	let core_actions_string = core_actions.join(",\n");
 	let core_bonus_actions_string = core_bonus_actions.join(",\n");
@@ -890,6 +892,26 @@ function processLayeredColumns(input: string, charactersPerRow: number) {
 	};
 }
 
+function hasDualWieldWeapons(data: CharacterSheetData): boolean {
+	// Check for if the user has weapons that can be dual wielded
+	const hasDualWielder = data.characterReference.feats?.includes("Dual Wielder")
+	let countLightWeapons = 0;
+	for (let i = 0; i < data.attacks.length; i++) {
+		if (data.attacks[i].properties.includes('Light')) {
+			countLightWeapons += 1;
+		}
+	}
+	if (countLightWeapons >= 2 || (hasDualWielder && countLightWeapons >= 1 && data.attacks.length >= 2)) {
+		return true;
+	}
+	return false;
+}
+
+function hasAdvancedDualWield(data: CharacterSheetData) {
+	const hasDualWieldFeat = data.features.includes('Dual Wielder');
+	const hasTwoWeaponFighting = data.features.includes('Two-Weapon Fighting Style');
+	return hasDualWieldFeat || hasTwoWeaponFighting;
+}
 
 async function fillFeaturesPage(
 	page: any,
@@ -903,7 +925,17 @@ async function fillFeaturesPage(
 	const charactersPerRow = 56;
 	const maxLinesPerColumn = 65;
 
-	let featureContent = formatFeaturesForPDF(data.features, data.characterReference, 'all');
+	let featuresCopy = [...data.features]
+	
+	if (hasDualWieldWeapons(data)) {
+		if (hasAdvancedDualWield(data)) {
+			featuresCopy.push('Dual Wield Attack (Basic Rules)');
+		} else {
+			featuresCopy.push('Dual Wield Attack');
+		}
+	}
+
+	let featureContent = formatFeaturesForPDF(featuresCopy, data.characterReference, 'all');
 
 	let columnOneContent = '';
 	let columnOneBoldContent = '';

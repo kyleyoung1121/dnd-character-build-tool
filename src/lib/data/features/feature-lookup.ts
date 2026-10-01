@@ -378,6 +378,59 @@ function findFeatureInBackground(backgroundName: string, featureName: string): F
 }
 
 /**
+ * Search for a feature from a list of static definitions
+ */
+function findStaticFeature(featureName: string): FeaturePrompt | null {
+	const STATIC_FEATURE_LIST: FeaturePrompt[] = [
+		{
+			name: 'Dual Wield Attack',
+			id: 'dual_wield_attack',
+			description: {
+				blocks: [
+					{
+						type: 'text',
+						text:
+							`When you Attack with a one-handed light melee weapon, you can use a bonus action to attack with a different one-handed light melee weapon. You don't add your ability modifier to the damage of the bonus attack, unless that modifier is negative.`
+					},
+				]
+			},
+			source: 'dual_wieldable_equipment',
+			effects: [
+				{
+					target: 'features',
+					action: 'add',
+					value: 'Dual Wield Attack'
+				}
+			]
+		},
+		{
+			name: 'Dual Wield Attack (Basic Rules)',
+			id: 'dual_wield_attack',
+			description: {
+				blocks: [
+					{
+						type: 'text',
+						text:
+							`When you Attack with a one-handed light melee weapon, you can use a bonus action to attack with a different one-handed light melee weapon. You don't add your ability modifier to the damage of the bonus attack, unless that modifier is negative.`
+					},
+				]
+			},
+			source: 'dual_wieldable_equipment',
+			effects: [
+				{
+					target: 'features',
+					action: 'add',
+					value: 'Dual Wield Attack'
+				}
+			]
+		},
+	]
+
+	return findFeatureInList(featureName, STATIC_FEATURE_LIST);
+}
+
+
+/**
  * Clean HTML tags and special characters from description for PDF display
  * The PDF library (WinAnsi encoding) cannot handle certain special characters
  * Convert supported HTML tags to PDF markers for styling
@@ -481,6 +534,12 @@ export function lookupFeature(
 		}
 	}
 	
+	// If all else fails, check to see if this might be a static feature (not from anything, its just defined here)
+	const feature = findStaticFeature(featureName);
+	if (feature) {
+		return feature;
+	}
+
 	return null;
 }
 

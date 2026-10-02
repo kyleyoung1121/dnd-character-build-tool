@@ -353,9 +353,13 @@ async function fillFrontPage(
 	let core_actions: string[] = []
 	let core_bonus_actions: string[] = []
 	let core_other: string[] = []
+	
+	// Check for any automatic spells
+	let autoSpells: string[] = []
+
+	let actionBoxHasSpell: boolean = false;
 
 	switch(data.class) {
-		// Barbarian mostly does Attack & Rage, but has some subclass adds
 		case 'Barbarian':
 			core_actions.push('Attack');
 			core_actions.push('Reckless Attack');
@@ -370,22 +374,16 @@ async function fillFrontPage(
 			}
 			break;
 
-		// Bard has a BA spell and a subclass feature
 		case 'Bard':
 			core_actions.push('Spellcasting');
 			core_actions.push('Attack');
 			core_bonus_actions.push('Bardic Inspiration');
-
-			if (data.spells.filter(spell => {return spell.name == 'Healing Word'}).length) {
-				core_bonus_actions.push('Healing Word');
-			}
 
 			if (data.features.includes('Cutting Words')) {
 				core_other.push('Cutting Words');
 			}
 			break;
 			
-		// Cleric has a variety of subclass adds, and BA spells.
 		case 'Cleric':
 			core_actions.push('Attack');
 			core_actions.push('Spellcasting');
@@ -408,31 +406,17 @@ async function fillFrontPage(
 			}
 
 			if (data.subclass?.includes('Life')) {
-				core_bonus_actions.push('Spiritual Weapon');
+				autoSpells.push('Spiritual Weapon');
 			}
 
 			if (data.subclass?.includes('War')) {
-				core_bonus_actions.push('Divine Favor');
-				core_bonus_actions.push('Shield of Faith');
-				core_bonus_actions.push('Magic Weapon');
-				core_bonus_actions.push('Spiritual Weapon');
+				autoSpells.push('Divine Favor');
+				autoSpells.push('Shield of Faith');
+				autoSpells.push('Magic Weapon');
+				autoSpells.push('Spiritual Weapon');
 			}
-
-			// Add any of these bonus action spells that the player has but havent been added yet
-			let clericBASpells = ['Healing Word', 'Sanctuary', 'Divine Favor', 'Shield of Faith', 'Magic Weapon', 'Spiritual Weapon']
-
-			for (let i = 0; i < clericBASpells.length; i++) {
-				if (data.spells.filter(spell => {return spell.name == clericBASpells[i]}).length) {
-					// Avoid duplicate entries, dont add spell if it already exists
-					if (!core_bonus_actions.includes(clericBASpells[i])) {
-						core_bonus_actions.push(clericBASpells[i]);
-					}	
-				}
-			}
-
 			break;
 
-		// Druid has several BA spells & their wildshape that might be an action / bonus action
 		case 'Druid':
 			let isCircleOfMoon = data.subclass?.includes('Moon')
 			core_actions.push('Spellcasting');
@@ -445,18 +429,7 @@ async function fillFrontPage(
 			}
 
 			if (data.subclass?.includes('Coast')) {
-				core_bonus_actions.push('Misty Step');
-			}
-			
-			// Add any of these bonus action spells that the player has
-			let druidBASpells = ['Shillelagh', 'Healing Word', 'Misty Step', 'Flame Blade', 'Expeditious Retreat']
-
-			for (let i = 0; i < druidBASpells.length; i++) {
-				if (data.spells.filter(spell => {return spell.name == druidBASpells[i]}).length) {
-					if (!core_bonus_actions.includes(druidBASpells[i])) {
-						core_bonus_actions.push(druidBASpells[i]);
-					}
-				}
+				autoSpells.push('Misty Step*');
 			}
 			break;
 
@@ -537,26 +510,15 @@ async function fillFrontPage(
 			}
 
 			if (data.subclass?.includes('Devotion')) {
-				core_bonus_actions.push('Sanctuary');
+				autoSpells.push('Sanctuary');
 			}
 
 			if (data.subclass?.includes('Ancients')) {
-				core_bonus_actions.push('Ensnaring Strike');
+				autoSpells.push('Ensnaring Strike');
 			}
 
 			if (data.subclass?.includes('Vengeance')) {
-				core_bonus_actions.push("Hunter's Mark");
-			}
-
-			// Add any of these bonus action spells that the player has
-			let paladinBASpells = ['Shield of Faith', "Hunter's Mark", 'Compelled Duel', 'Divine Favor', 'Searing Smite', 'Thunderous Smite', 'Wrathful Smite'];
-
-			for (let i = 0; i < paladinBASpells.length; i++) {
-				if (data.spells.filter(spell => {return spell.name == paladinBASpells[i]}).length) {
-					if (!core_bonus_actions.includes(paladinBASpells[i])) {
-						core_bonus_actions.push(paladinBASpells[i]);
-					}
-				}
+				autoSpells.push("Hunter's Mark");
 			}
 			break;
 
@@ -567,15 +529,6 @@ async function fillFrontPage(
 				core_actions.push('Beast Action');
 			}
 			
-			// Add any of these bonus action spells that the player has
-			let rangerBASpells = ['Hail of Thorns', "Hunter's Mark"];
-
-			for (let i = 0; i < rangerBASpells.length; i++) {
-				if (data.spells.filter(spell => {return spell.name == rangerBASpells[i]}).length) {
-					core_bonus_actions.push(rangerBASpells[i]);
-				}
-			}
-
 			// Add any of these feature actions that the player has
 			let rangerFeatureOther = ['Giant Killer', 'Horde Breaker', 'Colossus Slayer'];
 			for (let i = 0; i < rangerFeatureOther.length; i++) {
@@ -596,21 +549,6 @@ async function fillFrontPage(
 			}
 			if (data.subclass?.includes('Arcane Trickster')) {
 				core_actions.push('Spellcasting');
-			}
-
-			// Add any of these spells that the player has
-			let rogueBASpells = ['Expeditious Retreat'];
-			let rogueOtherSpells = ['Feather Fall', 'Shield'];
-			
-			for (let i = 0; i < rogueBASpells.length; i++) {
-				if (data.spells.filter(spell => {return spell.name == rogueBASpells[i]}).length) {
-					core_bonus_actions.push(rogueBASpells[i]);
-				}
-			}
-			for (let i = 0; i < rogueOtherSpells.length; i++) {
-				if (data.spells.filter(spell => {return spell.name == rogueOtherSpells[i]}).length) {
-					core_other.push(rogueOtherSpells[i]);
-				}
 			}
 			break;
 		
@@ -636,22 +574,6 @@ async function fillFrontPage(
 			if (data.features.includes('Tides of Chaos')) {
 				core_other.push('Tides of Chaos');
 			}
-			
-			// Add any of these spells that the player has
-			let sorcererBASpells = ['Expeditious Retreat', 'Misty Step'];
-			let sorcererOtherSpells = ['Feather Fall', 'Shield'];
-			
-			for (let i = 0; i < sorcererBASpells.length; i++) {
-				if (data.spells.filter(spell => {return spell.name == sorcererBASpells[i]}).length) {
-					core_bonus_actions.push(sorcererBASpells[i]);
-				}
-			}
-			for (let i = 0; i < sorcererOtherSpells.length; i++) {
-				if (data.spells.filter(spell => {return spell.name == sorcererOtherSpells[i]}).length) {
-					core_other.push(sorcererOtherSpells[i]);
-				}
-			}
-
 			break;
 
 		case 'Warlock':
@@ -673,22 +595,7 @@ async function fillFrontPage(
 			let warlockInvocationActions = ['Armor of Shadows', 'Beast Speech', 'Detect Magic', 'Fiendish Vigor', 'Gaze of Two Minds', 'Disguise Self', 'Misty Visions', 'Thief of Five Fates']
 			for (let i = 0; i < warlockInvocationActions.length; i++) {
 				if (data.features.filter(feature => {return feature == warlockInvocationActions[i]}).length) {
-					core_actions.push(warlockInvocationActions[i]);
-				}
-			}
-
-			// Add any of these spells that the player has
-			let warlockBASpells = ['Shillelagh', 'Expeditious Retreat', 'Hex', 'Misty Step'];
-			let warlockOtherSpells = ['Hellish Rebuke'];
-			
-			for (let i = 0; i < warlockBASpells.length; i++) {
-				if (data.spells.filter(spell => {return spell.name == warlockBASpells[i]}).length) {
-					core_bonus_actions.push(warlockBASpells[i]);
-				}
-			}
-			for (let i = 0; i < warlockOtherSpells.length; i++) {
-				if (data.spells.filter(spell => {return spell.name == warlockOtherSpells[i]}).length) {
-					core_other.push(warlockOtherSpells[i]);
+					core_actions.push(warlockInvocationActions[i] + '*');
 				}
 			}
 			break;
@@ -708,38 +615,21 @@ async function fillFrontPage(
 			if (data.features.includes('Portent')) {
 				core_other.push('Portent');
 			}
-
-			// Add any of these spells that the player has
-			let wizardBASpells = ['Expeditious Retreat', 'Misty Step'];
-			let wizardOtherSpells = ['Feather Fall', 'Shield'];
-			
-			for (let i = 0; i < wizardBASpells.length; i++) {
-				if (data.spells.filter(spell => {return spell.name == wizardBASpells[i]}).length) {
-					core_bonus_actions.push(wizardBASpells[i]);
-				}
-			}
-			for (let i = 0; i < wizardOtherSpells.length; i++) {
-				if (data.spells.filter(spell => {return spell.name == wizardOtherSpells[i]}).length) {
-					core_other.push(wizardOtherSpells[i]);
-				}
-			}
 			break;
 	}
 
 	switch(data.species.trim()) {
 		case 'Dragonborn':
-			core_actions.push('Breath Weapon')
+			core_actions.push('Breath Weapon');
 			break;
 		case 'Dark Elf (Elf)':
-			core_actions.push('Drow Magic')
+			core_actions.push('Drow Magic');
 			break;
 		case 'Rock Gnome (Gnome)':
-			core_other.push('Tinker')
+			core_other.push('Tinker');
 			break;
 		case 'Tiefling':
-			if (!core_other.includes('Hellish Rebuke')) {
-				core_other.push('Hellish Rebuke')
-			}
+			autoSpells.push('Hellish Rebuke');
 			break;
 	}
 
@@ -785,9 +675,79 @@ async function fillFrontPage(
 		core_bonus_actions.push("Dual Wield Attack");
 	}
 
+	// Check for spells (bonus action & reaction casting only)
+	const allBonusActionSpells = [
+		'Compelled Duel', 
+		'Divine Favor', 
+		'Expeditious Retreat', 
+		'Flame Blade',
+		'Hail of Thorns', 
+		'Healing Word',
+		'Hex',
+		"Hunter's Mark",
+		'Magic Weapon',
+		'Misty Step', 
+		'Sanctuary',
+		'Searing Smite',
+		'Shield of Faith',
+		'Shillelagh', 
+		'Spiritual Weapon',
+		'Thunderous Smite', 
+		'Wrathful Smite', 
+	];
+
+	const allReactionSpells = [
+		'Feather Fall',
+		'Hellish Rebuke',
+		'Shield',
+	];
+
+	let selectedBonusActionSpells = [];
+	let selectedReactionSpells = [];
+
+	for (let i = 0; i < allBonusActionSpells.length; i++) {
+		if (data.spells.filter(spell => {return spell.name == allBonusActionSpells[i]}).length) {
+			selectedBonusActionSpells.push(allBonusActionSpells[i] + '*');
+		}
+	}
+	for (let i = 0; i < allReactionSpells.length; i++) {
+		if (data.spells.filter(spell => {return spell.name == allReactionSpells[i]}).length) {
+			selectedReactionSpells.push(allReactionSpells[i] + '*');
+		}
+	}
+
+	for (let i = 0; i < autoSpells.length; i++) {
+		// Add any auto spells that are bonus actions
+		if (allBonusActionSpells.includes(autoSpells[i])) {
+			selectedBonusActionSpells.push(autoSpells[i] + '*');
+		
+		// Add any auto spells that are reactions
+		} else if (allReactionSpells.includes(autoSpells[i])) {
+			selectedReactionSpells.push(autoSpells[i] + '*');
+		}
+	}
+
+	selectedBonusActionSpells.sort();
+	selectedReactionSpells.sort();
+
+	core_bonus_actions.push(...selectedBonusActionSpells);
+	core_other.push(...selectedReactionSpells);
+
 	let core_actions_string = core_actions.join(",\n");
 	let core_bonus_actions_string = core_bonus_actions.join(",\n");
 	let core_reactions_string = core_other.join(",\n");
+
+	if (selectedBonusActionSpells.length > 0 || selectedReactionSpells.length > 0 || autoSpells.length > 0) {
+
+		const bonus_actions_length = core_bonus_actions.length;
+		const bonus_action_blanks = 11 - bonus_actions_length;
+		if (bonus_action_blanks > 0) {
+			for (let i = 0; i < bonus_action_blanks; i++) {
+				core_bonus_actions_string += '\n';
+			}
+			core_bonus_actions_string += '\n*(See Spells Page)';	
+		}
+	}
 
 	fillFormField(form, 'core_actions', core_actions_string, 10.5);
 	fillFormField(form, 'core_bonus_actions', core_bonus_actions_string, 10.5);

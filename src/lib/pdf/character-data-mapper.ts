@@ -7,7 +7,7 @@
 
 import type { Character } from '$lib/stores/character_store';
 import { hasSpellAccess } from '$lib/stores/character_store';
-import { getWeaponData } from '$lib/data/equipment/weapon-data';
+import { getWeaponData, type WeaponProperties } from '$lib/data/equipment/weapon-data';
 import { formatFeatureForPDF } from '$lib/data/features/feature-data';
 import { prepareFeaturesWithOverflow } from '$lib/data/features/feature-overflow';
 import { barbarian } from '$lib/data/classes/barbarian';
@@ -518,26 +518,7 @@ function calculateAttacks(
 		return [];
 	}
 	
-	const proficiencyBonus = getProficiencyBonus();
-	const attacks: Array<{ name: string; bonus: string; damage: string; properties: string[] }> = [];
-
-	// Assume proficiency with all weapons in attacks array
-	// Players can only select weapons they're proficient with through the equipment tab
-	
-	for (const weaponName of allAttacks) {
-		const weaponData = getWeaponData(weaponName);
-		
-		if (!weaponData) {
-			// If weapon not found in database, still add proficiency bonus
-			attacks.push({
-				name: weaponName,
-				bonus: formatModifier(proficiencyBonus), // Still add prof bonus
-				damage: '',
-				properties: [],
-			});
-			continue;
-		}
-		
+	function buildWeaponAttack(weaponData: WeaponProperties) {
 		// Determine which ability modifier to use
 		let abilityMod: number;
 		if (character.class == 'Monk' && (dexMod >= strMod)) {
@@ -602,14 +583,67 @@ function calculateAttacks(
 				}
 			}
 		}
-		
 
-		attacks.push({
+		return {
 			name: weaponData.name,
 			bonus: formatModifier(attackBonus),
 			damage: damageWithModifier.trim(),
 			properties: weaponProperties,
-		});
+		}
+	}
+
+	const proficiencyBonus = getProficiencyBonus();
+	const attacks: Array<{ name: string; bonus: string; damage: string; properties: string[] }> = [];
+
+	// Assume proficiency with all weapons in attacks array
+	// Players can only select weapons they're proficient with through the equipment tab
+	
+	for (const weaponName of allAttacks) {
+
+		// If weapon is the Pact Blade from Warlock, lets add a few possible weapons
+		if (weaponName == 'Pact Weapon') {
+			const greatAxeData = getWeaponData('Greataxe');
+			const battleAxeData = getWeaponData('Battleaxe');
+			const rapierData = getWeaponData('Rapier');
+
+			// Add a STR based option (Greataxe if they can use Heavy weapons)
+			if (greatAxeData && character.strength && character.strength >= 13) {
+				let builtAttack = buildWeaponAttack(greatAxeData)
+				builtAttack.name = builtAttack.name + ' (Pact)';
+				attacks.push(builtAttack);
+			} 
+			// (Battleaxe if they don't have enough STR for Greataxe)
+			else if (battleAxeData)  {
+				let builtAttack = buildWeaponAttack(battleAxeData)
+				builtAttack.name = builtAttack.name + ' (Pact)';
+				attacks.push(builtAttack);
+			}
+			
+			// Add rapier regardless of stats
+			if (rapierData) {
+				let builtAttack = buildWeaponAttack(rapierData)
+				builtAttack.name = builtAttack.name + ' (Pact)';
+				attacks.push(builtAttack);
+			}
+
+			continue;
+		}
+		
+		const weaponData = getWeaponData(weaponName);
+		
+		// If weapon not found in database, still add proficiency bonus
+		if (!weaponData) {
+			attacks.push({
+				name: weaponName,
+				bonus: formatModifier(proficiencyBonus), // Still add prof bonus
+				damage: '',
+				properties: [],
+			});
+			continue;
+		}
+
+		// If weapon is in the database, pull the relevant data and add it to the attacks
+		attacks.push(buildWeaponAttack(weaponData));
 	}
 	
 	// Monk automatically gets the upgraded Unarmed Strike attack

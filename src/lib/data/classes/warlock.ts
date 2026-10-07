@@ -567,7 +567,12 @@ const pactBoonPrompt: FeaturePrompt = {
 								target: 'features',
 								action: 'add',
 								value: 'Pact of the Blade'
-							}
+							},
+							{
+								target: 'attacks',
+								action: 'add',
+								value: "Pact Weapon"
+							},
 						]
 					},
 					{

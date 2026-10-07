@@ -424,6 +424,64 @@ function findStaticFeature(featureName: string): FeaturePrompt | null {
 				}
 			]
 		},
+		{
+			name: `Expertise: Thieves' Tools`,
+			id: 'expertise_thieves_tools',
+			description: {
+				blocks: [
+					{
+						type: 'computed-replacement',
+
+						whenAvailable: [
+							{
+								source: 'derived',
+								formula: 'DEX_MOD + 4'
+							}
+						],
+
+						fallbackText:
+							`You are an expert in using your thieves' tools. When you utilize these tools, you roll a d20 + your dexterity modifer + 4.`,
+
+						replacementTemplate:
+							`You are an expert in using your thieves' tools. When you utilize these tools, you roll a d20 + {value}.`,
+
+						singularTemplate:
+							`You are an expert in using your thieves' tools. When you utilize these tools, you roll a d20 + 1.`,
+					}
+				]
+			},
+			source: 'expertise_thieves_tools',
+			effects: []
+		},
+		{
+			name: `Thieves' Tools`,
+			id: 'thieves_tools',
+			description: {
+				blocks: [
+					{
+						type: 'computed-replacement',
+
+						whenAvailable: [
+							{
+								source: 'derived',
+								formula: 'DEX_MOD + 2'
+							}
+						],
+
+						fallbackText:
+							`When you use your thieves' tools, you roll a d20 + your dexterity modifer + 2.`,
+
+						replacementTemplate:
+							`When you use your thieves' tools, you roll a d20 + {value}.`,
+
+						singularTemplate:
+							`When you use your thieves' tools, you roll a d20 + 1.`,
+					}
+				]
+			},
+			source: 'thieves_tools',
+			effects: []
+		},
 	]
 
 	return findFeatureInList(featureName, STATIC_FEATURE_LIST);

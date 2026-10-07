@@ -867,6 +867,13 @@ function hasDualWieldWeapons(data: CharacterSheetData): boolean {
 	return false;
 }
 
+function hasBasicThievesTools(data: CharacterSheetData): boolean {
+	if (data.class == 'Rogue' && !data.features.includes(`Expertise: Thieves' Tools`)) {
+		return true;
+	}
+	return false;
+}
+
 function hasAdvancedDualWield(data: CharacterSheetData) {
 	const hasDualWieldFeat = data.features.includes('Dual Wielder');
 	const hasTwoWeaponFighting = data.features.includes('Two-Weapon Fighting Style');
@@ -893,6 +900,10 @@ async function fillFeaturesPage(
 		} else {
 			featuresCopy.push('Dual Wield Attack');
 		}
+	}
+
+	if (hasBasicThievesTools(data)) {
+		featuresCopy.push(`Thieves' Tools`);
 	}
 
 	let featureContent = formatFeaturesForPDF(featuresCopy, data.characterReference, 'all');

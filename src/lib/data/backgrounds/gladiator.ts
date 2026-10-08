@@ -68,6 +68,11 @@ export const gladiator: BackgroundData = {
 					target: 'proficiencies',
 					action: 'add',
 					value: ['{userChoice}']
+				},
+				{
+					target: 'attacks',
+					action: 'add',
+					value: ['{userChoice}']
 				}
 			]
 		},

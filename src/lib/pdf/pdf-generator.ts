@@ -198,39 +198,37 @@ async function fillFrontPage(
 	data.attacks.forEach((attack, index) => {
 		if (index < PAGE_1_FIELDS.attacks.length) {
 			attacks_names.push(attack.name);
-			attacks_to_hit.push('d20 ' + attack.bonus.substring(0,1) + ' ' + attack.bonus.substring(1));
-			let attackDamage = attack.damage;
+			let attackBonusString = attack.bonus;
 
-			// Check for Archery fighting style
 			if (data.features.includes('Archery Fighting Style')) {
 				// This only applies to weapons that are ranged
 				if (attack.properties.some((property) => property.toLowerCase().includes('range'))) {
 					try {
-						// Split '1d8+2 slashing' into the formula and the damage type
-						const damageSplit = attackDamage.split(' ');
-						const formula = damageSplit[0];
-						const damageType = damageSplit[1];
+						const bonusSignString = attack.bonus.substring(0,1)
+						const bonusValueString = attack.bonus.substring(1); 
 
-						// Split '1d8+2' into the dice and the mod
-						const formulaSplit = formula.split('+');
-						const damageDice = formulaSplit[0];
-						
-						// We can only pull the mod out if there was a mod to begin with! If dex = +0, the mod is omitted
-						let damageMod = '0'; // default to +0
-						if (formulaSplit.length >= 2) {
-							// But if we can pull out the mod, use the true mod
-							damageMod = formulaSplit[1];
+						// Attack bonus should never be negative, but still account for it
+						let attackBonus = Number(bonusValueString);
+						if (bonusSignString == '-') {
+							attackBonus *= -1;
 						}
 
-						// Convert the string mod into a number, add 2 from archery fighting style, and back into a string
-						damageMod = String(Number(damageMod) + 2);
-						// Reassemble the damage text
-						attackDamage = damageDice + '+' + damageMod + ' ' + damageType;
+						// Increase by two for Archery Fighting Style
+						attackBonus += 2;
+
+						if (attackBonus >= 0) {
+							attackBonusString = '+' + String(attackBonus);
+						} else {
+							attackBonusString = '-' + String(attackBonus*-1);
+						}
+
 					} catch {}
 				}
 			}
 
-			attacks_damage.push(attackDamage);
+			attacks_to_hit.push('d20 ' + attackBonusString.substring(0,1) + ' ' + attackBonusString.substring(1));
+
+			attacks_damage.push(attack.damage);
 			
 			let build_attacks_notes = "";
 			let properties_blacklist = ["Ammunition", "Heavy", "Loading"];
